@@ -17,6 +17,7 @@ clangStdenv.mkDerivation {
     cmake
     pkg-config
     rust
+    clippy
 
     llvmPackages_10.llvm
     lld_10

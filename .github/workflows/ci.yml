@@ -19,7 +19,7 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: false
           DEFAULT_BRANCH: main
-          VALIDATE_RUST_CLIPPY: true
+          VALIDATE_RUST_2018: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Submodules
@@ -27,4 +27,5 @@ jobs:
       - uses: cachix/install-nix-action@v13
         with:
           nix_path: nixpkgs=channel:nixos-unstable
+      - run: nix-shell --run "cargo clippy"
       - run: nix-shell --run "cargo test"
