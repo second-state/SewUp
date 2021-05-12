@@ -13,6 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          submodules: recursive
 
       - name: Super-Linter
         uses: github/super-linter@v3
@@ -22,8 +24,6 @@ jobs:
           VALIDATE_RUST_2018: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Submodules
-        run: git submodule update --init --recursive
       - uses: cachix/install-nix-action@v13
         with:
           nix_path: nixpkgs=channel:nixos-unstable
