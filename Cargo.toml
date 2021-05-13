@@ -6,6 +6,18 @@ edition = "2018"
 build="build.rs"
 
 [dependencies]
+thiserror = "1.0.24"
+anyhow = "1.0.40"
+serde = "1.0"
+serde_derive = "1.0"
+toml = "0.5.8"
+ewasm_api = { version = "0.11", features = ["std", "qimalloc"] }
+
+ethereum-types = { optional = true, features = ["serialize"], git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
 
 [build-dependencies]
 cmake = "0.1.42"
+
+[features]
+default = []
+token = ["ethereum-types"]
