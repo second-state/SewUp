@@ -3,6 +3,8 @@ use crate::errors::ContractError as Error;
 use ethereum_types::H160;
 use toml;
 
+use tempfile::NamedTempFile;
+
 #[test]
 fn test_config_serde() {
     let c1 = ERC20ContractHandler {
@@ -25,13 +27,14 @@ fn test_config_serde() {
 }
 
 #[test]
-fn test_handle_error_config() {
-    let mut c1 = ERC20ContractHandler {
+fn test_handle_error_missing_call_data_and_contract_address() {
+    let config_file = NamedTempFile::new().unwrap();
+    let mut c = ERC20ContractHandler {
         address: None,
         call_data: None,
-        config_file_path: Some("/path/to/config".into()),
+        config_file_path: Some(config_file.path().into()),
     };
-    let connect_result = c1.connect();
+    let connect_result = c.connect();
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -39,18 +42,58 @@ fn test_handle_error_config() {
             &Error::InsufficientContractInfoError
         );
     }
+}
 
-    let mut c2 = ERC20ContractHandler {
+#[test]
+fn test_handle_error_for_small_call_data() {
+    let config_file = NamedTempFile::new().unwrap();
+    let mut c = ERC20ContractHandler {
         address: None,
         call_data: Some("0xabcd".to_string()),
-        config_file_path: Some("/path/to/config".into()),
+        config_file_path: Some(config_file.path().into()),
     };
-    let connect_result = c2.connect();
+    let connect_result = c.connect();
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
             error.downcast_ref::<Error>().unwrap(),
             &Error::ContractSizeError(2),
+        );
+    }
+}
+
+#[test]
+fn test_handle_error_for_odd_size_call_data() {
+    let config_file = NamedTempFile::new().unwrap();
+    let mut c = ERC20ContractHandler {
+        address: None,
+        call_data: Some("0xabcdefeff".to_string()),
+        config_file_path: Some(config_file.path().into()),
+    };
+    let connect_result = c.connect();
+    assert!(connect_result.is_err());
+    if let Err(error) = connect_result {
+        assert_eq!(
+            error.downcast_ref::<Error>().unwrap(),
+            &Error::CalldataMalformat,
+        );
+    }
+}
+
+#[test]
+fn test_handle_error_for_mal_call_data() {
+    let config_file = NamedTempFile::new().unwrap();
+    let mut c = ERC20ContractHandler {
+        address: None,
+        call_data: Some("0xabcdefeffg".to_string()),
+        config_file_path: Some(config_file.path().into()),
+    };
+    let connect_result = c.connect();
+    assert!(connect_result.is_err());
+    if let Err(error) = connect_result {
+        assert_eq!(
+            error.downcast_ref::<Error>().unwrap(),
+            &Error::CalldataMalformat,
         );
     }
 }

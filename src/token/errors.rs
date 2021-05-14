@@ -6,4 +6,6 @@ pub enum ContractError {
     ContractSizeError(usize),
     #[error("contract address and call data are both absent")]
     InsufficientContractInfoError,
+    #[error("the format of calldata is hexaliteral")]
+    CalldataMalformat,
 }

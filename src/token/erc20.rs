@@ -13,7 +13,7 @@
 //! >>>
 
 use crate::token::errors::ContractError as Error;
-use anyhow::Result;
+use anyhow::{Context, Result};
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
 use std::path::PathBuf;
@@ -51,19 +51,44 @@ impl ERC20ContractHandler {
     fn deploy(&mut self) -> Result<()> {
         if let Some(_config_file_path) = self.config_file_path.take() {
             if let Some(call_data) = self.call_data.take() {
-                if let Some(call_data) = ERC20ContractHandler::get_call_data(call_data) {
-                    if call_data.len() < 4 {
-                        return Err(Error::ContractSizeError(call_data.len()).into());
-                    }
-                    return Ok(());
+                let call_data = ERC20ContractHandler::get_call_data(call_data)?;
+                if call_data.len() < 4 {
+                    return Err(Error::ContractSizeError(call_data.len()).into());
                 }
+                return Ok(());
             }
             return Err(Error::InsufficientContractInfoError.into());
         }
         panic!("config_file_path should be update when ERC20ContractHandler construct")
     }
+
     /// Return the call data binary from hex literal or from a ewasm file
-    fn get_call_data(_call_data_info: String) -> Option<Vec<u8>> {
-        Some(vec![0, 0])
+    fn get_call_data(call_data_info: String) -> Result<Vec<u8>> {
+        if call_data_info.starts_with("0x") {
+            if call_data_info.len() % 2 != 0 {
+                return Err(Error::CalldataMalformat.into());
+            }
+            let mut format_error = false;
+            let v = call_data_info[2..]
+                .chars()
+                .collect::<Vec<char>>()
+                .chunks(2)
+                .enumerate()
+                .map(|(i, c)| {
+                    u8::from_str_radix(c.iter().collect::<String>().as_str(), 16)
+                        .with_context(|| {
+                            format_error = true;
+                            format!("Failed to parse call data at {}", i * 2 + 2)
+                        })
+                        .unwrap_or(0)
+                })
+                .collect::<Vec<u8>>();
+            if format_error {
+                return Err(Error::CalldataMalformat.into());
+            }
+            Ok(v)
+        } else {
+            Ok(Vec::new())
+        }
     }
 }

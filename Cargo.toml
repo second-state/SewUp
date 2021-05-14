@@ -12,8 +12,10 @@ serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5.8"
 ewasm_api = { version = "0.11", features = ["std", "qimalloc"] }
-
 ethereum-types = { optional = true, features = ["serialize"], git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
+
+[dev-dependencies]
+tempfile = "3.2.0"
 
 [build-dependencies]
 cmake = "0.1.42"
