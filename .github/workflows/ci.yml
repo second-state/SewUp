@@ -27,5 +27,11 @@ jobs:
       - uses: cachix/install-nix-action@v13
         with:
           nix_path: nixpkgs=channel:nixos-unstable
-      - run: nix-shell --run "cargo clippy"
-      - run: nix-shell --run "cargo test --all-features"
+
+      - name: Clippy
+        env:
+          RUST_BACKTRACE: full
+        run: nix-shell --run "rustc --version --verbose && cargo clippy"
+        
+      - name: Test
+        run: nix-shell --run "cargo test --all-features"
