@@ -97,3 +97,41 @@ fn test_handle_error_for_mal_call_data() {
         );
     }
 }
+
+#[test]
+fn test_handle_error_for_mal_call_data_file() {
+    let config_file = NamedTempFile::new().unwrap();
+
+    let mut c = ERC20ContractHandler {
+        address: None,
+        call_data: Some(format!(
+            "{}/resources/test/bad.wasm",
+            env!("CARGO_MANIFEST_DIR")
+        )),
+        config_file_path: Some(config_file.path().into()),
+    };
+    let connect_result = c.connect();
+    assert!(connect_result.is_err());
+    if let Err(error) = connect_result {
+        assert_eq!(
+            error.downcast_ref::<Error>().unwrap(),
+            &Error::ContractSizeError(0),
+        );
+    }
+}
+
+#[test]
+fn test_handle_from_call_data_file() {
+    let config_file = NamedTempFile::new().unwrap();
+
+    let mut c = ERC20ContractHandler {
+        address: None,
+        call_data: Some(format!(
+            "{}/resources/test/erc20.wasm",
+            env!("CARGO_MANIFEST_DIR")
+        )),
+        config_file_path: Some(config_file.path().into()),
+    };
+    let connect_result = c.connect();
+    assert!(connect_result.is_ok());
+}

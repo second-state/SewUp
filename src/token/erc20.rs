@@ -16,6 +16,7 @@ use crate::token::errors::ContractError as Error;
 use anyhow::{Context, Result};
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
+use std::fs::read;
 use std::path::PathBuf;
 
 /// ERC20ContractHandler helps you deploy or interactive with the existing
@@ -88,7 +89,7 @@ impl ERC20ContractHandler {
             }
             Ok(v)
         } else {
-            Ok(Vec::new())
+            Ok(read(call_data_info)?)
         }
     }
 }
