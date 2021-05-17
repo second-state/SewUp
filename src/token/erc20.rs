@@ -13,20 +13,28 @@
 //! >>>
 
 use crate::token::errors::ContractError as Error;
+use crate::traits::{VMMessageBuilder, RT};
+
 use anyhow::{Context, Result};
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
+use std::cell::RefCell;
+use std::fmt;
 use std::fs::read;
 use std::path::PathBuf;
+use std::sync::Arc;
 
 /// ERC20ContractHandler helps you deploy or interactive with the existing
 /// ERC 20 contract
-#[derive(Debug, Clone, Deserialize, Serialize, Default)]
+#[derive(Clone, Deserialize, Serialize, Default)]
 pub struct ERC20ContractHandler {
     /// The contract address, when the contract is not deployed,
     /// the `connect` function called the contract will be automatically
     /// deployed and the address field of the config will be filled
-    pub address: Option<Address>,
+    pub contract_address: Option<Address>,
+
+    /// The address of the sender, who calls the contract
+    pub sender_address: Address,
 
     #[serde(skip_serializing)]
     /// The contract data in hex literal for eWasm binary, or a file path to
@@ -37,12 +45,27 @@ pub struct ERC20ContractHandler {
     /// this field will be filled
     #[serde(skip)]
     pub(crate) config_file_path: Option<PathBuf>,
+
+    #[serde(skip)]
+    pub(crate) rt: Option<Arc<RefCell<dyn RT>>>,
+}
+
+impl fmt::Debug for ERC20ContractHandler {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Point")
+            .field("contract_address", &self.contract_address)
+            .field("sender_address", &self.sender_address)
+            .field("call_data", &self.call_data)
+            .field("config_file_path", &self.config_file_path)
+            .field("rt", &self.rt.is_some())
+            .finish()
+    }
 }
 
 impl ERC20ContractHandler {
     /// Reach the contract, if the contract is not exist, then deploy it first
     pub fn connect(&mut self) -> Result<()> {
-        if self.address.is_none() {
+        if self.contract_address.is_none() {
             return self.deploy();
         }
         Ok(())
@@ -56,7 +79,18 @@ impl ERC20ContractHandler {
                 if call_data.len() < 4 {
                     return Err(Error::ContractSizeError(call_data.len()).into());
                 }
-                return Ok(());
+                if let Some(rt) = self.rt.take() {
+                    let msg = VMMessageBuilder {
+                        sender: Some(&self.sender_address),
+                        input_data: Some(&call_data),
+                        ..Default::default()
+                    }
+                    .build()?;
+                    rt.borrow_mut().execute(msg)?;
+                    self.rt = Some(rt);
+                    return Ok(());
+                }
+                panic!("rt should be init when parsing the connection string")
             }
             return Err(Error::InsufficientContractInfoError.into());
         }

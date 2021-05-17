@@ -25,4 +25,8 @@ clangStdenv.mkDerivation {
   ] ++ stdenv.lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
+  nativeBuildInputs = with nixpkgs; [
+    cmake
+  ];
+  LIBCLANG_PATH = "${nixpkgs.llvmPackages_10.libclang}/lib";
 }
