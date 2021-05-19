@@ -41,7 +41,7 @@ fn test_handle_error_missing_call_data_and_contract_address() {
         config_file_path: Some(config_file.path().into()),
         ..Default::default()
     };
-    let connect_result = c.connect();
+    let connect_result = c.connect(10000);
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -61,7 +61,7 @@ fn test_handle_error_for_small_call_data() {
         config_file_path: Some(config_file.path().into()),
         ..Default::default()
     };
-    let connect_result = c.connect();
+    let connect_result = c.connect(10000);
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -81,7 +81,7 @@ fn test_handle_error_for_odd_size_call_data() {
         config_file_path: Some(config_file.path().into()),
         ..Default::default()
     };
-    let connect_result = c.connect();
+    let connect_result = c.connect(10000);
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -101,7 +101,7 @@ fn test_handle_error_for_mal_call_data() {
         config_file_path: Some(config_file.path().into()),
         ..Default::default()
     };
-    let connect_result = c.connect();
+    let connect_result = c.connect(10000);
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -124,7 +124,7 @@ fn test_handle_error_for_mal_call_data_file() {
         config_file_path: Some(config_file.path().into()),
         ..Default::default()
     };
-    let connect_result = c.connect();
+    let connect_result = c.connect(10000);
     assert!(connect_result.is_err());
     if let Err(error) = connect_result {
         assert_eq!(
@@ -150,6 +150,6 @@ fn test_handle_from_call_data_file() {
 
     c.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let connect_result = c.connect();
+    let connect_result = c.connect(100000);
     assert!(connect_result.is_ok());
 }

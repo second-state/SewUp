@@ -72,7 +72,7 @@ impl HostContext for TestHost {
         key: &[u8; 32],
         value: &[u8; 32],
     ) -> evmc_storage_status {
-        evmc_storage_status::EVMC_STORAGE_UNCHANGED
+        evmc_storage_status::EVMC_STORAGE_MODIFIED
     }
 
     fn get_balance(&mut self, addr: &[u8; 20]) -> [u8; 32] {
@@ -132,6 +132,6 @@ impl HostContext for TestHost {
         is_static: bool,
         salt: &[u8; 32],
     ) -> (Vec<u8>, i64, [u8; 20], evmc_status_code) {
-        (Vec::new(), 0, [0; 20], evmc_status_code::EVMC_SUCCESS)
+        (vec![0; 32], gas, [0; 20], evmc_status_code::EVMC_SUCCESS)
     }
 }

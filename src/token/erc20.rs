@@ -64,15 +64,15 @@ impl fmt::Debug for ERC20ContractHandler {
 
 impl ERC20ContractHandler {
     /// Reach the contract, if the contract is not exist, then deploy it first
-    pub fn connect(&mut self) -> Result<()> {
+    pub fn connect(&mut self, gas: i64) -> Result<()> {
         if self.contract_address.is_none() {
-            return self.deploy();
+            return self.deploy(gas);
         }
         Ok(())
     }
 
     /// deploy the contract from call data store contract address into config
-    fn deploy(&mut self) -> Result<()> {
+    fn deploy(&mut self, gas: i64) -> Result<()> {
         if let Some(_config_file_path) = self.config_file_path.take() {
             if let Some(call_data) = self.call_data.take() {
                 let call_data = ERC20ContractHandler::get_call_data(call_data)?;
@@ -83,6 +83,7 @@ impl ERC20ContractHandler {
                     let msg = VMMessageBuilder {
                         sender: Some(&self.sender_address),
                         input_data: Some(&call_data),
+                        gas,
                         ..Default::default()
                     }
                     .build()?;
