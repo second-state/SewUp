@@ -1,0 +1,3 @@
+[submodule "ssvm-evmc"]
+	path = ssvm-evmc
+	url = git@github.com:second-state/ssvm-evmc.git
