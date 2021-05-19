@@ -9,6 +9,7 @@ let
     extensions = [ "rust-src" ];
   });
 
+  testScript = nixpkgs.writeShellScriptBin "run-test" "cargo test --all-features -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)";
   clangStdenv = nixpkgs.llvmPackages_10.stdenv;
 in
 clangStdenv.mkDerivation {
@@ -22,6 +23,8 @@ clangStdenv.mkDerivation {
     llvmPackages_10.llvm
     lld_10
     boost
+
+    testScript
   ] ++ stdenv.lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];

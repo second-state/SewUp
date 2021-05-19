@@ -32,6 +32,7 @@ jobs:
       #   env:
       #     RUST_BACKTRACE: full
       #   run: nix-shell --run "rustc --version --verbose && cargo clippy"
-        
+
       - name: Test
-        run: nix-shell --run "cargo test --all-features"
+        # Raise errors not only in Rust test layer but also in the VM layer
+        run: nix-shell --run "run-test"

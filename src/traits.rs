@@ -2,12 +2,13 @@
 //! This trait help you abstract any VM into application runtime layer,
 //! such that you can easily use your VM with SewUp libs.
 //!
-//! Besides, the VMErrors and VMmessage are rust style wrarp for evm_error and
-//! evm_message.
+//! Besides, the VMErrors, VMmessage VMresult are rust style wrarp for
+//! evm_error, evm_message and evm_result
 
 use anyhow::Result;
 use ethereum_types::{Address, H256, U256};
 use evmc_sys::evmc_call_kind;
+use std::any::Any;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -58,6 +59,13 @@ pub enum VmError {
     /// you can use this error type to help you customized you error message
     #[error("`{0}`")]
     CustomizedError(String),
+}
+
+#[derive(Debug, Default)]
+pub struct VMResult {
+    gas_left: i64,
+    output_data: Option<Box<dyn Any>>,
+    create_address: Option<Address>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -173,5 +181,5 @@ impl Default for VMMessageBuilder<'_> {
 
 pub trait RT {
     /// let VM execute the message
-    fn execute(&mut self, msg: VMMessage) -> Result<()>;
+    fn execute(&mut self, msg: VMMessage) -> Result<VMResult>;
 }
