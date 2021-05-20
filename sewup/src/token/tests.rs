@@ -118,7 +118,7 @@ fn test_handle_error_for_mal_call_data_file() {
     let mut c = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
-            "{}/resources/test/bad.wasm",
+            "{}/../resources/test/bad.wasm",
             env!("CARGO_MANIFEST_DIR")
         )),
         config_file_path: Some(config_file.path().into()),
@@ -141,7 +141,7 @@ fn test_handle_from_call_data_file() {
     let mut c = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
-            "{}/resources/test/erc20.wasm",
+            "{}/../resources/test/erc20.wasm",
             env!("CARGO_MANIFEST_DIR")
         )),
         config_file_path: Some(config_file.path().into()),
