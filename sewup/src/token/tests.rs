@@ -141,7 +141,7 @@ fn test_handle_from_call_data_file() {
     let mut c = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
-            "{}/../resources/test/erc20.wasm",
+            "{}/../resources/test/erc20_contract.wasm",
             env!("CARGO_MANIFEST_DIR")
         )),
         config_file_path: Some(config_file.path().into()),
@@ -150,6 +150,6 @@ fn test_handle_from_call_data_file() {
 
     c.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let connect_result = c.connect(100000);
+    let connect_result = c.connect(1_000_000);
     assert!(connect_result.is_ok());
 }

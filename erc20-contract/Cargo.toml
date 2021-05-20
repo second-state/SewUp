@@ -1,0 +1,24 @@
+[package]
+name = "erc20-contract"
+version = "0.1.0"
+authors = []
+edition = "2018"
+description = "This erc20 rs crate is based on the previous works of second state."
+
+[lib]
+path = "src/token.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
+tiny-keccak = { version = "2.0.2", features = ["sha3"] }
+
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z"
+
+[profile.release.package.erc20-contract]
+incremental = false
+opt-level = "z"

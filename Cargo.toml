@@ -2,4 +2,5 @@
 
 members = [
     "sewup",
+    "erc20-contract",
 ]
