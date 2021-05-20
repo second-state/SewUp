@@ -9,7 +9,7 @@ let
     extensions = [ "rust-src" ];
   });
 
-  testScript = nixpkgs.writeShellScriptBin "run-test" "cargo test --all-features -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)";
+  testScript = nixpkgs.writeShellScriptBin "run-test" "cargo test -p sewup --features=$1 -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)";
   clangStdenv = nixpkgs.llvmPackages_10.stdenv;
 in
 clangStdenv.mkDerivation {

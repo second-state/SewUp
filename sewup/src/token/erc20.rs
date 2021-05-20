@@ -7,9 +7,16 @@
 //!
 //! This handler mimic the database connecting way for ERC20 contract, and
 //! automatically deploy the contract if needed
+//!
+//!
+//! ## Getting started
+//!
+//! Add follow sewup with `token` feature enabled.
+//! > sewup = { features = ["token"] }
+//!
 //! >>>
-//! erc20://sender_address@node_ip:node_port/ERC20_contract_config_file_path
-//! erc20://sender_address@node_ip:node_port/contract_address
+//! sewup://sender_address@node_ip:node_port/ERC20_contract_config_file_path
+//! sewup://sender_address@node_ip:node_port/erc20_contract_address
 //! >>>
 
 use crate::token::errors::ContractError as Error;
