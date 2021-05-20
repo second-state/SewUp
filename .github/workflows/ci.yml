@@ -36,5 +36,5 @@ jobs:
       - name: Token feature test
         run: nix-shell --run "run-test token"
 
-      - name: Token feature test
-        run: nix-shell --run 'run-test kv || echo -e "\e[38;5;196m\e[0m allow fail"'
+      - name: KV feature test
+        run: nix-shell --run 'run-test kv'
