@@ -6,7 +6,6 @@ let
     });
   nixpkgs = import <nixpkgs> { overlays = [ mozillaOverlay ]; };
   rust = with nixpkgs; ((rustChannelOf { date = "2021-05-06"; channel = "stable"; }).rust.override {
-    extensions = [ "rust-src" ];
     targets = [ "wasm32-unknown-unknown" ];
   });
 
@@ -26,7 +25,7 @@ clangStdenv.mkDerivation {
     boost
 
     testScript
-  ] ++ stdenv.lib.optionals stdenv.isDarwin [
+  ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
   nativeBuildInputs = with nixpkgs; [
