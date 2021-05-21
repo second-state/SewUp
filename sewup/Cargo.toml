@@ -12,6 +12,7 @@ serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5.8"
 ethereum-types = {features = ["serialize"], git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
+contract-address = {git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
 evmc-sys = { git = "https://github.com/second-state/evmc", tag = "v7.4.0-rust-evmc-client-rc.2" }
 
 [dev-dependencies]

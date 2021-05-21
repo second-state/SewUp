@@ -6,6 +6,7 @@
 //! evm_error, evm_message and evm_result
 
 use anyhow::Result;
+use contract_address::ContractAddress;
 use ethereum_types::{Address, H256, U256};
 use evmc_sys::evmc_call_kind;
 use std::any::Any;
@@ -61,6 +62,7 @@ pub enum VmError {
     CustomizedError(String),
 }
 
+// TODO: abstract this, such that this can suitable for other chain than ETH
 #[derive(Debug, Default)]
 pub struct VMResult {
     gas_left: i64,
@@ -74,6 +76,7 @@ pub enum Flags {
     STATIC = 1,
 }
 
+// TODO: abstract this, such that this can suitable for other chain than ETH
 #[derive(Debug)]
 pub struct VMMessage<'a> {
     pub kind: evmc_call_kind,
@@ -182,4 +185,7 @@ impl Default for VMMessageBuilder<'_> {
 pub trait RT {
     /// let VM execute the message
     fn execute(&mut self, msg: VMMessage) -> Result<VMResult>;
+
+    /// Deploy contract and return the contract address
+    fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress>;
 }

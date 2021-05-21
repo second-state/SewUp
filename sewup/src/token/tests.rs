@@ -20,7 +20,7 @@ fn test_config_serde() {
     };
     assert_eq!(
         toml::to_string(&c1).unwrap(),
-        "contract_address = \"0x000000000000000000000000000000000000000f\"\nsender_address = \"0x0000000000000000000000000000000000000001\"\n"
+        "contract_address = \"0x000000000000000000000000000000000000000f\"\ncall_data = \"0x12345678\"\n"
     );
 
     let c2: ERC20ContractHandler =

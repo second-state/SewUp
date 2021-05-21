@@ -19,17 +19,19 @@
 //! sewup://sender_address@node_ip:node_port/erc20_contract_address
 //! >>>
 
+use std::cell::RefCell;
+use std::fmt;
+use std::fs::{self, read};
+use std::path::PathBuf;
+use std::sync::Arc;
+
 use crate::token::errors::ContractError as Error;
 use crate::traits::{VMMessageBuilder, RT};
 
 use anyhow::{Context, Result};
+use contract_address::ContractAddress;
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
-use std::cell::RefCell;
-use std::fmt;
-use std::fs::read;
-use std::path::PathBuf;
-use std::sync::Arc;
 
 /// ERC20ContractHandler helps you deploy or interactive with the existing
 /// ERC 20 contract
@@ -41,9 +43,9 @@ pub struct ERC20ContractHandler {
     pub contract_address: Option<Address>,
 
     /// The address of the sender, who calls the contract
+    #[serde(skip)]
     pub sender_address: Address,
 
-    #[serde(skip_serializing)]
     /// The contract data in hex literal for eWasm binary, or a file path to
     /// the .ewasm file
     pub call_data: Option<String>,
@@ -80,7 +82,7 @@ impl ERC20ContractHandler {
 
     /// deploy the contract from call data store contract address into config
     fn deploy(&mut self, gas: i64) -> Result<()> {
-        if let Some(_config_file_path) = self.config_file_path.take() {
+        if let Some(config_file_path) = self.config_file_path.take() {
             if let Some(call_data) = self.call_data.take() {
                 let call_data = ERC20ContractHandler::get_call_data(call_data)?;
                 if call_data.len() < 4 {
@@ -94,8 +96,13 @@ impl ERC20ContractHandler {
                         ..Default::default()
                     }
                     .build()?;
-                    rt.borrow_mut().execute(msg)?;
+                    self.contract_address = Some(*rt.borrow_mut().deploy(msg)?);
                     self.rt = Some(rt);
+                    fs::write(
+                        config_file_path,
+                        toml::to_string(self).expect("config generate error"),
+                    )
+                    .expect("config file can not be updated");
                     return Ok(());
                 }
                 panic!("rt should be init when parsing the connection string")
