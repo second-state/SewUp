@@ -7,6 +7,7 @@ let
   nixpkgs = import <nixpkgs> { overlays = [ mozillaOverlay ]; };
   rust = with nixpkgs; ((rustChannelOf { date = "2021-05-06"; channel = "stable"; }).rust.override {
     extensions = [ "rust-src" ];
+    targets = [ "wasm32-unknown-unknown" ];
   });
 
   testScript = nixpkgs.writeShellScriptBin "run-test" "cargo test -p sewup --features=$1 -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)";

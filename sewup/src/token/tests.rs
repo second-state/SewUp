@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::io::Read;
 use std::sync::Arc;
 
 use crate::erc20::ERC20ContractHandler;
@@ -20,7 +21,7 @@ fn test_config_serde() {
     };
     assert_eq!(
         toml::to_string(&c1).unwrap(),
-        "contract_address = \"0x000000000000000000000000000000000000000f\"\nsender_address = \"0x0000000000000000000000000000000000000001\"\n"
+        "contract_address = \"0x000000000000000000000000000000000000000f\"\ncall_data = \"0x12345678\"\n"
     );
 
     let c2: ERC20ContractHandler =
@@ -136,12 +137,12 @@ fn test_handle_error_for_mal_call_data_file() {
 
 #[test]
 fn test_handle_from_call_data_file() {
-    let config_file = NamedTempFile::new().unwrap();
+    let mut config_file = NamedTempFile::new().unwrap();
 
     let mut c = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
-            "{}/../resources/test/erc20.wasm",
+            "{}/../resources/test/erc20_contract.wasm",
             env!("CARGO_MANIFEST_DIR")
         )),
         config_file_path: Some(config_file.path().into()),
@@ -150,6 +151,13 @@ fn test_handle_from_call_data_file() {
 
     c.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let connect_result = c.connect(100000);
+    let connect_result = c.connect(1_000_000);
     assert!(connect_result.is_ok());
+
+    let mut buf = String::new();
+    config_file.read_to_string(&mut buf).unwrap();
+    assert_eq!(
+        buf,
+        "contract_address = \"0x522b3294e6d06aa25ad0f1b8891242e335d3b459\"\n"
+    );
 }

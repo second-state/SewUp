@@ -2,6 +2,9 @@
 
 use crate::traits::{Flags, VMMessage, VMResult, RT};
 
+use contract_address::ContractAddress;
+use ethereum_types::U256;
+
 use anyhow::Result;
 use evmc_sys::{evmc_call_kind, evmc_revision, evmc_status_code, evmc_storage_status};
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
@@ -53,6 +56,14 @@ impl RT for TestRuntime {
             &create2_salt.map_or_else(|| [0; 32], |h| h.0),
         );
         Ok(VMResult::default())
+    }
+
+    fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress> {
+        let VMMessage { sender, .. } = msg;
+        Ok(ContractAddress::from_sender_and_nonce(
+            sender,
+            &U256::default(),
+        ))
     }
 }
 
