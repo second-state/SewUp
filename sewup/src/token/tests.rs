@@ -1,4 +1,5 @@
 use std::cell::RefCell;
+use std::io::Read;
 use std::sync::Arc;
 
 use crate::erc20::ERC20ContractHandler;
@@ -136,7 +137,7 @@ fn test_handle_error_for_mal_call_data_file() {
 
 #[test]
 fn test_handle_from_call_data_file() {
-    let config_file = NamedTempFile::new().unwrap();
+    let mut config_file = NamedTempFile::new().unwrap();
 
     let mut c = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
@@ -152,4 +153,11 @@ fn test_handle_from_call_data_file() {
 
     let connect_result = c.connect(1_000_000);
     assert!(connect_result.is_ok());
+
+    let mut buf = String::new();
+    config_file.read_to_string(&mut buf).unwrap();
+    assert_eq!(
+        buf,
+        "contract_address = \"0x522b3294e6d06aa25ad0f1b8891242e335d3b459\"\n"
+    );
 }
