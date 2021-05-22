@@ -25,11 +25,10 @@ use std::fs::{self, read};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::token::errors::ContractError as Error;
-use crate::traits::{VMMessageBuilder, RT};
+use super::errors::ContractError as Error;
+use crate::runtimes::traits::{VMMessageBuilder, RT};
 
 use anyhow::{Context, Result};
-use contract_address::ContractAddress;
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
 
