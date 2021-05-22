@@ -2,9 +2,12 @@ use std::cell::RefCell;
 use std::io::Read;
 use std::sync::Arc;
 
-use crate::erc20::ERC20ContractHandler;
-use crate::errors::ContractError as Error;
+mod erc20;
+mod errors;
+
 use crate::runtimes::test::TestRuntime;
+use erc20::ERC20ContractHandler;
+use errors::ContractError as Error;
 
 use ethereum_types::Address;
 use toml;

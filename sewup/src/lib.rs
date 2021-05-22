@@ -8,7 +8,8 @@ pub mod kv;
 #[cfg(feature = "kv")]
 pub use kv::*;
 
-#[allow(dead_code)]
-pub mod traits;
-
+/// SewUp help you build up ewasm
+/// The runtime module is used for tesing
+///
+#[cfg(test)]
 pub mod runtimes;

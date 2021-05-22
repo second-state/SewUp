@@ -1,6 +1,6 @@
 //! A runtime for testing
 
-use crate::traits::{Flags, VMMessage, VMResult, RT};
+use crate::runtimes::traits::{Flags, VMMessage, VMResult, RT};
 
 use contract_address::ContractAddress;
 use ethereum_types::U256;
