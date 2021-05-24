@@ -1,13 +1,18 @@
 use anyhow::Result;
 use ewasm_api::types::*;
 use sewup::primitives::Contract;
-use sewup::token::helpers::{copy_into_address, copy_into_array, copy_into_storage_value};
-
-mod erc20;
-mod signature;
-
-use crate::erc20::*;
-use crate::signature::*;
+use sewup::token::{
+    erc20::{
+        allowance, approve, decimals, do_balance, do_transfer, mint, name, symbol, total_supply,
+        transfer_from,
+    },
+    helpers::{copy_into_address, copy_into_array, copy_into_storage_value},
+    signature::{
+        ALLOWANCE_SIGNATURE, APPROVE_SIGNATURE, DEVIMALS_SIGNATURE, DO_BALANCE_SIGNATURE,
+        DO_TRANSFER_SIGNATURE, MINT_SIGNATURE, NAME_SIGNATURE, SYMBOL_SIGNATURE,
+        TOTAL_SUPPLY_SIGNATURE, TRANSFER_FROM_SIGNATURE,
+    },
+};
 
 #[no_mangle]
 pub fn main() {
