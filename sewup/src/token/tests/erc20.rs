@@ -25,7 +25,7 @@ use std::fs::{self, read};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use super::errors::ContractError as Error;
+use crate::errors::ContractError as Error;
 use crate::runtimes::traits::{VMMessageBuilder, RT};
 
 use anyhow::{Context, Result};
