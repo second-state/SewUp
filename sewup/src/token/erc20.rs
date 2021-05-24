@@ -1,5 +1,8 @@
-use crate::utils::*;
-use ewasm_api::types::*;
+use super::helpers::{
+    copy_into_array, copy_into_storage_value, get_allowance, get_balance, set_allowance,
+    set_balance,
+};
+use ewasm_api::types::{Address, StorageValue};
 
 pub fn do_transfer(recipient: Address, value: StorageValue) {
     let sender = ewasm_api::caller();
