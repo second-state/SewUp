@@ -33,6 +33,10 @@ jobs:
       #     RUST_BACKTRACE: full
       #   run: nix-shell --run "rustc --version --verbose && cargo clippy"
 
+      # Build the latest contract before testing
+      - name: Build contract
+        run: nix-shell --run "update-contract"
+
       - name: Token feature test
         run: nix-shell --run "run-test token"
 
