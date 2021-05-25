@@ -8,7 +8,7 @@ use sewup::token::{
     },
     helpers::{copy_into_address, copy_into_array, copy_into_storage_value},
     signature::{
-        ALLOWANCE_SIGNATURE, APPROVE_SIGNATURE, DEVIMALS_SIGNATURE, DO_BALANCE_SIGNATURE,
+        ALLOWANCE_SIGNATURE, APPROVE_SIGNATURE, DECIMALS_SIGNATURE, DO_BALANCE_SIGNATURE,
         DO_TRANSFER_SIGNATURE, MINT_SIGNATURE, NAME_SIGNATURE, SYMBOL_SIGNATURE,
         TOTAL_SUPPLY_SIGNATURE, TRANSFER_FROM_SIGNATURE,
     },
@@ -57,7 +57,7 @@ pub fn main() {
             symbol();
         }
 
-        if function_selector == DEVIMALS_SIGNATURE {
+        if function_selector == DECIMALS_SIGNATURE {
             decimals();
         }
 

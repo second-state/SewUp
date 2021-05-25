@@ -6,6 +6,8 @@ mod handler;
 
 use crate::errors::ContractError as Error;
 use crate::runtimes::test::TestRuntime;
+use crate::token::signature;
+
 use handler::ERC20ContractHandler;
 
 use ethereum_types::Address;
@@ -141,7 +143,7 @@ fn test_handle_error_for_mal_call_data_file() {
 fn test_handle_from_call_data_file() {
     let mut config_file = NamedTempFile::new().unwrap();
 
-    let mut c = ERC20ContractHandler {
+    let mut h = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
             "{}/../resources/test/erc20_contract.wasm",
@@ -151,9 +153,9 @@ fn test_handle_from_call_data_file() {
         ..Default::default()
     };
 
-    c.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
+    h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let connect_result = c.connect(1_000_000);
+    let connect_result = h.connect(1_000_000);
     assert!(connect_result.is_ok());
 
     let mut buf = String::new();
@@ -162,4 +164,6 @@ fn test_handle_from_call_data_file() {
         buf,
         "contract_address = \"0x522b3294e6d06aa25ad0f1b8891242e335d3b459\"\n"
     );
+
+    h.execute(signature::DECIMALS_SIGNATURE, None, 1_000_000);
 }

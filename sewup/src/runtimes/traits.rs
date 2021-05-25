@@ -87,6 +87,7 @@ pub struct VMMessage<'a> {
     pub sender: &'a Address,
     pub input_data: Option<&'a Vec<u8>>,
     pub value: U256,
+    pub code: Option<&'a Vec<u8>>,
     pub create2_salt: Option<H256>,
 }
 
@@ -100,6 +101,7 @@ pub struct VMMessageBuilder<'a> {
     pub sender: Option<&'a Address>,
     pub input_data: Option<&'a Vec<u8>>,
     pub value: U256,
+    pub code: Option<&'a Vec<u8>>,
     pub create2_salt: Option<H256>,
 }
 
@@ -134,6 +136,7 @@ impl<'a> VMMessageBuilder<'a> {
             sender,
             input_data,
             value,
+            code,
             create2_salt,
         } = self;
 
@@ -152,6 +155,7 @@ impl<'a> VMMessageBuilder<'a> {
                 sender,
                 input_data,
                 value,
+                code,
                 create2_salt,
             });
         }
@@ -177,6 +181,7 @@ impl Default for VMMessageBuilder<'_> {
             destination: None,
             sender: None,
             input_data: None,
+            code: None,
             create2_salt: None,
         }
     }

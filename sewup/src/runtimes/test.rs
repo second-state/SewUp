@@ -34,6 +34,7 @@ impl RT for TestRuntime {
             sender,
             input_data,
             value,
+            code,
             create2_salt,
         } = msg;
 
@@ -52,7 +53,7 @@ impl RT for TestRuntime {
             &sender.0,
             input_data.unwrap_or_else(|| &null_input_data),
             &v,
-            input_data.unwrap_or_else(|| &null_input_data),
+            code.unwrap_or(input_data.unwrap_or_else(|| &null_input_data)),
             &create2_salt.map_or_else(|| [0; 32], |h| h.0),
         );
         Ok(VMResult::default())
