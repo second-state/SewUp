@@ -12,7 +12,7 @@ serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5.8"
 ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
-tiny-keccak = { version = "2.0.2", features = ["sha3"] }
+tiny-keccak = { version = "2.0.2", features = ["sha3", "keccak"] }
 
 [dev-dependencies]
 tempfile = "3.2.0"
@@ -20,6 +20,7 @@ rust-ssvm = { git = "https://github.com/second-state/rust-ssvm.git", rev = "5b37
 evmc-sys = { git = "https://github.com/second-state/evmc", tag = "v7.4.0-rust-evmc-client-rc.2" }
 contract-address = {git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
 ethereum-types = {features = ["serialize"], git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
+hex-literal = "0.3.1"
 
 [build-dependencies]
 cmake = "0.1.42"
