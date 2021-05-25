@@ -1,3 +1,9 @@
+//! Sewup - Second state eWasm Utility Program
+//! A library to help you sew up your Ethereum project with Rust and just like develop in a common backend.
+//!
+//! Use the crate with different feature to use the high level api just enable the features you
+//! want to use.
+
 #[cfg(feature = "token")]
 pub mod token;
 #[cfg(feature = "token")]
