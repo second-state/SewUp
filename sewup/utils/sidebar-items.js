@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["copy_into_array",""],["sha3_256",""]]});
+initSidebarItems({"fn":[["copy_into_array",""],["get_function_signature",""],["sha3_256",""]]});

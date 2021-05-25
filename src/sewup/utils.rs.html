@@ -20,8 +20,29 @@
 <span id="17">17</span>
 <span id="18">18</span>
 <span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Sha3</span>};
+<span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>, <span class="ident">Sha3</span>};
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">copy_into_array</span><span class="op">&lt;</span><span class="ident">A</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span>[<span class="ident">T</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">A</span>
 <span class="kw">where</span>
@@ -39,6 +60,27 @@
     <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">input</span>);
     <span class="ident">hasher</span>.<span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>);
     <span class="ident">output</span>
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_function_signature</span>(<span class="ident">funtion_prototype</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">4</span>] {
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+    <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">funtion_prototype</span>.<span class="ident">as_bytes</span>());
+    <span class="ident">hasher</span>.<span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sig</span>);
+    <span class="ident">sig</span>
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+    <span class="kw">use</span> <span class="ident">hex_literal</span>::<span class="kw-2">*</span>;
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_function_signature</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">hex</span><span class="macro">!</span>(<span class="string">&quot;c48d6d5e&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_function_signature</span>(<span class="string">&quot;sendMessage(string,address)&quot;</span>), <span class="ident">sig</span>);
+        <span class="ident">sig</span> <span class="op">=</span> <span class="macro">hex</span><span class="macro">!</span>(<span class="string">&quot;70a08231&quot;</span>);
+        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">get_function_signature</span>(<span class="string">&quot;balanceOf(address)&quot;</span>), <span class="ident">sig</span>);
+    }
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-js="../../search-index.js"></div>
