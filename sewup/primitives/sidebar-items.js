@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Contract",""]],"type":[["FunctionSignature",""]]});
