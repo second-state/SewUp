@@ -39,10 +39,22 @@
 <span id="36">36</span>
 <span id="37">37</span>
 <span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">bucket</span>::<span class="ident">Bucket</span>;
 <span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
 
+<span class="doccomment">/// Store is a storage space for an account in a specific block.</span>
+<span class="doccomment">/// We can import the storage from a past block, and we only commit the storage</span>
+<span class="doccomment">/// into the latest block.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Besides, there may be more than one bucket in store, such that you can</span>
+<span class="doccomment">/// easily save different kind of key/value pair in the chain.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Store</span> {}
 
 <span class="kw">impl</span> <span class="ident">Store</span> {
