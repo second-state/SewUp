@@ -62,7 +62,35 @@ impl RT for TestRuntime {
                 gas_left,
                 ..Default::default()
             }),
-            _ => Err(VmError::CustomizedError("Unhandle error".into()).into()),
+            evmc_status_code::EVMC_FAILURE => Err(VmError::Failure.into()),
+            evmc_status_code::EVMC_REVERT => Err(VmError::Revert.into()),
+            evmc_status_code::EVMC_OUT_OF_GAS => Err(VmError::OutOfGas.into()),
+            evmc_status_code::EVMC_INVALID_INSTRUCTION => Err(VmError::InvalidInstruction.into()),
+            evmc_status_code::EVMC_UNDEFINED_INSTRUCTION => {
+                Err(VmError::UndefinedInstruction.into())
+            }
+            evmc_status_code::EVMC_STACK_OVERFLOW => Err(VmError::StackOverflow.into()),
+            evmc_status_code::EVMC_STACK_UNDERFLOW => Err(VmError::StackUnderflow.into()),
+            evmc_status_code::EVMC_BAD_JUMP_DESTINATION => Err(VmError::BadJumpDestination.into()),
+            evmc_status_code::EVMC_INVALID_MEMORY_ACCESS => {
+                Err(VmError::InvalidMemoryAccess.into())
+            }
+            evmc_status_code::EVMC_CALL_DEPTH_EXCEEDED => Err(VmError::CallDepthExceeded.into()),
+            evmc_status_code::EVMC_STATIC_MODE_VIOLATION => {
+                Err(VmError::StaticModeViolation.into())
+            }
+            evmc_status_code::EVMC_PRECOMPILE_FAILURE => Err(VmError::PrecompileFailure.into()),
+            evmc_status_code::EVMC_CONTRACT_VALIDATION_FAILURE => {
+                Err(VmError::ContractValidationFailure.into())
+            }
+            evmc_status_code::EVMC_ARGUMENT_OUT_OF_RANGE => Err(VmError::ArgumentOutOfRange.into()),
+            evmc_status_code::EVMC_WASM_UNREACHABLE_INSTRUCTION => {
+                Err(VmError::WasmUnreachableInstruction.into())
+            }
+            evmc_status_code::EVMC_WASM_TRAP => Err(VmError::WasmTrap.into()),
+            evmc_status_code::EVMC_INTERNAL_ERROR => Err(VmError::InternalError.into()),
+            evmc_status_code::EVMC_REJECTED => Err(VmError::Rejected.into()),
+            evmc_status_code::EVMC_OUT_OF_MEMORY => Err(VmError::OutOfMemory.into()),
         }
     }
 

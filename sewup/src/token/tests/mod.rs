@@ -168,7 +168,9 @@ fn test_deploy_wasm() {
 
 #[test]
 fn test_execute_wasm_functions() {
-    fn run_function(fun_sig: [u8; 4], input_data: Option<&[u8]>, expect_ouput: Vec<u8>) {
+    use hex_literal::*;
+    let runtime = Arc::new(RefCell::new(TestRuntime::default()));
+    let run_function = |fun_sig: [u8; 4], input_data: Option<&[u8]>, expect_ouput: Vec<u8>| {
         let config_file = NamedTempFile::new().unwrap();
 
         let mut h = ERC20ContractHandler {
@@ -181,12 +183,13 @@ fn test_execute_wasm_functions() {
             ..Default::default()
         };
 
-        h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
+        h.rt = Some(runtime.clone());
 
         let r = h.execute(fun_sig, input_data, 1_000_000).unwrap();
 
         assert_eq!(r.output_data, expect_ouput);
-    }
+    };
+
     run_function(
         signature::NAME_SIGNATURE,
         None,
@@ -205,6 +208,19 @@ fn test_execute_wasm_functions() {
         None,
         vec![0, 0, 0, 0, 5, 245, 225, 0],
     );
-    // TODO: check why this fail
+    run_function(
+        signature::TOTAL_SUPPLY_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 5, 245, 225, 0],
+    );
+
+    // TODO: check why this fail and add more test with trasfer
     // run_function(signature::MINT_SIGNATURE, None, vec![]);
+
+    let balance_input = hex!("00000000000000000000000000000000FACEB00C");
+    run_function(
+        signature::DO_BALANCE_SIGNATURE,
+        Some(&balance_input),
+        vec![],
+    );
 }
