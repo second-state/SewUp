@@ -140,7 +140,7 @@ fn test_handle_error_for_mal_call_data_file() {
 }
 
 #[test]
-fn test_handle_from_call_data_file() {
+fn test_deploy_wasm() {
     let mut config_file = NamedTempFile::new().unwrap();
 
     let mut h = ERC20ContractHandler {
@@ -164,6 +164,27 @@ fn test_handle_from_call_data_file() {
         buf,
         "contract_address = \"0x522b3294e6d06aa25ad0f1b8891242e335d3b459\"\n"
     );
+}
 
-    h.execute(signature::DECIMALS_SIGNATURE, None, 1_000_000);
+#[test]
+fn test_execute_wasm() {
+    let config_file = NamedTempFile::new().unwrap();
+
+    let mut h = ERC20ContractHandler {
+        sender_address: Address::from_low_u64_be(1),
+        call_data: Some(format!(
+            "{}/../resources/test/erc20_contract.wasm",
+            env!("CARGO_MANIFEST_DIR")
+        )),
+        config_file_path: Some(config_file.path().into()),
+        ..Default::default()
+    };
+
+    h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
+
+    let r = h
+        .execute(signature::DECIMALS_SIGNATURE, None, 1_000_000)
+        .unwrap();
+
+    assert_eq!(r.output_data, vec![0, 0, 0, 0, 0, 0, 0, 0]);
 }

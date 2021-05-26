@@ -125,7 +125,6 @@ impl ERC20ContractHandler {
                 if let Some(input) = input {
                     input_data.extend_from_slice(input);
                 }
-                println!("{:?}", input_data);
 
                 let msg = VMMessageBuilder {
                     sender: Some(&self.sender_address),
