@@ -12,6 +12,8 @@
 <span id="9"> 9</span>
 <span id="10">10</span>
 <span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">thiserror</span>::<span class="ident">Error</span>;
 
@@ -23,6 +25,8 @@
     <span class="ident">InsufficientContractInfoError</span>,
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the format of calldata is hexaliteral&quot;</span>)]</span>
     <span class="ident">CalldataMalformat</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;calldata is absent&quot;</span>)]</span>
+    <span class="ident">CalldataAbsent</span>,
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-js="../../search-index.js"></div>
