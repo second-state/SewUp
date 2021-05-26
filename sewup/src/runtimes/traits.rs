@@ -9,7 +9,6 @@ use anyhow::Result;
 use contract_address::ContractAddress;
 use ethereum_types::{Address, H256, U256};
 use evmc_sys::evmc_call_kind;
-use std::any::Any;
 use thiserror::Error;
 
 #[derive(Error, Debug, PartialEq)]
@@ -65,9 +64,9 @@ pub enum VmError {
 // TODO: abstract this, such that this can suitable for other chain than ETH
 #[derive(Debug, Default)]
 pub struct VMResult {
-    gas_left: i64,
-    output_data: Option<Box<dyn Any>>,
-    create_address: Option<Address>,
+    pub(crate) gas_left: i64,
+    pub(crate) output_data: Vec<u8>,
+    pub(crate) create_address: Option<Address>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -87,6 +86,7 @@ pub struct VMMessage<'a> {
     pub sender: &'a Address,
     pub input_data: Option<&'a Vec<u8>>,
     pub value: U256,
+    pub code: Option<&'a Vec<u8>>,
     pub create2_salt: Option<H256>,
 }
 
@@ -100,6 +100,7 @@ pub struct VMMessageBuilder<'a> {
     pub sender: Option<&'a Address>,
     pub input_data: Option<&'a Vec<u8>>,
     pub value: U256,
+    pub code: Option<&'a Vec<u8>>,
     pub create2_salt: Option<H256>,
 }
 
@@ -134,6 +135,7 @@ impl<'a> VMMessageBuilder<'a> {
             sender,
             input_data,
             value,
+            code,
             create2_salt,
         } = self;
 
@@ -152,6 +154,7 @@ impl<'a> VMMessageBuilder<'a> {
                 sender,
                 input_data,
                 value,
+                code,
                 create2_salt,
             });
         }
@@ -177,6 +180,7 @@ impl Default for VMMessageBuilder<'_> {
             destination: None,
             sender: None,
             input_data: None,
+            code: None,
             create2_salt: None,
         }
     }

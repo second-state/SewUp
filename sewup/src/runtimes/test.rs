@@ -1,6 +1,6 @@
 //! A runtime for testing
 
-use crate::runtimes::traits::{Flags, VMMessage, VMResult, RT};
+use crate::runtimes::traits::{Flags, VMMessage, VMResult, VmError, RT};
 
 use contract_address::ContractAddress;
 use ethereum_types::U256;
@@ -34,6 +34,7 @@ impl RT for TestRuntime {
             sender,
             input_data,
             value,
+            code,
             create2_salt,
         } = msg;
 
@@ -41,7 +42,7 @@ impl RT for TestRuntime {
         let mut v = [0u8; 32];
         value.to_big_endian(&mut v);
 
-        self.vm.execute(
+        let (output_data, gas_left, status_code) = self.vm.execute(
             &mut self.host,
             evmc_revision::EVMC_FRONTIER,
             kind,
@@ -52,16 +53,52 @@ impl RT for TestRuntime {
             &sender.0,
             input_data.unwrap_or_else(|| &null_input_data),
             &v,
-            input_data.unwrap_or_else(|| &null_input_data),
+            code.unwrap_or(input_data.unwrap_or_else(|| &null_input_data)),
             &create2_salt.map_or_else(|| [0; 32], |h| h.0),
         );
-        Ok(VMResult::default())
+        match status_code {
+            evmc_status_code::EVMC_SUCCESS => Ok(VMResult {
+                output_data: output_data.into(),
+                gas_left,
+                ..Default::default()
+            }),
+            evmc_status_code::EVMC_FAILURE => Err(VmError::Failure.into()),
+            evmc_status_code::EVMC_REVERT => Err(VmError::Revert.into()),
+            evmc_status_code::EVMC_OUT_OF_GAS => Err(VmError::OutOfGas.into()),
+            evmc_status_code::EVMC_INVALID_INSTRUCTION => Err(VmError::InvalidInstruction.into()),
+            evmc_status_code::EVMC_UNDEFINED_INSTRUCTION => {
+                Err(VmError::UndefinedInstruction.into())
+            }
+            evmc_status_code::EVMC_STACK_OVERFLOW => Err(VmError::StackOverflow.into()),
+            evmc_status_code::EVMC_STACK_UNDERFLOW => Err(VmError::StackUnderflow.into()),
+            evmc_status_code::EVMC_BAD_JUMP_DESTINATION => Err(VmError::BadJumpDestination.into()),
+            evmc_status_code::EVMC_INVALID_MEMORY_ACCESS => {
+                Err(VmError::InvalidMemoryAccess.into())
+            }
+            evmc_status_code::EVMC_CALL_DEPTH_EXCEEDED => Err(VmError::CallDepthExceeded.into()),
+            evmc_status_code::EVMC_STATIC_MODE_VIOLATION => {
+                Err(VmError::StaticModeViolation.into())
+            }
+            evmc_status_code::EVMC_PRECOMPILE_FAILURE => Err(VmError::PrecompileFailure.into()),
+            evmc_status_code::EVMC_CONTRACT_VALIDATION_FAILURE => {
+                Err(VmError::ContractValidationFailure.into())
+            }
+            evmc_status_code::EVMC_ARGUMENT_OUT_OF_RANGE => Err(VmError::ArgumentOutOfRange.into()),
+            evmc_status_code::EVMC_WASM_UNREACHABLE_INSTRUCTION => {
+                Err(VmError::WasmUnreachableInstruction.into())
+            }
+            evmc_status_code::EVMC_WASM_TRAP => Err(VmError::WasmTrap.into()),
+            evmc_status_code::EVMC_INTERNAL_ERROR => Err(VmError::InternalError.into()),
+            evmc_status_code::EVMC_REJECTED => Err(VmError::Rejected.into()),
+            evmc_status_code::EVMC_OUT_OF_MEMORY => Err(VmError::OutOfMemory.into()),
+        }
     }
 
     fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress> {
-        let VMMessage { sender, .. } = msg;
+        let sender = msg.sender.clone();
+        self.execute(msg)?;
         Ok(ContractAddress::from_sender_and_nonce(
-            sender,
+            &sender,
             &U256::default(),
         ))
     }

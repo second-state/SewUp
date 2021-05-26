@@ -8,4 +8,6 @@ pub enum ContractError {
     InsufficientContractInfoError,
     #[error("the format of calldata is hexaliteral")]
     CalldataMalformat,
+    #[error("calldata is absent")]
+    CalldataAbsent,
 }

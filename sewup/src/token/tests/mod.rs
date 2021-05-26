@@ -6,6 +6,8 @@ mod handler;
 
 use crate::errors::ContractError as Error;
 use crate::runtimes::test::TestRuntime;
+use crate::token::signature;
+
 use handler::ERC20ContractHandler;
 
 use ethereum_types::Address;
@@ -138,10 +140,10 @@ fn test_handle_error_for_mal_call_data_file() {
 }
 
 #[test]
-fn test_handle_from_call_data_file() {
+fn test_deploy_wasm() {
     let mut config_file = NamedTempFile::new().unwrap();
 
-    let mut c = ERC20ContractHandler {
+    let mut h = ERC20ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
             "{}/../resources/test/erc20_contract.wasm",
@@ -151,9 +153,9 @@ fn test_handle_from_call_data_file() {
         ..Default::default()
     };
 
-    c.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
+    h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let connect_result = c.connect(1_000_000);
+    let connect_result = h.connect(1_000_000);
     assert!(connect_result.is_ok());
 
     let mut buf = String::new();
@@ -161,5 +163,64 @@ fn test_handle_from_call_data_file() {
     assert_eq!(
         buf,
         "contract_address = \"0x522b3294e6d06aa25ad0f1b8891242e335d3b459\"\n"
+    );
+}
+
+#[test]
+fn test_execute_wasm_functions() {
+    use hex_literal::*;
+    let runtime = Arc::new(RefCell::new(TestRuntime::default()));
+    let run_function = |fun_sig: [u8; 4], input_data: Option<&[u8]>, expect_ouput: Vec<u8>| {
+        let config_file = NamedTempFile::new().unwrap();
+
+        let mut h = ERC20ContractHandler {
+            sender_address: Address::from_low_u64_be(1),
+            call_data: Some(format!(
+                "{}/../resources/test/erc20_contract.wasm",
+                env!("CARGO_MANIFEST_DIR")
+            )),
+            config_file_path: Some(config_file.path().into()),
+            ..Default::default()
+        };
+
+        h.rt = Some(runtime.clone());
+
+        let r = h.execute(fun_sig, input_data, 1_000_000).unwrap();
+
+        assert_eq!(r.output_data, expect_ouput);
+    };
+
+    run_function(
+        signature::NAME_SIGNATURE,
+        None,
+        vec![
+            69, 82, 67, 50, 48, 84, 111, 107, 101, 110, 68, 101, 109, 111,
+        ],
+    );
+    run_function(signature::SYMBOL_SIGNATURE, None, vec![69, 84, 68]);
+    run_function(
+        signature::DECIMALS_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 0, 0, 0, 0],
+    );
+    run_function(
+        signature::TOTAL_SUPPLY_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 5, 245, 225, 0],
+    );
+    run_function(
+        signature::TOTAL_SUPPLY_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 5, 245, 225, 0],
+    );
+
+    // TODO: check why this fail and add more test with trasfer
+    // run_function(signature::MINT_SIGNATURE, None, vec![]);
+
+    let balance_input = hex!("00000000000000000000000000000000FACEB00C");
+    run_function(
+        signature::DO_BALANCE_SIGNATURE,
+        Some(&balance_input),
+        vec![],
     );
 }

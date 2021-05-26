@@ -26,7 +26,7 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use crate::errors::ContractError as Error;
-use crate::runtimes::traits::{VMMessageBuilder, RT};
+use crate::runtimes::traits::{VMMessageBuilder, VMResult, RT};
 
 use anyhow::{Context, Result};
 use ethereum_types::Address;
@@ -109,6 +109,37 @@ impl ERC20ContractHandler {
             return Err(Error::InsufficientContractInfoError.into());
         }
         panic!("config_file_path should be update when ERC20ContractHandler construct")
+    }
+
+    pub fn execute(
+        &mut self,
+        fun_sig: [u8; 4],
+        input: Option<&[u8]>,
+        gas: i64,
+    ) -> Result<VMResult> {
+        if let Some(rt) = self.rt.take() {
+            let mut result: Result<VMResult> = Err(Error::CalldataAbsent.into());
+            if let Some(call_data) = self.call_data.take() {
+                let call_data = ERC20ContractHandler::get_call_data(call_data)?;
+                let mut input_data: Vec<u8> = fun_sig.to_vec();
+                if let Some(input) = input {
+                    input_data.extend_from_slice(input);
+                }
+
+                let msg = VMMessageBuilder {
+                    sender: Some(&self.sender_address),
+                    input_data: Some(&input_data),
+                    gas,
+                    code: Some(&call_data),
+                    ..Default::default()
+                }
+                .build()?;
+                result = Ok(rt.borrow_mut().execute(msg)?);
+            }
+            self.rt = Some(rt);
+            return result;
+        }
+        panic!("rt should be init when parsing the connection string")
     }
 
     /// Return the call data binary from hex literal or from a ewasm file

@@ -6,7 +6,7 @@ pub const NAME_SIGNATURE: [u8; 4] = [6, 253, 222, 3];
 
 pub const SYMBOL_SIGNATURE: [u8; 4] = [149, 216, 155, 65];
 
-pub const DEVIMALS_SIGNATURE: [u8; 4] = [49, 60, 229, 103];
+pub const DECIMALS_SIGNATURE: [u8; 4] = [49, 60, 229, 103];
 
 pub const TOTAL_SUPPLY_SIGNATURE: [u8; 4] = [24, 22, 13, 221];
 
@@ -29,7 +29,7 @@ mod tests {
         // assert_eq!(get_function_signature("doTransfer(address,value)"), DO_TRANSFER_SIGNATURE);
         assert_eq!(get_function_signature("name()"), NAME_SIGNATURE);
         assert_eq!(get_function_signature("symbol()"), SYMBOL_SIGNATURE);
-        assert_eq!(get_function_signature("decimals()"), DEVIMALS_SIGNATURE);
+        assert_eq!(get_function_signature("decimals()"), DECIMALS_SIGNATURE);
         assert_eq!(
             get_function_signature("totalSupply()"),
             TOTAL_SUPPLY_SIGNATURE
