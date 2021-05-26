@@ -167,24 +167,44 @@ fn test_deploy_wasm() {
 }
 
 #[test]
-fn test_execute_wasm() {
-    let config_file = NamedTempFile::new().unwrap();
+fn test_execute_wasm_functions() {
+    fn run_function(fun_sig: [u8; 4], input_data: Option<&[u8]>, expect_ouput: Vec<u8>) {
+        let config_file = NamedTempFile::new().unwrap();
 
-    let mut h = ERC20ContractHandler {
-        sender_address: Address::from_low_u64_be(1),
-        call_data: Some(format!(
-            "{}/../resources/test/erc20_contract.wasm",
-            env!("CARGO_MANIFEST_DIR")
-        )),
-        config_file_path: Some(config_file.path().into()),
-        ..Default::default()
-    };
+        let mut h = ERC20ContractHandler {
+            sender_address: Address::from_low_u64_be(1),
+            call_data: Some(format!(
+                "{}/../resources/test/erc20_contract.wasm",
+                env!("CARGO_MANIFEST_DIR")
+            )),
+            config_file_path: Some(config_file.path().into()),
+            ..Default::default()
+        };
 
-    h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
+        h.rt = Some(Arc::new(RefCell::new(TestRuntime::default())));
 
-    let r = h
-        .execute(signature::DECIMALS_SIGNATURE, None, 1_000_000)
-        .unwrap();
+        let r = h.execute(fun_sig, input_data, 1_000_000).unwrap();
 
-    assert_eq!(r.output_data, vec![0, 0, 0, 0, 0, 0, 0, 0]);
+        assert_eq!(r.output_data, expect_ouput);
+    }
+    run_function(
+        signature::NAME_SIGNATURE,
+        None,
+        vec![
+            69, 82, 67, 50, 48, 84, 111, 107, 101, 110, 68, 101, 109, 111,
+        ],
+    );
+    run_function(signature::SYMBOL_SIGNATURE, None, vec![69, 84, 68]);
+    run_function(
+        signature::DECIMALS_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 0, 0, 0, 0],
+    );
+    run_function(
+        signature::TOTAL_SUPPLY_SIGNATURE,
+        None,
+        vec![0, 0, 0, 0, 5, 245, 225, 0],
+    );
+    // TODO: check why this fail
+    // run_function(signature::MINT_SIGNATURE, None, vec![]);
 }
