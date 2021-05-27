@@ -40,5 +40,5 @@ clangStdenv.mkDerivation {
   nativeBuildInputs = with nixpkgs; [
     cmake
   ];
-  LIBCLANG_PATH = "${nixpkgs.llvmPackages_10.libclang}/lib";
+  LIBCLANG_PATH = "${nixpkgs.llvmPackages_10.libclang.lib}/lib";
 }
