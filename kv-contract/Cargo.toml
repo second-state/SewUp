@@ -1,0 +1,8 @@
+[package]
+name = "kv-contract"
+version = "0.1.0"
+authors = ["Antonio Yang <yanganto@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+sewup-derive = { path = '../sewup-derive' }
