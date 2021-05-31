@@ -13,6 +13,7 @@ serde_derive = "1.0"
 toml = "0.5.8"
 ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
 tiny-keccak = { version = "2.0.2", features = ["sha3", "keccak"] }
+sewup-derive = { path = '../sewup-derive' }
 
 [dev-dependencies]
 tempfile = "3.2.0"
