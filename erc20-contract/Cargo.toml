@@ -12,6 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
 sewup = { path="../sewup", features = [ "token" ] }
+sewup-derive = { path = '../sewup-derive' }
 anyhow = "1.0.40"
 
 [profile.release]

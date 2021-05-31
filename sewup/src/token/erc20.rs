@@ -3,7 +3,9 @@ use super::helpers::{
     set_balance,
 };
 use ewasm_api::types::{Address, StorageValue};
+use sewup_derive::ewasm_lib_fn;
 
+#[ewasm_lib_fn]
 pub fn do_transfer(recipient: Address, value: StorageValue) {
     let sender = ewasm_api::caller();
     let sender_balance = get_balance(&sender);
@@ -33,6 +35,7 @@ pub fn do_transfer(recipient: Address, value: StorageValue) {
     set_balance(&recipient, &rc_value);
 }
 
+#[ewasm_lib_fn]
 pub fn do_balance(account: Address) {
     let balance = get_balance(&account);
 
@@ -41,44 +44,52 @@ pub fn do_balance(account: Address) {
     }
 }
 
+#[ewasm_lib_fn]
 pub fn name() {
     let token_name = "ERC20TokenDemo".to_string().into_bytes();
     ewasm_api::finish_data(&token_name);
 }
 
+#[ewasm_lib_fn]
 pub fn symbol() {
     let symbol = "ETD".to_string().into_bytes();
     ewasm_api::finish_data(&symbol);
 }
 
+#[ewasm_lib_fn]
 pub fn decimals() {
     let decimals = 0_u64.to_be_bytes();
     ewasm_api::finish_data(&decimals);
 }
 
+#[ewasm_lib_fn]
 pub fn total_supply() {
     let total_supply = 100000000_u64.to_be_bytes();
     ewasm_api::finish_data(&total_supply);
 }
 
+#[ewasm_lib_fn]
 pub fn approve(spender: Address, value: StorageValue) {
     let sender = ewasm_api::caller();
 
     set_allowance(&sender, &spender, &value);
 }
 
+#[ewasm_lib_fn]
 pub fn allowance(owner: Address, spender: Address) {
     let allowance_value = get_allowance(&owner, &spender);
 
     ewasm_api::finish_data(&allowance_value.bytes);
 }
 
+#[ewasm_lib_fn]
 pub fn mint(the: Address, value: u64) {
     let value: [u8; 8] = value.to_be_bytes();
     let stv_owner_balance = copy_into_storage_value(&value[0..8]);
     set_balance(&the, &stv_owner_balance);
 }
 
+#[ewasm_lib_fn]
 pub fn transfer_from(owner: Address, recipient: Address, value: u64) {
     let sender = ewasm_api::caller();
     let owner_balance = get_balance(&owner);
