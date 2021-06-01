@@ -12,6 +12,34 @@ fn get_function_signature(funtion_prototype: &str) -> [u8; 4] {
 }
 
 #[proc_macro_attribute]
+pub fn ewasm_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
+    let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
+        if cap.name("name").unwrap().as_str() == "main" {
+            panic!("function name main is reserved for the wrapper")
+        }
+        cap.name("name").unwrap().as_str().to_owned()
+    } else {
+        panic!("parse function error")
+    };
+    format!(
+        r#"
+        #[no_mangle]
+        pub fn main() {{
+            {}
+            if let Err(e) = {}() {{
+                println!("ewasm error: {{:?}}", e);
+            }}
+        }}
+    "#,
+        item.to_string(),
+        fn_name
+    )
+    .parse()
+    .unwrap()
+}
+
+#[proc_macro_attribute]
 pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {

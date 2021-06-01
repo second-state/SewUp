@@ -10,7 +10,7 @@ use sewup::token::{
     },
     helpers::{copy_into_address, copy_into_array, copy_into_storage_value},
 };
-use sewup_derive::{ewasm_fn, fn_sig};
+use sewup_derive::{ewasm_fn, ewasm_main, fn_sig};
 
 #[ewasm_fn]
 fn do_balance(contract: &Contract) {
@@ -85,6 +85,7 @@ fn transfer_from(contract: &Contract) {
 
     erc20_transfer_from(owner, recipient, value);
 }
+
 #[ewasm_fn]
 fn mint(contract: &Contract) {
     let adddress = copy_into_address(&contract.input_data[4..24]);
@@ -95,27 +96,21 @@ fn mint(contract: &Contract) {
     erc20_mint(adddress, value);
 }
 
-#[no_mangle]
-pub fn main() {
-    fn inner() -> Result<()> {
-        let contract = Contract::new()?;
-        match contract.get_function_selector()? {
-            fn_sig!(do_balance) => do_balance(&contract),
-            fn_sig!(do_transfer) => do_transfer(&contract),
-            NAME_SIG => name(),
-            SYMBOL_SIG => symbol(),
-            DECIMALS_SIG => decimals(),
-            TOTAL_SUPPLY_SIG => total_supply(),
-            fn_sig!(approve) => approve(&contract),
-            fn_sig!(allowance) => allowance(&contract),
-            fn_sig!(transfer_from) => transfer_from(&contract),
-            fn_sig!(mint) => mint(&contract),
-            _ => (),
-        };
-        Ok(())
-    }
-
-    if let Err(_e) = inner() {
-        // println!("{:?}", e);
-    }
+#[ewasm_main]
+fn ewasm_main() -> Result<()> {
+    let contract = Contract::new()?;
+    match contract.get_function_selector()? {
+        fn_sig!(do_balance) => do_balance(&contract),
+        fn_sig!(do_transfer) => do_transfer(&contract),
+        NAME_SIG => name(),
+        SYMBOL_SIG => symbol(),
+        DECIMALS_SIG => decimals(),
+        TOTAL_SUPPLY_SIG => total_supply(),
+        fn_sig!(approve) => approve(&contract),
+        fn_sig!(allowance) => allowance(&contract),
+        fn_sig!(transfer_from) => transfer_from(&contract),
+        fn_sig!(mint) => mint(&contract),
+        _ => (),
+    };
+    Ok(())
 }
