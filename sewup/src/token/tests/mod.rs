@@ -171,7 +171,7 @@ fn test_execute_wasm_functions() {
     use hex_literal::*;
     let runtime = Arc::new(RefCell::new(TestRuntime::default()));
     let run_function =
-        |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_ouput: Vec<u8>| {
+        |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
             let config_file = NamedTempFile::new().unwrap();
 
             let mut h = ERC20ContractHandler {
@@ -188,7 +188,7 @@ fn test_execute_wasm_functions() {
 
             let r = h.execute(fn_sig, input_data, 1_000_000).unwrap();
 
-            assert_eq!((fn_name, r.output_data), (fn_name, expect_ouput));
+            assert_eq!((fn_name, r.output_data), (fn_name, expect_output));
         };
 
     run_function(

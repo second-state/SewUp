@@ -1,0 +1,21 @@
+name: Typo
+on:
+  pull_request:
+
+jobs:
+  typo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v13
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      - name: Install typos
+        run: nix-shell --run "cargo install typos-cli"
+
+      - name: Check typo
+        run: nix-shell --run "typos"
