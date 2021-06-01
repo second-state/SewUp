@@ -47,7 +47,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
             fn_name,
             params
                 .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or_else(|| "").trim())
+                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
                 .collect::<Vec<_>>()
                 .join(",")
         );
@@ -78,7 +78,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
             fn_name,
             params
                 .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or_else(|| "").trim())
+                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
                 .collect::<Vec<_>>()
                 .join(",")
         );

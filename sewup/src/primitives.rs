@@ -16,12 +16,12 @@ impl Contract {
         let data_size = ewasm_api::calldata_size();
         let input_data = ewasm_api::calldata_acquire();
         if data_size < 4 {
-            return Err(ContractSizeError(data_size).into());
+            Err(ContractSizeError(data_size).into())
         } else {
-            return Ok(Contract {
+            Ok(Contract {
                 data_size,
                 input_data,
-            });
+            })
         }
     }
     pub fn get_function_selector(&self) -> Result<FunctionSignature> {

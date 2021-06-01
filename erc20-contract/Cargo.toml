@@ -3,7 +3,7 @@ name = "erc20-contract"
 version = "0.1.0"
 authors = []
 edition = "2018"
-description = "This erc20 rs crate is based on the previous works of second state."
+description = "This is based on the previous works of second state, but **Not** an exanple for SewUp, I use the project toe setup developing environment for SewUp."
 
 [lib]
 path = "src/token.rs"

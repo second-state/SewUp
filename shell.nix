@@ -9,10 +9,14 @@ let
     targets = [ "wasm32-unknown-unknown" ];
   });
   updateContract = nixpkgs.writeShellScriptBin "update-contract" ''
-    cd erc20-contract
+    update-single-contract erc20
+    update-single-contract kv
+  '';
+  updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
+    cd $1-contract
     cargo build --release
     cd ../
-    mv target/wasm32-unknown-unknown/release/erc20_contract.wasm resources/test/erc20_contract.wasm
+    mv target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm
   '';
   testScript = nixpkgs.writeShellScriptBin "run-test" ''
     cd sewup
@@ -28,6 +32,7 @@ with nixpkgs; pkgs.mkShell {
     rust-stable
     boost
     updateContract
+    updateSingleContract
     testScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
