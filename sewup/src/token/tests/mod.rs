@@ -201,7 +201,7 @@ fn test_execute_wasm_functions() {
     );
     run_function(
         "symbol",
-        get_function_signature("symbol()"),
+        get_function_signature("symbol(& str)"),
         None,
         vec![69, 84, 68],
     );
