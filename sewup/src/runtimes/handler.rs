@@ -1,24 +1,5 @@
-//! ERC20 contract handler
-//! The handler helps you deploy/generate ERC20 token, just like manipulating a
-//! database.
-//!
-//! The general way we connect to a DB is to use the connection string
-//! > postgres://user:password@127.0.0.1:5432
-//!
-//! This handler mimic the database connecting way for ERC20 contract, and
-//! automatically deploy the contract if needed
-//!
-//!
-//! ## Getting started
-//!
-//! Add follow sewup with `token` feature enabled.
-//! > sewup = { features = ["token"] }
-//!
-//! >>>
-//! sewup://sender_address@node_ip:node_port/ERC20_contract_config_file_path
-//! sewup://sender_address@node_ip:node_port/erc20_contract_address
-//! >>>
-
+//! Contract handler
+//! The handler helps you deploy contract and test the contract you developing
 use std::cell::RefCell;
 use std::fmt;
 use std::fs::{self, read};
@@ -32,10 +13,8 @@ use anyhow::{Context, Result};
 use ethereum_types::Address;
 use serde_derive::{Deserialize, Serialize};
 
-/// ERC20ContractHandler helps you deploy or interactive with the existing
-/// ERC 20 contract
 #[derive(Clone, Deserialize, Serialize, Default)]
-pub struct ERC20ContractHandler {
+pub struct ContractHandler {
     /// The contract address, when the contract is not deployed,
     /// the `connect` function called the contract will be automatically
     /// deployed and the address field of the config will be filled
@@ -49,7 +28,7 @@ pub struct ERC20ContractHandler {
     /// the .ewasm file
     pub call_data: Option<String>,
 
-    /// If the ERC20_contract_config_file_path pass from the connection string,
+    /// If the contract_config_file_path pass from the connection string,
     /// this field will be filled
     #[serde(skip)]
     pub(crate) config_file_path: Option<PathBuf>,
@@ -58,9 +37,9 @@ pub struct ERC20ContractHandler {
     pub(crate) rt: Option<Arc<RefCell<dyn RT>>>,
 }
 
-impl fmt::Debug for ERC20ContractHandler {
+impl fmt::Debug for ContractHandler {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Point")
+        f.debug_struct("ContractHandler")
             .field("contract_address", &self.contract_address)
             .field("sender_address", &self.sender_address)
             .field("call_data", &self.call_data)
@@ -70,7 +49,7 @@ impl fmt::Debug for ERC20ContractHandler {
     }
 }
 
-impl ERC20ContractHandler {
+impl ContractHandler {
     /// Reach the contract, if the contract is not exist, then deploy it first
     pub fn connect(&mut self, gas: i64) -> Result<()> {
         if self.contract_address.is_none() {
@@ -83,7 +62,7 @@ impl ERC20ContractHandler {
     fn deploy(&mut self, gas: i64) -> Result<()> {
         if let Some(config_file_path) = self.config_file_path.take() {
             if let Some(call_data) = self.call_data.take() {
-                let call_data = ERC20ContractHandler::get_call_data(call_data)?;
+                let call_data = ContractHandler::get_call_data(call_data)?;
                 if call_data.len() < 4 {
                     return Err(Error::ContractSizeError(call_data.len()).into());
                 }
@@ -108,7 +87,7 @@ impl ERC20ContractHandler {
             }
             return Err(Error::InsufficientContractInfoError.into());
         }
-        panic!("config_file_path should be update when ERC20ContractHandler construct")
+        panic!("config_file_path should be update when ContractHandler constructed")
     }
 
     pub fn execute(
@@ -120,7 +99,7 @@ impl ERC20ContractHandler {
         if let Some(rt) = self.rt.take() {
             let mut result: Result<VMResult> = Err(Error::CalldataAbsent.into());
             if let Some(call_data) = self.call_data.take() {
-                let call_data = ERC20ContractHandler::get_call_data(call_data)?;
+                let call_data = ContractHandler::get_call_data(call_data)?;
                 let mut input_data: Vec<u8> = fun_sig.to_vec();
                 if let Some(input) = input {
                     input_data.extend_from_slice(input);

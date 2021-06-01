@@ -1,5 +1,6 @@
 use super::bucket::Bucket;
 use anyhow::Result;
+use std::collections::{hash_map::HashMap, BTreeMap};
 
 /// Store is a storage space for an account in a specific block.
 /// We can import the storage from a past block, and we only commit the storage
@@ -7,11 +8,14 @@ use anyhow::Result;
 ///
 /// Besides, there may be more than one bucket in store, such that you can
 /// easily save different kind of key/value pair in the chain.
-pub struct Store {}
+#[derive(Default)]
+pub struct Store {
+    tenants: HashMap<[u8; 4], BTreeMap<Vec<u8>, Vec<u8>>>,
+}
 
 impl Store {
     pub fn new() -> Result<Self> {
-        Ok(Store {})
+        Ok(Store::default())
     }
 
     /// Get a list of bucket names

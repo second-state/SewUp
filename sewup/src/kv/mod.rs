@@ -37,11 +37,20 @@
 //TODO: remove this after implement
 #[allow(unused_variables)]
 #[allow(dead_code)]
+// This will be test after compiled into wasm
+#[cfg(not(test))]
 mod store;
+#[cfg(not(test))]
 pub use store::*;
 
 //TODO: remove this after implement
 #[allow(unused_variables)]
 #[allow(dead_code)]
+// This will be test after compiled into wasm
+#[cfg(not(test))]
 mod bucket;
+#[cfg(not(test))]
 pub use bucket::*;
+
+#[cfg(test)]
+mod tests;

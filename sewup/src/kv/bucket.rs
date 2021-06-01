@@ -87,3 +87,9 @@ impl Bucket {
         true
     }
 }
+
+impl Default for Bucket {
+    fn default() -> Self {
+        Self::new()
+    }
+}

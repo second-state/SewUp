@@ -2,22 +2,17 @@ use std::cell::RefCell;
 use std::io::Read;
 use std::sync::Arc;
 
-mod handler;
-
 use crate::errors::ContractError as Error;
-use crate::runtimes::test::TestRuntime;
+use crate::runtimes::{handler::ContractHandler, test::TestRuntime};
 use crate::utils::get_function_signature;
 
-use handler::ERC20ContractHandler;
-
 use ethereum_types::Address;
-use toml;
-
 use tempfile::NamedTempFile;
+use toml;
 
 #[test]
 fn test_config_serde() {
-    let c1 = ERC20ContractHandler {
+    let c1 = ContractHandler {
         contract_address: Some(Address::from_low_u64_be(15)),
         sender_address: Address::from_low_u64_be(1),
         call_data: Some("0x12345678".into()),
@@ -28,11 +23,11 @@ fn test_config_serde() {
         "contract_address = \"0x000000000000000000000000000000000000000f\"\ncall_data = \"0x12345678\"\n"
     );
 
-    let c2: ERC20ContractHandler =
+    let c2: ContractHandler =
         toml::from_str("contract_address = \"0x000000000000000000000000000000000000000f\"\nsender_address = \"0x0000000000000000000000000000000000000001\"\n").unwrap();
     assert_eq!(c2.contract_address, c1.contract_address);
 
-    let c3: ERC20ContractHandler = toml::from_str("call_data = \"0x12345678\"\nsender_address = \"0x0000000000000000000000000000000000000001\"\n").unwrap();
+    let c3: ContractHandler = toml::from_str("call_data = \"0x12345678\"\nsender_address = \"0x0000000000000000000000000000000000000001\"\n").unwrap();
     assert_eq!(c3.contract_address, None);
     assert_eq!(c3.call_data.unwrap(), "0x12345678".to_string());
 }
@@ -40,7 +35,7 @@ fn test_config_serde() {
 #[test]
 fn test_handle_error_missing_call_data_and_contract_address() {
     let config_file = NamedTempFile::new().unwrap();
-    let mut c = ERC20ContractHandler {
+    let mut c = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         contract_address: None,
         config_file_path: Some(config_file.path().into()),
@@ -59,7 +54,7 @@ fn test_handle_error_missing_call_data_and_contract_address() {
 #[test]
 fn test_handle_error_for_small_call_data() {
     let config_file = NamedTempFile::new().unwrap();
-    let mut c = ERC20ContractHandler {
+    let mut c = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         contract_address: None,
         call_data: Some("0xabcd".to_string()),
@@ -79,7 +74,7 @@ fn test_handle_error_for_small_call_data() {
 #[test]
 fn test_handle_error_for_odd_size_call_data() {
     let config_file = NamedTempFile::new().unwrap();
-    let mut c = ERC20ContractHandler {
+    let mut c = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         contract_address: None,
         call_data: Some("0xabcdefeff".to_string()),
@@ -99,7 +94,7 @@ fn test_handle_error_for_odd_size_call_data() {
 #[test]
 fn test_handle_error_for_mal_call_data() {
     let config_file = NamedTempFile::new().unwrap();
-    let mut c = ERC20ContractHandler {
+    let mut c = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         contract_address: None,
         call_data: Some("0xabcdefeffg".to_string()),
@@ -120,7 +115,7 @@ fn test_handle_error_for_mal_call_data() {
 fn test_handle_error_for_mal_call_data_file() {
     let config_file = NamedTempFile::new().unwrap();
 
-    let mut c = ERC20ContractHandler {
+    let mut c = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
             "{}/../resources/test/bad.wasm",
@@ -143,7 +138,7 @@ fn test_handle_error_for_mal_call_data_file() {
 fn test_deploy_wasm() {
     let mut config_file = NamedTempFile::new().unwrap();
 
-    let mut h = ERC20ContractHandler {
+    let mut h = ContractHandler {
         sender_address: Address::from_low_u64_be(1),
         call_data: Some(format!(
             "{}/../resources/test/erc20_contract.wasm",
@@ -174,7 +169,7 @@ fn test_execute_wasm_functions() {
         |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
             let config_file = NamedTempFile::new().unwrap();
 
-            let mut h = ERC20ContractHandler {
+            let mut h = ContractHandler {
                 sender_address: Address::from_low_u64_be(1),
                 call_data: Some(format!(
                     "{}/../resources/test/erc20_contract.wasm",
