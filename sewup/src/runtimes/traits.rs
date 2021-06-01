@@ -53,7 +53,7 @@ pub enum VmError {
     OutOfMemory,
 
     #[error("there shoulbe be a caller(sender) for the message")]
-    UnkownCaller,
+    UnknownCaller,
 
     /// If the EWASM erorrs are not enough for your VM,
     /// you can use this error type to help you customized you error message
@@ -158,7 +158,7 @@ impl<'a> VMMessageBuilder<'a> {
                 create2_salt,
             });
         }
-        Err(VmError::UnkownCaller.into())
+        Err(VmError::UnknownCaller.into())
     }
 
     /// Use Create2 EVM call with predefined salt

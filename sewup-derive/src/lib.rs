@@ -3,10 +3,10 @@ use proc_macro::TokenStream;
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
 
-fn get_function_signature(funtion_prototype: &str) -> [u8; 4] {
+fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
-    hasher.update(funtion_prototype.as_bytes());
+    hasher.update(function_prototype.as_bytes());
     hasher.finalize(&mut sig);
     sig
 }
