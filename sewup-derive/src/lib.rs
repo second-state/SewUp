@@ -15,9 +15,6 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 pub fn ewasm_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
     let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
-        if cap.name("name").unwrap().as_str() == "main" {
-            panic!("function name main is reserved for the wrapper")
-        }
         cap.name("name").unwrap().as_str().to_owned()
     } else {
         panic!("parse function error")

@@ -97,13 +97,13 @@ fn mint(contract: &Contract) {
 }
 
 #[ewasm_main]
-fn ewasm_main() -> Result<()> {
+fn main() -> Result<()> {
     let contract = Contract::new()?;
     match contract.get_function_selector()? {
         fn_sig!(do_balance) => do_balance(&contract),
         fn_sig!(do_transfer) => do_transfer(&contract),
         NAME_SIG => name(),
-        SYMBOL_SIG => symbol(),
+        SYMBOL_SIG => symbol("ETD"),
         DECIMALS_SIG => decimals(),
         TOTAL_SUPPLY_SIG => total_supply(),
         fn_sig!(approve) => approve(&contract),

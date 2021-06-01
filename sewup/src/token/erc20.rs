@@ -51,8 +51,8 @@ pub fn name() {
 }
 
 #[ewasm_lib_fn]
-pub fn symbol() {
-    let symbol = "ETD".to_string().into_bytes();
+pub fn symbol(s: &str) {
+    let symbol = s.to_string().into_bytes();
     ewasm_api::finish_data(&symbol);
 }
 
