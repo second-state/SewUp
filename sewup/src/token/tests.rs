@@ -216,7 +216,7 @@ fn test_execute_wasm_functions() {
     let balance_input = hex!("00000000000000000000000000000000FACEB00C");
     run_function(
         "do balance",
-        get_function_signature("do_balance(&Contract)"),
+        get_function_signature("do_balance(& Contract)"),
         Some(&balance_input),
         vec![],
     );

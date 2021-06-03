@@ -16,7 +16,9 @@ let
     cd $1-contract
     cargo build --release
     cd ../
-    mv target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm
+    mv target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm \
+      & echo "==> update $1" \
+      & echo "==> `ls -l resources/test/$1_contract.wasm`"
   '';
   testScript = nixpkgs.writeShellScriptBin "run-test" ''
     cd sewup

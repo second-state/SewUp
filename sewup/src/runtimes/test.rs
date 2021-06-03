@@ -2,10 +2,11 @@
 
 use crate::runtimes::traits::{Flags, VMMessage, VMResult, VmError, RT};
 
-use contract_address::ContractAddress;
-use ethereum_types::U256;
+use std::collections::HashMap;
 
 use anyhow::Result;
+use contract_address::ContractAddress;
+use ethereum_types::U256;
 use evmc_sys::{evmc_call_kind, evmc_revision, evmc_status_code, evmc_storage_status};
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
 
@@ -17,7 +18,7 @@ pub struct TestRuntime {
 impl Default for TestRuntime {
     fn default() -> Self {
         Self {
-            host: TestHost {},
+            host: TestHost::default(),
             vm: create_vm(),
         }
     }
@@ -104,14 +105,21 @@ impl RT for TestRuntime {
     }
 }
 
-struct TestHost {}
+#[derive(Default)]
+struct TestHost {
+    store: HashMap<[u8; 32], [u8; 32]>,
+}
+
 impl HostContext for TestHost {
     fn account_exists(&mut self, addr: &[u8; 20]) -> bool {
         true
     }
 
     fn get_storage(&mut self, addr: &[u8; 20], key: &[u8; 32]) -> [u8; 32] {
-        [0; 32]
+        match self.store.get(key) {
+            Some(v) => *v,
+            None => [0; 32],
+        }
     }
 
     fn set_storage(
@@ -120,6 +128,7 @@ impl HostContext for TestHost {
         key: &[u8; 32],
         value: &[u8; 32],
     ) -> evmc_storage_status {
+        self.store.insert(*key, *value);
         evmc_storage_status::EVMC_STORAGE_MODIFIED
     }
 

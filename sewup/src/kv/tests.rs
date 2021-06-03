@@ -10,7 +10,7 @@ use tempfile::NamedTempFile;
 #[test]
 fn test_execute_wasm_functions() {
     let runtime = Arc::new(RefCell::new(TestRuntime::default()));
-    let _run_function =
+    let run_function =
         |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
             let config_file = NamedTempFile::new().unwrap();
 
@@ -26,8 +26,29 @@ fn test_execute_wasm_functions() {
 
             h.rt = Some(runtime.clone());
 
-            let r = h.execute(fn_sig, input_data, 1_000_000).unwrap();
-
-            assert_eq!((fn_name, r.output_data), (fn_name, expect_output));
+            match h.execute(fn_sig, input_data, 1_000_000) {
+                Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
+                Err(e) => {
+                    panic!("vm error: {:?}", e);
+                }
+            }
         };
+    run_function(
+        "Commit test",
+        get_function_signature("empty_commit()"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Unknow Handler",
+        get_function_signature("unknow_function()"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Verson check test",
+        get_function_signature("check_version_and_feature(u8,Vec<Feature>)"),
+        None,
+        vec![],
+    );
 }

@@ -13,6 +13,7 @@ crate-type = ["cdylib"]
 sewup = { path = '../sewup', features = ['kv'] }
 sewup-derive = { path = '../sewup-derive' }
 anyhow = "1.0.40"
+thiserror = "1.0.24"
 
 [profile.release]
 incremental = false
