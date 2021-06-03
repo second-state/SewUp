@@ -196,7 +196,7 @@ fn test_execute_wasm_functions() {
     );
     run_function(
         "symbol",
-        get_function_signature("symbol(& str)"),
+        get_function_signature("symbol(&str)"),
         None,
         vec![69, 84, 68],
     );
@@ -216,8 +216,14 @@ fn test_execute_wasm_functions() {
     let balance_input = hex!("00000000000000000000000000000000FACEB00C");
     run_function(
         "do balance",
-        get_function_signature("do_balance(& Contract)"),
+        get_function_signature("do_balance(&Contract)"),
         Some(&balance_input),
+        vec![],
+    );
+    run_function(
+        "Unknow Handler",
+        get_function_signature("unknow_function()"),
+        None,
         vec![],
     );
 }
