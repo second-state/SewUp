@@ -41,7 +41,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
         let canonical_fn = format!(
             "{}({})",
             fn_name,
@@ -72,7 +72,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^pub fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
         let canonical_fn = format!(
             "{}({})",
             fn_name,
