@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["aho_corasick","anyhow","cfg_if","crunchy","ewasm_api","memchr","proc_macro2","qimalloc","quote","regex","regex_syntax","serde","serde_derive","sewup","sewup_derive","syn","thiserror","thiserror_impl","tiny_keccak","toml","unicode_xid"];
+window.ALL_CRATES = ["aho_corasick","anyhow","bincode","cfg_if","crunchy","ewasm_api","memchr","proc_macro2","qimalloc","quote","regex","regex_syntax","serde","serde_derive","sewup","sewup_derive","syn","thiserror","thiserror_impl","tiny_keccak","toml","unicode_xid"];
