@@ -23,9 +23,11 @@ pub fn ewasm_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
         r#"
         #[no_mangle]
         pub fn main() {{
+            use ewasm_api::finish_data;
             {}
             if let Err(e) = {}() {{
-                println!("ewasm error: {{:?}}", e);
+                let error_msg = e.to_string();
+                finish_data(&error_msg.as_bytes());
             }}
         }}
     "#,

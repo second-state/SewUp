@@ -7,6 +7,10 @@ pub enum KVError {
     UnexpectVersion(u8),
     #[error("features are compatible, current features are: `{0:?}`")]
     IncompatibleFeatures(Vec<Feature>),
-    #[error("unknow handle")]
+    #[error("current db size is `{0}`.")]
+    UnexpectedDBSize(u32),
+    #[error("current bucket are: `{0:?}`")]
+    IncorrectBuckets(Vec<String>),
+    #[error("unknow handler")]
     UnknownHandle,
 }
