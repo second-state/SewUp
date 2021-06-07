@@ -25,3 +25,56 @@ pub fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     hasher.finalize(&mut sig);
     sig
 }
+
+#[inline]
+pub fn storage_index_to_addr(idx: usize, addr: &mut [u8; 32]) {
+    for j in 0..(idx / 32) + 1 {
+        assert!(j < 32, "Too big to store on chain");
+        addr[j] = (idx >> (5 * j) & 31) as u8;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_storage_index_to_addr() {
+        let mut addr: [u8; 32] = [0; 32];
+
+        storage_index_to_addr(1, &mut addr);
+        assert_eq!(
+            addr,
+            [
+                1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+            ]
+        );
+
+        storage_index_to_addr(32, &mut addr);
+        assert_eq!(
+            addr,
+            [
+                0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+            ]
+        );
+
+        storage_index_to_addr(33, &mut addr);
+        assert_eq!(
+            addr,
+            [
+                1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+            ]
+        );
+
+        storage_index_to_addr(65, &mut addr);
+        assert_eq!(
+            addr,
+            [
+                1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0
+            ]
+        );
+    }
+}

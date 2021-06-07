@@ -43,11 +43,37 @@ fn test_execute_wasm_functions() {
         "Unknow Handler",
         get_function_signature("unknow_function()"),
         None,
-        vec![],
+        vec![
+            117, 110, 107, 110, 111, 119, 32, 104, 97, 110, 100, 108, 101, 114,
+        ],
     );
     run_function(
         "Verson check test",
-        get_function_signature("check_version_and_feature(u8,Vec<Feature>)"),
+        get_function_signature("check_version_and_features(u8,Vec<Feature>)"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Check empty storage size",
+        get_function_signature("check_empty_storage_size(u32)"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Add buckets",
+        get_function_signature("add_buckets()"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Check buckets",
+        get_function_signature("check_buckets(Vec<String>)"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Drop bucket and check",
+        get_function_signature("drop_bucket_than_check(&str,Vec<String>)"),
         None,
         vec![],
     );
