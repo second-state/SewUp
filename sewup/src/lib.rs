@@ -27,3 +27,5 @@ pub mod utils;
 /// The runtime module is used for tesing
 #[cfg(test)]
 pub mod runtimes;
+
+pub mod types;

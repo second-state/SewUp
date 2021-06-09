@@ -1,6 +1,7 @@
 use std::collections::hash_map::HashMap;
 use std::convert::TryInto;
 
+use crate::types::Raw;
 use crate::utils::storage_index_to_addr;
 
 use super::bucket::Bucket;
@@ -15,7 +16,7 @@ pub enum Feature {
     Default = 1,
 }
 
-type Tenants = HashMap<String, Vec<u8>>;
+type Tenants = HashMap<String, Vec<Raw>>;
 
 /// Store is a storage space for an account in a specific block.
 /// We can import the storage from a past block, and we only commit the storage
