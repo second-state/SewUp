@@ -3,7 +3,7 @@ use std::convert::TryInto;
 
 use crate::utils::storage_index_to_addr;
 
-use super::bucket::Bucket;
+use super::bucket::{Bucket, RawBucket};
 use anyhow::Result;
 use ewasm_api::{storage_load, storage_store};
 
@@ -15,7 +15,7 @@ pub enum Feature {
     Default = 1,
 }
 
-type Tenants = HashMap<String, Vec<u8>>;
+type Tenants = HashMap<String, RawBucket>;
 
 /// Store is a storage space for an account in a specific block.
 /// We can import the storage from a past block, and we only commit the storage
@@ -79,7 +79,7 @@ impl Store {
     }
 
     pub fn bucket<K, V>(&mut self, name: &str) -> Result<Bucket> {
-        self.tenants.insert(name.into(), Vec::new());
+        self.tenants.insert(name.into(), (Vec::new(), Vec::new()));
         // TODO
         Ok(Bucket {})
     }
