@@ -1,8 +1,12 @@
-use anyhow::Result;
 use std::any::Any as StdAny;
-use std::collections::BTreeMap;
+use std::marker::PhantomData;
 
-pub type RawBucket = BTreeMap<Vec<u8>, Vec<u8>>;
+use anyhow::Result;
+
+use crate::types::Raw;
+
+// TODO: quick for first iteration
+pub type RawBucket = (Vec<Raw>, Vec<(Raw, Raw)>);
 
 /// This is temp struct will be changed after implement
 type Any = Box<dyn StdAny>;
