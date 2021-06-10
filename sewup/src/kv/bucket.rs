@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 
 use anyhow::Result;
 
+use super::traits::{Key, Value};
 use crate::types::Raw;
 
 // TODO: quick for first iteration
@@ -11,7 +12,7 @@ pub type RawBucket = (Vec<Raw>, Vec<(Raw, Raw)>);
 /// This is temp struct will be changed after implement
 type Any = Box<dyn StdAny>;
 /// This is temp struct will be changed after implement
-type Item<K, V> = (K, V);
+type Item<K, V> = (Raw, Raw, PhantomData<K>, PhantomData<V>);
 /// This is temp struct will be changed after implement
 type Iter<K, V> = Vec<(K, V)>;
 
@@ -19,11 +20,23 @@ type Iter<K, V> = Vec<(K, V)>;
 /// The types of key and value should be specific when new a bucket.
 /// Items save into bucket may have different encoding, the will base on the
 /// feature you enabled.
-pub struct Bucket {}
+pub struct Bucket<'a, K: Key<'a>, V: Value> {
+    pub(crate) name: String,
+    pub(crate) raw_bucket: RawBucket,
+    phantom_k: PhantomData<K>,
+    phantom_v: PhantomData<V>,
+    phantom: PhantomData<&'a ()>,
+}
 
-impl Bucket {
-    pub fn new() -> Bucket {
-        Bucket {}
+impl<'a, K: Key<'a>, V: Value> Bucket<'a, K, V> {
+    pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<'a, K, V> {
+        Bucket {
+            name,
+            raw_bucket,
+            phantom_k: PhantomData,
+            phantom_v: PhantomData,
+            phantom: PhantomData,
+        }
     }
 
     pub fn contains(&self, _key: Any) -> Result<bool> {
@@ -92,11 +105,5 @@ impl Bucket {
 
     pub fn is_empty(&self) -> bool {
         true
-    }
-}
-
-impl Default for Bucket {
-    fn default() -> Self {
-        Self::new()
     }
 }

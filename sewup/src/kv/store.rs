@@ -1,6 +1,10 @@
 use std::collections::hash_map::HashMap;
 use std::convert::TryInto;
 
+use crate::kv::{
+    errors::Error,
+    traits::{Key, Value},
+};
 use crate::utils::storage_index_to_addr;
 
 use super::bucket::{Bucket, RawBucket};
@@ -15,7 +19,7 @@ pub enum Feature {
     Default = 1,
 }
 
-type Tenants = HashMap<String, RawBucket>;
+type Tenants = HashMap<String, Option<RawBucket>>;
 
 /// Store is a storage space for an account in a specific block.
 /// We can import the storage from a past block, and we only commit the storage
@@ -78,10 +82,18 @@ impl Store {
         self.tenants.keys().map(|k| k.to_string()).collect()
     }
 
-    pub fn bucket<K, V>(&mut self, name: &str) -> Result<Bucket> {
-        self.tenants.insert(name.into(), (Vec::new(), Vec::new()));
-        // TODO
-        Ok(Bucket {})
+    pub fn bucket<'a, K: Key<'a>, V: Value>(&mut self, name: &str) -> Result<Bucket<'a, K, V>> {
+        let raw_bucket = if self.tenants.contains_key(name) {
+            if let Some(bucket) = self.tenants.get_mut(name).unwrap().take() {
+                bucket
+            } else {
+                return Err(Error::BucketAlreadyOpen.into());
+            }
+        } else {
+            self.tenants.insert(name.into(), None);
+            (Vec::new(), Vec::new())
+        };
+        Ok(Bucket::new(name.into(), raw_bucket))
     }
 
     pub fn drop_bucket<S: AsRef<str>>(&mut self, name: S) -> Result<()> {
@@ -140,8 +152,22 @@ impl Store {
         }
     }
 
+    /// Save bucket data back to store
+    pub fn save<'a, K: Key<'a>, V: Value>(&mut self, bucket: Bucket<'a, K, V>) -> Result<()> {
+        let Bucket {
+            name, raw_bucket, ..
+        } = bucket;
+        self.tenants.insert(name, Some(raw_bucket));
+        Ok(())
+    }
+
     /// Save to storage
     pub fn commit(&self) -> Result<u32> {
+        for (k, v) in self.tenants.iter() {
+            if v.is_none() {
+                return Err(Error::BucketNotSync(k.to_string()).into());
+            }
+        }
         let mut buffer = [0u8; 32];
         VERSION.to_be_bytes().swap_with_slice(&mut buffer[0..1]);
         self._features
