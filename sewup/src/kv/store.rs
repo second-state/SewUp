@@ -153,12 +153,11 @@ impl Store {
     }
 
     /// Save bucket data back to store
-    pub fn save<'a, K: Key<'a>, V: Value>(&mut self, bucket: Bucket<'a, K, V>) -> Result<()> {
+    pub fn save<'a, K: Key<'a>, V: Value>(&mut self, bucket: Bucket<'a, K, V>) {
         let Bucket {
             name, raw_bucket, ..
         } = bucket;
         self.tenants.insert(name, Some(raw_bucket));
-        Ok(())
     }
 
     /// Save to storage

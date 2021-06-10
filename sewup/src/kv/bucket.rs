@@ -100,10 +100,10 @@ impl<'a, K: Key<'a>, V: Value> Bucket<'a, K, V> {
     }
 
     pub fn len(&self) -> usize {
-        0
+        self.raw_bucket.0.len()
     }
 
     pub fn is_empty(&self) -> bool {
-        true
+        self.raw_bucket.0.is_empty()
     }
 }
