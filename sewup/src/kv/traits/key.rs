@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::convert::TryFrom;
 
 use anyhow::Result;
@@ -5,22 +6,26 @@ use serde::{Deserialize, Serialize};
 
 use crate::types::{Raw, Row};
 
-// TODO here
 pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
-    // TODO: handle half Raw for numbers to save storage
-    fn from_raw_key(r: &'a Row, padding: u8) -> Result<Self>;
-
+    fn from_raw_key(r: &'a Row) -> Result<Self> {
+        let buffer: &[u8] = r.borrow();
+        let header = buffer[0] as usize;
+        let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
+            .expect("load db binary fail");
+        Ok(instance)
+    }
     fn to_raw_key(&self) -> Result<Row> {
-        let _bin = bincode::serialize(&self).expect("serialize a key fail");
-        // Ok(self.iter(|s| s.into()).collect::<Raw>().into())
-        Ok(Row::default())
+        let mut bin = bincode::serialize(&self).expect("serialize a key fail");
+        let length = bin.len();
+        let header = ((length + 1) & 31) as u8; // padding bytes
+        let mut vec = vec![header];
+        vec.append(&mut bin);
+        Ok(vec.into())
     }
 }
 
 impl<'a> Key<'a> for Raw {
-    fn from_raw_key(x: &Row, _padding: u8) -> Result<Self> {
-        // TODO: think twice about the assert
-        // assert inner size == 1
+    fn from_raw_key(x: &Row) -> Result<Self> {
         Ok(Raw::try_from(x).expect("Data loose from Row to Raw"))
     }
     fn to_raw_key(&self) -> Result<Row> {
@@ -29,7 +34,7 @@ impl<'a> Key<'a> for Raw {
 }
 
 impl<'a> Key<'a> for Row {
-    fn from_raw_key(x: &Row, _padding: u8) -> Result<Self> {
+    fn from_raw_key(x: &'a Row) -> Result<Self> {
         Ok(x.clone())
     }
 }

@@ -7,7 +7,8 @@ use super::traits::{Key, Value};
 use crate::types::{Raw, Row};
 
 // TODO: quick for first iteration
-pub type RawBucket = (Vec<Raw>, Vec<(Row, Row)>);
+// ~128 Gb per object
+pub type RawBucket = (Vec<(Raw, u32)>, Vec<(Row, Row)>);
 
 /// This is temp struct will be changed after implement
 type Any = Box<dyn StdAny>;

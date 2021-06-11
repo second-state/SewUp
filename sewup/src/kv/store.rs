@@ -109,8 +109,9 @@ impl Store {
 
     /// Returns the size in bytes
     pub fn size(&self) -> Result<u32> {
-        let bin = bincode::serialize(&self.tenants).expect("serialize db binary fail");
-        Ok(bin.len() as u32)
+        let len =
+            bincode::serialized_size(&self.tenants).expect("estimate serialized db size fail");
+        Ok(len as u32)
     }
 
     /// Import the database from the specific block height
