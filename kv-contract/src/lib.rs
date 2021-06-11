@@ -1,7 +1,7 @@
 use anyhow::Result;
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
-use sewup::types::Raw;
+use sewup::types::Row;
 use sewup_derive::{ewasm_fn, ewasm_main, fn_sig};
 
 mod errors;
@@ -46,8 +46,8 @@ fn check_empty_storage_size(size: u32) -> Result<()> {
 #[ewasm_fn]
 fn add_buckets() -> Result<()> {
     let mut storage = Store::load(None)?;
-    let bucket1 = storage.bucket::<Raw, Raw>("bucket1")?;
-    let bucket2 = storage.bucket::<Raw, Raw>("bucket2")?;
+    let bucket1 = storage.bucket::<Row, Row>("bucket1")?;
+    let bucket2 = storage.bucket::<Row, Row>("bucket2")?;
     if !bucket1.is_empty() {
         return Err(KVError::BucketError("inited bucket should be empty.".to_string()).into());
     }

@@ -28,4 +28,5 @@ pub mod utils;
 #[cfg(test)]
 pub mod runtimes;
 
+#[allow(unused_variables)]
 pub mod types;

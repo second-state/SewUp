@@ -4,10 +4,10 @@ use std::marker::PhantomData;
 use anyhow::Result;
 
 use super::traits::{Key, Value};
-use crate::types::Raw;
+use crate::types::{Raw, Row};
 
 // TODO: quick for first iteration
-pub type RawBucket = (Vec<Raw>, Vec<(Raw, Raw)>);
+pub type RawBucket = (Vec<Raw>, Vec<(Row, Row)>);
 
 /// This is temp struct will be changed after implement
 type Any = Box<dyn StdAny>;
@@ -20,7 +20,7 @@ type Iter<K, V> = Vec<(K, V)>;
 /// The types of key and value should be specific when new a bucket.
 /// Items save into bucket may have different encoding, the will base on the
 /// feature you enabled.
-pub struct Bucket<'a, K: Key<'a>, V: Value> {
+pub struct Bucket<'a, K: Key<'a>, V: Value<'a>> {
     pub(crate) name: String,
     pub(crate) raw_bucket: RawBucket,
     phantom_k: PhantomData<K>,
@@ -28,7 +28,7 @@ pub struct Bucket<'a, K: Key<'a>, V: Value> {
     phantom: PhantomData<&'a ()>,
 }
 
-impl<'a, K: Key<'a>, V: Value> Bucket<'a, K, V> {
+impl<'a, K: Key<'a>, V: Value<'a>> Bucket<'a, K, V> {
     pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<'a, K, V> {
         Bucket {
             name,

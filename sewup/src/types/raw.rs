@@ -1,13 +1,15 @@
-use std::{fmt, iter::FromIterator};
+use std::{convert::TryFrom, fmt, iter::FromIterator};
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_derive::Deserialize;
 
+use crate::types::*;
+
 #[derive(Clone)]
 pub struct Raw {
-    bytes: [u8; 32],
-    // TODO: design on the flag for better performance
-    flag: u8,
+    pub(super) bytes: [u8; 32],
+    // TODO: design a feature using the flag to write only needed
+    // flag: u8,
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -99,7 +101,7 @@ impl<'de> Deserialize<'de> for Raw {
                     e01, e02, e03, e04, e05, e06, e07, e08, e09, e10, e11, e12, e13, e14, e15, e16,
                     e17, e18, e19, e20, e21, e22, e23, e24, e25, e26, e27, e28, e29, e30, e31, e32,
                 ];
-                Raw { bytes, flag: 1 }
+                Raw { bytes, /*flag: 1*/ }
             },
         )
     }
@@ -109,7 +111,7 @@ impl Default for Raw {
     fn default() -> Self {
         Raw {
             bytes: [0; 32],
-            flag: 0,
+            // flag: 0,
         }
     }
 }
@@ -126,7 +128,7 @@ impl Raw {
         if slice.len() <= 32 {
             let mut instance = Self::default();
             instance.bytes[..slice.len()].copy_from_slice(slice);
-            return instance;
+            instance
         } else {
             panic!("input slice is bigger than a Raw");
         }
@@ -197,6 +199,30 @@ impl std::borrow::Borrow<[u8]> for &Raw {
     }
 }
 
+impl TryFrom<&Row> for Raw {
+    type Error = &'static str;
+
+    fn try_from(value: &Row) -> Result<Self, Self::Error> {
+        if value.len() <= 1 {
+            Err("Row is bigger than raw")
+        } else {
+            Ok(value.inner[0].clone())
+        }
+    }
+}
+
+impl TryFrom<Row> for Raw {
+    type Error = &'static str;
+
+    fn try_from(value: Row) -> Result<Self, Self::Error> {
+        if value.len() <= 1 {
+            Err("Row is bigger than raw")
+        } else {
+            Ok(value.inner[0].clone())
+        }
+    }
+}
+
 macro_rules! from_array {
     ($($s:expr),*) => {
         $(
@@ -244,86 +270,4 @@ impl fmt::Debug for Raw {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.as_ref().fmt(f)
     }
-}
-
-#[test]
-fn test_ser_de() {
-    let raw = Raw::from(vec![0, 1]);
-    assert_eq!(
-        raw.bytes,
-        [
-            0u8, 1u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
-            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8
-        ]
-    );
-    let bin = bincode::serialize(&raw).expect("serialize raw fail");
-    let load: Raw = bincode::deserialize(&bin).expect("load raw binary fail");
-    assert_eq!(raw.bytes, load.bytes);
-    assert_eq!(0, raw.flag);
-    assert_eq!(1, load.flag);
-}
-
-#[test]
-fn test_ser_de2() {
-    let raw = Raw::from(vec![
-        0u8, 1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8, 9u8, 10u8, 11u8, 12u8, 13u8, 14u8, 15u8,
-        200u8, 201u8, 202u8, 203u8, 204u8, 205u8, 206u8, 207u8, 208u8, 209u8, 210u8, 211u8, 212u8,
-        213u8, 214u8, 215u8,
-    ]);
-    assert_eq!(
-        raw.bytes,
-        [
-            0u8, 1u8, 2u8, 3u8, 4u8, 5u8, 6u8, 7u8, 8u8, 9u8, 10u8, 11u8, 12u8, 13u8, 14u8, 15u8,
-            200u8, 201u8, 202u8, 203u8, 204u8, 205u8, 206u8, 207u8, 208u8, 209u8, 210u8, 211u8,
-            212u8, 213u8, 214u8, 215u8
-        ]
-    );
-    let bin = bincode::serialize(&raw).expect("serialize raw fail");
-    let load: Raw = bincode::deserialize(&bin).expect("load raw binary fail");
-    assert_eq!(raw.bytes, load.bytes);
-    assert_eq!(0, raw.flag);
-    assert_eq!(1, load.flag);
-}
-
-#[test]
-fn test_from() {
-    let r1 = Raw::from(vec![1, 2, 3]);
-    assert_eq!(
-        r1,
-        vec![
-            1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0
-        ]
-    );
-    let r2 = Raw::from(&[4; 32][..]);
-    assert_eq!(r2, vec![4; 32]);
-}
-
-#[test]
-fn test_short_string() {
-    // TODO: need more design on string
-    let r1 = Raw::from("abcd");
-    assert_eq!(
-        r1,
-        vec![
-            97, 98, 99, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0
-        ]
-    );
-}
-
-#[test]
-fn test_box() {
-    let box1: Box<[u8]> = Box::new([1, 2, 3]);
-    let r1: Raw = box1.into();
-    assert_eq!(
-        r1,
-        vec![
-            1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0
-        ]
-    );
-    let box2: Box<[u8]> = Box::new([5; 32]);
-    let r2: Raw = box2.into();
-    assert_eq!(r2, vec![5; 32]);
 }
