@@ -1,7 +1,9 @@
 use std::borrow::Borrow;
-use std::convert::TryFrom;
+use std::convert::{TryFrom, TryInto};
 
 use anyhow::Result;
+use crypto::blake2s::Blake2s;
+use crypto::mac::Mac;
 use serde::{Deserialize, Serialize};
 
 use crate::types::{Raw, Row};
@@ -14,6 +16,7 @@ pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
             .expect("load db binary fail");
         Ok(instance)
     }
+
     fn to_raw_key(&self) -> Result<Row> {
         let mut bin = bincode::serialize(&self).expect("serialize a key fail");
         let length = bin.len();
@@ -21,6 +24,42 @@ pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
         let mut vec = vec![header];
         vec.append(&mut bin);
         Ok(vec.into())
+    }
+
+    fn gen_hash_key(&self, value_len: u32) -> Result<Raw> {
+        let mut bytes: [u8; 32] = [0; 32];
+        let bin = bincode::serialize(&self).expect("serialize a key fail");
+        let length = bin.len() as u32;
+
+        let mut b = Blake2s::new(24);
+        b.input(&bin);
+        b.raw_result(&mut bytes[0..24]);
+
+        let mut length_buffer = (length as u32).to_be_bytes();
+        length_buffer.swap_with_slice(&mut bytes[24..28]);
+        length_buffer = (value_len as u32).to_be_bytes();
+        length_buffer.swap_with_slice(&mut bytes[28..32]);
+
+        Ok(Raw::from(&bytes))
+    }
+}
+
+pub trait AsHashKey {
+    fn get_size_from_hash(&self, hash: [u8; 24]) -> Option<(u32, u32)>;
+}
+
+impl AsHashKey for Raw {
+    fn get_size_from_hash(&self, hash: [u8; 24]) -> Option<(u32, u32)> {
+        if hash == self.bytes[0..24] {
+            let key_bytes: &[u8; 4] = (&self.bytes[24..28]).try_into().unwrap();
+            let value_bytes: &[u8; 4] = (&self.bytes[28..32]).try_into().unwrap();
+            Some((
+                u32::from_be_bytes(*key_bytes),
+                u32::from_be_bytes(*value_bytes),
+            ))
+        } else {
+            None
+        }
     }
 }
 

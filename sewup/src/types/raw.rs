@@ -7,7 +7,7 @@ use crate::types::*;
 
 #[derive(Clone)]
 pub struct Raw {
-    pub(super) bytes: [u8; 32],
+    pub(crate) bytes: [u8; 32],
     // TODO: design a feature using the flag to write only needed
     // flag: u8,
 }
