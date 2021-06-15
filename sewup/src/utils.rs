@@ -28,9 +28,9 @@ pub fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 
 #[inline]
 pub fn storage_index_to_addr(idx: usize, addr: &mut [u8; 32]) {
-    for j in 0..(idx / 32) + 1 {
+    for (j, byte) in addr.iter_mut().enumerate().take((idx / 32) + 1) {
         assert!(j < 32, "Too big to store on chain");
-        addr[j] = (idx >> (5 * j) & 31) as u8;
+        *byte = (idx >> (5 * j) & 31) as u8;
     }
 }
 

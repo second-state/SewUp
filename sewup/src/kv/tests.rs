@@ -8,7 +8,7 @@ use ethereum_types::Address;
 use tempfile::NamedTempFile;
 
 #[test]
-fn test_execute_wasm_functions() {
+fn test_execute_storage_operations() {
     let runtime = Arc::new(RefCell::new(TestRuntime::default()));
     let run_function =
         |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
@@ -74,6 +74,52 @@ fn test_execute_wasm_functions() {
     run_function(
         "Drop bucket and check",
         get_function_signature("drop_bucket_than_check(&str,Vec<String>)"),
+        None,
+        vec![],
+    );
+}
+
+#[test]
+fn test_execute_bucket_operations() {
+    let runtime = Arc::new(RefCell::new(TestRuntime::default()));
+    let run_function =
+        |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
+            let config_file = NamedTempFile::new().unwrap();
+
+            let mut h = ContractHandler {
+                sender_address: Address::from_low_u64_be(1),
+                call_data: Some(format!(
+                    "{}/../resources/test/kv_contract.wasm",
+                    env!("CARGO_MANIFEST_DIR")
+                )),
+                config_file_path: Some(config_file.path().into()),
+                ..Default::default()
+            };
+
+            h.rt = Some(runtime.clone());
+
+            match h.execute(fn_sig, input_data, 1_000_000) {
+                Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
+                Err(e) => {
+                    panic!("vm error: {:?}", e);
+                }
+            }
+        };
+    run_function(
+        "Init bucket with struct",
+        get_function_signature("new_bucket_with_specific_struct()"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Check objects in the bucket",
+        get_function_signature("check_objects_in_bucket()"),
+        None,
+        vec![],
+    );
+    run_function(
+        "Check object deletection of bucket",
+        get_function_signature("delete_object_in_bucket()"),
         None,
         vec![],
     );

@@ -15,6 +15,8 @@ sewup-derive = { path = '../sewup-derive' }
 ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
 anyhow = "1.0.40"
 thiserror = "1.0.24"
+serde = "1.0"
+serde_derive = "1.0"
 
 [profile.release]
 incremental = false

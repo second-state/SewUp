@@ -54,3 +54,8 @@ pub use bucket::*;
 
 #[cfg(test)]
 mod tests;
+
+pub mod traits;
+
+#[allow(dead_code)]
+mod errors;

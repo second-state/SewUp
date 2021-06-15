@@ -13,6 +13,7 @@ let
     update-single-contract kv
   '';
   updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
+    rm -f resources/test/$1_contract.wasm
     cd $1-contract
     cargo build --release
     cd ../
