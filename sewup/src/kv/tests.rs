@@ -117,4 +117,10 @@ fn test_execute_bucket_operations() {
         None,
         vec![],
     );
+    run_function(
+        "Check object deletection of bucket",
+        get_function_signature("delete_object_in_bucket()"),
+        None,
+        vec![],
+    );
 }

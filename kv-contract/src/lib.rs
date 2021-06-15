@@ -109,11 +109,11 @@ fn new_bucket_with_specific_struct() -> Result<()> {
         b"jovy".into(),
         "A faith keep me up and away from fall".to_string().into(),
     )?;
-    let simle_struct = SimpleStruct {
+    let simple_struct = SimpleStruct {
         trust: true,
         description: "An action without doubt".to_string(),
     };
-    bucket2.set(b"ant".into(), simle_struct)?;
+    bucket2.set(b"ant".into(), simple_struct)?;
 
     storage.save(bucket1);
     storage.save(bucket2);
@@ -147,6 +147,33 @@ fn check_objects_in_bucket() -> Result<()> {
     } else {
         return Err(KVError::ValueNotFound.into());
     }
+    bucket2.set(b"bug".into(), SimpleStruct::default())?;
+
+    storage.save(bucket1);
+    storage.save(bucket2);
+
+    storage.commit()?;
+
+    Ok(())
+}
+
+#[ewasm_fn]
+fn delete_object_in_bucket() -> Result<()> {
+    let mut storage = Store::load(None)?;
+    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+
+    if bucket2.get(b"bug".into())?.is_none() {
+        return Err(KVError::ValueError("there should be a bug for testing".to_string()).into());
+    }
+
+    bucket2.remove(b"bug".into())?;
+
+    if bucket2.get(b"bug".into())?.is_some() {
+        return Err(
+            KVError::ValueError("there should be no bug after deleting".to_string()).into(),
+        );
+    }
+
     Ok(())
 }
 
@@ -171,7 +198,7 @@ fn main() -> Result<()> {
         // Following handler is for other test
         fn_sig!(new_bucket_with_specific_struct) => new_bucket_with_specific_struct()?,
         fn_sig!(check_objects_in_bucket) => check_objects_in_bucket()?,
-
+        fn_sig!(delete_object_in_bucket) => delete_object_in_bucket()?,
         _ => return Err(KVError::UnknownHandle.into()),
     };
 

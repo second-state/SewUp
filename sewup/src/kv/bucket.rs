@@ -89,7 +89,24 @@ impl<'a, K: Key<'a>, V: Clone + Value<'a>> Bucket<'a, K, V> {
         Ok(())
     }
 
-    pub fn remove(&self, _key: Any) -> Result<()> {
+    pub fn remove(&mut self, key: K) -> Result<()> {
+        let hash = key.gen_hash()?;
+
+        let mut idx = 0u32;
+
+        for (i, item) in self.raw_bucket.0.iter().enumerate() {
+            let (is_match, k_size, v_size) = item.get_size_from_hash(hash);
+            if is_match {
+                // TODO: better implement here
+                for _ in (idx + k_size)..(idx + k_size + v_size) {
+                    self.raw_bucket.1.remove(idx as usize);
+                }
+                idx = i as u32;
+                break;
+            }
+            idx = idx + k_size + v_size;
+        }
+        self.raw_bucket.0.remove(idx as usize);
         Ok(())
     }
 
