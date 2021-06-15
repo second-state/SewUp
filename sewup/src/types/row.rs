@@ -12,15 +12,13 @@ pub struct Row {
 
 impl Row {
     pub fn new(slice: &[u8]) -> Self {
-        let inner: Vec<Raw> = slice
-            .into_iter()
-            .map(|b| *b)
-            .collect::<Vec<u8>>()
-            .chunks(32)
-            .fold(Vec::<Raw>::new(), |mut vec, chunk| {
+        let inner: Vec<Raw> = slice.iter().copied().collect::<Vec<u8>>().chunks(32).fold(
+            Vec::<Raw>::new(),
+            |mut vec, chunk| {
                 vec.push(chunk.into());
                 vec
-            });
+            },
+        );
         Self {
             inner,
             ..Default::default()
@@ -36,6 +34,14 @@ impl Row {
 
     pub fn clean_buffer(&mut self) {
         self._buffer = Vec::new();
+    }
+
+    pub fn to_utf8_string(&self) -> Result<String, std::string::FromUtf8Error> {
+        let buf = self.inner.iter().fold(Vec::<u8>::new(), |mut vec, raw| {
+            vec.extend_from_slice(raw.as_ref());
+            vec
+        });
+        String::from_utf8(buf)
     }
 }
 
@@ -58,6 +64,15 @@ impl From<Vec<Raw>> for Row {
     fn from(v: Vec<Raw>) -> Self {
         Self {
             inner: v,
+            ..Default::default()
+        }
+    }
+}
+
+impl From<&[Raw]> for Row {
+    fn from(v: &[Raw]) -> Self {
+        Self {
+            inner: v.into(),
             ..Default::default()
         }
     }
@@ -173,7 +188,7 @@ impl From<Box<[u8]>> for Row {
 
 impl std::borrow::Borrow<[u8]> for Row {
     fn borrow(&self) -> &[u8] {
-        if self.inner.len() > 0 && self._buffer.len() == 0 {
+        if !self.inner.is_empty() && self._buffer.is_empty() {
             panic!("make buffer before brrow")
         }
         self._buffer.as_ref()
@@ -182,7 +197,7 @@ impl std::borrow::Borrow<[u8]> for Row {
 
 impl std::borrow::Borrow<[u8]> for &Row {
     fn borrow(&self) -> &[u8] {
-        if self.inner.len() > 0 && self._buffer.len() == 0 {
+        if !self.inner.is_empty() && self._buffer.is_empty() {
             panic!("make buffer before brrow")
         }
         self._buffer.as_ref()

@@ -1,13 +1,24 @@
 use anyhow::Result;
+use serde_derive::{Deserialize, Serialize};
+
+use sewup::kv::traits::Value;
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
-use sewup::types::Row;
+use sewup::types::{Raw, Row};
 use sewup_derive::{ewasm_fn, ewasm_main, fn_sig};
 
 mod errors;
 use errors::KVError;
 
 const EMPTY_DB_SIZE: u32 = 8;
+
+#[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq)]
+struct SimpleStruct {
+    trust: bool,
+    description: String,
+}
+
+impl Value<'_> for SimpleStruct {}
 
 #[ewasm_fn]
 fn empty_commit() -> Result<()> {
@@ -46,7 +57,7 @@ fn check_empty_storage_size(size: u32) -> Result<()> {
 #[ewasm_fn]
 fn add_buckets() -> Result<()> {
     let mut storage = Store::load(None)?;
-    let bucket1 = storage.bucket::<Row, Row>("bucket1")?;
+    let bucket1 = storage.bucket::<Raw, Raw>("bucket1")?;
     let bucket2 = storage.bucket::<Row, Row>("bucket2")?;
     if !bucket1.is_empty() {
         return Err(KVError::BucketError("inited bucket should be empty.".to_string()).into());
@@ -88,6 +99,57 @@ fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> Result<()>
     Ok(())
 }
 
+#[ewasm_fn]
+fn new_bucket_with_specific_struct() -> Result<()> {
+    let mut storage = Store::new()?;
+    let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
+    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+
+    bucket1.set(
+        b"jovy".into(),
+        "A faith keep me up and away from fall".to_string().into(),
+    )?;
+    let simle_struct = SimpleStruct {
+        trust: true,
+        description: "An action without doubt".to_string(),
+    };
+    bucket2.set(b"ant".into(), simle_struct)?;
+
+    storage.save(bucket1);
+    storage.save(bucket2);
+
+    storage.commit()?;
+    Ok(())
+}
+
+#[ewasm_fn]
+fn check_objects_in_bucket() -> Result<()> {
+    let mut storage = Store::load(None)?;
+    let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
+    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+
+    if let Some(faith) = bucket1.get(b"jovy".into())? {
+        if faith.to_utf8_string()? !=
+            "A faith keep me up and away from fall\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}\u{0}".to_string() {
+            return Err(KVError::ValueError(faith.to_utf8_string()? ).into());
+        }
+    } else {
+        return Err(KVError::ValueNotFound.into());
+    }
+
+    if let Some(simple_struct) = bucket2.get(b"ant".into())? {
+        if !simple_struct.trust {
+            return Err(KVError::ValueError("struct trust not true".to_string()).into());
+        }
+        if simple_struct.description != "An action without doubt".to_string() {
+            return Err(KVError::ValueError(simple_struct.description).into());
+        }
+    } else {
+        return Err(KVError::ValueNotFound.into());
+    }
+    Ok(())
+}
+
 #[ewasm_main]
 fn main() -> Result<()> {
     let contract = Contract::new()?;
@@ -105,6 +167,11 @@ fn main() -> Result<()> {
         fn_sig!(drop_bucket_than_check) => {
             drop_bucket_than_check("bucket1", vec!["bucket2".to_string()])?
         }
+
+        // Following handler is for other test
+        fn_sig!(new_bucket_with_specific_struct) => new_bucket_with_specific_struct()?,
+        fn_sig!(check_objects_in_bucket) => check_objects_in_bucket()?,
+
         _ => return Err(KVError::UnknownHandle.into()),
     };
 

@@ -26,40 +26,46 @@ pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
         Ok(vec.into())
     }
 
-    fn gen_hash_key(&self, value_len: u32) -> Result<Raw> {
+    fn gen_hash_key(&self, key_len: u32, value_len: u32) -> Result<Raw> {
         let mut bytes: [u8; 32] = [0; 32];
         let bin = bincode::serialize(&self).expect("serialize a key fail");
-        let length = bin.len() as u32;
 
         let mut b = Blake2s::new(24);
         b.input(&bin);
         b.raw_result(&mut bytes[0..24]);
 
-        let mut length_buffer = (length as u32).to_be_bytes();
+        let mut length_buffer = key_len.to_be_bytes();
         length_buffer.swap_with_slice(&mut bytes[24..28]);
         length_buffer = (value_len as u32).to_be_bytes();
         length_buffer.swap_with_slice(&mut bytes[28..32]);
 
         Ok(Raw::from(&bytes))
     }
+
+    fn gen_hash(&self) -> Result<[u8; 24]> {
+        let mut hash: [u8; 24] = [0; 24];
+        let bin = bincode::serialize(&self).expect("serialize a key fail");
+
+        let mut b = Blake2s::new(24);
+        b.input(&bin);
+        b.raw_result(&mut hash);
+        Ok(hash)
+    }
 }
 
 pub trait AsHashKey {
-    fn get_size_from_hash(&self, hash: [u8; 24]) -> Option<(u32, u32)>;
+    fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32);
 }
 
 impl AsHashKey for Raw {
-    fn get_size_from_hash(&self, hash: [u8; 24]) -> Option<(u32, u32)> {
-        if hash == self.bytes[0..24] {
-            let key_bytes: &[u8; 4] = (&self.bytes[24..28]).try_into().unwrap();
-            let value_bytes: &[u8; 4] = (&self.bytes[28..32]).try_into().unwrap();
-            Some((
-                u32::from_be_bytes(*key_bytes),
-                u32::from_be_bytes(*value_bytes),
-            ))
-        } else {
-            None
-        }
+    fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32) {
+        let key_bytes: &[u8; 4] = (&self.bytes[24..28]).try_into().unwrap();
+        let value_bytes: &[u8; 4] = (&self.bytes[28..32]).try_into().unwrap();
+        (
+            hash == self.bytes[0..24],
+            u32::from_be_bytes(*key_bytes),
+            u32::from_be_bytes(*value_bytes),
+        )
     }
 }
 
@@ -77,27 +83,3 @@ impl<'a> Key<'a> for Row {
         Ok(x.clone())
     }
 }
-
-// impl<'a> Key<'a> for &'a [u8] {
-//     fn from_raw_key(x: &'a Raw) -> Result<&'a [u8]> {
-//         Ok(x.as_ref())
-//     }
-// }
-
-// impl<'a> Key<'a> for &'a str {
-//     fn from_raw_key(x: &'a Raw) -> Result<Self> {
-//         Ok(std::str::from_utf8(x.as_ref())?)
-//     }
-// }
-
-// impl<'a> Key<'a> for Vec<u8> {
-//     fn from_raw_key(r: &Raw) -> Result<Self> {
-//         Ok(r.as_ref().to_vec())
-//     }
-// }
-
-// impl<'a> Key<'a> for String {
-//     fn from_raw_key(x: &Raw) -> Result<Self> {
-//         Ok(std::str::from_utf8(x.as_ref())?.to_string())
-//     }
-// }

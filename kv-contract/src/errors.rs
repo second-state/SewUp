@@ -13,6 +13,10 @@ pub enum KVError {
     IncorrectBuckets(Vec<String>),
     #[error("bucket error: `{0}.`")]
     BucketError(String),
+    #[error("current value is `{0}.`")]
+    ValueError(String),
+    #[error("ValueNotFound")]
+    ValueNotFound,
     #[error("unknow handler")]
     UnknownHandle,
 }

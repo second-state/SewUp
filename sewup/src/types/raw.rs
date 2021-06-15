@@ -133,6 +133,9 @@ impl Raw {
             panic!("input slice is bigger than a Raw");
         }
     }
+    pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
+        std::str::from_utf8(&self.bytes)
+    }
 }
 
 impl FromIterator<u8> for Raw {
@@ -178,6 +181,12 @@ impl From<&Raw> for Raw {
 impl From<Vec<u8>> for Raw {
     fn from(v: Vec<u8>) -> Self {
         Raw::new(&v)
+    }
+}
+
+impl From<Row> for Vec<Raw> {
+    fn from(v: Row) -> Self {
+        v.inner
     }
 }
 

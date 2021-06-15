@@ -82,7 +82,10 @@ impl Store {
         self.tenants.keys().map(|k| k.to_string()).collect()
     }
 
-    pub fn bucket<'a, K: Key<'a>, V: Value<'a>>(&mut self, name: &str) -> Result<Bucket<'a, K, V>> {
+    pub fn bucket<'a, K: Key<'a>, V: Default + Clone + Value<'a>>(
+        &mut self,
+        name: &str,
+    ) -> Result<Bucket<'a, K, V>> {
         let raw_bucket = if self.tenants.contains_key(name) {
             if let Some(bucket) = self.tenants.get_mut(name).unwrap().take() {
                 bucket
