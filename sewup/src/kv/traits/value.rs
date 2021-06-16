@@ -7,7 +7,7 @@ use serde::Serialize;
 
 use crate::types::{Raw, Row};
 
-pub trait Value<'a>: Sized + Serialize + DeserializeOwned {
+pub trait Value: Sized + Serialize + DeserializeOwned {
     fn to_raw_value(&self) -> Result<Row> {
         let mut bin = bincode::serialize(&self).expect("serialize a value fail");
         let length = bin.len();
@@ -25,7 +25,7 @@ pub trait Value<'a>: Sized + Serialize + DeserializeOwned {
     }
 }
 
-impl<'a> Value<'a> for Raw {
+impl Value for Raw {
     fn to_raw_value(&self) -> Result<Row> {
         Ok(self.into())
     }
@@ -35,7 +35,7 @@ impl<'a> Value<'a> for Raw {
     }
 }
 
-impl<'a> Value<'a> for Row {
+impl Value for Row {
     fn to_raw_value(&self) -> Result<Row> {
         Ok(self.clone())
     }

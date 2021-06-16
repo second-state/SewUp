@@ -1,4 +1,3 @@
-use std::any::Any as StdAny;
 use std::marker::PhantomData;
 
 use anyhow::Result;
@@ -10,33 +9,72 @@ use crate::types::{Raw, Row};
 // TODO: quick for first iteration
 pub type RawBucket = (Vec<Raw>, Vec<Raw>);
 
-/// This is temp struct will be changed after implement
-type Any = Box<dyn StdAny>;
-/// This is temp struct will be changed after implement
-type Item<K, V> = (Row, Row, PhantomData<K>, PhantomData<V>);
-/// This is temp struct will be changed after implement
-type Iter<K, V> = Vec<(K, V)>;
-
 /// Bucket is an abstract concept to help you storage key value items.
 /// The types of key and value should be specific when new a bucket.
 /// Items save into bucket may have different encoding, the will base on the
 /// feature you enabled.
-pub struct Bucket<'a, K: Key<'a>, V: Value<'a>> {
+pub struct Bucket<K: Key, V: Value> {
     pub(crate) name: String,
     pub(crate) raw_bucket: RawBucket,
     phantom_k: PhantomData<K>,
     phantom_v: PhantomData<V>,
-    phantom: PhantomData<&'a ()>,
 }
 
-impl<'a, K: Key<'a>, V: Clone + Value<'a>> Bucket<'a, K, V> {
-    pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<'a, K, V> {
+type Item<K, V> = (K, V);
+
+pub struct Iter<'a, K, V> {
+    raw_bucket: &'a RawBucket,
+    index: usize,
+    item_idx: u32,
+    upperlimit: Option<usize>,
+    phantom_k: PhantomData<K>,
+    phantom_v: PhantomData<V>,
+}
+
+impl<'a, K: Key, V: Value> Iterator for Iter<'a, K, V> {
+    type Item = Item<K, V>;
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let upperlimit = if let Some(upperlimit) = self.upperlimit {
+                upperlimit
+            } else {
+                self.raw_bucket.0.len()
+            };
+
+            if self.index == upperlimit {
+                return None;
+            }
+
+            let (k_size, v_size) = self.raw_bucket.0[self.index].get_size();
+
+            let mut key_row = Row::from(
+                &self.raw_bucket.1[(self.item_idx) as usize..(self.item_idx + k_size) as usize],
+            );
+
+            key_row.make_buffer();
+            let key = K::from_raw_key(&key_row).expect("parse key from raw fail");
+
+            let mut value_row = Row::from(
+                &self.raw_bucket.1
+                    [(self.item_idx + k_size) as usize..(self.item_idx + k_size + v_size) as usize],
+            );
+            value_row.make_buffer();
+            let value = V::from_raw_value(&value_row).expect("parse value from raw fail");
+
+            self.item_idx = self.item_idx + k_size + v_size;
+
+            return Some((key, value));
+        }
+    }
+}
+
+impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
+    pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<K, V> {
         Bucket {
             name,
             raw_bucket,
             phantom_k: PhantomData,
             phantom_v: PhantomData,
-            phantom: PhantomData,
         }
     }
 
@@ -54,7 +92,7 @@ impl<'a, K: Key<'a>, V: Clone + Value<'a>> Bucket<'a, K, V> {
         Ok(false)
     }
 
-    pub fn get(&mut self, key: K) -> Result<Option<V>> {
+    pub fn get(&self, key: K) -> Result<Option<V>> {
         let hash = key.gen_hash()?;
 
         let mut idx = 0u32;
@@ -110,47 +148,61 @@ impl<'a, K: Key<'a>, V: Clone + Value<'a>> Bucket<'a, K, V> {
         Ok(())
     }
 
-    pub fn iter(&self) -> Iter<Any, Any> {
-        unimplemented!();
+    pub fn iter(&self) -> Iter<K, V> {
+        return Iter {
+            raw_bucket: &self.raw_bucket,
+            index: 0,
+            item_idx: 0,
+            upperlimit: None,
+            phantom_k: PhantomData,
+            phantom_v: PhantomData,
+        };
     }
 
     /// May not work
-    pub fn iter_range(&self, a: Any, b: Any) -> Iter<Any, Any> {
-        unimplemented!();
+    pub fn iter_range(&self, start: usize, end: usize) -> Iter<K, V> {
+        return Iter {
+            raw_bucket: &self.raw_bucket,
+            index: start,
+            item_idx: 0,
+            upperlimit: Some(end),
+            phantom_k: PhantomData,
+            phantom_v: PhantomData,
+        };
     }
 
     /// May not work
-    pub fn iter_prefix(&self, a: Any) -> Iter<Any, Any> {
+    pub fn iter_prefix(&self, prefix: K) -> Iter<K, V> {
         unimplemented!();
     }
 
     /// Native only, return an watch object, May not work
-    pub fn watch(&self, key: Any) -> Result<()> {
+    pub fn watch(&self, key: K) -> Result<()> {
         unimplemented!();
     }
 
     /// Get previous key, value pair
-    pub fn prev_key(&self, key: Any) -> Result<Option<Item<Any, Any>>> {
+    pub fn prev_key(&self, key: K) -> Result<Option<Item<K, V>>> {
         unimplemented!();
     }
 
     /// Get next key value paire
-    pub fn next_key(&self, key: Any) -> Result<Option<Item<Any, Any>>> {
+    pub fn next_key(&self, key: K) -> Result<Option<Item<K, V>>> {
         unimplemented!();
     }
 
     /// Pop items
-    pub fn pop(&self, key: Any) -> Result<Option<Any>> {
+    pub fn pop(&self, key: K) -> Result<Option<V>> {
         unimplemented!();
     }
 
     /// Pop the last item
-    pub fn pop_back(&self) -> Result<Option<Item<Any, Any>>> {
+    pub fn pop_back(&self) -> Result<Option<Item<K, V>>> {
         Ok(None)
     }
 
     /// Pop the first item
-    pub fn pop_front(&self) -> Result<Option<Item<Any, Any>>> {
+    pub fn pop_front(&self) -> Result<Option<Item<K, V>>> {
         Ok(None)
     }
 
