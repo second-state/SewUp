@@ -4,12 +4,13 @@ use std::convert::{TryFrom, TryInto};
 use anyhow::Result;
 use crypto::blake2s::Blake2s;
 use crypto::mac::Mac;
-use serde::{Deserialize, Serialize};
+use serde::de::DeserializeOwned;
+use serde::Serialize;
 
 use crate::types::{Raw, Row};
 
-pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
-    fn from_raw_key(r: &'a Row) -> Result<Self> {
+pub trait Key: Sized + Serialize + DeserializeOwned {
+    fn from_raw_key(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
         let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
@@ -55,21 +56,25 @@ pub trait Key<'a>: Sized + Serialize + Deserialize<'a> {
 
 pub trait AsHashKey {
     fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32);
+    fn get_size(&self) -> (u32, u32);
 }
 
 impl AsHashKey for Raw {
     fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32) {
+        let (k_size, v_size) = self.get_size();
+        (hash == self.bytes[0..24], k_size, v_size)
+    }
+    fn get_size(&self) -> (u32, u32) {
         let key_bytes: &[u8; 4] = (&self.bytes[24..28]).try_into().unwrap();
         let value_bytes: &[u8; 4] = (&self.bytes[28..32]).try_into().unwrap();
         (
-            hash == self.bytes[0..24],
             u32::from_be_bytes(*key_bytes),
             u32::from_be_bytes(*value_bytes),
         )
     }
 }
 
-impl<'a> Key<'a> for Raw {
+impl Key for Raw {
     fn from_raw_key(x: &Row) -> Result<Self> {
         Ok(Raw::try_from(x).expect("Data loose from Row to Raw"))
     }
@@ -78,8 +83,8 @@ impl<'a> Key<'a> for Raw {
     }
 }
 
-impl<'a> Key<'a> for Row {
-    fn from_raw_key(x: &'a Row) -> Result<Self> {
+impl Key for Row {
+    fn from_raw_key(x: &Row) -> Result<Self> {
         Ok(x.clone())
     }
 }
