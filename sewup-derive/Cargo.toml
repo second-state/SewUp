@@ -3,6 +3,9 @@ name = "sewup-derive"
 version = "0.0.1"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2018"
+description = "Macros implementation for SewUp"
+license = "Apache-2.0"
+repository = "https://github.com/second-state/SewUp"
 
 [lib]
 proc-macro = true
