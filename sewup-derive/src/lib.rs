@@ -109,6 +109,42 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
         .unwrap()
 }
 
+#[proc_macro_derive(Value)]
+pub fn derive_value(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let struct_name = cap.name("name").unwrap().as_str();
+        format!(
+            r#"
+            impl sewup::kv::traits::Value for {} {{}}
+        "#,
+            struct_name,
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    }
+}
+
+#[proc_macro_derive(Key)]
+pub fn derive_key(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let struct_name = cap.name("name").unwrap().as_str();
+        format!(
+            r#"
+            impl sewup::kv::traits::Key for {} {{}}
+        "#,
+            struct_name,
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
