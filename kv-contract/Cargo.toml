@@ -10,9 +10,9 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup = { path = '../sewup', features = ['kv'] }
-sewup-derive = { path = '../sewup-derive' }
-ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
+sewup = { version =  "0.0.1", features = [ "kv" ] }
+sewup-derive = "0.0.1"
+ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 anyhow = "1.0.40"
 thiserror = "1.0.24"
 serde = "1.0"
