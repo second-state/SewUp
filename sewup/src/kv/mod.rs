@@ -14,25 +14,19 @@
 //! > sewup = { features = ["kv"] }
 //!
 //! ```ignore
-//! use sewup::kv::*;
+//! use sewup::kv::Store;
+//! use sewup::types::{Raw, Row};
 //!
-//! let store = Store::new()?;
-//! let bucket = Store.bucket::<Raw, Raw>("default")?;
+//! let mut store = Store::new().unwrap();
+//! let mut bucket = store.bucket::<Raw, Raw>("default").unwrap();
 //!
 //! // Set testing = 123
-//! bucket.set(b"test", b"123")?;
-//! assert!(bucket.get(b"test").unwrap().unwrap() == "123");
-//! assert!(bucket.get(b"not exist").unwrap() == None);
+//! bucket.set(b"test".into(), b"123".into());
 //!
 //! // Set store with specific types
-//! let bucket2 = Store.bucket::<Integer, String>("bucket2")?;
-//! bucket2.set(1, "Testing");
+//! let mut bucket2 = store.bucket::<Raw, Row>("bucket2").unwrap();
+//! bucket2.set(b"long".into(), "Testing".to_string().into());
 //! ```
-//!
-//! These serialization features will be support
-//! 1. msgpack
-//! 2. bincode
-//! 3. json
 
 //TODO: remove this after implement
 #[allow(unused_variables)]

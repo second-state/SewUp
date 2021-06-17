@@ -177,6 +177,7 @@ impl Store {
             .to_le_bytes()
             .swap_with_slice(&mut buffer[1..3]);
 
+        // TODO: store as really need
         let bin = bincode::serialize(&self.tenants).expect("serialize db binary fail");
         let length = bin.len();
 

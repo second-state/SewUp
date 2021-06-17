@@ -4,6 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 
 use crate::types::*;
 
+/// A list of `Raw`, which helps you store much bigger data than a `Raw`
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Row {
     pub(super) inner: Vec<Raw>,
