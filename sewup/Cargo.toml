@@ -4,6 +4,9 @@ version = "0.0.1"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2018"
 build="build.rs"
+description = "A library to help you sew up your Ethereum project with Rust and just like develop in a common backend."
+license = "Apache-2.0"
+repository = "https://github.com/second-state/SewUp"
 
 [dependencies]
 thiserror = "1.0.24"
@@ -11,11 +14,11 @@ anyhow = "1.0.40"
 serde = "1.0"
 serde_derive = "1.0"
 toml = "0.5.8"
-ewasm_api = { git = "https://github.com/second-state/ewasm-rust-api.git", rev = "fbd49ae75dc47fb02b35f9006f510ca90a0187de", default-features = false, features = ["std", "qimalloc"] }
+ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 tiny-keccak = { version = "2.0.2", features = ["sha3", "keccak"] }
-sewup-derive = { path = '../sewup-derive' }
+sewup-derive = "0.0.1"
 bincode = { version = "1.3", optional = true }
-crypto = { package="rust-crypto-wasm", git ="https://github.com/buttercup/rust-crypto-wasm.git", rev="26310309cf434d30938a3401e2f0617eabfd129a" }
+cryptoxide = "0.3.3"
 
 [dev-dependencies]
 tempfile = "3.2.0"

@@ -2,8 +2,8 @@ use std::borrow::Borrow;
 use std::convert::{TryFrom, TryInto};
 
 use anyhow::Result;
-use crypto::blake2s::Blake2s;
-use crypto::mac::Mac;
+use cryptoxide::blake2s::Blake2s;
+use cryptoxide::mac::Mac;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
