@@ -1,1 +1,1 @@
-initSidebarItems({"attr":[["ewasm_fn",""],["ewasm_lib_fn",""],["ewasm_main",""]],"macro":[["fn_sig",""]]});
+initSidebarItems({"attr":[["ewasm_fn",""],["ewasm_lib_fn",""],["ewasm_main",""]],"derive":[["Key",""],["Value",""]],"macro":[["fn_sig",""]]});
