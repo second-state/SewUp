@@ -1,3 +1,6 @@
+//! Bucket is an abstract concept to help you storage key value items.
+//! The types of key and value should be specific when new a bucket.
+//! Items save into bucket may have different encoding, the will base on the feature you enabled.
 use std::marker::PhantomData;
 
 use anyhow::Result;
@@ -7,12 +10,12 @@ use crate::kv::traits::key::AsHashKey;
 use crate::types::{Raw, Row};
 
 // TODO: quick for first iteration
+/// `RawBucket` is a structure the data format really store
+/// The hash key is stored in the first item, and the `Key` and `Value` are
+/// stored in the second item
 pub type RawBucket = (Vec<Raw>, Vec<Raw>);
 
-/// Bucket is an abstract concept to help you storage key value items.
-/// The types of key and value should be specific when new a bucket.
-/// Items save into bucket may have different encoding, the will base on the
-/// feature you enabled.
+/// Bucket is a wrapper for `RawBucket`, including the name of the bucket
 pub struct Bucket<K: Key, V: Value> {
     pub(crate) name: String,
     pub(crate) raw_bucket: RawBucket,
@@ -69,6 +72,7 @@ impl<'a, K: Key, V: Value> Iterator for Iter<'a, K, V> {
 }
 
 impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
+    /// New a `Bucket` with name
     pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<K, V> {
         Bucket {
             name,
@@ -78,6 +82,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         }
     }
 
+    /// Check the `Key` in the bucket
     pub fn contains(&self, key: K) -> Result<bool> {
         let hash = key.gen_hash()?;
 
@@ -92,6 +97,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         Ok(false)
     }
 
+    /// Get a `Value` from bucket by `Key`
     pub fn get(&self, key: K) -> Result<Option<V>> {
         let hash = key.gen_hash()?;
 
@@ -112,6 +118,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         Ok(None)
     }
 
+    /// Set an item into the bucket
     pub fn set(&mut self, key: K, value: V) -> Result<()> {
         let mut value: Vec<Raw> = value.to_raw_value()?.into();
         let mut raw_key: Vec<Raw> = key.to_raw_key()?.into();
@@ -127,6 +134,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         Ok(())
     }
 
+    /// Remove a item from the bucket by key
     pub fn remove(&mut self, key: K) -> Result<()> {
         let hash = key.gen_hash()?;
 
@@ -148,6 +156,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         Ok(())
     }
 
+    /// Iterate all the items in the bucket
     pub fn iter(&self) -> Iter<K, V> {
         return Iter {
             raw_bucket: &self.raw_bucket,
@@ -159,7 +168,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         };
     }
 
-    /// May not work
+    /// Iterate the items in the bucket with specific range
     pub fn iter_range(&self, start: usize, end: usize) -> Iter<K, V> {
         return Iter {
             raw_bucket: &self.raw_bucket,
@@ -171,27 +180,27 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         };
     }
 
-    /// May not work
+    /// Iterate the times with special prefix
     pub fn iter_prefix(&self, prefix: K) -> Iter<K, V> {
         unimplemented!();
     }
 
-    /// Native only, return an watch object, May not work
-    pub fn watch(&self, key: K) -> Result<()> {
-        unimplemented!();
-    }
+    // Always watch a Item among the blocks
+    // pub fn watch(&self, key: K) -> Result<()> {
+    //     unimplemented!();
+    // }
 
     /// Get previous key, value pair
     pub fn prev_key(&self, key: K) -> Result<Option<Item<K, V>>> {
         unimplemented!();
     }
 
-    /// Get next key value paire
+    /// Get next key value pair
     pub fn next_key(&self, key: K) -> Result<Option<Item<K, V>>> {
         unimplemented!();
     }
 
-    /// Pop items
+    /// Pop item with specific key
     pub fn pop(&self, key: K) -> Result<Option<V>> {
         unimplemented!();
     }
@@ -206,10 +215,12 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         Ok(None)
     }
 
+    /// Get the length of the bucket
     pub fn len(&self) -> usize {
         self.raw_bucket.0.len()
     }
 
+    /// Check there is something in the bucket
     pub fn is_empty(&self) -> bool {
         self.raw_bucket.0.is_empty()
     }

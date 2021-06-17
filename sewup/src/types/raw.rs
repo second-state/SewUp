@@ -5,6 +5,7 @@ use serde_derive::Deserialize;
 
 use crate::types::*;
 
+/// The small storage unit in the contract, which contains 32 bytes.
 #[derive(Clone)]
 pub struct Raw {
     pub(crate) bytes: [u8; 32],
