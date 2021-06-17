@@ -283,6 +283,7 @@
 <span id="280">280</span>
 <span id="281">281</span>
 <span id="282">282</span>
+<span id="283">283</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">convert</span>::<span class="ident">TryFrom</span>, <span class="ident">fmt</span>, <span class="ident">iter</span>::<span class="ident">FromIterator</span>};
 
@@ -291,6 +292,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::<span class="kw-2">*</span>;
 
+<span class="doccomment">/// The small storage unit in the contract, which contains 32 bytes.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Raw</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>],

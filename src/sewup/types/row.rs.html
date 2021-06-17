@@ -206,6 +206,7 @@
 <span id="203">203</span>
 <span id="204">204</span>
 <span id="205">205</span>
+<span id="206">206</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">FromIterator</span>;
 
@@ -213,6 +214,7 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::<span class="kw-2">*</span>;
 
+<span class="doccomment">/// A list of `Raw`, which helps you store much bigger data than a `Raw`</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Row</span> {
     <span class="kw">pub</span>(<span class="kw">super</span>) <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span>,

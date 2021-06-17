@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Raw",""],["Row",""]]});
+initSidebarItems({"struct":[["Raw","The small storage unit in the contract, which contains 32 bytes."],["Row","A list of `Raw`, which helps you store much bigger data than a `Raw`"]]});

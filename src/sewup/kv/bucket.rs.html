@@ -217,7 +217,21 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Bucket is an abstract concept to help you storage key value items.</span>
+<span class="doccomment">//! The types of key and value should be specific when new a bucket.</span>
+<span class="doccomment">//! Items save into bucket may have different encoding, the will base on the feature you enabled.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 
 <span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
@@ -227,12 +241,12 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::{<span class="ident">Raw</span>, <span class="ident">Row</span>};
 
 <span class="comment">// TODO: quick for first iteration</span>
+<span class="doccomment">/// `RawBucket` is a structure the data format really store</span>
+<span class="doccomment">/// The hash key is stored in the first item, and the `Key` and `Value` are</span>
+<span class="doccomment">/// stored in the second item</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">RawBucket</span> <span class="op">=</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span>);
 
-<span class="doccomment">/// Bucket is an abstract concept to help you storage key value items.</span>
-<span class="doccomment">/// The types of key and value should be specific when new a bucket.</span>
-<span class="doccomment">/// Items save into bucket may have different encoding, the will base on the</span>
-<span class="doccomment">/// feature you enabled.</span>
+<span class="doccomment">/// Bucket is a wrapper for `RawBucket`, including the name of the bucket</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>: <span class="ident">Key</span>, <span class="ident">V</span>: <span class="ident">Value</span><span class="op">&gt;</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">raw_bucket</span>: <span class="ident">RawBucket</span>,
@@ -289,6 +303,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="ident">Key</span>, <span class="ident">V</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Value</span><span class="op">&gt;</span> <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// New a `Bucket` with name</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">raw_bucket</span>: <span class="ident">RawBucket</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Bucket</span> {
             <span class="ident">name</span>,
@@ -298,6 +313,7 @@
         }
     }
 
+    <span class="doccomment">/// Check the `Key` in the bucket</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">gen_hash</span>()<span class="question-mark">?</span>;
 
@@ -312,6 +328,7 @@
         <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
     }
 
+    <span class="doccomment">/// Get a `Value` from bucket by `Key`</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">gen_hash</span>()<span class="question-mark">?</span>;
 
@@ -332,6 +349,7 @@
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
+    <span class="doccomment">/// Set an item into the bucket</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>, <span class="ident">value</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">value</span>.<span class="ident">to_raw_value</span>()<span class="question-mark">?</span>.<span class="ident">into</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw_key</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">to_raw_key</span>()<span class="question-mark">?</span>.<span class="ident">into</span>();
@@ -347,6 +365,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Remove a item from the bucket by key</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">key</span>.<span class="ident">gen_hash</span>()<span class="question-mark">?</span>;
 
@@ -368,6 +387,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="doccomment">/// Iterate all the items in the bucket</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">return</span> <span class="ident">Iter</span> {
             <span class="ident">raw_bucket</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_bucket</span>,
@@ -379,7 +399,7 @@
         };
     }
 
-    <span class="doccomment">/// May not work</span>
+    <span class="doccomment">/// Iterate the items in the bucket with specific range</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_range</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="kw">return</span> <span class="ident">Iter</span> {
             <span class="ident">raw_bucket</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_bucket</span>,
@@ -391,27 +411,27 @@
         };
     }
 
-    <span class="doccomment">/// May not work</span>
+    <span class="doccomment">/// Iterate the times with special prefix</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">iter_prefix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Iter</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="macro">unimplemented</span><span class="macro">!</span>();
     }
 
-    <span class="doccomment">/// Native only, return an watch object, May not work</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">watch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="macro">unimplemented</span><span class="macro">!</span>();
-    }
+    <span class="comment">// Always watch a Item among the blocks</span>
+    <span class="comment">// pub fn watch(&amp;self, key: K) -&gt; Result&lt;()&gt; {</span>
+    <span class="comment">//     unimplemented!();</span>
+    <span class="comment">// }</span>
 
     <span class="doccomment">/// Get previous key, value pair</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prev_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">unimplemented</span><span class="macro">!</span>();
     }
 
-    <span class="doccomment">/// Get next key value paire</span>
+    <span class="doccomment">/// Get next key value pair</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">next_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">unimplemented</span><span class="macro">!</span>();
     }
 
-    <span class="doccomment">/// Pop items</span>
+    <span class="doccomment">/// Pop item with specific key</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">unimplemented</span><span class="macro">!</span>();
     }
@@ -426,10 +446,12 @@
         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
     }
 
+    <span class="doccomment">/// Get the length of the bucket</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">len</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
         <span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">0</span>.<span class="ident">len</span>()
     }
 
+    <span class="doccomment">/// Check there is something in the bucket</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_empty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">0</span>.<span class="ident">is_empty</span>()
     }

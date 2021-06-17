@@ -56,12 +56,6 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
-<span id="58">58</span>
-<span id="59">59</span>
-<span id="60">60</span>
-<span id="61">61</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! `kv` feature provides a simple way to key/value store things into evm</span>
 <span class="doccomment">//! It aims to be lightweight and with a nice high level interface.</span>
@@ -79,25 +73,19 @@
 <span class="doccomment">//! &gt; sewup = { features = [&quot;kv&quot;] }</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ```ignore</span>
-<span class="doccomment">//! use sewup::kv::*;</span>
+<span class="doccomment">//! use sewup::kv::Store;</span>
+<span class="doccomment">//! use sewup::types::{Raw, Row};</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! let store = Store::new()?;</span>
-<span class="doccomment">//! let bucket = Store.bucket::&lt;Raw, Raw&gt;(&quot;default&quot;)?;</span>
+<span class="doccomment">//! let mut store = Store::new().unwrap();</span>
+<span class="doccomment">//! let mut bucket = store.bucket::&lt;Raw, Raw&gt;(&quot;default&quot;).unwrap();</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Set testing = 123</span>
-<span class="doccomment">//! bucket.set(b&quot;test&quot;, b&quot;123&quot;)?;</span>
-<span class="doccomment">//! assert!(bucket.get(b&quot;test&quot;).unwrap().unwrap() == &quot;123&quot;);</span>
-<span class="doccomment">//! assert!(bucket.get(b&quot;not exist&quot;).unwrap() == None);</span>
+<span class="doccomment">//! bucket.set(b&quot;test&quot;.into(), b&quot;123&quot;.into());</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! // Set store with specific types</span>
-<span class="doccomment">//! let bucket2 = Store.bucket::&lt;Integer, String&gt;(&quot;bucket2&quot;)?;</span>
-<span class="doccomment">//! bucket2.set(1, &quot;Testing&quot;);</span>
+<span class="doccomment">//! let mut bucket2 = store.bucket::&lt;Raw, Row&gt;(&quot;bucket2&quot;).unwrap();</span>
+<span class="doccomment">//! bucket2.set(b&quot;long&quot;.into(), &quot;Testing&quot;.to_string().into());</span>
 <span class="doccomment">//! ```</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! These serialization features will be support</span>
-<span class="doccomment">//! 1. msgpack</span>
-<span class="doccomment">//! 2. bincode</span>
-<span class="doccomment">//! 3. json</span>
 
 <span class="comment">//TODO: remove this after implement</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
