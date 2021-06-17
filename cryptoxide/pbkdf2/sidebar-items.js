@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["pbkdf2","Execute the PBKDF2 Key Derivation Function. The Scrypt Key Derivation Function generally provides better security, so, applications that do not have a requirement to use PBKDF2 specifically should consider using that function instead."]]});

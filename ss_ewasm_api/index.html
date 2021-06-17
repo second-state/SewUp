@@ -1,0 +1,106 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="ewasm_api is a library used to interface with Ethereum’s EEI in Ewasm, a set of enhancements to the Ethereum smart contract platform. ewasm_api exposes both a set of unsafe “native” functions representing the actual EEI functions, and a set of safe wrappers around them. It is recommended not to use the native functions as they do not perform bounds-checking."><meta name="keywords" content="rust, rustlang, rust-lang, ss_ewasm_api"><title>ss_ewasm_api - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings"></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../ss_ewasm_api/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><p class="location">Crate ss_ewasm_api</p><div class="block version"><p>Version 0.11.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all ss_ewasm_api's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#enums">Enums</a></li><li><a href="#functions">Functions</a></li></ul></div><p class="location"></p><div id="sidebar-vars" data-name="ss_ewasm_api" data-ty="mod" data-relpath="../"></div></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="">ss_ewasm_api</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/ss_ewasm_api/lib.rs.html#1-669" title="goto source code">[src]</a></span></h1><div class="docblock"><p>ewasm_api is a library used to interface with Ethereum’s EEI in <a href="https://github.com/ewasm/design">Ewasm</a>, a set of enhancements to
+the Ethereum smart contract platform.
+ewasm_api exposes both a set of unsafe “native” functions representing the actual EEI
+functions, and a set of safe wrappers around them. It is recommended not to use the native
+functions as they do not perform bounds-checking.</p>
+<p>To use ewasm_api, simply include it as a dependency in your project.
+ewasm_api can be built with various feature sets:</p>
+<ul>
+<li><code>default</code>: Builds with <code>wee_alloc</code> as the global allocator and with the Rust standard
+library.</li>
+<li><code>qimalloc</code>: Builds with <a href="https://github.com/wasmx/qimalloc">qimalloc</a> as the global
+allocator.</li>
+<li><code>debug</code>: Exposes the debugging interface.</li>
+<li><code>experimental</code>: Exposes the experimental bignum system library API.</li>
+</ul>
+<h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">ewasm_api</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">fn</span> <span class="ident">entry</span>() {
+    <span class="kw">let</span> <span class="ident">a</span>: <span class="ident">Hash</span> <span class="op">=</span> <span class="ident">block_hash</span>(<span class="number">1</span>);
+    <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">bytes</span>);
+}
+
+<span class="macro">ewasm_entry_point</span><span class="macro">!</span>(<span class="ident">entry</span>);</pre></div>
+<p>Using lower-level primitives:</p>
+
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<span class="kw">use</span> <span class="ident">ewasm_api</span>::{<span class="ident">types</span>::<span class="ident">Hash</span>, <span class="ident">block_hash</span>, <span class="ident">finish_data</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+<span class="kw">pub</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+    <span class="kw">let</span> <span class="ident">a</span>: <span class="ident">types</span>::<span class="ident">Hash</span> <span class="op">=</span> <span class="ident">block_hash</span>(<span class="number">1</span>);
+    <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>.<span class="ident">bytes</span>);
+}</pre></div>
+</div><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
+<table><tr class="module-item"><td><a class="mod" href="prelude/index.html" title="ss_ewasm_api::prelude mod">prelude</a></td><td class="docblock-short"><p>Re-export of all the basic features.</p>
+</td></tr><tr class="module-item"><td><a class="mod" href="types/index.html" title="ss_ewasm_api::types mod">types</a></td><td class="docblock-short"><p>High-level types commonly used in Ethereum contracts.</p>
+</td></tr></table><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<table><tr class="module-item"><td><a class="macro" href="macro.ewasm_entry_point.html" title="ss_ewasm_api::ewasm_entry_point macro">ewasm_entry_point</a></td><td class="docblock-short"><p>Declare entry point for a contract. Expects a Rust function name to be executed.
+This will only compile in when using the wasm32 target.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.CallResult.html" title="ss_ewasm_api::CallResult enum">CallResult</a></td><td class="docblock-short"><p>Enum describing the result of a call. Used by <code>call</code>, <code>callCode</code>, <code>callDelegate</code>, and
+<code>callStatic</code>.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.CreateResult.html" title="ss_ewasm_api::CreateResult enum">CreateResult</a></td><td class="docblock-short"><p>Enum describing the result of <code>create</code>. On success, the data contained is the address of the
+newly created contract.</p>
+</td></tr><tr class="module-item"><td><a class="enum" href="enum.Error.html" title="ss_ewasm_api::Error enum">Error</a></td><td class="docblock-short"><p>Enum representing an error code for EEI calls. Currently used by <code>codeCopy</code>, <code>callDataCopy</code>,
+<code>externalCodeCopy</code>, and <code>returnDataCopy</code>.</p>
+</td></tr></table><h2 id="functions" class="section-header"><a href="#functions">Functions</a></h2>
+<table><tr class="module-item"><td><a class="fn" href="fn.abort.html" title="ss_ewasm_api::abort fn">abort</a></td><td class="docblock-short"><p>Halts execution, reverts all changes to the state and consumes all gas.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_coinbase.html" title="ss_ewasm_api::block_coinbase fn">block_coinbase</a></td><td class="docblock-short"><p>Returns the beneficiary address for the block this transaction is in (current block)</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_difficulty.html" title="ss_ewasm_api::block_difficulty fn">block_difficulty</a></td><td class="docblock-short"><p>Returns the difficulty of the most recent block.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_gas_limit.html" title="ss_ewasm_api::block_gas_limit fn">block_gas_limit</a></td><td class="docblock-short"><p>Returns the gas limit of the most recent block.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_hash.html" title="ss_ewasm_api::block_hash fn">block_hash</a></td><td class="docblock-short"><p>Returns the hash of the <code>number</code>th most recent block.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_number.html" title="ss_ewasm_api::block_number fn">block_number</a></td><td class="docblock-short"><p>Returns the number of the most recent block.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.block_timestamp.html" title="ss_ewasm_api::block_timestamp fn">block_timestamp</a></td><td class="docblock-short"><p>Returns the timestamp of the most recent block.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.call_code.html" title="ss_ewasm_api::call_code fn">call_code</a></td><td class="docblock-short"><p>Executes another account’s code in the context of the caller.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.call_delegate.html" title="ss_ewasm_api::call_delegate fn">call_delegate</a></td><td class="docblock-short"><p>Executes a call similar to <code>call_code</code>, but retaining the currently executing call’s sender
+and value.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.call_mutable.html" title="ss_ewasm_api::call_mutable fn">call_mutable</a></td><td class="docblock-short"><p>Executes a standard call to the specified address with the given gas limit, ether value, and
+data.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.call_static.html" title="ss_ewasm_api::call_static fn">call_static</a></td><td class="docblock-short"><p>Executes a static call which cannot mutate the state.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.calldata_acquire.html" title="ss_ewasm_api::calldata_acquire fn">calldata_acquire</a></td><td class="docblock-short"><p>Returns a vector containing all data passed with the currently executing call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.calldata_copy.html" title="ss_ewasm_api::calldata_copy fn">calldata_copy</a></td><td class="docblock-short"><p>Returns the segment of call data beginning at <code>from</code>, and continuing for <code>length</code> bytes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.calldata_size.html" title="ss_ewasm_api::calldata_size fn">calldata_size</a></td><td class="docblock-short"><p>Returns the length of the call data supplied with the currently executing call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.caller.html" title="ss_ewasm_api::caller fn">caller</a></td><td class="docblock-short"><p>Returns the sender of the currently executing call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.callvalue.html" title="ss_ewasm_api::callvalue fn">callvalue</a></td><td class="docblock-short"><p>Returns the value sent with the currently executing call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.code_acquire.html" title="ss_ewasm_api::code_acquire fn">code_acquire</a></td><td class="docblock-short"><p>Returns the currently executing code.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.code_copy.html" title="ss_ewasm_api::code_copy fn">code_copy</a></td><td class="docblock-short"><p>Copies the segment of running code beginning at <code>from</code> and continuing for <code>length</code> bytes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.code_size.html" title="ss_ewasm_api::code_size fn">code_size</a></td><td class="docblock-short"><p>Returns the size of the currently executing code.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.consume_gas.html" title="ss_ewasm_api::consume_gas fn">consume_gas</a></td><td class="docblock-short"><p>Subtracts the given amount from the VM’s gas counter. This is usually injected by the metering
+contract at deployment time, and hence is unneeded in most cases.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.create.html" title="ss_ewasm_api::create fn">create</a></td><td class="docblock-short"><p>Creates a contract with the the given code, sending the specified ether value to its address.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.current_address.html" title="ss_ewasm_api::current_address fn">current_address</a></td><td class="docblock-short"><p>Returns the executing address.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.external_balance.html" title="ss_ewasm_api::external_balance fn">external_balance</a></td><td class="docblock-short"><p>Returns the balance of the address given.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.external_code_acquire.html" title="ss_ewasm_api::external_code_acquire fn">external_code_acquire</a></td><td class="docblock-short"><p>Returns the code at the specified address.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.external_code_copy.html" title="ss_ewasm_api::external_code_copy fn">external_code_copy</a></td><td class="docblock-short"><p>Returns the segment of code at <code>address</code> beginning at <code>from</code> and continuing for <code>length</code> bytes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.external_code_size.html" title="ss_ewasm_api::external_code_size fn">external_code_size</a></td><td class="docblock-short"><p>Returns the size of the code at the specified address.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.finish.html" title="ss_ewasm_api::finish fn">finish</a></td><td class="docblock-short"><p>Ends execution, signalling success.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.finish_data.html" title="ss_ewasm_api::finish_data fn">finish_data</a></td><td class="docblock-short"><p>Fills the return buffer with the given data and halts execution, signalling success.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.gas_left.html" title="ss_ewasm_api::gas_left fn">gas_left</a></td><td class="docblock-short"><p>Returns the gas left in the current call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.log0.html" title="ss_ewasm_api::log0 fn">log0</a></td><td class="docblock-short"><p>Appends log data without a topic.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.log1.html" title="ss_ewasm_api::log1 fn">log1</a></td><td class="docblock-short"><p>Appends log data with one topic.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.log2.html" title="ss_ewasm_api::log2 fn">log2</a></td><td class="docblock-short"><p>Appends log data with two topics.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.log3.html" title="ss_ewasm_api::log3 fn">log3</a></td><td class="docblock-short"><p>Appends log data with three topics.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.log4.html" title="ss_ewasm_api::log4 fn">log4</a></td><td class="docblock-short"><p>Appends log data with four topics.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.returndata_acquire.html" title="ss_ewasm_api::returndata_acquire fn">returndata_acquire</a></td><td class="docblock-short"><p>Returns the data in the VM’s return buffer.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.returndata_copy.html" title="ss_ewasm_api::returndata_copy fn">returndata_copy</a></td><td class="docblock-short"><p>Returns the segment of return buffer data beginning at <code>from</code> and continuing for <code>length</code> bytes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.returndata_size.html" title="ss_ewasm_api::returndata_size fn">returndata_size</a></td><td class="docblock-short"><p>Returns the length of the data in the VM’s return buffer.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.revert.html" title="ss_ewasm_api::revert fn">revert</a></td><td class="docblock-short"><p>Halts execution and reverts all changes to the state.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.revert_data.html" title="ss_ewasm_api::revert_data fn">revert_data</a></td><td class="docblock-short"><p>Fills the return buffer with the given data and halts execution, reverting all state changes.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.selfdestruct.html" title="ss_ewasm_api::selfdestruct fn">selfdestruct</a></td><td class="docblock-short"><p>Self-destructs the running contract, sending all its ether to a specified beneficiary address.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.storage_load.html" title="ss_ewasm_api::storage_load fn">storage_load</a></td><td class="docblock-short"><p>Accesses the storage data at the specified key.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.storage_store.html" title="ss_ewasm_api::storage_store fn">storage_store</a></td><td class="docblock-short"><p>Sets the storage data at the specified key.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.tx_gas_price.html" title="ss_ewasm_api::tx_gas_price fn">tx_gas_price</a></td><td class="docblock-short"><p>Returns the gas price of the currently executing call.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.tx_origin.html" title="ss_ewasm_api::tx_origin fn">tx_origin</a></td><td class="docblock-short"><p>Returns the address of the original transaction sender.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.unsafe_calldata_copy.html" title="ss_ewasm_api::unsafe_calldata_copy fn">unsafe_calldata_copy</a></td><td class="docblock-short"><p>Executes callDataCopy, but does not check for overflow.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.unsafe_code_copy.html" title="ss_ewasm_api::unsafe_code_copy fn">unsafe_code_copy</a></td><td class="docblock-short"><p>Executes codeCopy, but does not check for overflow.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.unsafe_external_code_copy.html" title="ss_ewasm_api::unsafe_external_code_copy fn">unsafe_external_code_copy</a></td><td class="docblock-short"><p>Executes externalCodeCopy, but does not check for overflow.</p>
+</td></tr><tr class="module-item"><td><a class="fn" href="fn.unsafe_returndata_copy.html" title="ss_ewasm_api::unsafe_returndata_copy fn">unsafe_returndata_copy</a></td><td class="docblock-short"><p>Executes returnDataCopy, but does not check for overflow.</p>
+</td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="ss_ewasm_api" data-search-js="../search-index.js"></div>
+    <script src="../main.js"></script></body></html>
