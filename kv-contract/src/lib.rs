@@ -1,24 +1,21 @@
 use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 
-use sewup::kv::traits::Value;
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
 use sewup::types::{Raw, Row};
-use sewup_derive::{ewasm_fn, ewasm_main, fn_sig};
+use sewup_derive::{ewasm_fn, ewasm_main, fn_sig, Value};
 
 mod errors;
 use errors::KVError;
 
 const EMPTY_DB_SIZE: u32 = 8;
 
-#[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
 struct SimpleStruct {
     trust: bool,
     description: String,
 }
-
-impl Value<'_> for SimpleStruct {}
 
 #[ewasm_fn]
 fn empty_commit() -> Result<()> {
