@@ -6,4 +6,5 @@ members = [
 
     "examples/erc20-contract",
     "examples/kv-contract",
+    "examples/default-contract",
 ]

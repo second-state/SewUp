@@ -11,6 +11,7 @@ let
   updateContract = nixpkgs.writeShellScriptBin "update-contract" ''
     update-single-contract erc20
     update-single-contract kv
+    update-single-contract default
   '';
   updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
     rm -f resources/test/$1_contract.wasm
@@ -23,7 +24,7 @@ let
   '';
   testScript = nixpkgs.writeShellScriptBin "run-test" ''
     cd sewup
-    cargo test -p sewup --features=$1 -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)
+    cargo test -p sewup --no-default-features --features=$1 -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)
     cd ../
   '';
 in

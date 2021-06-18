@@ -30,3 +30,7 @@ pub mod runtimes;
 
 #[allow(unused_variables)]
 pub mod types;
+
+#[cfg(feature = "default")]
+#[cfg(test)]
+mod tests;

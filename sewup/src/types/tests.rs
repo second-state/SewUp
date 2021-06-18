@@ -1,5 +1,6 @@
 use crate::types::*;
 
+#[cfg(feature = "default")]
 #[test]
 fn test_ser_de_for_raw() {
     let raw = Raw::from(vec![0, 1]);
@@ -17,6 +18,7 @@ fn test_ser_de_for_raw() {
     // assert_eq!(1, load.flag);
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_ser_de_for_raw2() {
     let raw = Raw::from(vec![
@@ -37,6 +39,7 @@ fn test_ser_de_for_raw2() {
     // assert_eq!(1, load.flag);
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_from() {
     let r1 = Raw::from(vec![1, 2, 3]);
@@ -51,6 +54,7 @@ fn test_from() {
     assert_eq!(r2, vec![4; 32]);
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_short_string() {
     // TODO: need more design on string
@@ -64,6 +68,7 @@ fn test_short_string() {
     );
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_box() {
     let box1: Box<[u8]> = Box::new([1, 2, 3]);
@@ -80,6 +85,7 @@ fn test_box() {
     assert_eq!(r2, vec![5; 32]);
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_ser_de_for_row() {
     let row = Row::from(vec![
@@ -102,6 +108,7 @@ fn test_ser_de_for_row() {
     assert_eq!(row.inner, load.inner);
 }
 
+#[cfg(feature = "default")]
 #[test]
 fn test_str_for_row() {
     let row =

@@ -26,6 +26,7 @@ pub fn storage_index_to_addr(idx: usize, addr: &mut [u8; 32]) {
     }
 }
 
+#[cfg(feature = "default")]
 #[cfg(test)]
 mod tests {
     use super::*;
