@@ -4,7 +4,6 @@ members = [
     "sewup",
     "sewup-derive",
 
-    # contract examples
-    "erc20-contract",
-    "kv-contract",
+    "examples/erc20-contract",
+    "examples/kv-contract",
 ]

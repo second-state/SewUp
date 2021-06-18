@@ -14,9 +14,9 @@ let
   '';
   updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
     rm -f resources/test/$1_contract.wasm
-    cd $1-contract
+    cd examples/$1-contract
     cargo build --release
-    cd ../
+    cd ../../
     mv target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm \
       & echo "==> update $1" \
       & echo "==> `ls -l resources/test/$1_contract.wasm`"
