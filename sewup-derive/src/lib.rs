@@ -104,9 +104,27 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 
 #[proc_macro]
 pub fn fn_sig(item: TokenStream) -> TokenStream {
-    format!("_{}_SIG", item.to_string().to_ascii_uppercase())
-        .parse()
-        .unwrap()
+    let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let fn_name = cap.name("name").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        let canonical_fn = format!(
+            "{}({})",
+            fn_name,
+            params
+                .split(',')
+                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+        format!(r"{:?}", get_function_signature(&canonical_fn))
+            .parse()
+            .unwrap()
+    } else {
+        format!("_{}_SIG", item.to_string().to_ascii_uppercase())
+            .parse()
+            .unwrap()
+    }
 }
 
 #[proc_macro_derive(Value)]

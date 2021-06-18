@@ -4,9 +4,9 @@ use std::sync::Arc;
 
 use crate::errors::ContractError as Error;
 use crate::runtimes::{handler::ContractHandler, test::TestRuntime};
-use crate::utils::get_function_signature;
 
 use ethereum_types::Address;
+use sewup_derive::fn_sig;
 use tempfile::NamedTempFile;
 use toml;
 
@@ -188,27 +188,22 @@ fn test_execute_wasm_functions() {
 
     run_function(
         "name",
-        get_function_signature("name()"),
+        fn_sig!(name()),
         None,
         vec![
             69, 82, 67, 50, 48, 84, 111, 107, 101, 110, 68, 101, 109, 111,
         ],
     );
-    run_function(
-        "symbol",
-        get_function_signature("symbol(&str)"),
-        None,
-        vec![69, 84, 68],
-    );
+    run_function("symbol", fn_sig!(symbol(s: &str)), None, vec![69, 84, 68]);
     run_function(
         "decimals",
-        get_function_signature("decimals()"),
+        fn_sig!(decimals()),
         None,
         vec![0, 0, 0, 0, 0, 0, 0, 0],
     );
     run_function(
         "total supply",
-        get_function_signature("total_supply()"),
+        fn_sig!(total_supply()),
         None,
         vec![0, 0, 0, 0, 5, 245, 225, 0],
     );
@@ -216,14 +211,9 @@ fn test_execute_wasm_functions() {
     let balance_input = hex!("00000000000000000000000000000000FACEB00C");
     run_function(
         "do balance",
-        get_function_signature("do_balance(&Contract)"),
+        fn_sig!(do_balance(contract: &Contract)),
         Some(&balance_input),
         vec![],
     );
-    run_function(
-        "Unknow Handler",
-        get_function_signature("unknow_function()"),
-        None,
-        vec![],
-    );
+    run_function("Unknow Handler", fn_sig!(unknow_function()), None, vec![]);
 }

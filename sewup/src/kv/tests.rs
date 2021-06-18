@@ -2,16 +2,16 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 use crate::runtimes::{handler::ContractHandler, test::TestRuntime};
-use crate::utils::get_function_signature;
 
 use ethereum_types::Address;
+use sewup_derive::fn_sig;
 use tempfile::NamedTempFile;
 
 #[test]
 fn test_execute_storage_operations() {
     let runtime = Arc::new(RefCell::new(TestRuntime::default()));
     let run_function =
-        |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
+        |fn_name: &str, sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
             let config_file = NamedTempFile::new().unwrap();
 
             let mut h = ContractHandler {
@@ -26,22 +26,17 @@ fn test_execute_storage_operations() {
 
             h.rt = Some(runtime.clone());
 
-            match h.execute(fn_sig, input_data, 1_000_000) {
+            match h.execute(sig, input_data, 1_000_000) {
                 Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
                 Err(e) => {
                     panic!("vm error: {:?}", e);
                 }
             }
         };
-    run_function(
-        "Commit test",
-        get_function_signature("empty_commit()"),
-        None,
-        vec![],
-    );
+    run_function("Commit test", fn_sig!(empty_commit()), None, vec![]);
     run_function(
         "Unknow Handler",
-        get_function_signature("unknow_function()"),
+        fn_sig!(unknow_function()),
         None,
         vec![
             117, 110, 107, 110, 111, 119, 32, 104, 97, 110, 100, 108, 101, 114,
@@ -49,31 +44,32 @@ fn test_execute_storage_operations() {
     );
     run_function(
         "Verson check test",
-        get_function_signature("check_version_and_features(u8,Vec<Feature>)"),
+        fn_sig!(check_version_and_features(
+            version: u8,
+            features: Vec<Feature>
+        )),
         None,
         vec![],
     );
     run_function(
         "Check empty storage size",
-        get_function_signature("check_empty_storage_size(u32)"),
+        fn_sig!(check_empty_storage_size(size: u32)),
         None,
         vec![],
     );
-    run_function(
-        "Add buckets",
-        get_function_signature("add_buckets()"),
-        None,
-        vec![],
-    );
+    run_function("Add buckets", fn_sig!(add_buckets()), None, vec![]);
     run_function(
         "Check buckets",
-        get_function_signature("check_buckets(Vec<String>)"),
+        fn_sig!(check_buckets(buckets: Vec<String>)),
         None,
         vec![],
     );
     run_function(
         "Drop bucket and check",
-        get_function_signature("drop_bucket_than_check(&str,Vec<String>)"),
+        fn_sig!(drop_bucket_than_check(
+            name: &str,
+            remine_buckets: Vec<String>
+        )),
         None,
         vec![],
     );
@@ -83,7 +79,7 @@ fn test_execute_storage_operations() {
 fn test_execute_bucket_operations() {
     let runtime = Arc::new(RefCell::new(TestRuntime::default()));
     let run_function =
-        |fn_name: &str, fn_sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
+        |fn_name: &str, sig: [u8; 4], input_data: Option<&[u8]>, expect_output: Vec<u8>| {
             let config_file = NamedTempFile::new().unwrap();
 
             let mut h = ContractHandler {
@@ -98,7 +94,7 @@ fn test_execute_bucket_operations() {
 
             h.rt = Some(runtime.clone());
 
-            match h.execute(fn_sig, input_data, 1_000_000) {
+            match h.execute(sig, input_data, 1_000_000) {
                 Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
                 Err(e) => {
                     panic!("vm error: {:?}", e);
@@ -107,19 +103,19 @@ fn test_execute_bucket_operations() {
         };
     run_function(
         "Init bucket with struct",
-        get_function_signature("new_bucket_with_specific_struct()"),
+        fn_sig!(new_bucket_with_specific_struct()),
         None,
         vec![],
     );
     run_function(
         "Check objects in the bucket",
-        get_function_signature("check_objects_in_bucket()"),
+        fn_sig!(check_objects_in_bucket()),
         None,
         vec![],
     );
     run_function(
         "Check object deletection of bucket",
-        get_function_signature("delete_object_in_bucket()"),
+        fn_sig!(delete_object_in_bucket()),
         None,
         vec![],
     );
