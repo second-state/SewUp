@@ -42,3 +42,6 @@ jobs:
 
       - name: KV feature test
         run: nix-shell --run 'run-test kv'
+
+      - name: Derive test
+        run: nix-shell --run 'cargo test -p sewup-derive'
