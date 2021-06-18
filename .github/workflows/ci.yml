@@ -37,6 +37,9 @@ jobs:
       - name: Build contract
         run: nix-shell --run "update-contract"
 
+      - name: default feature test
+        run: nix-shell --run 'run-test default'
+
       - name: Token feature test
         run: nix-shell --run "run-test token"
 
