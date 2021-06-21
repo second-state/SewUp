@@ -34,3 +34,5 @@ pub mod types;
 #[cfg(feature = "default")]
 #[cfg(test)]
 mod tests;
+
+pub use bincode;
