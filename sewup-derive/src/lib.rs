@@ -21,6 +21,7 @@ pub fn ewasm_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
     };
     format!(
         r#"
+        use sewup::bincode;
         #[no_mangle]
         pub fn main() {{
             use ewasm_api::finish_data;
@@ -124,6 +125,25 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
         format!("_{}_SIG", item.to_string().to_ascii_uppercase())
             .parse()
             .unwrap()
+    }
+}
+
+#[proc_macro]
+pub fn input_from(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>\w+)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let contract = cap.name("contract").unwrap().as_str();
+        let fn_name = cap.name("name").unwrap().as_str();
+        format!(
+            r#"
+                {}(bincode::deserialize(&{}.input_data[4..])?)
+            "#,
+            fn_name, contract
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("fail to parsing function in fn_select");
     }
 }
 

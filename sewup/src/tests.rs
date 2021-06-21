@@ -4,8 +4,15 @@ use std::sync::Arc;
 use crate::runtimes::{handler::ContractHandler, test::TestRuntime};
 
 use ethereum_types::Address;
+use serde_derive::{Deserialize, Serialize};
 use sewup_derive::fn_sig;
 use tempfile::NamedTempFile;
+
+#[derive(Default, Serialize, Deserialize)]
+struct SimpleStruct {
+    trust: bool,
+    description: String,
+}
 
 #[test]
 fn test_execute_basic_operations() {
@@ -33,10 +40,24 @@ fn test_execute_basic_operations() {
                 }
             }
         };
+
+    let mut simple_struct = SimpleStruct::default();
+    let mut bin = bincode::serialize(&simple_struct).unwrap();
     run_function(
         "Check input object",
         fn_sig!(check_input_object(s: SimpleStruct)),
-        None,
+        Some(&bin),
+        vec![
+            110, 111, 116, 32, 116, 114, 117, 115, 116, 32, 105, 110, 112, 117, 116,
+        ],
+    );
+
+    simple_struct.trust = true;
+    bin = bincode::serialize(&simple_struct).unwrap();
+    run_function(
+        "Check input object",
+        fn_sig!(check_input_object(s: SimpleStruct)),
+        Some(&bin),
         vec![],
     );
 }
