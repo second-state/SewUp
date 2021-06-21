@@ -24,6 +24,6 @@ panic = "abort"
 lto = true
 opt-level = "z"
 
-[profile.release.package.kv-contract]
+[profile.release.package.default-contract]
 incremental = false
 opt-level = "z"

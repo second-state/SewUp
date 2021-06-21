@@ -12,31 +12,86 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 }
 
 #[proc_macro_attribute]
-pub fn ewasm_main(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
     let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
         cap.name("name").unwrap().as_str().to_owned()
     } else {
         panic!("parse function error")
     };
-    format!(
-        r#"
-        use sewup::bincode;
-        #[no_mangle]
-        pub fn main() {{
+
+    return match attr.to_string().as_str() {
+        // Return the inner structure from unwrap result
+        // This is for a scenario that you take care the result but not using Rust client
+        "unwrap" => format!(
+            r#"
+            use sewup::bincode;
             use ewasm_api::finish_data;
-            {}
-            if let Err(e) = {}() {{
-                let error_msg = e.to_string();
-                finish_data(&error_msg.as_bytes());
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                match {}() {{
+                    Ok(r) =>  {{
+                        let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
+                        finish_data(&bin);
+
+                    }},
+                    Err(e) => {{
+                        let error_msg = e.to_string();
+                        finish_data(&error_msg.as_bytes());
+
+                    }}
+                }}
             }}
-        }}
-    "#,
-        item.to_string(),
-        fn_name
-    )
-    .parse()
-    .unwrap()
+        "#,
+            item.to_string(),
+            fn_name
+        )
+        .parse()
+        .unwrap(),
+
+        // Return all result structure
+        // This is for a scenario that you are using a rust client to operation the contract
+        "rusty" => format!(
+            r#"
+            use sewup::bincode;
+            use ewasm_api::finish_data;
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                let r = {}();
+                let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
+                finish_data(&bin);
+            }}
+        "#,
+            item.to_string(),
+            fn_name
+        )
+        .parse()
+        .unwrap(),
+
+        // Default only return error message,
+        // This is for a scenario that you just want to modify the data on
+        // chain only
+        _ => format!(
+            r#"
+            use sewup::bincode;
+            use ewasm_api::finish_data;
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                if let Err(e) = {}() {{
+                    let error_msg = e.to_string();
+                    finish_data(&error_msg.as_bytes());
+                }}
+            }}
+        "#,
+            item.to_string(),
+            fn_name
+        )
+        .parse()
+        .unwrap()
+    };
 }
 
 #[proc_macro_attribute]
