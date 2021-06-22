@@ -1,0 +1,29 @@
+[package]
+name = "rusty-contract"
+version = "0.1.0"
+authors = ["Antonio Yang <yanganto@gmail.com>"]
+edition = "2018"
+description = "The rusty return example contract using sewup default feature"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+sewup ={ version = "0.0.2", path = "../../sewup" }
+sewup-derive = { version = "0.0.2", path = "../../sewup-derive" }
+ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
+anyhow = "1.0.40"
+thiserror = "1.0.24"
+serde = "1.0"
+serde_derive = "1.0"
+
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z"
+
+[profile.release.package.rusty-contract]
+incremental = false
+opt-level = "z"

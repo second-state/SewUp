@@ -1,4 +1,5 @@
 extern crate proc_macro;
+
 use proc_macro::TokenStream;
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
@@ -37,7 +38,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         panic!("parse function error")
     };
 
-    return match attr.to_string().as_str() {
+    return match attr.to_string().to_lowercase().as_str() {
         // Return the inner structure from unwrap result
         // This is for a scenario that you take care the result but not using Rust client
         "unwrap" => format!(
@@ -217,20 +218,35 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
 /// `input_from` will help you to get the input data from contract caller, and
 /// automatically deserialize input into handler
 /// `input_from!(contract, the_name_of_the_handler)`
+/// Besides, you can map the error to your customized error when something wrong happend in
+/// `input_from!`, for example:
+/// `input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
 #[proc_macro]
 pub fn input_from(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>\w+)").unwrap();
+    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>\w+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let contract = cap.name("contract").unwrap().as_str();
         let fn_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-                {}(bincode::deserialize(&{}.input_data[4..])?)
-            "#,
-            fn_name, contract
-        )
-        .parse()
-        .unwrap()
+        let error_handler = cap.name("error_handler").unwrap().as_str();
+        if error_handler.is_empty() {
+            format!(
+                r#"
+                    {}(bincode::deserialize(&{}.input_data[4..])?)
+                "#,
+                fn_name, contract
+            )
+            .parse()
+            .unwrap()
+        } else {
+            format!(
+                r#"
+                    {}(bincode::deserialize(&{}.input_data[4..]).map_err({})?)
+                "#,
+                fn_name, contract, error_handler
+            )
+            .parse()
+            .unwrap()
+        }
     } else {
         panic!("fail to parsing function in fn_select");
     }
