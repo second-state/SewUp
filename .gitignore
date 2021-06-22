@@ -5,4 +5,5 @@ shell.nix
 resources/test/erc20_contract.wasm
 resources/test/kv_contract.wasm
 resources/test/default_contract.wasm
+resources/test/rusty_contract.wasm
 .direnv
