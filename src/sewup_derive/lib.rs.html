@@ -198,8 +198,115 @@
 <span id="195">195</span>
 <span id="196">196</span>
 <span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
 <span class="kw">use</span> <span class="ident">regex</span>::<span class="ident">Regex</span>;
 <span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>};
@@ -212,34 +319,109 @@
     <span class="ident">sig</span>
 }
 
+<span class="doccomment">/// `ewasm_main` is a macro for the main function of the contract</span>
+<span class="doccomment">/// There are three different contract output.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// `#[ewasm_main]`</span>
+<span class="doccomment">/// The default contract output, the error will be return as a string message</span>
+<span class="doccomment">/// This is for a scenario that you just want to modify the data on</span>
+<span class="doccomment">/// chain only, and the error will to string than return.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// `#[ewasm_main(rusty)]`</span>
+<span class="doccomment">/// The rust styl output, the result object from ewasm_main function will be</span>
+<span class="doccomment">/// returned, this is for a scenario that you are using a rust client to catch</span>
+<span class="doccomment">/// and want to catch the result from the contract.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// `#[ewasm_main(unwrap)]`</span>
+<span class="doccomment">/// The unwrap the output of the result object from ewasm_main function.</span>
+<span class="doccomment">/// This is for a scenario that you are using a rust non-rust client,</span>
+<span class="doccomment">/// and you are only care the happy case of excuting the contract.</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_main</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_main</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;fn (?P&lt;name&gt;[^(]+?)\(&quot;</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
         <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">to_owned</span>()
     } <span class="kw">else</span> {
         <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;parse function error&quot;</span>)
     };
-    <span class="macro">format</span><span class="macro">!</span>(
-        <span class="string">r#&quot;
-        use sewup::bincode;
-        #[no_mangle]
-        pub fn main() {{
+
+    <span class="kw">return</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
+        <span class="comment">// Return the inner structure from unwrap result</span>
+        <span class="comment">// This is for a scenario that you take care the result but not using Rust client</span>
+        <span class="string">&quot;unwrap&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(
+            <span class="string">r#&quot;
+            use sewup::bincode;
             use ewasm_api::finish_data;
-            {}
-            if let Err(e) = {}() {{
-                let error_msg = e.to_string();
-                finish_data(&amp;error_msg.as_bytes());
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                match {}() {{
+                    Ok(r) =&gt;  {{
+                        let bin = bincode::serialize(&amp;r).expect(&quot;The resuslt of `ewasm_main` should be serializable&quot;);
+                        finish_data(&amp;bin);
+
+                    }},
+                    Err(e) =&gt; {{
+                        let error_msg = e.to_string();
+                        finish_data(&amp;error_msg.as_bytes());
+
+                    }}
+                }}
             }}
-        }}
-    &quot;#</span>,
-        <span class="ident">item</span>.<span class="ident">to_string</span>(),
-        <span class="ident">fn_name</span>
-    )
-    .<span class="ident">parse</span>()
-    .<span class="ident">unwrap</span>()
+        &quot;#</span>,
+            <span class="ident">item</span>.<span class="ident">to_string</span>(),
+            <span class="ident">fn_name</span>
+        )
+        .<span class="ident">parse</span>()
+        .<span class="ident">unwrap</span>(),
+
+        <span class="comment">// Return all result structure</span>
+        <span class="comment">// This is for a scenario that you are using a rust client to operation the contract</span>
+        <span class="string">&quot;rusty&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(
+            <span class="string">r#&quot;
+            use sewup::bincode;
+            use ewasm_api::finish_data;
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                let r = {}();
+                let bin = bincode::serialize(&amp;r).expect(&quot;The resuslt of `ewasm_main` should be serializable&quot;);
+                finish_data(&amp;bin);
+            }}
+        &quot;#</span>,
+            <span class="ident">item</span>.<span class="ident">to_string</span>(),
+            <span class="ident">fn_name</span>
+        )
+        .<span class="ident">parse</span>()
+        .<span class="ident">unwrap</span>(),
+
+        <span class="comment">// Default only return error message,</span>
+        <span class="comment">// This is for a scenario that you just want to modify the data on</span>
+        <span class="comment">// chain only</span>
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(
+            <span class="string">r#&quot;
+            use sewup::bincode;
+            use ewasm_api::finish_data;
+            #[no_mangle]
+            pub fn main() {{
+                {}
+                if let Err(e) = {}() {{
+                    let error_msg = e.to_string();
+                    finish_data(&amp;error_msg.as_bytes());
+                }}
+            }}
+        &quot;#</span>,
+            <span class="ident">item</span>.<span class="ident">to_string</span>(),
+            <span class="ident">fn_name</span>
+        )
+        .<span class="ident">parse</span>()
+        .<span class="ident">unwrap</span>()
+    };
 }
 
+<span class="doccomment">/// The macro helps you to build your handler in the contract, and also</span>
+<span class="doccomment">/// generate the function signature, you can use `fn_sig!` macro to get your</span>
+<span class="doccomment">/// function signature of the function wrappered with `#[ewasm_fn]`</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_fn</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;^fn (?P&lt;name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
@@ -271,6 +453,9 @@
     }
 }
 
+<span class="doccomment">/// The macro helps you to build your handler as a lib, which can used in the</span>
+<span class="doccomment">/// contract, the function signature well automatically generated as</span>
+<span class="doccomment">/// `{FUNCTION_NAME}_SIG`</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_lib_fn</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;^pub fn (?P&lt;name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
@@ -304,6 +489,14 @@
     }
 }
 
+<span class="doccomment">/// `fn_sig` helps you get you function signature</span>
+<span class="doccomment">/// 1. provide function name to get function signature from the same namespace,</span>
+<span class="doccomment">/// which function should be decorated with `#[ewasm_fn]`, for example,</span>
+<span class="doccomment">/// `fn_sig!(the_name_of_contract_handler)`</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// 2. provide a function name with input parameters then the macro will</span>
+<span class="doccomment">/// calculate the correct functional signature for you.</span>
+<span class="doccomment">/// ex: `fn_sig!(the_name_of_contract_handler( a: i32, b: String ))`</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fn_sig</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;^(?P&lt;name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
@@ -329,25 +522,43 @@
     }
 }
 
+<span class="doccomment">/// `input_from` will help you to get the input data from contract caller, and</span>
+<span class="doccomment">/// automatically deserialize input into handler</span>
+<span class="doccomment">/// `input_from!(contract, the_name_of_the_handler)`</span>
+<span class="doccomment">/// Besides, you can map the error to your customized error when something wrong happened in</span>
+<span class="doccomment">/// `input_from!`, for example:</span>
+<span class="doccomment">/// `input_from!(contract, check_input_object, |_| Err(&quot;DeserdeError&quot;))`</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">input_from</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+),\s+(?P&lt;name&gt;\w+)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+),\s+(?P&lt;name&gt;\w+),?(?P&lt;error_handler&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
         <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;contract&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="macro">format</span><span class="macro">!</span>(
-            <span class="string">r#&quot;
-                {}(bincode::deserialize(&amp;{}.input_data[4..])?)
-            &quot;#</span>,
-            <span class="ident">fn_name</span>, <span class="ident">contract</span>
-        )
-        .<span class="ident">parse</span>()
-        .<span class="ident">unwrap</span>()
+        <span class="kw">let</span> <span class="ident">error_handler</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;error_handler&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">if</span> <span class="ident">error_handler</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">r#&quot;
+                    {}(bincode::deserialize(&amp;{}.input_data[4..])?)
+                &quot;#</span>,
+                <span class="ident">fn_name</span>, <span class="ident">contract</span>
+            )
+            .<span class="ident">parse</span>()
+            .<span class="ident">unwrap</span>()
+        } <span class="kw">else</span> {
+            <span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">r#&quot;
+                    {}(bincode::deserialize(&amp;{}.input_data[4..]).map_err({})?)
+                &quot;#</span>,
+                <span class="ident">fn_name</span>, <span class="ident">contract</span>, <span class="ident">error_handler</span>
+            )
+            .<span class="ident">parse</span>()
+            .<span class="ident">unwrap</span>()
+        }
     } <span class="kw">else</span> {
         <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;fail to parsing function in fn_select&quot;</span>);
     }
 }
-
+<span class="doccomment">/// `Value` derive help you implement Value trait for kv feature</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Value</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_value</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;struct (?P&lt;name&gt;\w+)&quot;</span>).<span class="ident">unwrap</span>();
@@ -366,6 +577,7 @@
     }
 }
 
+<span class="doccomment">/// `Key` derive help you implement Key trait for the kv feature</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Key</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_key</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex</span>::<span class="ident">new</span>(<span class="string">r&quot;struct (?P&lt;name&gt;\w+)&quot;</span>).<span class="ident">unwrap</span>();
