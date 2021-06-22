@@ -218,7 +218,7 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
 /// `input_from` will help you to get the input data from contract caller, and
 /// automatically deserialize input into handler
 /// `input_from!(contract, the_name_of_the_handler)`
-/// Besides, you can map the error to your customized error when something wrong happend in
+/// Besides, you can map the error to your customized error when something wrong happened in
 /// `input_from!`, for example:
 /// `input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
 #[proc_macro]
