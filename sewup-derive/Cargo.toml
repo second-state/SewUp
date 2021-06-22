@@ -1,11 +1,12 @@
 [package]
 name = "sewup-derive"
-version = "0.0.2"
+version = "0.0.3"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2018"
 description = "Macros implementation for SewUp"
 license = "Apache-2.0"
 repository = "https://github.com/second-state/SewUp"
+readme = "../README.md"
 
 [lib]
 proc-macro = true

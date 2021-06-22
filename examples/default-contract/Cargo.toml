@@ -10,8 +10,8 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup ={ version = "0.0.2", path = "../../sewup" }
-sewup-derive = { version = "0.0.2", path = "../../sewup-derive" }
+sewup ={ version = "0.0.3", path = "../../sewup" }
+sewup-derive = { version = "0.0.3", path = "../../sewup-derive" }
 ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 anyhow = "1.0.40"
 thiserror = "1.0.24"
