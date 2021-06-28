@@ -11,14 +11,14 @@ let
   updateContract = nixpkgs.writeShellScriptBin "update-contract" ''
     update-single-contract erc20
     update-single-contract kv
-    update-single-contract default
+    update-single-contract rusty
   '';
   updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
     rm -f resources/test/$1_contract.wasm
     cd examples/$1-contract
-    cargo build --release
+    cargo build --release --target=wasm32-unknown-unknown
     cd ../../
-    mv target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm \
+    mv examples/$1-contract/target/wasm32-unknown-unknown/release/$1_contract.wasm resources/test/$1_contract.wasm \
       & echo "==> update $1" \
       & echo "==> `ls -l resources/test/$1_contract.wasm`"
   '';

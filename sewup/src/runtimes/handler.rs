@@ -31,10 +31,10 @@ pub struct ContractHandler {
     /// If the contract_config_file_path pass from the connection string,
     /// this field will be filled
     #[serde(skip)]
-    pub(crate) config_file_path: Option<PathBuf>,
+    pub config_file_path: Option<PathBuf>,
 
     #[serde(skip)]
-    pub(crate) rt: Option<Arc<RefCell<dyn RT>>>,
+    pub rt: Option<Arc<RefCell<dyn RT>>>,
 }
 
 impl fmt::Debug for ContractHandler {

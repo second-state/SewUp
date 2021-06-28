@@ -13,8 +13,16 @@ pub struct Contract {
 
 impl Contract {
     pub fn new() -> Result<Self> {
+        #[cfg(target_arch = "wasm32")]
         let data_size = ewasm_api::calldata_size();
+        #[cfg(not(target_arch = "wasm32"))]
+        let data_size = 0;
+
+        #[cfg(target_arch = "wasm32")]
         let input_data = ewasm_api::calldata_acquire();
+        #[cfg(not(target_arch = "wasm32"))]
+        let input_data = Vec::new();
+
         if data_size < 4 {
             Err(ContractSizeError(data_size).into())
         } else {

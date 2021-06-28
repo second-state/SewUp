@@ -43,8 +43,11 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         // This is for a scenario that you take care the result but not using Rust client
         "unwrap" => format!(
             r#"
+            #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
             use ewasm_api::finish_data;
+            #[cfg(target_arch = "wasm32")]
             #[no_mangle]
             pub fn main() {{
                 {}
@@ -72,8 +75,11 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         // This is for a scenario that you are using a rust client to operation the contract
         "rusty" => format!(
             r#"
+            #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
             use ewasm_api::finish_data;
+            #[cfg(target_arch = "wasm32")]
             #[no_mangle]
             pub fn main() {{
                 {}
@@ -94,7 +100,9 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => format!(
             r#"
             use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
             use ewasm_api::finish_data;
+            #[cfg(target_arch = "wasm32")]
             #[no_mangle]
             pub fn main() {{
                 {}
@@ -132,7 +140,9 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         );
         format!(
             r#"
+            #[cfg(target_arch = "wasm32")]
             pub(crate) const _{}_SIG: [u8; 4] = {:?};
+            #[cfg(target_arch = "wasm32")]
             {}
         "#,
             fn_name.to_ascii_uppercase(),
@@ -167,7 +177,9 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         format!(
             r#"
             /// The siganature for fn {}
+            #[cfg(target_arch = "wasm32")]
             pub const {}_SIG: [u8; 4] = {:?};
+            #[cfg(target_arch = "wasm32")]
             {}
         "#,
             fn_name,
@@ -259,6 +271,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
         let struct_name = cap.name("name").unwrap().as_str();
         format!(
             r#"
+            #[cfg(target_arch = "wasm32")]
             impl sewup::kv::traits::Value for {} {{}}
         "#,
             struct_name,
@@ -278,6 +291,7 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
         let struct_name = cap.name("name").unwrap().as_str();
         format!(
             r#"
+            #[cfg(target_arch = "wasm32")]
             impl sewup::kv::traits::Key for {} {{}}
         "#,
             struct_name,

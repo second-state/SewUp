@@ -65,7 +65,7 @@ pub enum VmError {
 #[derive(Debug, Default)]
 pub struct VMResult {
     pub(crate) gas_left: i64,
-    pub(crate) output_data: Vec<u8>,
+    pub output_data: Vec<u8>,
     pub(crate) create_address: Option<Address>,
 }
 
