@@ -27,6 +27,11 @@ let
     cargo test -p sewup --no-default-features --features=$1 -- --nocapture | tee /tmp/vm_errors && exit $(grep ERROR /tmp/vm_errors | wc -l)
     cd ../
   '';
+  exampleTestScript = nixpkgs.writeShellScriptBin "run-example-test" ''
+    cd examples/$1-contract
+    cargo test
+    cd ../../
+  '';
 in
 with nixpkgs; pkgs.mkShell {
   buildInputs = [
@@ -38,6 +43,7 @@ with nixpkgs; pkgs.mkShell {
     updateContract
     updateSingleContract
     testScript
+    exampleTestScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
