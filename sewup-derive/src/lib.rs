@@ -301,7 +301,7 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
 }
 
 #[proc_macro_attribute]
-pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mod_re = Regex::new(r"mod (?P<mod_name>[^\{]*)\{").unwrap();
     let fn_re = Regex::new(r"fn (?P<fn_name>[^\(]*)\(").unwrap();
 

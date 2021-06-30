@@ -71,8 +71,8 @@ pub struct VMResult {
 
 #[derive(Debug, PartialEq)]
 pub enum Flags {
-    DEFAULT = 0,
-    STATIC = 1,
+    Default = 0,
+    Static = 1,
 }
 
 // TODO: abstract this, such that this can suitable for other chain than ETH
@@ -108,7 +108,7 @@ impl<'a> VMMessageBuilder<'a> {
     /// The Message will be restricted and do not modify the storage
     #[inline]
     pub fn read_only(mut self) -> Self {
-        self.flags = Flags::STATIC;
+        self.flags = Flags::Static;
         self
     }
 
@@ -141,7 +141,7 @@ impl<'a> VMMessageBuilder<'a> {
 
         if let Some(sender) = sender {
             let destination = if let Some(destination) = destination {
-                destination.clone()
+                *destination
             } else {
                 Address::from_low_u64_be(0)
             };
@@ -173,7 +173,7 @@ impl Default for VMMessageBuilder<'_> {
     fn default() -> Self {
         Self {
             kind: evmc_call_kind::EVMC_CALL,
-            flags: Flags::DEFAULT,
+            flags: Flags::Default,
             depth: i32::MAX,
             value: U256::from(0u64),
             gas: 0,

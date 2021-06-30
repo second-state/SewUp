@@ -47,14 +47,14 @@ impl RT for TestRuntime {
             &mut self.host,
             evmc_revision::EVMC_FRONTIER,
             kind,
-            flags == Flags::STATIC,
+            flags == Flags::Static,
             depth,
             gas,
             &destination.0,
             &sender.0,
-            input_data.unwrap_or_else(|| &null_input_data),
+            input_data.unwrap_or(&null_input_data),
             &v,
-            code.unwrap_or(input_data.unwrap_or_else(|| &null_input_data)),
+            code.unwrap_or_else(|| input_data.unwrap_or(&null_input_data)),
             &create2_salt.map_or_else(|| [0; 32], |h| h.0),
         );
         match status_code {
@@ -96,7 +96,7 @@ impl RT for TestRuntime {
     }
 
     fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress> {
-        let sender = msg.sender.clone();
+        let sender = *msg.sender;
         self.execute(msg)?;
         Ok(ContractAddress::from_sender_and_nonce(
             &sender,
@@ -156,6 +156,7 @@ impl HostContext for TestHost {
 
     fn selfdestruct(&mut self, addr: &[u8; 20], beneficiary: &[u8; 20]) {}
 
+    #[allow(clippy::type_complexity)]
     fn get_tx_context(
         &mut self,
     ) -> (
