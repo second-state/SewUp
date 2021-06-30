@@ -11,7 +11,6 @@ let
   updateContract = nixpkgs.writeShellScriptBin "update-contract" ''
     update-single-contract erc20
     update-single-contract kv
-    update-single-contract rusty
   '';
   updateSingleContract = nixpkgs.writeShellScriptBin "update-single-contract" ''
     rm -f resources/test/$1_contract.wasm

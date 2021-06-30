@@ -43,6 +43,9 @@ jobs:
       - name: Default example test
         run: nix-shell --run 'run-example-test default'
 
+      - name: Rusty example test
+        run: nix-shell --run 'run-example-test rusty'
+
       - name: Token feature test
         run: nix-shell --run "run-test token"
 
