@@ -1,3 +1,2 @@
-[build]
-target = "wasm32-unknown-unknown"
-rustflags = ["-Clink-arg=--export-table"]
+[target.'cfg(target_arch="wasm32")']
+rustflags = ["-C", "link-arg=--export-table"]

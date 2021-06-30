@@ -31,10 +31,10 @@ pub struct ContractHandler {
     /// If the contract_config_file_path pass from the connection string,
     /// this field will be filled
     #[serde(skip)]
-    pub(crate) config_file_path: Option<PathBuf>,
+    pub config_file_path: Option<PathBuf>,
 
     #[serde(skip)]
-    pub(crate) rt: Option<Arc<RefCell<dyn RT>>>,
+    pub rt: Option<Arc<RefCell<dyn RT>>>,
 }
 
 impl fmt::Debug for ContractHandler {
@@ -123,12 +123,12 @@ impl ContractHandler {
 
     /// Return the call data binary from hex literal or from a ewasm file
     fn get_call_data(call_data_info: String) -> Result<Vec<u8>> {
-        if call_data_info.starts_with("0x") {
+        if let Some(stripped_data_info) = call_data_info.strip_prefix("0x") {
             if call_data_info.len() % 2 != 0 {
                 return Err(Error::CalldataMalformat.into());
             }
             let mut format_error = false;
-            let v = call_data_info[2..]
+            let v = stripped_data_info
                 .chars()
                 .collect::<Vec<char>>()
                 .chunks(2)

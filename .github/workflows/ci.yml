@@ -40,11 +40,17 @@ jobs:
       - name: Default feature test
         run: nix-shell --run 'run-test default'
 
-      - name: Token feature test
-        run: nix-shell --run "run-test token"
+      - name: Default example test
+        run: nix-shell --run 'run-example-test default'
 
-      - name: KV feature test
-        run: nix-shell --run 'run-test kv'
+      - name: Rusty example test
+        run: nix-shell --run 'run-example-test rusty'
+
+      - name: KV example test
+        run: nix-shell --run 'run-example-test kv'
+
+      - name: ERC20 example test
+        run: nix-shell --run 'run-example-test erc20'
 
       - name: Derive test
         run: nix-shell --run 'cargo test -p sewup-derive'

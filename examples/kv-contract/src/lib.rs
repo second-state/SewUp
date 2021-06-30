@@ -4,7 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
 use sewup::types::{Raw, Row};
-use sewup_derive::{ewasm_fn, ewasm_main, fn_sig, Value};
+use sewup_derive::{ewasm_fn, ewasm_main, ewasm_test, fn_sig, Value};
 
 mod errors;
 use errors::KVError;
@@ -174,6 +174,12 @@ fn delete_object_in_bucket() -> Result<()> {
     Ok(())
 }
 
+#[ewasm_fn]
+fn non_regist_function() -> Result<()> {
+    // A function forget to regist
+    Ok(())
+}
+
 #[ewasm_main]
 fn main() -> Result<()> {
     let contract = Contract::new()?;
@@ -200,4 +206,36 @@ fn main() -> Result<()> {
     };
 
     Ok(())
+}
+
+#[ewasm_test]
+mod tests {
+    use super::*;
+
+    #[ewasm_test]
+    fn test_execute_storage_operations() {
+        ewasm_assert_ok!(empty_commit());
+
+        ewasm_assert_eq!(
+            non_regist_function(),
+            ewasm_err_output!(KVError::UnknownHandle)
+        );
+
+        ewasm_assert_ok!(check_version_and_features());
+
+        ewasm_assert_ok!(check_empty_storage_size());
+
+        ewasm_assert_ok!(add_buckets());
+
+        ewasm_assert_ok!(check_buckets());
+
+        ewasm_assert_ok!(drop_bucket_than_check());
+    }
+
+    #[ewasm_test]
+    fn test_execute_bucket_operations() {
+        ewasm_assert_ok!(new_bucket_with_specific_struct());
+        ewasm_assert_ok!(check_objects_in_bucket());
+        ewasm_assert_ok!(delete_object_in_bucket());
+    }
 }

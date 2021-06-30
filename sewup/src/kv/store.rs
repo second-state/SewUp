@@ -4,6 +4,7 @@ use std::convert::TryInto;
 use crate::kv::{
     errors::Error,
     traits::{Key, Value},
+    Feature,
 };
 use crate::utils::storage_index_to_addr;
 
@@ -13,11 +14,6 @@ use ewasm_api::{storage_load, storage_store};
 
 const VERSION: u8 = 1;
 const CONFIG_ADDR: [u8; 32] = [0; 32];
-
-#[derive(Debug, PartialEq)]
-pub enum Feature {
-    Default = 1,
-}
 
 type Tenants = HashMap<String, Option<RawBucket>>;
 

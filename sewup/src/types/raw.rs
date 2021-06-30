@@ -1,7 +1,7 @@
 use std::{convert::TryFrom, fmt, iter::FromIterator};
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde_derive::Deserialize;
+use serde_derive::Deserialize as DeserializeDerive;
 
 use crate::types::*;
 
@@ -13,7 +13,7 @@ pub struct Raw {
     // flag: u8,
 }
 
-#[derive(Deserialize, Debug, PartialEq)]
+#[derive(DeserializeDerive, Debug, PartialEq)]
 struct RawHelper {
     e01: u8,
     e02: u8,

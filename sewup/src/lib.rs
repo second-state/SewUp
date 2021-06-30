@@ -23,16 +23,10 @@ pub mod primitives;
 #[allow(dead_code)]
 pub mod utils;
 
-/// SewUp help you build up ewasm
-/// The runtime module is used for tesing
-#[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 pub mod runtimes;
 
 #[allow(unused_variables)]
 pub mod types;
-
-#[cfg(feature = "default")]
-#[cfg(test)]
-mod tests;
 
 pub use bincode;
