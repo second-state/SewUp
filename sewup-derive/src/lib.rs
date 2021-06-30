@@ -140,7 +140,6 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         );
         format!(
             r#"
-            #[cfg(target_arch = "wasm32")]
             pub(crate) const _{}_SIG: [u8; 4] = {:?};
             #[cfg(target_arch = "wasm32")]
             {}
@@ -177,9 +176,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         format!(
             r#"
             /// The siganature for fn {}
-            #[cfg(target_arch = "wasm32")]
             pub const {}_SIG: [u8; 4] = {:?};
-            #[cfg(target_arch = "wasm32")]
             {}
         "#,
             fn_name,
@@ -300,6 +297,156 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
         .unwrap()
     } else {
         panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    }
+}
+
+#[proc_macro_attribute]
+pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let mod_re = Regex::new(r"mod (?P<mod_name>[^\{]*)\{").unwrap();
+    let fn_re = Regex::new(r"fn (?P<fn_name>[^\(]*)\(").unwrap();
+
+    if let Some(cap) = mod_re.captures(&item.to_string()) {
+        let mod_name = cap.name("mod_name").unwrap().as_str().to_owned();
+        let prefix = format!("mod {}{{", mod_name);
+        return format!(
+        r#"
+            #[cfg(test)]
+            mod {} {{
+                use sewup::bincode;
+                use sewup::runtimes::{{handler::ContractHandler, test::TestRuntime}};
+                use sewup_derive::*;
+                use std::cell::RefCell;
+                use std::path::Path;
+                use std::path::PathBuf;
+                use std::process::Command;
+                use std::sync::Arc;
+
+                fn _build_wasm() -> String {{
+                    let output = Command::new("sh")
+                        .arg("-c")
+                        .arg("cargo build --release --target=wasm32-unknown-unknown")
+                        .output()
+                        .expect("failed to build wasm binary");
+                    if !output.status.success() {{
+                        panic!("failt to build wasm binary")
+                    }}
+                    let pkg_name = env!("CARGO_PKG_NAME");
+                    let base_dir = env!("CARGO_MANIFEST_DIR");
+                    let wasm_binary = format!(
+                        "{{}}/target/wasm32-unknown-unknown/release/{{}}.wasm",
+                        base_dir,
+                        pkg_name.replace("-", "_")
+                    );
+
+                    if !Path::new(&wasm_binary).exists() {{
+                        panic!("wasm binary missing")
+                    }}
+                    wasm_binary
+                }}
+
+                fn _build_runtime_and_runner() -> (
+                    Arc<RefCell<TestRuntime>>,
+                    impl Fn(Arc<RefCell<TestRuntime>>, &str, [u8; 4], Option<&[u8]>, Vec<u8>) -> (),
+                ) {{
+                    (
+                        Arc::new(RefCell::new(TestRuntime::default())),
+                        |runtime: Arc<RefCell<TestRuntime>>,
+                         fn_name: &str,
+                         sig: [u8; 4],
+                         input_data: Option<&[u8]>,
+                         expect_output: Vec<u8>| {{
+                            let mut h = ContractHandler {{
+                                call_data: Some(_build_wasm()),
+                                ..Default::default()
+                            }};
+
+                            h.rt = Some(runtime.clone());
+
+                            match h.execute(sig, input_data, 1_000_000_000_000) {{
+                                Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
+                                Err(e) => {{
+                                    panic!("vm error: {{:?}}", e);
+                                }}
+                            }}
+                        }},
+                    )
+                }}
+
+                #[test]
+                fn _compile_test() {{
+                    _build_wasm();
+                }}
+
+                {}
+        "#,
+            mod_name,
+            item.to_string().trim_start_matches(&prefix)
+        )
+        .parse()
+        .unwrap();
+    } else if let Some(cap) = fn_re.captures(&item.to_string()) {
+        let fn_name = cap.name("fn_name").unwrap().as_str().to_owned();
+        let prefix = format!("fn {}()\n{{", fn_name);
+        return format!(
+            r#"
+            #[test]
+            fn {} () {{
+                let (_runtime, _run_wasm_fn) = _build_runtime_and_runner();
+                let mut _bin: Vec<u8> = Vec::new();
+
+                {}
+        "#,
+            fn_name,
+            item.to_string().trim_start_matches(&prefix)
+        )
+        .parse()
+        .unwrap();
+    } else {
+        panic!("parse mod or function for testing error")
+    }
+}
+
+#[proc_macro]
+pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+        let fn_name = cap.name("fn_name").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        let equivalence = cap.name("equivalence").unwrap().as_str();
+        if params.is_empty() {
+            format!(
+                r#"
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        None,
+                        {}
+                    );
+                "#,
+                fn_name, fn_name, equivalence
+            )
+            .parse()
+            .unwrap()
+        } else {
+            format!(
+                r#"
+                    _bin = bincode::serialize(&{}).unwrap();
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        Some(&_bin),
+                        {}
+                    );
+                "#,
+                params, fn_name, fn_name, equivalence
+            )
+            .parse()
+            .unwrap()
+        }
+    } else {
+        panic!("fail to parsing function in fn_select");
     }
 }
 
