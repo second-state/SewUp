@@ -2,9 +2,7 @@ use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 
 use sewup::primitives::Contract;
-use sewup_derive::{
-    ewasm_assert_eq, ewasm_fn, ewasm_main, ewasm_test, fn_sig, input_from, output_from,
-};
+use sewup_derive::{ewasm_fn, ewasm_main, ewasm_test, fn_sig, input_from};
 
 mod errors;
 use errors::Error;

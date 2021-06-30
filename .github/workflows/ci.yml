@@ -49,8 +49,8 @@ jobs:
       - name: KV example test
         run: nix-shell --run 'run-example-test kv'
 
-      - name: Token feature test
-        run: nix-shell --run "run-test token"
+      - name: ERC20 example test
+        run: nix-shell --run 'run-example-test erc20'
 
       - name: Derive test
         run: nix-shell --run 'cargo test -p sewup-derive'

@@ -2,7 +2,13 @@ use super::helpers::{
     copy_into_array, copy_into_storage_value, get_allowance, get_balance, set_allowance,
     set_balance,
 };
+
+#[cfg(target_arch = "wasm32")]
 use ewasm_api::types::{Address, StorageValue};
+
+#[cfg(not(target_arch = "wasm32"))]
+use super::helpers::{Address, StorageValue};
+
 use sewup_derive::ewasm_lib_fn;
 
 #[ewasm_lib_fn]

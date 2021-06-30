@@ -140,7 +140,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         );
         format!(
             r#"
-            pub(crate) const _{}_SIG: [u8; 4] = {:?};
+            pub(crate) const {}_SIG: [u8; 4] = {:?};
             #[cfg(target_arch = "wasm32")]
             {}
         "#,
@@ -177,11 +177,18 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
             r#"
             /// The siganature for fn {}
             pub const {}_SIG: [u8; 4] = {:?};
+
+            #[cfg(not(target_arch = "wasm32"))]
+            pub fn {}({}) {{}}
+
+            #[cfg(target_arch = "wasm32")]
             {}
         "#,
             fn_name,
             fn_name.to_ascii_uppercase(),
             get_function_signature(&canonical_fn),
+            fn_name,
+            params,
             item.to_string()
         )
         .parse()
@@ -218,7 +225,7 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
             .parse()
             .unwrap()
     } else {
-        format!("_{}_SIG", item.to_string().to_ascii_uppercase())
+        format!("{}_SIG", item.to_string().to_ascii_uppercase())
             .parse()
             .unwrap()
     }
@@ -327,8 +334,8 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         .arg("cargo build --release --target=wasm32-unknown-unknown")
                         .output()
                         .expect("failed to build wasm binary");
-                    if !output.status.success() {{
-                        panic!("failt to build wasm binary")
+                    if !dbg!(output).status.success() {{
+                        panic!("return code not success: fail to build wasm binary")
                     }}
                     let pkg_name = env!("CARGO_PKG_NAME");
                     let base_dir = env!("CARGO_MANIFEST_DIR");

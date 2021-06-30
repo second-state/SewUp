@@ -28,10 +28,6 @@ contract-address = {git = "https://github.com/paritytech/parity-common.git", rev
 evmc-sys = { git = "https://github.com/second-state/evmc", tag = "v7.4.0-rust-evmc-client-rc.2" }
 rust-ssvm = { git = "https://github.com/second-state/rust-ssvm.git", rev = "5b37140a2e573aef62dde6a68003b1d51faeef77" }
 
-[dev-dependencies]
-tempfile = "3.2.0"
-hex-literal = "0.3.1"
-
 [build-dependencies]
 cmake = "0.1.42"
 

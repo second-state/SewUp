@@ -4,9 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
 use sewup::types::{Raw, Row};
-use sewup_derive::{
-    ewasm_assert_eq, ewasm_err_output, ewasm_fn, ewasm_main, ewasm_test, fn_sig, Value,
-};
+use sewup_derive::{ewasm_fn, ewasm_main, ewasm_test, fn_sig, Value};
 
 mod errors;
 use errors::KVError;
