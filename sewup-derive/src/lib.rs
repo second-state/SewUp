@@ -450,6 +450,119 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     }
 }
 
+/// This macro helps you asser your handler without error and returns
+#[proc_macro]
+pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+        let fn_name = cap.name("fn_name").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        if params.is_empty() {
+            format!(
+                r#"
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        None,
+                        Vec::new()
+                    );
+                "#,
+                fn_name, fn_name
+            )
+            .parse()
+            .unwrap()
+        } else {
+            format!(
+                r#"
+                    _bin = bincode::serialize(&{}).unwrap();
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        Some(&_bin),
+                        Vec::new()
+                    );
+                "#,
+                params, fn_name, fn_name
+            )
+            .parse()
+            .unwrap()
+        }
+    } else {
+        panic!("fail to parsing function in fn_select");
+    }
+}
+
+/// This macro helps you assert return Ok(()) your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
+#[proc_macro]
+pub fn ewasm_assert_rusty_ok(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+        let fn_name = cap.name("fn_name").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        if params.is_empty() {
+            format!(
+                r#"
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        None,
+                        vec![0, 0, 0, 0]
+                    );
+                "#,
+                fn_name, fn_name
+            )
+            .parse()
+            .unwrap()
+        } else {
+            format!(
+                r#"
+                    _bin = bincode::serialize(&{}).unwrap();
+                    _run_wasm_fn(
+                        _runtime.clone(),
+                        "{}",
+                        fn_sig!({}),
+                        Some(&_bin),
+                        vec![0, 0, 0, 0]
+                    );
+                "#,
+                params, fn_name, fn_name
+            )
+            .parse()
+            .unwrap()
+        }
+    } else {
+        panic!("fail to parsing function in fn_select");
+    }
+}
+
+/// This macro helps you assert return Err your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
+/// you should pass the complete Result type, as the following example
+/// `ewasm_rusty_err_output!(Err("NotTrustedInput") as Result<(), &'static str>)`
+/// such that you can easy to use any kind of rust error as you like
+#[proc_macro]
+pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
+    format!(
+        r#"bincode::serialize(&({})).expect("can not serialize the output expected from ewasm").to_vec()"#,
+        &item.to_string()
+    )
+    .parse()
+    .unwrap()
+}
+
+/// The macro helps you to get the binary result of the thiserror,
+/// such that you can assert your handler with error.
+/// for example:
+/// `ewasm_assert_eq!(some_handler(), ewasm_err_output!(Error::SomeError))`
+#[proc_macro]
+pub fn ewasm_err_output(item: TokenStream) -> TokenStream {
+    format!("{}.to_string().as_bytes().to_vec()", &item.to_string())
+        .parse()
+        .unwrap()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
