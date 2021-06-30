@@ -4,7 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
 use sewup::types::{Raw, Row};
-use sewup_derive::{ewasm_fn, ewasm_main, fn_sig, Value};
+use sewup_derive::{ewasm_assert_eq, ewasm_fn, ewasm_main, ewasm_test, fn_sig, Value};
 
 mod errors;
 use errors::KVError;
@@ -174,6 +174,12 @@ fn delete_object_in_bucket() -> Result<()> {
     Ok(())
 }
 
+#[ewasm_fn]
+fn non_regist_function() -> Result<()> {
+    // A function forget to regist
+    Ok(())
+}
+
 #[ewasm_main]
 fn main() -> Result<()> {
     let contract = Contract::new()?;
@@ -200,4 +206,36 @@ fn main() -> Result<()> {
     };
 
     Ok(())
+}
+
+#[ewasm_test]
+mod tests {
+    use super::*;
+
+    #[ewasm_test]
+    fn test_execute_storage_operations() {
+        ewasm_assert_eq!(empty_commit(), vec![],);
+
+        ewasm_assert_eq!(
+            non_regist_function(),
+            vec![117, 110, 107, 110, 111, 119, 32, 104, 97, 110, 100, 108, 101, 114],
+        );
+
+        ewasm_assert_eq!(check_version_and_features(), vec![],);
+
+        ewasm_assert_eq!(check_empty_storage_size(), vec![],);
+
+        ewasm_assert_eq!(add_buckets(), vec![],);
+
+        ewasm_assert_eq!(check_buckets(), vec![],);
+
+        ewasm_assert_eq!(drop_bucket_than_check(), vec![],);
+    }
+
+    #[ewasm_test]
+    fn test_execute_bucket_operations() {
+        ewasm_assert_eq!(new_bucket_with_specific_struct(), vec![],);
+        ewasm_assert_eq!(check_objects_in_bucket(), vec![],);
+        ewasm_assert_eq!(delete_object_in_bucket(), vec![],);
+    }
 }

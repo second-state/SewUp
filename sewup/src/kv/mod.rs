@@ -13,6 +13,7 @@
 //! Add follow sewup with `kv` feature enabled.
 //! > sewup = { features = ["kv"] }
 //!
+//TODO: run this doc test with target wasm32
 //! ```ignore
 //! use sewup::kv::Store;
 //! use sewup::types::{Raw, Row};
@@ -28,26 +29,26 @@
 //! bucket2.set(b"long".into(), "Testing".to_string().into());
 //! ```
 
-//TODO: remove this after implement
+#[derive(Debug, PartialEq)]
+pub enum Feature {
+    Default = 1,
+}
+
 #[allow(unused_variables)]
 #[allow(dead_code)]
-// This will be test after compiled into wasm
-#[cfg(not(test))]
+#[cfg(target_arch = "wasm32")]
 mod store;
-#[cfg(not(test))]
+#[cfg(target_arch = "wasm32")]
 pub use store::*;
+#[cfg(not(target_arch = "wasm32"))]
+pub struct Store {}
 
-//TODO: remove this after implement
 #[allow(unused_variables)]
 #[allow(dead_code)]
-// This will be test after compiled into wasm
-#[cfg(not(test))]
+#[cfg(target_arch = "wasm32")]
 mod bucket;
-#[cfg(not(test))]
+#[cfg(target_arch = "wasm32")]
 pub use bucket::*;
-
-#[cfg(test)]
-mod tests;
 
 pub mod traits;
 

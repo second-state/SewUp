@@ -46,11 +46,11 @@ jobs:
       - name: Rusty example test
         run: nix-shell --run 'run-example-test rusty'
 
+      - name: KV example test
+        run: nix-shell --run 'run-example-test kv'
+
       - name: Token feature test
         run: nix-shell --run "run-test token"
-
-      - name: KV feature test
-        run: nix-shell --run 'run-test kv'
 
       - name: Derive test
         run: nix-shell --run 'cargo test -p sewup-derive'
