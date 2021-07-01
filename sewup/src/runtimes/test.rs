@@ -157,19 +157,8 @@ impl HostContext for TestHost {
     fn selfdestruct(&mut self, addr: &[u8; 20], beneficiary: &[u8; 20]) {}
 
     #[allow(clippy::type_complexity)]
-    fn get_tx_context(
-        &mut self,
-    ) -> (
-        [u8; 32],
-        [u8; 20],
-        [u8; 20],
-        i64,
-        i64,
-        i64,
-        [u8; 32],
-        [u8; 32],
-    ) {
-        ([0; 32], [0; 20], [0; 20], 0, 0, 0, [0; 32], [0; 32])
+    fn get_tx_context(&mut self) -> ([u8; 32], [u8; 20], [u8; 20], i64, i64, i64, [u8; 32]) {
+        ([0; 32], [0; 20], [0; 20], 0, 0, 0, [0; 32])
     }
 
     fn get_block_hash(&mut self, number: i64) -> [u8; 32] {
