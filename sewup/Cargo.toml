@@ -21,10 +21,9 @@ sewup-derive = { version = "0.0.3" }
 bincode = "1.3"
 cryptoxide = "0.3.3"
 
-# TODO: Fix following dep before release 0.0.3
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-ethereum-types = {features = ["serialize"], git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
-contract-address = {git = "https://github.com/paritytech/parity-common.git", rev = "0867e488f6567e0d7fe13e78a14797ff019033f7" }
+ethereum-types = { version = "0.11.0", features = ["serialize"] }
+contract-address = "0.6.0"
 evmc-sys = { version = "6.3.1-rc4", package = "ssvm-evmc-sys" }
 rust-ssvm = "0.1.0-rc2"
 
