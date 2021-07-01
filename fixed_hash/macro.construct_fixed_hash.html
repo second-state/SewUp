@@ -19,9 +19,9 @@
 <div class="example-wrap"><pre class="rust rust-example-rendered">
 <span class="kw">use</span> <span class="ident">fixed_hash</span>::<span class="ident">construct_fixed_hash</span>;
 <span class="macro">construct_fixed_hash</span><span class="macro">!</span>{
-    <span class="doccomment">/// My unformatted 160 bytes sized hash type.</span>
-    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H160</span>(<span class="number">20</span>);
+	<span class="doccomment">/// My unformatted 160 bytes sized hash type.</span>
+	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serialize&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H160</span>(<span class="number">20</span>);
 }
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">std</span>::<span class="ident">mem</span>::<span class="ident">size_of</span>::<span class="op">&lt;</span><span class="ident">H160</span><span class="op">&gt;</span>(), <span class="number">20</span>);</pre></div>
 <p>The visibility modifier is optional and you can create a private hash type.</p>
