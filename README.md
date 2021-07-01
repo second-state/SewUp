@@ -14,11 +14,11 @@
 | 2021/06/19 | Rust meetup (Beijing) | [v0.0.1-pre](https://slides.com/yanganto/sewup)             |
 
 ## Usage
-Add `sewup` with the featurex and the `sewup-derive` into Cargo.toml, and setup other sections
+Add `sewup` with the features and the `sewup-derive` into Cargo.toml, and setup other sections
 as following, then you are ready to build contract with sewup.
 
-Beside, we suggest you using `anyhow` to handle your result, but not limited to, please checkout
-`#[ewasm_main(rusty)]` and learn more.
+Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
+if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
 
 ```toml
 [package]
@@ -40,7 +40,7 @@ panic = "abort"
 lto = true
 opt-level = "z"
 
-[profile.release.package.hello-contract] // package name
+[profile.release.package.hello-contract]  # package name
 incremental = false
 opt-level = "z"
 ```
