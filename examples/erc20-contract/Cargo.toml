@@ -10,8 +10,8 @@ path = "src/token.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup ={ version = "0.0.3", path = "../../sewup", features = [ "token" ] }
-sewup-derive = { version = "0.0.3", path = "../../sewup-derive" }
+sewup ={ version = "0.0.4", path = "../../sewup", features = [ "token" ] }
+sewup-derive = { version = "0.0.4", path = "../../sewup-derive" }
 anyhow = "1.0.40"
 ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 

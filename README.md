@@ -44,7 +44,7 @@ opt-level = "z"
 incremental = false
 opt-level = "z"
 ```
-Place [.carggo/config](./examples/hello-contract/.cargo/config) file in your project to specify the flags for build.
+Place [.cargo/config](./examples/hello-contract/.cargo/config) file in your project to specify the flags for build.
 
 Here is minimize example for writing a contract with sewup
 ```rust
