@@ -1,7 +1,7 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/crate.io-0.0.2-green.svg)](https://crates.io/search?q=sewup)
+[![Generic badge](https://img.shields.io/badge/crate.io-0.0.3-green.svg)](https://crates.io/search?q=sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
 
