@@ -16,9 +16,14 @@
 ## Usage
 Add `sewup` with the featurex and the `sewup-derive` into Cargo.toml, and setup other sections
 as following, then you are ready to build contract with sewup.
-Beside, we suggest you using `anyhow` to handle your result, but not limited to.
+
+Beside, we suggest you using `anyhow` to handle your result, but not limited to, please checkout
+`#[ewasm_main(rusty)]` and learn more.
 
 ```toml
+[package]
+name = "hello-contract"
+
 [lib]
 path = "src/lib.rs"
 crate-type = ["cdylib"]
@@ -35,7 +40,7 @@ panic = "abort"
 lto = true
 opt-level = "z"
 
-[profile.release.package.default-contract]
+[profile.release.package.hello-contract] // package name
 incremental = false
 opt-level = "z"
 ```
@@ -44,8 +49,36 @@ Place [.carggo/config](./examples/hello-contract/.cargo/config) file in your pro
 Here is minimize example for writing a contract with sewup
 ```rust
 // lib.rs
+use anyhow::Result;
 
+use sewup::primitives::Contract;
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
+#[ewasm_fn]
+fn hello() -> Result<String> {
+    Ok("hello world".to_string())
+}
+
+#[ewasm_main(auto)]
+fn main() -> Result<String> {
+    let contract = Contract::new()?;
+    let greeting = match contract.get_function_selector()? {
+        ewasm_fn_sig!(hello) => hello()?,
+        _ => panic!("unknown handle"),
+    };
+    Ok(greeting)
+}
+
+#[ewasm_test]
+mod tests {
+    use super::*;
+    use sewup_derive::ewasm_auto_assert_eq;
+
+    #[ewasm_test]
+    fn test_get_greeting() {
+        ewasm_auto_assert_eq!(hello(), "hello world".to_string());
+    }
+}
 ```
 
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
@@ -53,6 +86,8 @@ Besides, you also can easily run test with `cargo test`, the ewasm contract auto
 Furthermore, you can learn more from other examples in the [example](./examples/) folder.
 
 ## Development
-The workspace have several project, the contract project should build with target `wasm32-unknown-unknown` and the flag `-Clink-arg=--export-table`.
-After placing the `.wasm` output into [/resources/test](./resources/test), you can run `cargo test -p sewup --features=kv` to check on the test for kv features.
+The workspace have several project, the contract project should build with target
+`wasm32-unknown-unknown` and the flag `-C link-arg=--export-table`.
+
+You can run `cargo test` in each example to check on the test your modification.
 It is easy to participate with help want issues and the good first issues.
