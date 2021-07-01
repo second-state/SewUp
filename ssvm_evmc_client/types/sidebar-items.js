@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["ADDRESS_LENGTH",""],["BYTES32_LENGTH",""]],"type":[["Address",""],["Bytes",""],["Bytes32",""],["CallKind",""],["Capabilities",""],["Revision",""],["StatusCode",""],["StorageStatus",""]]});
