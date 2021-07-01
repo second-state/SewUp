@@ -12,8 +12,9 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     sig
 }
 
-/// `ewasm_main` is a macro for the main function of the contract
-/// There are three different contract output.
+/// helps you setup the main function of a contract
+///
+/// There are three different kind contract output.
 ///
 /// `#[ewasm_main]`
 /// The default contract output, the error will be return as a string message
@@ -29,6 +30,18 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 /// The unwrap the output of the result object from ewasm_main function.
 /// This is for a scenario that you are using a rust non-rust client,
 /// and you are only care the happy case of excuting the contract.
+///
+/// ```compile_fail
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///     Ok(())
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
@@ -120,9 +133,22 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     };
 }
 
-/// The macro helps you to build your handler in the contract, and also
-/// generate the function signature, you can use `fn_sig!` macro to get your
-/// function signature of the function wrappered with `#[ewasm_fn]`
+/// helps you to build your handlers in the contract
+///
+/// This macro also generate the function signature, you can use
+/// `ewasm_fn_sig!` macro to get your function signature;
+///
+/// ```compile_fail
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///     Ok(())
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -155,9 +181,37 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
-/// The macro helps you to build your handler as a lib, which can used in the
-/// contract, the function signature well automatically generated as
-/// `{FUNCTION_NAME}_SIG`
+/// helps you to build your handler in other module
+///
+/// This macro will automatically generated as `{FUNCTION_NAME}_SIG`
+///
+/// ```compile_fail
+/// // module.rs
+///
+/// use ss_ewasm_api as ewasm_api;
+///
+/// #[ewasm_lib_fn]
+/// pub fn symbol(s: &str) {
+///     let symbol = s.to_string().into_bytes();
+///     ewasm_api::finish_data(&symbol);
+/// }
+/// ```
+///
+/// ```compile_fail
+/// // lib.rs
+///
+/// use module::{symbol, SYMBOL_SIG};
+///
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         SYMBOL_SIG => symbol("ETD"),
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///     Ok(())
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^pub fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -198,16 +252,57 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 }
 
-/// `fn_sig` helps you get you function signature
+/// helps you get you function signature
+///
 /// 1. provide function name to get function signature from the same namespace,
 /// which function should be decorated with `#[ewasm_fn]`, for example,
-/// `fn_sig!(the_name_of_contract_handler)`
+/// `ewasm_fn_sig!(contract_handler)`
+///
+/// ```compile_fail
+/// #[ewasm_fn]
+/// fn decorated_handler(a: i32, b: String) -> Result<()> {
+///     Ok(())
+/// }
+///
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(decorated_handler) => ewasm_input_from!(contract, decorated_handler)?,
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///     Ok(())
+/// }
+/// ```
 ///
 /// 2. provide a function name with input parameters then the macro will
 /// calculate the correct functional signature for you.
-/// ex: `fn_sig!(the_name_of_contract_handler( a: i32, b: String ))`
+/// ex: `ewasm_fn_sig!(undecorated_handler( a: i32, b: String ))`
+///
+/// ```compile_fail
+/// // some_crate.rs
+/// pub fn decorated_handler(a: i32, b: String) -> Result<()> {
+///     Ok(())
+/// }
+/// ```
+///
+/// ```compile_fail
+/// use some_crate::decorated_handler;
+///
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(undecorated_handler(a: i32, b: String))
+///             => ewasm_input_from!(contract, undecorated_handler)?,
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///     Ok(())
+/// }
+/// ```
+///
 #[proc_macro]
-pub fn fn_sig(item: TokenStream) -> TokenStream {
+pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let fn_name = cap.name("name").unwrap().as_str();
@@ -231,14 +326,38 @@ pub fn fn_sig(item: TokenStream) -> TokenStream {
     }
 }
 
-/// `input_from` will help you to get the input data from contract caller, and
-/// automatically deserialize input into handler
-/// `input_from!(contract, the_name_of_the_handler)`
+/// helps you to get the input data from contract caller
+///
+/// This macro automatically deserialize input into handler
+/// `ewasm_input_from!(contract, the_name_of_the_handler)`
+/// ```compile_fail
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let contract = Contract::new()?;
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         _ => return Err(Error::UnknownHandle.into()),
+///     };
+///  Ok(())
+///  }
+/// ```
+///
 /// Besides, you can map the error to your customized error when something wrong happened in
-/// `input_from!`, for example:
-/// `input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
+/// `ewasm_input_from!`, for example:
+/// `ewasm_input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
+/// ```compile_fail
+/// #[ewasm_main(rusty)]
+/// fn main() -> Result<(), &'static str> {
+///     let contract = Contract::new().map_err(|_| "NewContractError")?;
+///     match contract.get_function_selector().map_err(|_| "FailGetFnSelector")? {
+///         ewasm_fn_sig!(check_input_object) =>  ewasm_input_from!(contract, check_input_object, |_| "DeserdeError")?
+///         _ => return Err("UnknownHandle"),
+///     };
+///     Ok(())
+/// }
+/// ```
 #[proc_macro]
-pub fn input_from(item: TokenStream) -> TokenStream {
+pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>\w+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let contract = cap.name("contract").unwrap().as_str();
@@ -267,27 +386,17 @@ pub fn input_from(item: TokenStream) -> TokenStream {
         panic!("fail to parsing function in fn_select");
     }
 }
-/// `Value` derive help you implement Value trait for kv feature
-#[proc_macro_derive(Value)]
-pub fn derive_value(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-            #[cfg(target_arch = "wasm32")]
-            impl sewup::kv::traits::Value for {} {{}}
-        "#,
-            struct_name,
-        )
-        .parse()
-        .unwrap()
-    } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
-    }
-}
 
 /// `Key` derive help you implement Key trait for the kv feature
+///
+/// ```
+/// use sewup_derive::Key;
+/// #[derive(Key)]
+/// struct SimpleStruct {
+///     trust: bool,
+///     description: String,
+/// }
+/// ```
 #[proc_macro_derive(Key)]
 pub fn derive_key(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
@@ -307,6 +416,48 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
     }
 }
 
+/// `Value` derive help you implement Value trait for kv feature
+///
+/// ```
+/// use sewup_derive::Value;
+/// #[derive(Value)]
+/// struct SimpleStruct {
+///     trust: bool,
+///     description: String,
+/// }
+/// ```
+#[proc_macro_derive(Value)]
+pub fn derive_value(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let struct_name = cap.name("name").unwrap().as_str();
+        format!(
+            r#"
+            #[cfg(target_arch = "wasm32")]
+            impl sewup::kv::traits::Value for {} {{}}
+        "#,
+            struct_name,
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    }
+}
+
+/// helps you setup the test mododule, and test cases in contract.
+///
+/// ```compile_fail
+/// #[ewasm_test]
+/// mod tests {
+///     use super::*;
+///
+///     #[ewasm_test]
+///     fn test_execute_basic_operations() {
+///         ewasm_assert_ok!(contract_fn());
+///     }
+/// }
+/// ```
 #[proc_macro_attribute]
 pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mod_re = Regex::new(r"mod (?P<mod_name>[^\{]*)\{").unwrap();
@@ -412,7 +563,19 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
         panic!("parse mod or function for testing error")
     }
 }
-
+/// helps you assert output from the handle of a contract with `Vec<u8>`.
+///
+/// ```compile_fail
+/// #[ewasm_test]
+/// mod tests {
+///     use super::*;
+///
+///     #[ewasm_test]
+///     fn test_execute_basic_operations() {
+///         ewasm_assert_eq!(handler_fn(), vec![74, 111, 118, 121]);
+///     }
+/// }
+/// ```
 #[proc_macro]
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
@@ -426,7 +589,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         None,
                         {}
                     );
@@ -442,7 +605,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         Some(&_bin),
                         {}
                     );
@@ -457,7 +620,19 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     }
 }
 
-/// This macro helps you asser your handler without error and returns
+/// helps you assert your handler without error and returns
+///
+/// ```compile_fail
+/// #[ewasm_test]
+/// mod tests {
+///     use super::*;
+///
+///     #[ewasm_test]
+///     fn test_execute_basic_operations() {
+///         ewasm_assert_ok!(contract_fn());
+///     }
+/// }
+/// ```
 #[proc_macro]
 pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -470,9 +645,9 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         None,
-                        Vec::new()
+                        Vec::with_capacity(0)
                     );
                 "#,
                 fn_name, fn_name
@@ -486,9 +661,9 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         Some(&_bin),
-                        Vec::new()
+                        Vec::with_capacity(0)
                     );
                 "#,
                 params, fn_name, fn_name
@@ -501,9 +676,12 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
     }
 }
 
-/// This macro helps you assert return Ok(()) your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
+/// helps you assert return Ok(()) your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
+///
+/// This usage of the macro likes `ewasm_assert_ok`, this only difference is that the contract main
+/// function should be decorated with `#[ewasm_main(rusty)]`.
 #[proc_macro]
-pub fn ewasm_assert_rusty_ok(item: TokenStream) -> TokenStream {
+pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = cap.name("fn_name").unwrap().as_str();
@@ -514,7 +692,7 @@ pub fn ewasm_assert_rusty_ok(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         None,
                         vec![0, 0, 0, 0]
                     );
@@ -530,7 +708,7 @@ pub fn ewasm_assert_rusty_ok(item: TokenStream) -> TokenStream {
                     _run_wasm_fn(
                         _runtime.clone(),
                         "{}",
-                        fn_sig!({}),
+                        ewasm_fn_sig!({}),
                         Some(&_bin),
                         vec![0, 0, 0, 0]
                     );
@@ -545,10 +723,14 @@ pub fn ewasm_assert_rusty_ok(item: TokenStream) -> TokenStream {
     }
 }
 
-/// This macro helps you assert return Err your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
-/// you should pass the complete Result type, as the following example
+/// helps you assert return Err your handler with rusty ewasm_main, namely `#[ewasm_main(rusty)]`
+///
+/// This usage of the macro likes `ewasm_err_output`, the contract main function should be
+/// decorated with `#[ewasm_main(rusty)]`.
+///
+/// You should pass the complete Result type, as the following example
 /// `ewasm_rusty_err_output!(Err("NotTrustedInput") as Result<(), &'static str>)`
-/// such that you can easy to use any kind of rust error as you like
+/// such that you can easy to use any kind of rust error as you like.
 #[proc_macro]
 pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
     format!(
@@ -559,10 +741,26 @@ pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
     .unwrap()
 }
 
-/// The macro helps you to get the binary result of the thiserror,
+/// helps you to get the binary result of the thiserror,
+///
 /// such that you can assert your handler with error.
 /// for example:
-/// `ewasm_assert_eq!(some_handler(), ewasm_err_output!(Error::SomeError))`
+/// ```compile_fail
+/// #[ewasm_test]
+/// mod tests {
+///    use super::*;
+///
+///    #[ewasm_test]
+///    fn test_execute_basic_operations() {
+///        let mut simple_struct = SimpleStruct::default();
+///
+///        ewasm_assert_eq!(
+///            check_input_object(simple_struct),
+///            ewasm_err_output!(Error::NotTrustedInput)
+///        );
+///    }
+///}
+/// ```
 #[proc_macro]
 pub fn ewasm_err_output(item: TokenStream) -> TokenStream {
     format!("{}.to_string().as_bytes().to_vec()", &item.to_string())

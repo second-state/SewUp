@@ -1,7 +1,7 @@
 use serde_derive::{Deserialize, Serialize};
 use sewup::primitives::Contract;
 
-use sewup_derive::{ewasm_fn, ewasm_main, ewasm_test, fn_sig, input_from};
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_test};
 
 #[derive(Default, Serialize, Deserialize)]
 struct SimpleStruct {
@@ -24,8 +24,8 @@ fn main() -> Result<(), &'static str> {
         .get_function_selector()
         .map_err(|_| "FailGetFnSelector")?
     {
-        fn_sig!(check_input_object) => {
-            input_from!(contract, check_input_object, |_| "DeserdeError")?
+        ewasm_fn_sig!(check_input_object) => {
+            ewasm_input_from!(contract, check_input_object, |_| "DeserdeError")?
         }
         _ => return Err("UnknownHandle"),
     };
@@ -37,7 +37,7 @@ fn main() -> Result<(), &'static str> {
 mod tests {
     use super::*;
     use sewup::primitives::Contract;
-    use sewup_derive::{ewasm_assert_eq, ewasm_assert_rusty_ok, ewasm_rusty_err_output};
+    use sewup_derive::{ewasm_assert_eq, ewasm_rusty_assert_ok, ewasm_rusty_err_output};
 
     #[ewasm_test]
     fn test_execute_rusty_contract() {
@@ -62,7 +62,7 @@ mod tests {
         simple_struct.trust = true;
 
         // use `ewasm_assert_rusty_ok`, because the `#[ewasm_main(rusty)]` specify the rusty return
-        ewasm_assert_rusty_ok!(check_input_object(simple_struct));
+        ewasm_rusty_assert_ok!(check_input_object(simple_struct));
 
         // Assert an ok result with raw output,
         // the previous `ewasm_assert_rusty_ok` is the suggested way
