@@ -211,6 +211,7 @@ fn main() -> Result<()> {
 #[ewasm_test]
 mod tests {
     use super::*;
+    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output};
 
     #[ewasm_test]
     fn test_execute_storage_operations() {

@@ -9,7 +9,7 @@ use sewup::token::{
     },
     helpers::{copy_into_address, copy_into_array, copy_into_storage_value},
 };
-use sewup_derive::{ewasm_assert_eq, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::*;
@@ -120,7 +120,8 @@ fn main() -> Result<()> {
 #[ewasm_test]
 mod tests {
     use super::*;
-    use hex_literal::*;
+    use hex_literal::hex;
+    use sewup_derive::ewasm_assert_eq;
 
     #[ewasm_test]
     fn test_execute_basic_operations() {

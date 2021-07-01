@@ -5,6 +5,7 @@ members = [
     "sewup-derive",
 ]
 exclude = [
+    "examples/hello-contract",
     "examples/default-contract",
     "examples/erc20-contract",
     "examples/kv-contract",
