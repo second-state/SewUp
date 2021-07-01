@@ -13,8 +13,6 @@ crate-type = ["cdylib"]
 sewup ={ version = "0.0.3", path = "../../sewup", features = [ "token" ] }
 sewup-derive = { version = "0.0.3", path = "../../sewup-derive" }
 anyhow = "1.0.40"
-
-[target.'cfg(target_arch = "wasm32")'.dependencies]
 ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 
 [dev-dependencies]

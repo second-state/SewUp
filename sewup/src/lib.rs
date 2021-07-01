@@ -30,3 +30,8 @@ pub mod runtimes;
 pub mod types;
 
 pub use bincode;
+
+/// Re export the ewasm_api
+/// these api is low level apis, it is better to keep in a library not in the contract file
+#[cfg(target_arch = "wasm32")]
+pub use ewasm_api;

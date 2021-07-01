@@ -4,7 +4,7 @@ use serde_derive::{Deserialize, Serialize};
 use sewup::kv::{Feature, Store};
 use sewup::primitives::Contract;
 use sewup::types::{Raw, Row};
-use sewup_derive::{ewasm_fn, ewasm_main, ewasm_test, fn_sig, Value};
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
 
 mod errors;
 use errors::KVError;
@@ -185,23 +185,23 @@ fn main() -> Result<()> {
     let contract = Contract::new()?;
 
     match contract.get_function_selector()? {
-        fn_sig!(empty_commit) => empty_commit()?,
-        fn_sig!(check_version_and_features) => {
+        ewasm_fn_sig!(empty_commit) => empty_commit()?,
+        ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(1, vec![Feature::Default])?
         }
-        fn_sig!(check_empty_storage_size) => check_empty_storage_size(EMPTY_DB_SIZE)?,
-        fn_sig!(add_buckets) => add_buckets()?,
-        fn_sig!(check_buckets) => {
+        ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(EMPTY_DB_SIZE)?,
+        ewasm_fn_sig!(add_buckets) => add_buckets()?,
+        ewasm_fn_sig!(check_buckets) => {
             check_buckets(vec!["bucket1".to_string(), "bucket2".to_string()])?
         }
-        fn_sig!(drop_bucket_than_check) => {
+        ewasm_fn_sig!(drop_bucket_than_check) => {
             drop_bucket_than_check("bucket1", vec!["bucket2".to_string()])?
         }
 
         // Following handler is for other test
-        fn_sig!(new_bucket_with_specific_struct) => new_bucket_with_specific_struct()?,
-        fn_sig!(check_objects_in_bucket) => check_objects_in_bucket()?,
-        fn_sig!(delete_object_in_bucket) => delete_object_in_bucket()?,
+        ewasm_fn_sig!(new_bucket_with_specific_struct) => new_bucket_with_specific_struct()?,
+        ewasm_fn_sig!(check_objects_in_bucket) => check_objects_in_bucket()?,
+        ewasm_fn_sig!(delete_object_in_bucket) => delete_object_in_bucket()?,
         _ => return Err(KVError::UnknownHandle.into()),
     };
 
@@ -211,6 +211,7 @@ fn main() -> Result<()> {
 #[ewasm_test]
 mod tests {
     use super::*;
+    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output};
 
     #[ewasm_test]
     fn test_execute_storage_operations() {

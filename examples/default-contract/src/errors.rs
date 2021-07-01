@@ -4,6 +4,6 @@ use thiserror::Error;
 pub enum Error {
     #[error("not trust input")]
     NotTrustedInput,
-    #[error("unknow handler")]
+    #[error("unknown handler")]
     UnknownHandle,
 }
