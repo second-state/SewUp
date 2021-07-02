@@ -409,6 +409,7 @@ pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
 ///     description: String,
 /// }
 /// ```
+#[cfg(feature = "kv")]
 #[proc_macro_derive(Key)]
 pub fn derive_key(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
@@ -438,6 +439,7 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
 ///     description: String,
 /// }
 /// ```
+#[cfg(feature = "kv")]
 #[proc_macro_derive(Value)]
 pub fn derive_value(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"struct (?P<name>\w+)").unwrap();

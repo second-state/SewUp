@@ -34,3 +34,4 @@ cmake = "0.1.42"
 default = [ ]
 token = [ ]
 kv = []
+rdb = []

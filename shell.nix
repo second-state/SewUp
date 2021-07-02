@@ -11,7 +11,9 @@ let
   exampleTestScript = nixpkgs.writeShellScriptBin "run-example-test" ''
     cd examples/$1-contract
     cargo test
+    rc=$?
     cd ../../
+    exit $rc
   '';
 in
 with nixpkgs; pkgs.mkShell {

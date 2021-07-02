@@ -3,6 +3,16 @@
 //!
 //! Use the crate with different feature to use the high level api just enable the features you
 //! want to use.
+//! - KV feature helps you develop contract as key value database
+//! ```toml
+//! sewup = { version = "*", features = ['kv'] }
+//! sewup-derive = { version = "*", features = ['kv']  }
+//! ```
+//! - RDB feature helps you develop contract as rdb database
+//! ```toml
+//! sewup = { version = "*", features = ['rdb'] }
+//! sewup-derive = { version = "*", features = ['rdb']  }
+//! ```
 
 #[cfg(feature = "token")]
 pub mod token;
@@ -13,6 +23,11 @@ pub use token::*;
 pub mod kv;
 #[cfg(feature = "kv")]
 pub use kv::*;
+
+#[cfg(feature = "rdb")]
+pub mod rdb;
+#[cfg(feature = "rdb")]
+pub use rdb::*;
 
 pub mod errors;
 
