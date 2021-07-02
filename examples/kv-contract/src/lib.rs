@@ -187,7 +187,7 @@ fn main() -> Result<()> {
     match contract.get_function_selector()? {
         ewasm_fn_sig!(empty_commit) => empty_commit()?,
         ewasm_fn_sig!(check_version_and_features) => {
-            check_version_and_features(1, vec![Feature::Default])?
+            check_version_and_features(0, vec![Feature::Default])?
         }
         ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(EMPTY_DB_SIZE)?,
         ewasm_fn_sig!(add_buckets) => add_buckets()?,
