@@ -17,6 +17,10 @@
 Add `sewup` with the features and the `sewup-derive` into Cargo.toml, and setup other sections
 as following, then you are ready to build contract with sewup.
 
+Features list (should select none or one of following)
+- kv - for writing contract as key value database
+- rdb - for writing contract as relational database
+
 Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
 if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
 

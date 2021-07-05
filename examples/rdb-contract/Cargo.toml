@@ -1,17 +1,17 @@
 [package]
-name = "kv-contract"
+name = "rdb-contract"
 version = "0.1.0"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2018"
-description = "The example contract using sewup kv feature"
+description = "The example contract using sewup rdb feature"
 
 [lib]
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup ={ version = "0.0.4", path = "../../sewup", features = [ "kv" ] }
-sewup-derive = { version = "0.0.4", path = "../../sewup-derive", features = [ "kv" ] }
+sewup ={ version = "0.0.4", path = "../../sewup", features = [ "rdb" ] }
+sewup-derive = { version = "0.0.4", path = "../../sewup-derive", features = [ "rdb" ] }
 anyhow = "1.0.40"
 thiserror = "1.0.24"
 serde = "1.0"
@@ -23,6 +23,6 @@ panic = "abort"
 lto = true
 opt-level = "z"
 
-[profile.release.package.kv-contract]
+[profile.release.package.rdb-contract]
 incremental = false
 opt-level = "z"

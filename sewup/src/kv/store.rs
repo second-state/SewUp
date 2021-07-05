@@ -12,7 +12,8 @@ use super::bucket::{Bucket, RawBucket};
 use anyhow::Result;
 use ewasm_api::{storage_load, storage_store};
 
-const VERSION: u8 = 1;
+const KV_FEATURE: u8 = 0;
+const VERSION: u8 = 0;
 const CONFIG_ADDR: [u8; 32] = [0; 32];
 
 type Tenants = HashMap<String, Option<RawBucket>>;
@@ -27,12 +28,13 @@ type Tenants = HashMap<String, Option<RawBucket>>;
 /// ### Store Header
 /// The fist 32 bytes are reserved as header of the store,
 ///
-/// | 0th          | 1st ~ 2nd     | ... | 28th ~ 31st |
-/// |--------------|---------------|-----|-------------|
-/// | version (BE) | Features (LE) | -   | size (BE)   |
+/// | 0th            | 1st          | 2nd ~ 3rd        | ... | 28th ~ 31st |
+/// |----------------|--------------|------------------|-----|-------------|
+/// | Sewup Features | version (BE) | KV Features (LE) | -   | size (BE)   |
 ///
 /// Base on the features, the storage may have different encoding in to binary
 pub struct Store {
+    _sewup_feature: u8,
     version: u8,
     _features: u16,
     _size: u32,
@@ -45,6 +47,7 @@ impl Default for Store {
         _features |= Feature::Default as u16;
 
         Self {
+            _sewup_feature: 0,
             version: VERSION,
             _features,
             _size: 0,
@@ -122,13 +125,18 @@ impl Store {
             let mut store = Self::new()?;
 
             let config: [u8; 32] = storage_load(&CONFIG_ADDR.into()).bytes;
-            if VERSION != config[0] {
+
+            if KV_FEATURE != config[0] {
+                panic!("Sewup feature not correct")
+            }
+
+            if VERSION != config[1] {
                 // TODO
                 panic!("migration not implement")
             }
 
             store._features =
-                u16::from_le_bytes(config[1..3].try_into().expect("load storage feature fail"));
+                u16::from_le_bytes(config[2..4].try_into().expect("load storage feature fail"));
 
             let mut bin: Vec<u8> = Vec::new();
             let mut addr: [u8; 32] = [0; 32];
@@ -168,10 +176,11 @@ impl Store {
             }
         }
         let mut buffer = [0u8; 32];
-        VERSION.to_be_bytes().swap_with_slice(&mut buffer[0..1]);
+        KV_FEATURE.to_be_bytes().swap_with_slice(&mut buffer[0..1]);
+        VERSION.to_be_bytes().swap_with_slice(&mut buffer[1..2]);
         self._features
             .to_le_bytes()
-            .swap_with_slice(&mut buffer[1..3]);
+            .swap_with_slice(&mut buffer[2..4]);
 
         // TODO: store as really need
         let bin = bincode::serialize(&self.tenants).expect("serialize db binary fail");

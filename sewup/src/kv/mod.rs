@@ -1,4 +1,4 @@
-//! `kv` feature provides a simple way to key/value store things into evm
+//! `kv` feature provides a simple way to key/value store things into ethereum runtime.
 //! It aims to be lightweight and with a nice high level interface.
 //! Store is an abstract storage instance from one account in one block
 //! There can be more than one bucket in a store.
