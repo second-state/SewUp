@@ -13,7 +13,7 @@ use anyhow::Result;
 use ewasm_api::{storage_load, storage_store};
 
 const KV_FEATURE: u8 = 0;
-const VERSION: u8 = 1;
+const VERSION: u8 = 0;
 const CONFIG_ADDR: [u8; 32] = [0; 32];
 
 type Tenants = HashMap<String, Option<RawBucket>>;

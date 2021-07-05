@@ -319,9 +319,12 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
             .parse()
             .unwrap()
     } else {
-        format!("{}_SIG", item.to_string().to_ascii_uppercase())
-            .parse()
-            .unwrap()
+        format!(
+            "{}_SIG",
+            item.to_string().replace(" ", "").to_ascii_uppercase()
+        )
+        .parse()
+        .unwrap()
     }
 }
 
@@ -459,6 +462,76 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
     }
 }
 
+/// `Table` derive help you implement table relating function and wrapper
+/// structure for the rdb feature
+/// ```
+/// #[derive(Table)]
+/// struct Person {
+///     trusted: bool,
+///     age: u8,
+/// }
+/// ```
+#[cfg(feature = "rdb")]
+#[proc_macro_derive(Table)]
+pub fn derive_table(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}")
+        .unwrap();
+    if let Some(cap) = re.captures(&item.to_string()) {
+        let struct_name = cap.name("name").unwrap().as_str();
+        let fields = cap.name("fields").unwrap().as_str();
+        format!(
+            r#"
+            #[derive(Default, sewup::rdb::Serialize)]
+            pub struct {}Wrapper {{
+                id: Option<u32>,
+                {}
+            }}
+
+            mod {} {{
+                use sewup_derive::ewasm_fn_sig;
+
+                pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!({}::get());
+                pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!({}::create());
+                pub(crate) const UPDATE_SIG: [u8; 4] = ewasm_fn_sig!({}::update());
+                pub(crate) const DELETE_SIG: [u8; 4] = ewasm_fn_sig!({}::delete());
+            }}
+
+            #[cfg(target_arch = "wasm32")]
+            mod person {{
+                use super::*;
+                pub fn get() -> Result<{}Wrapper> {{
+                    Ok(Default::default())
+                }}
+                pub fn create() -> Result<{}Wrapper> {{
+                    Ok(Default::default())
+                }}
+                pub fn update() -> Result<{}Wrapper> {{
+                    Ok(Default::default())
+                }}
+                pub fn delete() -> Result<{}Wrapper> {{
+                    Ok(Default::default())
+                }}
+            }}
+        "#,
+            struct_name,
+            fields.replace(":", ":Option<").replace(",", ">,"),
+            struct_name.to_ascii_uppercase(),
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    }
+}
+
 /// helps you setup the test mododule, and test cases in contract.
 ///
 /// ```compile_fail
@@ -579,7 +652,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
-        let fn_name = cap.name("fn_name").unwrap().as_str();
+        let fn_name = cap.name("fn_name").unwrap().as_str().replace(" ", "");
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         let equivalence = cap.name("equivalence").unwrap().as_str();
         if params.is_empty() {
