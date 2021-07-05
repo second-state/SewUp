@@ -38,12 +38,37 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Sewup - Second state eWasm Utility Program</span>
 <span class="doccomment">//! A library to help you sew up your Ethereum project with Rust and just like develop in a common backend.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Use the crate with different feature to use the high level api just enable the features you</span>
 <span class="doccomment">//! want to use.</span>
+<span class="doccomment">//! - KV feature helps you develop contract as key value database</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! sewup = { version = &quot;*&quot;, features = [&#39;kv&#39;] }</span>
+<span class="doccomment">//! sewup-derive = { version = &quot;*&quot;, features = [&#39;kv&#39;]  }</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! - RDB feature helps you develop contract as rdb database</span>
+<span class="doccomment">//! ```toml</span>
+<span class="doccomment">//! sewup = { version = &quot;*&quot;, features = [&#39;rdb&#39;] }</span>
+<span class="doccomment">//! sewup-derive = { version = &quot;*&quot;, features = [&#39;rdb&#39;]  }</span>
+<span class="doccomment">//! ```</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;token&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">token</span>;
@@ -54,6 +79,11 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">kv</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kv&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kv</span>::<span class="kw-2">*</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rdb</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">rdb</span>::<span class="kw-2">*</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">errors</span>;
 
