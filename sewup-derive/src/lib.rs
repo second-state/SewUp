@@ -499,27 +499,23 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             mod person {{
                 use super::*;
-                pub fn get() -> Result<{}Wrapper> {{
-                    Ok(Default::default())
+                pub fn get() -> Result<()> {{
+                    Ok(())
                 }}
-                pub fn create() -> Result<{}Wrapper> {{
-                    Ok(Default::default())
+                pub fn create() -> Result<()> {{
+                    Ok(())
                 }}
-                pub fn update() -> Result<{}Wrapper> {{
-                    Ok(Default::default())
+                pub fn update() -> Result<()> {{
+                    Ok(())
                 }}
-                pub fn delete() -> Result<{}Wrapper> {{
-                    Ok(Default::default())
+                pub fn delete() -> Result<()> {{
+                    Ok(())
                 }}
             }}
         "#,
             struct_name,
             fields.replace(":", ":Option<").replace(",", ">,"),
             struct_name.to_ascii_uppercase(),
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
             struct_name,
             struct_name,
             struct_name,
