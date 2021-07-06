@@ -12,8 +12,8 @@ mod db;
 #[cfg(target_arch = "wasm32")]
 pub use db::*;
 #[cfg(not(target_arch = "wasm32"))]
-pub struct DB {}
+pub struct Db {}
 
 mod errors;
 
-pub use serde_derive::Serialize;
+pub use serde_derive::{Deserialize, Serialize};
