@@ -41,6 +41,13 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryInto</span>;
 
@@ -53,6 +60,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Contract</span> {
     <span class="kw">pub</span> <span class="ident">data_size</span>: <span class="ident">usize</span>,
     <span class="kw">pub</span> <span class="ident">input_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    <span class="ident">fn_sig</span>: <span class="ident">FunctionSignature</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Contract</span> {
@@ -67,19 +75,25 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
         <span class="kw">let</span> <span class="ident">input_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
 
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+        <span class="kw">let</span> <span class="ident">fn_sig</span> <span class="op">=</span> <span class="ident">input_data</span>[<span class="number">0</span>..<span class="number">4</span>]
+            .<span class="ident">try_into</span>()
+            .<span class="ident">expect</span>(<span class="string">&quot;size greator than 4 after validated&quot;</span>);
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
+        <span class="kw">let</span> <span class="ident">fn_sig</span> <span class="op">=</span> [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>];
+
         <span class="kw">if</span> <span class="ident">data_size</span> <span class="op">&lt;</span> <span class="number">4</span> {
             <span class="prelude-val">Err</span>(<span class="ident">ContractSizeError</span>(<span class="ident">data_size</span>).<span class="ident">into</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">Contract</span> {
                 <span class="ident">data_size</span>,
                 <span class="ident">input_data</span>,
+                <span class="ident">fn_sig</span>,
             })
         }
     }
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_function_selector</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">FunctionSignature</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">input_data</span>[<span class="number">0</span>..<span class="number">4</span>]
-            .<span class="ident">try_into</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;size greator than 4 after validated&quot;</span>))
+        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">fn_sig</span>)
     }
 }
 </pre></div>
