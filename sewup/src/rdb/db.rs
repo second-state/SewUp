@@ -6,6 +6,7 @@ use crate::rdb::{errors::Error, Deserialize, Feature, Serialize, SerializeTrait}
 use crate::utils::storage_index_to_addr;
 
 use anyhow::Result;
+#[cfg(target_arch = "wasm32")]
 use ewasm_api::{storage_load, storage_store};
 use tiny_keccak::{Hasher, Keccak};
 
@@ -118,8 +119,14 @@ impl Db {
         None
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn load(block_height: Option<i64>) -> Result<Self> {
+        unimplemented!()
+    }
+
     /// Import the database from the specific block height
     /// If not the will import db from the latest block
+    #[cfg(target_arch = "wasm32")]
     pub fn load(block_height: Option<i64>) -> Result<Self> {
         if let Some(_block_height) = block_height {
             unimplemented!();
@@ -169,7 +176,13 @@ impl Db {
         }
     }
 
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn commit(&self) -> Result<u32> {
+        unimplemented!()
+    }
+
     /// Save to db
+    #[cfg(target_arch = "wasm32")]
     pub fn commit(&self) -> Result<u32> {
         let mut buffer = [0u8; 32];
         RDB_FEATURE.to_be_bytes().swap_with_slice(&mut buffer[0..1]);

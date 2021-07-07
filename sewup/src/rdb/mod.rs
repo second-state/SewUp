@@ -5,14 +5,8 @@ pub enum Feature {
     Default = 1,
 }
 
-#[allow(unused_variables)]
-#[allow(dead_code)]
-#[cfg(target_arch = "wasm32")]
 mod db;
-#[cfg(target_arch = "wasm32")]
 pub use db::*;
-#[cfg(not(target_arch = "wasm32"))]
-pub struct Db {}
 
 mod errors;
 

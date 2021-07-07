@@ -464,7 +464,8 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 
 /// `Table` derive help you implement table relating function and wrapper
 /// structure for the rdb feature
-/// ```
+/// ```ignore
+/// use sewup_derive::Table;
 /// #[derive(Table)]
 /// struct Person {
 ///     trusted: bool,
