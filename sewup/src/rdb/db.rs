@@ -28,9 +28,9 @@ pub struct TableInfo {
 /// ### DB Header
 /// The fist 32 bytes are reserved as header of the store,
 ///
-/// | 0th            | 1st          | 2nd ~ 3rd         | ...                    | 28th ~ 31st |
-/// |----------------|--------------|-------------------|------------------------|-------------|
-/// | Sewup Features | version (BE) | RDB Features (LE) | Size of TableInfo (BE) | -           |
+/// | 0th            | 1st          | 2nd ~ 3rd         | ... | 28th ~ 31st            |
+/// |----------------|--------------|-------------------|-----|------------------------|
+/// | Sewup Features | version (BE) | RDB Features (LE) | -   | Size of TableInfo (BE) |
 ///
 /// Base on the features, the storage may have different encoding in to binary
 #[derive(Serialize)]
