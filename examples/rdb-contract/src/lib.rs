@@ -44,6 +44,12 @@ fn check_tables() -> Result<()> {
     if info.record_size != 2 {
         return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
     }
+    if info.range.start != 2 {
+        return Err(RDBError::SimpleError("Person range start not correct".into()).into());
+    }
+    if info.range.end != 2 {
+        return Err(RDBError::SimpleError("Person range end not correct".into()).into());
+    }
     Ok(())
 }
 

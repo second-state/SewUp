@@ -20,10 +20,10 @@ const CONFIG_ADDR: [u8; 32] = [0; 32];
 pub type TableSig = [u8; 4];
 
 // One table info is half Raw
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
 pub struct TableInfo {
-    sig: TableSig,
-    range: Range<u32>,
+    pub(crate) sig: TableSig,
+    pub range: Range<u32>,
     pub record_size: u32,
 }
 
@@ -44,7 +44,7 @@ pub struct Db {
     _sewup_feature: u8,
     version: u8,
     _features: u16,
-    table_info: Vec<TableInfo>,
+    pub(crate) table_info: Vec<TableInfo>,
 }
 
 impl Default for Db {
@@ -83,10 +83,22 @@ impl Db {
 
     pub fn create_table<T: SerializeTrait + Default + Sized>(&mut self, name: &str) -> Result<()> {
         let default_instance = T::default();
-        let info = TableInfo {
-            sig: get_table_signature(name),
-            record_size: bincode::serialized_size(&default_instance)? as u32,
-            ..Default::default()
+        let info = if self.table_info.is_empty() {
+            TableInfo {
+                sig: get_table_signature(name),
+                record_size: bincode::serialized_size(&default_instance)? as u32,
+                range: (2..2),
+            }
+        } else {
+            let TableInfo {
+                range: last_table_range,
+                ..
+            } = self.table_info[self.table_info.len() - 1].clone();
+            TableInfo {
+                sig: get_table_signature(name),
+                record_size: bincode::serialized_size(&default_instance)? as u32,
+                range: (last_table_range.end..last_table_range.end),
+            }
         };
         self.table_info.push(info);
 
@@ -164,20 +176,21 @@ impl Db {
             ) as isize;
 
             let mut addr: [u8; 32] = [0; 32];
+            let mut buffer: [u8; 32] = [0; 32];
             let mut storage_index = 0;
+            let mut info = TableInfo::default();
 
             while table_info_size > 0 {
                 storage_index += 1;
                 storage_index_to_addr(storage_index, &mut addr);
 
-                let buffer: [u8; 32] = storage_load(&addr.into()).bytes;
-                let info1: TableInfo =
-                    bincode::deserialize(&buffer[0..16]).expect("load 1st info from chunk fail");
-                db.table_info.push(info1);
+                buffer = storage_load(&addr.into()).bytes;
+                info = bincode::deserialize(&buffer[0..16]).expect("load 1st info from chunk fail");
+                db.table_info.push(info);
                 if table_info_size > 1 {
-                    let info2: TableInfo = bincode::deserialize(&buffer[16..32])
+                    info = bincode::deserialize(&buffer[16..32])
                         .expect("load 2nd info from chunk fail");
-                    db.table_info.push(info2);
+                    db.table_info.push(info);
                 }
                 table_info_size = table_info_size - 2;
             }
@@ -191,7 +204,8 @@ impl Db {
         Ok(0)
     }
 
-    /// Save to db
+    /// Update the header of Db, but not the Table
+    /// The commit of Table will automatically trigger the commit of Db
     #[cfg(target_arch = "wasm32")]
     pub fn commit(&self) -> Result<u32> {
         let mut buffer = [0u8; 32];
@@ -236,6 +250,76 @@ impl Db {
         // TODO: fix this when implementing table
         Ok(0)
     }
+
+    /// alloc storage space for table
+    pub fn alloc_table_storage(&mut self, sig: TableSig, raw_length: u32) -> Result<Range<u32>> {
+        let mut modify_list: Vec<(Range<u32>, Range<u32>)> = Vec::new();
+        let mut info_raw_length = self.table_info.len() / 2;
+        if self.table_info.len() % 2 > 0 {
+            info_raw_length = info_raw_length + 1;
+        }
+
+        let mut previous_end = (info_raw_length + 1) as u32;
+
+        let mut output: Option<Range<u32>> = None;
+        for info in self.table_info.iter_mut() {
+            if info.range.start != previous_end {
+                let new_range = if info.sig == sig {
+                    Range {
+                        start: previous_end,
+                        end: previous_end + raw_length,
+                    }
+                } else {
+                    Range {
+                        start: previous_end,
+                        end: previous_end + info.range.end - info.range.start,
+                    }
+                };
+                modify_list.push((info.range.clone(), new_range.clone()));
+                info.range = new_range;
+            }
+            if info.sig == sig {
+                output = Some(info.clone().range);
+            }
+            previous_end = info.range.end;
+        }
+
+        migration_table(modify_list);
+
+        output.ok_or(Error::TableNotExist(format!("Table [sig: {:?}]", sig)).into())
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn migration_table(list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
+    Ok(())
+}
+
+/// Migrate table from Range to Range
+#[cfg(target_arch = "wasm32")]
+fn migration_table(mut list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
+    let mut buffer: [u8; 32] = [0; 32];
+    let mut addr: [u8; 32] = [0; 32];
+
+    while let Some((
+        Range::<u32> {
+            start: _before_range_start,
+            end: before_range_end,
+        },
+        Range::<u32> {
+            start: new_range_start,
+            end: new_range_end,
+        },
+    )) = list.pop()
+    {
+        for i in 1..=new_range_end - new_range_start {
+            storage_index_to_addr((before_range_end - i) as usize, &mut addr);
+            buffer = storage_load(&addr.into()).bytes;
+            storage_index_to_addr((new_range_end - i) as usize, &mut addr);
+            storage_store(&addr.into(), &buffer.into());
+        }
+    }
+    Ok(())
 }
 
 fn get_table_signature(table_name: &str) -> TableSig {
@@ -244,4 +328,33 @@ fn get_table_signature(table_name: &str) -> TableSig {
     hasher.update(table_name.as_bytes());
     hasher.finalize(&mut sig);
     sig
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_alloc_table_storage() {
+        #[derive(Default, Serialize)]
+        struct Person {
+            trusted: bool,
+        }
+
+        let mut db = Db::default();
+        db.create_table::<Person>("Person1");
+        db.create_table::<Person>("Person2");
+        db.create_table::<Person>("Person3");
+        assert!(db.table_info.len() == 3);
+        for i in 0..3 {
+            assert!(db.table_info[i].range == Range::<u32> { start: 2, end: 2 });
+        }
+        // There are not record in Person1, Person3, and there 3 raw of record in Person2
+        let r = db
+            .alloc_table_storage(get_table_signature("Person2"), 3)
+            .unwrap();
+        assert!(db.table_info[0].range == Range::<u32> { start: 3, end: 3 });
+        assert!(db.table_info[1].range == Range::<u32> { start: 3, end: 6 });
+        assert!(db.table_info[2].range == Range::<u32> { start: 6, end: 6 });
+    }
 }
