@@ -9,7 +9,7 @@ use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_output_from, ewasm_
 mod errors;
 use errors::RDBError;
 
-#[derive(Table)]
+#[derive(Table, Default, sewup::rdb::Serialize)]
 struct Person {
     trusted: bool,
     age: u8,
@@ -18,7 +18,7 @@ struct Person {
 #[ewasm_fn]
 fn init_db_with_tables() -> Result<()> {
     let mut db = Db::new()?;
-    db.create_table("Person", 3); // TODO: fix this when implementing table
+    db.create_table::<Person>("Person");
     db.commit()?;
     Ok(())
 }
@@ -41,7 +41,7 @@ fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<()>
 fn check_tables() -> Result<()> {
     let mut db = Db::load(None)?;
     let info = db.table_info("Person").unwrap();
-    if info.record_size != 3 {
+    if info.record_size != 2 {
         return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
     }
     Ok(())

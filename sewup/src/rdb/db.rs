@@ -2,7 +2,7 @@ use std::collections::hash_map::HashMap;
 use std::convert::TryInto;
 use std::ops::Range;
 
-use crate::rdb::{errors::Error, Deserialize, Feature, Serialize};
+use crate::rdb::{errors::Error, Deserialize, Feature, Serialize, SerializeTrait};
 use crate::utils::storage_index_to_addr;
 
 use anyhow::Result;
@@ -75,12 +75,11 @@ impl Db {
         output
     }
 
-    // TODO: Implement like this later
-    // pub fn table<T>()
-    pub fn create_table<S: AsRef<str>>(&mut self, name: S, size_per_row: usize) -> Result<()> {
+    pub fn create_table<T: SerializeTrait + Default + Sized>(&mut self, name: &str) -> Result<()> {
+        let default_instance = T::default();
         let info = TableInfo {
-            sig: get_table_signature(name.as_ref()),
-            record_size: size_per_row as u32,
+            sig: get_table_signature(name),
+            record_size: bincode::serialized_size(&default_instance)? as u32,
             ..Default::default()
         };
         self.table_info.push(info);

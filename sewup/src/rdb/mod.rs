@@ -16,4 +16,5 @@ pub struct Db {}
 
 mod errors;
 
+pub use serde::Serialize as SerializeTrait;
 pub use serde_derive::{Deserialize, Serialize};
