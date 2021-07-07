@@ -1,7 +1,8 @@
-use std::collections::hash_map::HashMap;
 use std::convert::TryInto;
+use std::marker::PhantomData;
 use std::ops::Range;
 
+use crate::rdb::table::Table;
 use crate::rdb::{errors::Error, Deserialize, Feature, Serialize, SerializeTrait};
 use crate::utils::storage_index_to_addr;
 
@@ -10,14 +11,18 @@ use anyhow::Result;
 use ewasm_api::{storage_load, storage_store};
 use tiny_keccak::{Hasher, Keccak};
 
+#[cfg(target_arch = "wasm32")]
 const RDB_FEATURE: u8 = 1;
 const VERSION: u8 = 0;
+#[cfg(target_arch = "wasm32")]
 const CONFIG_ADDR: [u8; 32] = [0; 32];
+
+pub type TableSig = [u8; 4];
 
 // One table info is half Raw
 #[derive(Serialize, Deserialize, Clone, Default)]
 pub struct TableInfo {
-    sig: [u8; 4],
+    sig: TableSig,
     range: Range<u32>,
     pub record_size: u32,
 }
@@ -29,9 +34,9 @@ pub struct TableInfo {
 /// ### DB Header
 /// The fist 32 bytes are reserved as header of the store,
 ///
-/// | 0th            | 1st          | 2nd ~ 3rd         | ... | 28th ~ 31st            |
-/// |----------------|--------------|-------------------|-----|------------------------|
-/// | Sewup Features | version (BE) | RDB Features (LE) | -   | Size of TableInfo (BE) |
+/// | 0th            | 1st          | 2nd ~ 3rd         | ... | 28th ~ 31st              |
+/// |----------------|--------------|-------------------|-----|--------------------------|
+/// | Sewup Features | version (BE) | RDB Features (LE) | -   | length of TableInfo (BE) |
 ///
 /// Base on the features, the storage may have different encoding in to binary
 #[derive(Serialize)]
@@ -88,10 +93,15 @@ impl Db {
         Ok(())
     }
 
-    // TODO: Implement like this later
-    // pub fn table<T>()
-    pub fn table<S: AsRef<str>>(name: S) -> Result<u32> {
-        Ok(0)
+    pub fn table<T: SerializeTrait + Default + Sized>(self, name: &str) -> Result<Table<T>> {
+        let info = self
+            .table_info(name)
+            .ok_or(Error::TableNotExist(name.into()))?;
+        Ok(Table::<T> {
+            info,
+            data: Vec::new(),
+            phantom: PhantomData,
+        })
     }
 
     pub fn drop_table<S: AsRef<str>>(&mut self, name: S) {
@@ -178,7 +188,7 @@ impl Db {
 
     #[cfg(not(target_arch = "wasm32"))]
     pub fn commit(&self) -> Result<u32> {
-        unimplemented!()
+        Ok(0)
     }
 
     /// Save to db
@@ -228,7 +238,7 @@ impl Db {
     }
 }
 
-fn get_table_signature(table_name: &str) -> [u8; 4] {
+fn get_table_signature(table_name: &str) -> TableSig {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
     hasher.update(table_name.as_bytes());

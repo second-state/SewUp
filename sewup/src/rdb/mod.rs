@@ -8,6 +8,9 @@ pub enum Feature {
 mod db;
 pub use db::*;
 
+mod table;
+pub use table::*;
+
 mod errors;
 
 pub use serde::Serialize as SerializeTrait;
