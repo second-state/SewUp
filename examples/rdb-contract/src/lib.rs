@@ -18,8 +18,6 @@ struct Person {
 #[ewasm_fn]
 fn init_db_with_tables() -> Result<()> {
     let mut db = Db::new()?;
-    db.create_table("Table1", 1);
-    db.create_table("Table2", 2);
     db.create_table("Person", 3); // TODO: fix this when implementing table
     db.commit()?;
     Ok(())
@@ -42,17 +40,7 @@ fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<()>
 #[ewasm_fn]
 fn check_tables() -> Result<()> {
     let mut db = Db::load(None)?;
-    let mut info = db.table_info("Table1").unwrap();
-    if info.record_size != 1 {
-        return Err(RDBError::SimpleError("Table1 record_size not correct".into()).into());
-    }
-
-    info = db.table_info("Table2").unwrap();
-    if info.record_size != 2 {
-        return Err(RDBError::SimpleError("Table2 record_size not correct".into()).into());
-    }
-
-    info = db.table_info("Person").unwrap();
+    let info = db.table_info("Person").unwrap();
     if info.record_size != 3 {
         return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
     }
@@ -62,7 +50,7 @@ fn check_tables() -> Result<()> {
 #[ewasm_fn]
 fn drop_table() -> Result<()> {
     let mut db = Db::load(None)?;
-    db.drop_table("Table2");
+    db.drop_table("Person");
     db.commit()?;
     Ok(())
 }
@@ -70,13 +58,8 @@ fn drop_table() -> Result<()> {
 #[ewasm_fn]
 fn check_tables_again() -> Result<()> {
     let mut db = Db::load(None)?;
-    let mut info = db.table_info("Table1").unwrap();
-    if info.record_size != 1 {
-        return Err(RDBError::SimpleError("Table1 record_size not correct".into()).into());
-    }
-    info = db.table_info("Person").unwrap();
-    if info.record_size != 3 {
-        return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
+    if db.table_info("Person").is_some() {
+        return Err(RDBError::SimpleError("Person table should be deleted".into()).into());
     }
     Ok(())
 }
