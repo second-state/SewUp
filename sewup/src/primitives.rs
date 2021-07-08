@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
 use super::errors::ContractError::ContractSizeError;
