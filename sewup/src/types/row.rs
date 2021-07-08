@@ -44,6 +44,10 @@ impl Row {
         });
         String::from_utf8(buf)
     }
+
+    pub fn into_raw_vec(self) -> Vec<Raw> {
+        self.inner
+    }
 }
 
 impl Default for Row {

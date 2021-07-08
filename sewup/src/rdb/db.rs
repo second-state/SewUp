@@ -176,16 +176,15 @@ impl Db {
             ) as isize;
 
             let mut addr: [u8; 32] = [0; 32];
-            let mut buffer: [u8; 32] = [0; 32];
             let mut storage_index = 0;
-            let mut info = TableInfo::default();
 
             while table_info_size > 0 {
                 storage_index += 1;
                 storage_index_to_addr(storage_index, &mut addr);
 
-                buffer = storage_load(&addr.into()).bytes;
-                info = bincode::deserialize(&buffer[0..16]).expect("load 1st info from chunk fail");
+                let buffer: [u8; 32] = storage_load(&addr.into()).bytes;
+                let mut info =
+                    bincode::deserialize(&buffer[0..16]).expect("load 1st info from chunk fail");
                 db.table_info.push(info);
                 if table_info_size > 1 {
                     info = bincode::deserialize(&buffer[16..32])
@@ -284,7 +283,7 @@ impl Db {
             previous_end = info.range.end;
         }
 
-        migration_table(modify_list);
+        migration_table(modify_list)?;
 
         output.ok_or(Error::TableNotExist(format!("Table [sig: {:?}]", sig)).into())
     }
@@ -298,7 +297,6 @@ fn migration_table(list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
 /// Migrate table from Range to Range
 #[cfg(target_arch = "wasm32")]
 fn migration_table(mut list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
-    let mut buffer: [u8; 32] = [0; 32];
     let mut addr: [u8; 32] = [0; 32];
 
     while let Some((
@@ -314,7 +312,7 @@ fn migration_table(mut list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
     {
         for i in 1..=new_range_end - new_range_start {
             storage_index_to_addr((before_range_end - i) as usize, &mut addr);
-            buffer = storage_load(&addr.into()).bytes;
+            let buffer: [u8; 32] = storage_load(&addr.into()).bytes;
             storage_index_to_addr((new_range_end - i) as usize, &mut addr);
             storage_store(&addr.into(), &buffer.into());
         }

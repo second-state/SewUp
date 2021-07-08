@@ -137,6 +137,9 @@ impl Raw {
     pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
         std::str::from_utf8(&self.bytes)
     }
+    pub fn to_bytes32(&self) -> [u8; 32] {
+        self.bytes
+    }
 }
 
 impl FromIterator<u8> for Raw {
