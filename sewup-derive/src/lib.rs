@@ -360,7 +360,7 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro]
 pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>\w+),?(?P<error_handler>.*)").unwrap();
+    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let contract = cap.name("contract").unwrap().as_str();
         let fn_name = cap.name("name").unwrap().as_str();
@@ -479,13 +479,37 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         .unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let struct_name = cap.name("name").unwrap().as_str();
-        let fields = cap.name("fields").unwrap().as_str();
+        let field_part = cap.name("fields").unwrap().as_str();
+        let fields = field_part
+            .split(',')
+            .map(|p| p.split(':').nth(0).unwrap_or("").trim())
+            .filter(|s| !s.is_empty())
+            .collect::<Vec<_>>();
         format!(
             r#"
-            #[derive(Default, sewup::rdb::Serialize)]
+            impl sewup::rdb::traits::Record for {} {{}}
+
+            #[derive(Default, Clone, sewup::rdb::Serialize, sewup::rdb::Deserialize)]
             pub struct {}Wrapper {{
-                id: Option<u32>,
+                id: Option<usize>,
                 {}
+            }}
+
+            impl From<{}> for {}Wrapper {{
+                fn from(instance: {}) -> Self {{
+                    Self {{
+                        id: None,
+                        {}
+                    }}
+                }}
+            }}
+
+            impl From<{}Wrapper> for {} {{
+                fn from(wrapper: {}Wrapper) -> Self {{
+                    Self {{
+                        {}
+                    }}
+                }}
             }}
 
             mod {} {{
@@ -498,26 +522,102 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             }}
 
             #[cfg(target_arch = "wasm32")]
-            mod person {{
+            mod {} {{
                 use super::*;
-                pub fn get() -> Result<()> {{
+                pub fn get(instance: {}Wrapper) -> Result<()> {{
+                    let table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                    let raw_output = table.get_record(instance.id.unwrap_or_default())?;
+                    let mut output: {}Wrapper = raw_output.into();
+                    output.id = instance.id;
+                    sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn create() -> Result<()> {{
+                pub fn create(instance: {}Wrapper) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                    let mut output = instance.clone();
+                    output.id = Some(table.add_record(instance.into())?);
+                    table.commit()?;
+                    sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn update() -> Result<()> {{
+                pub fn update(instance: {}Wrapper) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                    let id = instance.id.unwrap_or_default();
+                    table.update_record(id, Some(instance.clone().into()))?;
+                    table.commit()?;
+                    sewup::utils::ewasm_return(ewasm_output_from!(instance));
                     Ok(())
                 }}
-                pub fn delete() -> Result<()> {{
+                pub fn delete(instance: {}Wrapper) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                    let id = instance.id.unwrap_or_default();
+                    table.update_record(id, None)?;
+                    table.commit()?;
+                    sewup::utils::ewasm_return(ewasm_output_from!(instance));
                     Ok(())
                 }}
             }}
+
+            #[cfg(not(target_arch = "wasm32"))]
+            mod {} {{
+                use super::*;
+                #[inline]
+                pub fn protocol(instance: {}) -> {}Wrapper {{
+                    instance.into()
+                }}
+                pub type Protocol = {}Wrapper;
+                impl Protocol {{
+                    pub fn set_id(&mut self, id: usize) {{
+                        self.id = Some(id);
+                    }}
+                    pub fn is_empty(&self) -> bool {{
+                        self.trusted.is_none() && self.age.is_none()
+                    }}
+                }}
+            }}
         "#,
+            //Record trait
             struct_name,
-            fields.replace(":", ":Option<").replace(",", ">,"),
+            // Wraper struct
+            struct_name,
+            field_part.replace(":", ":Option<").replace(",", ">,"),
+            // impl From for warper
+            struct_name,
+            struct_name,
+            struct_name,
+            fields
+                .iter()
+                .map(|f| format!("{}:Some(instance.{})", f, f))
+                .collect::<Vec<_>>()
+                .join(","),
+            // impl From for instance
+            struct_name,
+            struct_name,
+            struct_name,
+            fields
+                .iter()
+                .map(|f| format!(r#"{}:wrapper.{}.expect("{} field missing")"#, f, f, f))
+                .collect::<Vec<_>>()
+                .join(","),
+            // mod for signature
             struct_name.to_ascii_uppercase(),
             struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            // mod for handlers
+            struct_name.to_ascii_lowercase(),
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            // mod for protocol
+            struct_name.to_ascii_lowercase(),
             struct_name,
             struct_name,
             struct_name,
@@ -685,7 +785,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        panic!("fail to parsing function in ewasm_assert_eq");
     }
 }
 

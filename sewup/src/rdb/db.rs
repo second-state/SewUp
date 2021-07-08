@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use std::ops::Range;
 
 use crate::rdb::table::Table;
+use crate::rdb::traits::{Record, HEADER_SIZE};
 use crate::rdb::{errors::Error, Deserialize, Feature, Serialize, SerializeTrait};
 use crate::utils::storage_index_to_addr;
 
@@ -24,7 +25,7 @@ pub type TableSig = [u8; 4];
 pub struct TableInfo {
     pub(crate) sig: TableSig,
     pub range: Range<u32>,
-    pub record_size: u32,
+    pub record_raw_size: u32,
 }
 
 /// DB is a storage space for an account in a specific block.
@@ -81,12 +82,18 @@ impl Db {
         output
     }
 
-    pub fn create_table<T: SerializeTrait + Default + Sized>(&mut self, name: &str) -> Result<()> {
+    pub fn create_table<T: SerializeTrait + Default + Sized + Record>(&mut self) -> Result<()> {
         let default_instance = T::default();
+        let ser_size = bincode::serialized_size(&default_instance)?;
+        let record_raw_size = if ser_size == 0 {
+            0u32
+        } else {
+            (ser_size as u32 + HEADER_SIZE) / 32 + 1
+        };
         let info = if self.table_info.is_empty() {
             TableInfo {
-                sig: get_table_signature(name),
-                record_size: bincode::serialized_size(&default_instance)? as u32,
+                sig: get_table_signature(std::any::type_name::<T>()),
+                record_raw_size,
                 range: (2..2),
             }
         } else {
@@ -95,8 +102,8 @@ impl Db {
                 ..
             } = self.table_info[self.table_info.len() - 1].clone();
             TableInfo {
-                sig: get_table_signature(name),
-                record_size: bincode::serialized_size(&default_instance)? as u32,
+                sig: get_table_signature(std::any::type_name::<T>()),
+                record_raw_size,
                 range: (last_table_range.end..last_table_range.end),
             }
         };
@@ -105,19 +112,20 @@ impl Db {
         Ok(())
     }
 
-    pub fn table<T: SerializeTrait + Default + Sized>(self, name: &str) -> Result<Table<T>> {
+    pub fn table<T: SerializeTrait + Default + Sized + Record>(self) -> Result<Table<T>> {
         let info = self
-            .table_info(name)
-            .ok_or(Error::TableNotExist(name.into()))?;
+            .table_info::<T>()
+            .ok_or(Error::TableNotExist(std::any::type_name::<T>().into()))?;
         Ok(Table::<T> {
             info,
             data: Vec::new(),
             phantom: PhantomData,
-        })
+        }
+        .load_data()?)
     }
 
-    pub fn drop_table<S: AsRef<str>>(&mut self, name: S) {
-        let sig = get_table_signature(name.as_ref());
+    pub fn drop_table<T>(&mut self) {
+        let sig = get_table_signature(std::any::type_name::<T>());
         let mut new_table_info = Vec::with_capacity(self.table_info.len() - 1);
         for info in self.table_info.iter() {
             if info.sig != sig {
@@ -131,8 +139,8 @@ impl Db {
         self.table_info.len()
     }
 
-    pub fn table_info<S: AsRef<str>>(&self, name: S) -> Option<TableInfo> {
-        let sig = get_table_signature(name.as_ref());
+    pub fn table_info<T>(&self) -> Option<TableInfo> {
+        let sig = get_table_signature(std::any::type_name::<T>());
         for info in self.table_info.iter() {
             if info.sig == sig {
                 return Some(info.clone());
@@ -261,25 +269,26 @@ impl Db {
         let mut previous_end = (info_raw_length + 1) as u32;
 
         let mut output: Option<Range<u32>> = None;
+        let mut new_range: Option<Range<u32>> = None;
         for info in self.table_info.iter_mut() {
-            if info.range.start != previous_end {
-                let new_range = if info.sig == sig {
-                    Range {
-                        start: previous_end,
-                        end: previous_end + raw_length,
-                    }
-                } else {
-                    Range {
-                        start: previous_end,
-                        end: previous_end + info.range.end - info.range.start,
-                    }
-                };
+            if info.sig == sig {
+                new_range = Some(Range {
+                    start: previous_end,
+                    end: previous_end + raw_length,
+                });
+                output = new_range.clone();
+            } else if info.range.start != previous_end {
+                new_range = Some(Range {
+                    start: previous_end,
+                    end: previous_end + info.range.end - info.range.start,
+                });
+            }
+
+            if let Some(new_range) = new_range.take() {
                 modify_list.push((info.range.clone(), new_range.clone()));
                 info.range = new_range;
             }
-            if info.sig == sig {
-                output = Some(info.clone().range);
-            }
+
             previous_end = info.range.end;
         }
 
@@ -333,26 +342,56 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_alloc_table_storage() {
-        #[derive(Default, Serialize)]
-        struct Person {
+    fn test_alloc_table_storage_with_tables() {
+        #[derive(Default, Serialize, Deserialize)]
+        struct Person1 {
             trusted: bool,
         }
+        impl Record for Person1 {}
+
+        #[derive(Default, Serialize, Deserialize)]
+        struct Person2 {
+            trusted: bool,
+        }
+        impl Record for Person2 {}
+
+        #[derive(Default, Serialize, Deserialize)]
+        struct Person3 {
+            trusted: bool,
+        }
+        impl Record for Person3 {}
 
         let mut db = Db::default();
-        db.create_table::<Person>("Person1");
-        db.create_table::<Person>("Person2");
-        db.create_table::<Person>("Person3");
+        db.create_table::<Person1>();
+        db.create_table::<Person2>();
+        db.create_table::<Person3>();
         assert!(db.table_info.len() == 3);
         for i in 0..3 {
             assert!(db.table_info[i].range == Range::<u32> { start: 2, end: 2 });
         }
         // There are not record in Person1, Person3, and there 3 raw of record in Person2
         let r = db
-            .alloc_table_storage(get_table_signature("Person2"), 3)
+            .alloc_table_storage(get_table_signature(std::any::type_name::<Person2>()), 3)
             .unwrap();
         assert!(db.table_info[0].range == Range::<u32> { start: 3, end: 3 });
         assert!(db.table_info[1].range == Range::<u32> { start: 3, end: 6 });
         assert!(db.table_info[2].range == Range::<u32> { start: 6, end: 6 });
+    }
+    #[test]
+    fn test_alloc_table_storage_with_one_table() {
+        #[derive(Default, Serialize, Deserialize)]
+        struct Person {
+            trusted: bool,
+        }
+        impl Record for Person {}
+
+        let mut db = Db::default();
+        db.create_table::<Person>();
+        assert!(db.table_info.len() == 1);
+        assert!(db.table_info[0].range == Range::<u32> { start: 2, end: 2 });
+        let r = db.alloc_table_storage(get_table_signature(std::any::type_name::<Person>()), 1);
+
+        assert!(r.unwrap() == Range::<u32> { start: 2, end: 3 });
+        assert!(db.table_info[0].range == Range::<u32> { start: 2, end: 3 });
     }
 }

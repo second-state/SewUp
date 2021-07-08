@@ -2,19 +2,89 @@ use std::marker::PhantomData;
 
 use anyhow::Result;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::storage_store;
+use ewasm_api::{storage_load, storage_store};
 
 use crate::rdb::db::{Db, TableInfo};
+use crate::rdb::{
+    errors::Error,
+    traits::{Record, HEADER_SIZE},
+};
 use crate::types::{Raw, Row};
 use crate::utils::storage_index_to_addr;
 
-pub struct Table<T> {
+pub struct Table<T: Record> {
     pub(crate) info: TableInfo,
     pub(crate) data: Vec<Row>,
     pub(crate) phantom: PhantomData<T>,
 }
 
-impl<T> Table<T> {
+impl<T: Record> Table<T> {
+    pub fn add_record(&mut self, instance: T) -> Result<usize> {
+        self.data.push(instance.to_row(self.info.record_raw_size)?);
+        Ok(self.data.len())
+    }
+
+    pub fn get_record(&self, id: usize) -> Result<T> {
+        return if id == 0 {
+            Err(Error::RecordIdCorrect.into())
+        } else if self.data.len() == 0 {
+            Err(Error::TableIsEmpty.into())
+        } else {
+            let mut row: Row = self.data[id - 1].clone();
+            row.make_buffer();
+            if let Some(i) = T::from_row(&row) {
+                Ok(i)
+            } else {
+                Err(Error::RecordDeleted.into())
+            }
+        };
+    }
+
+    pub fn update_record(&mut self, id: usize, instance: Option<T>) -> Result<()> {
+        return if id == 0 {
+            Err(Error::RecordIdCorrect.into())
+        } else if self.data.len() == 0 {
+            Err(Error::TableIsEmpty.into())
+        } else {
+            if let Some(instance) = instance {
+                self.data[id - 1] = instance.to_row(self.info.record_raw_size)?;
+            } else {
+                self.data[id - 1].wipe_header(HEADER_SIZE as usize)
+            }
+            Ok(())
+        };
+    }
+
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn load_data(self) -> Result<Self> {
+        Ok(self)
+    }
+
+    #[cfg(target_arch = "wasm32")]
+    pub fn load_data(self) -> Result<Self> {
+        let Self { info, phantom, .. } = self;
+        let mut db = Db::load(None)?;
+        let mut addr: [u8; 32] = [0; 32];
+        let mut data: Vec<Row> = Vec::new();
+        let mut buffer: Vec<Raw> = Vec::new();
+
+        for storage_idx in info.clone().range {
+            storage_index_to_addr(storage_idx as usize, &mut addr);
+            let raw: Raw = (&storage_load(&addr.into()).bytes).into();
+            buffer.push(raw);
+            if buffer.len() % info.record_raw_size as usize == 0 {
+                data.push(buffer.into());
+                buffer = Vec::new();
+            }
+        }
+
+        Ok(Table::<T> {
+            info,
+            data,
+            phantom,
+        })
+    }
+
     #[cfg(not(target_arch = "wasm32"))]
     pub fn commit(&self) -> Result<u32> {
         Ok(0)

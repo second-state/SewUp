@@ -48,6 +48,12 @@ impl Row {
     pub fn into_raw_vec(self) -> Vec<Raw> {
         self.inner
     }
+
+    /// wipe the header with header size in bytes
+    pub fn wipe_header(&mut self, header_size: usize) {
+        assert!(header_size <= 32);
+        self.inner[0].wipe_header(header_size);
+    }
 }
 
 impl Default for Row {

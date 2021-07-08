@@ -11,7 +11,9 @@ pub use db::*;
 mod table;
 pub use table::*;
 
-mod errors;
+pub mod traits;
+
+pub mod errors;
 
 pub use serde::Serialize as SerializeTrait;
 pub use serde_derive::{Deserialize, Serialize};
