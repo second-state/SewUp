@@ -1,4 +1,11 @@
+#[cfg(target_arch = "wasm32")]
+use ewasm_api::finish_data;
 use tiny_keccak::{Hasher, Sha3};
+
+#[cfg(target_arch = "wasm32")]
+pub fn ewasm_return(bytes: Vec<u8>) {
+    finish_data(&bytes);
+}
 
 pub fn copy_into_array<A, T>(slice: &[T]) -> A
 where

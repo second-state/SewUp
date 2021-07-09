@@ -137,6 +137,17 @@ impl Raw {
     pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
         std::str::from_utf8(&self.bytes)
     }
+    pub fn to_bytes32(&self) -> [u8; 32] {
+        self.bytes
+    }
+
+    /// wipe the header with header size in bytes
+    pub fn wipe_header(&mut self, header_size: usize) {
+        assert!(header_size <= 32);
+        for i in 0..header_size {
+            self.bytes[i] = 0;
+        }
+    }
 }
 
 impl FromIterator<u8> for Raw {

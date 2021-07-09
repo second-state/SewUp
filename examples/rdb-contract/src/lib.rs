@@ -2,15 +2,21 @@ use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 
 use sewup::primitives::Contract;
-use sewup::rdb::{Db, Feature};
+use sewup::rdb::{errors::Error as LibError, Db, Feature};
 use sewup::types::{Raw, Row};
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_output_from, ewasm_test, Table};
+use sewup_derive::{
+    ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_output_from, ewasm_test, Table,
+};
 
 mod errors;
 use errors::RDBError;
 
-#[derive(Table)]
-struct Person {
+// Table derive provides the handers for CRUD,
+// to communicate with these handler, you will need protocol.
+// The protocol is easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`,
+// please check out the test case in the end of this document
+#[derive(Table, Default, sewup::rdb::Serialize, sewup::rdb::Deserialize)]
+pub struct Person {
     trusted: bool,
     age: u8,
 }
@@ -18,9 +24,7 @@ struct Person {
 #[ewasm_fn]
 fn init_db_with_tables() -> Result<()> {
     let mut db = Db::new()?;
-    db.create_table("Table1", 1);
-    db.create_table("Table2", 2);
-    db.create_table("Person", 3); // TODO: fix this when implementing table
+    db.create_table::<Person>();
     db.commit()?;
     Ok(())
 }
@@ -42,19 +46,15 @@ fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<()>
 #[ewasm_fn]
 fn check_tables() -> Result<()> {
     let mut db = Db::load(None)?;
-    let mut info = db.table_info("Table1").unwrap();
-    if info.record_size != 1 {
-        return Err(RDBError::SimpleError("Table1 record_size not correct".into()).into());
+    let info = db.table_info::<Person>().unwrap();
+    if info.record_raw_size != 1 {
+        return Err(RDBError::SimpleError("Person record_raw_size not correct".into()).into());
     }
-
-    info = db.table_info("Table2").unwrap();
-    if info.record_size != 2 {
-        return Err(RDBError::SimpleError("Table2 record_size not correct".into()).into());
+    if info.range.start != 2 {
+        return Err(RDBError::SimpleError("Person range start not correct".into()).into());
     }
-
-    info = db.table_info("Person").unwrap();
-    if info.record_size != 3 {
-        return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
+    if info.range.end != 2 {
+        return Err(RDBError::SimpleError("Person range end not correct".into()).into());
     }
     Ok(())
 }
@@ -62,7 +62,7 @@ fn check_tables() -> Result<()> {
 #[ewasm_fn]
 fn drop_table() -> Result<()> {
     let mut db = Db::load(None)?;
-    db.drop_table("Table2");
+    db.drop_table::<Person>();
     db.commit()?;
     Ok(())
 }
@@ -70,13 +70,8 @@ fn drop_table() -> Result<()> {
 #[ewasm_fn]
 fn check_tables_again() -> Result<()> {
     let mut db = Db::load(None)?;
-    let mut info = db.table_info("Table1").unwrap();
-    if info.record_size != 1 {
-        return Err(RDBError::SimpleError("Table1 record_size not correct".into()).into());
-    }
-    info = db.table_info("Person").unwrap();
-    if info.record_size != 3 {
-        return Err(RDBError::SimpleError("Person record_size not correct".into()).into());
+    if db.table_info::<Person>().is_some() {
+        return Err(RDBError::SimpleError("Person table should be deleted".into()).into());
     }
     Ok(())
 }
@@ -85,10 +80,10 @@ fn main() -> Result<()> {
     let mut contract = Contract::new()?;
 
     match contract.get_function_selector()? {
-        ewasm_fn_sig!(person::get) => person::get()?,
-        ewasm_fn_sig!(person::create) => person::create()?,
-        ewasm_fn_sig!(person::update) => person::update()?,
-        ewasm_fn_sig!(person::delete) => person::delete()?,
+        ewasm_fn_sig!(person::get) => ewasm_input_from!(contract, person::get)?,
+        ewasm_fn_sig!(person::create) => ewasm_input_from!(contract, person::create)?,
+        ewasm_fn_sig!(person::update) => ewasm_input_from!(contract, person::update)?,
+        ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract, person::delete)?,
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![Feature::Default])?
         }
@@ -109,11 +104,57 @@ mod tests {
 
     #[ewasm_test]
     fn test_execute_crud_handler() {
-        // TODO: correctly implement the handler
-        ewasm_assert_eq!(person::get(), vec![]);
-        ewasm_assert_eq!(person::create(), vec![]);
-        ewasm_assert_eq!(person::update(), vec![]);
-        ewasm_assert_eq!(person::delete(), vec![]);
+        ewasm_assert_ok!(init_db_with_tables());
+
+        let person = Person {
+            trusted: true,
+            age: 18,
+        };
+
+        let create_input = person::protocol(person);
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_assert_eq!(
+            person::create(create_input),
+            ewasm_output_from!(expect_output)
+        );
+
+        let mut get_input: person::Protocol = Person::default().into();
+        get_input.set_id(1);
+        ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(expect_output));
+
+        let older_person = Person {
+            trusted: true,
+            age: 20,
+        };
+        let mut update_input = person::protocol(older_person);
+        update_input.set_id(1);
+        ewasm_assert_eq!(
+            person::update(update_input),
+            ewasm_output_from!(update_input)
+        );
+        ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(update_input));
+
+        // Please Notice that protocol from the default instance may not be empty,
+        // this dependents on the default implementation of the struct.
+        // You always can use {struct name}::Protocol::default() to get a empty one,
+        // then set the id to delete the object.
+        let mut default_person_protocol = person::protocol(Person::default());
+        assert!(!default_person_protocol.is_empty());
+
+        let mut delete_input = person::Protocol::default();
+        assert!(delete_input.is_empty());
+
+        delete_input.id = Some(1);
+        ewasm_assert_eq!(
+            person::delete(delete_input),
+            ewasm_output_from!(delete_input)
+        );
+
+        ewasm_assert_eq!(
+            person::get(get_input),
+            ewasm_err_output!(LibError::RecordDeleted)
+        );
     }
 
     #[ewasm_test]

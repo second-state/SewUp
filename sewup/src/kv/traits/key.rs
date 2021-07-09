@@ -9,10 +9,13 @@ use serde::Serialize;
 
 use crate::types::{Raw, Row};
 
+//TODO make Header bigger for big object storage
 pub trait Key: Sized + Serialize + DeserializeOwned {
+    // XXX: typo raw
     fn from_raw_key(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
+        // XXX fix expect msg
         let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
             .expect("load db binary fail");
         Ok(instance)
@@ -29,6 +32,7 @@ pub trait Key: Sized + Serialize + DeserializeOwned {
 
     fn gen_hash_key(&self, key_len: u32, value_len: u32) -> Result<Raw> {
         let mut bytes: [u8; 32] = [0; 32];
+        // XXX fix expect msg
         let bin = bincode::serialize(&self).expect("serialize a key fail");
 
         let mut b = Blake2s::new(24);
@@ -45,6 +49,7 @@ pub trait Key: Sized + Serialize + DeserializeOwned {
 
     fn gen_hash(&self) -> Result<[u8; 24]> {
         let mut hash: [u8; 24] = [0; 24];
+        // XXX fix expect msg
         let bin = bincode::serialize(&self).expect("serialize a key fail");
 
         let mut b = Blake2s::new(24);
@@ -75,6 +80,7 @@ impl AsHashKey for Raw {
 }
 
 impl Key for Raw {
+    // XXX: typo raw
     fn from_raw_key(x: &Row) -> Result<Self> {
         Ok(Raw::try_from(x).expect("Data loose from Row to Raw"))
     }
@@ -84,6 +90,7 @@ impl Key for Raw {
 }
 
 impl Key for Row {
+    // XXX: typo raw
     fn from_raw_key(x: &Row) -> Result<Self> {
         Ok(x.clone())
     }
