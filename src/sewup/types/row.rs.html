@@ -207,6 +207,16 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">iter</span>::<span class="ident">FromIterator</span>;
 
@@ -253,6 +263,16 @@
             <span class="ident">vec</span>
         });
         <span class="ident">String</span>::<span class="ident">from_utf8</span>(<span class="ident">buf</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw_vec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">inner</span>
+    }
+
+    <span class="doccomment">/// wipe the header with header size in bytes</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wipe_header</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">header_size</span>: <span class="ident">usize</span>) {
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">header_size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">32</span>);
+        <span class="self">self</span>.<span class="ident">inner</span>[<span class="number">0</span>].<span class="ident">wipe_header</span>(<span class="ident">header_size</span>);
     }
 }
 
