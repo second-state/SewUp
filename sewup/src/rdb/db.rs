@@ -5,8 +5,9 @@ use std::ops::Range;
 use crate::rdb::errors::Error;
 use crate::rdb::table::Table;
 use crate::rdb::traits::{Record, HEADER_SIZE};
+use crate::rdb::Feature;
 use crate::utils::storage_index_to_addr;
-use crate::{Deserialize, Feature, Serialize, SerializeTrait};
+use crate::{Deserialize, Serialize, SerializeTrait};
 
 use anyhow::Result;
 #[cfg(target_arch = "wasm32")]
@@ -34,16 +35,20 @@ pub struct TableInfo {
 /// into the latest block.
 ///
 /// ## Storage map
+/// ```compile_fail
 /// | 0th ~ 31th bytes | dynamic size | dynamic size              | dynamic size |
 /// |------------------|--------------|---------------------------|--------------|
 /// | DB header        | Table info   | Table data of first table | ...          |
+/// ```
 ///
 /// ### DB Header
 /// The fist 32 bytes are reserved as header of the store,
 ///
+/// ```compile_fail
 /// | 0th            | 1st          | 2nd ~ 3rd         | ... | 28th ~ 31st              |
 /// |----------------|--------------|-------------------|-----|--------------------------|
 /// | Sewup Features | version (BE) | RDB Features (LE) | -   | length of TableInfo (BE) |
+/// ```
 ///
 /// Base on the features, the storage may have different encoding in to binary
 #[derive(Serialize)]

@@ -11,7 +11,7 @@ use serde::Serialize;
 use crate::types::{Raw, Row};
 
 /// helps to serialize struct as Key to row or deserialized from row
-/// ```
+/// ```compile_fail
 /// | 1st bytes | ...    | padding                   |
 /// |-----------|--------|---------------------------|
 /// | Header    | Binary | padding to n times Byte32 |

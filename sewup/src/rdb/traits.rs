@@ -12,7 +12,7 @@ use crate::types::{Raw, Row};
 pub const HEADER_SIZE: u32 = 1;
 
 /// helps to serialize struct to row or deserialized from row
-/// ```
+/// ```compile_fail
 /// | 1st bytes | ...    | padding                   |
 /// |-----------|--------|---------------------------|
 /// | Header    | Binary | padding to n times Byte32 |
