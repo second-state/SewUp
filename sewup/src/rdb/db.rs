@@ -20,7 +20,7 @@ const CONFIG_ADDR: [u8; 32] = [0; 32];
 
 pub type TableSig = [u8; 4];
 
-// One table info is half Raw
+/// Metadata of table
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
 pub struct TableInfo {
     pub(crate) sig: TableSig,
@@ -31,6 +31,11 @@ pub struct TableInfo {
 /// DB is a storage space for an account in a specific block.
 /// We can import the storage from a past block, and we only commit the storage
 /// into the latest block.
+///
+/// ## Storage map
+/// | 0th ~ 31th bytes | dynamic size | dynamic size              | dynamic size |
+/// |------------------|--------------|---------------------------|--------------|
+/// | DB header        | Table info   | Table data of first table | ...          |
 ///
 /// ### DB Header
 /// The fist 32 bytes are reserved as header of the store,
@@ -82,6 +87,7 @@ impl Db {
         output
     }
 
+    /// create table for storage
     pub fn create_table<T: SerializeTrait + Default + Sized + Record>(&mut self) -> Result<()> {
         let default_instance = T::default();
         let ser_size = bincode::serialized_size(&default_instance)?;
@@ -112,6 +118,7 @@ impl Db {
         Ok(())
     }
 
+    /// get table with date loaded
     pub fn table<T: SerializeTrait + Default + Sized + Record>(self) -> Result<Table<T>> {
         let info = self
             .table_info::<T>()
@@ -124,6 +131,7 @@ impl Db {
         .load_data()?)
     }
 
+    /// drop table
     pub fn drop_table<T>(&mut self) {
         let sig = get_table_signature(std::any::type_name::<T>());
         let mut new_table_info = Vec::with_capacity(self.table_info.len() - 1);
@@ -135,6 +143,7 @@ impl Db {
         self.table_info = new_table_info;
     }
 
+    /// get the numbers of tables
     pub fn table_length(&self) -> usize {
         self.table_info.len()
     }
@@ -207,14 +216,14 @@ impl Db {
     }
 
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn commit(&self) -> Result<u32> {
-        Ok(0)
+    pub fn commit(&self) -> Result<()> {
+        Ok(())
     }
 
     /// Update the header of Db, but not the Table
     /// The commit of Table will automatically trigger the commit of Db
     #[cfg(target_arch = "wasm32")]
-    pub fn commit(&self) -> Result<u32> {
+    pub fn commit(&self) -> Result<()> {
         let mut buffer = [0u8; 32];
         RDB_FEATURE.to_be_bytes().swap_with_slice(&mut buffer[0..1]);
         VERSION.to_be_bytes().swap_with_slice(&mut buffer[1..2]);
@@ -253,13 +262,15 @@ impl Db {
                 break;
             }
         }
-
-        // TODO: fix this when implementing table
-        Ok(0)
+        Ok(())
     }
 
     /// alloc storage space for table
-    pub fn alloc_table_storage(&mut self, sig: TableSig, raw_length: u32) -> Result<Range<u32>> {
+    pub(crate) fn alloc_table_storage(
+        &mut self,
+        sig: TableSig,
+        raw_length: u32,
+    ) -> Result<Range<u32>> {
         let mut modify_list: Vec<(Range<u32>, Range<u32>)> = Vec::new();
         let mut info_raw_length = self.table_info.len() / 2;
         if self.table_info.len() % 2 > 0 {
@@ -369,7 +380,7 @@ mod tests {
         for i in 0..3 {
             assert!(db.table_info[i].range == Range::<u32> { start: 2, end: 2 });
         }
-        // There are not record in Person1, Person3, and there 3 raw of record in Person2
+        // There are not record in Person1, Person3, and there 3 raw size of records in Person2
         let r = db
             .alloc_table_storage(get_table_signature(std::any::type_name::<Person2>()), 3)
             .unwrap();

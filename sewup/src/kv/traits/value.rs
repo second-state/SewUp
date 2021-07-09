@@ -7,7 +7,7 @@ use serde::Serialize;
 
 use crate::types::{Raw, Row};
 
-//XXX make Header bigger for big object storage
+//TODO make Header bigger for big object storage
 pub trait Value: Sized + Serialize + DeserializeOwned {
     // XXX: typo raw
     fn to_raw_value(&self) -> Result<Row> {
@@ -21,8 +21,9 @@ pub trait Value: Sized + Serialize + DeserializeOwned {
     fn from_raw_value(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
+        // XXX: fix expect msg
         let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
-            .expect("load db binary fail"); // XXX
+            .expect("load db binary fail");
         Ok(instance)
     }
 }

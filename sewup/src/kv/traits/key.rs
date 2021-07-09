@@ -9,14 +9,15 @@ use serde::Serialize;
 
 use crate::types::{Raw, Row};
 
-//XXX make Header bigger for big object storage
+//TODO make Header bigger for big object storage
 pub trait Key: Sized + Serialize + DeserializeOwned {
     // XXX: typo raw
     fn from_raw_key(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
+        // XXX fix expect msg
         let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
-            .expect("load db binary fail"); // XXX
+            .expect("load db binary fail");
         Ok(instance)
     }
 
@@ -31,7 +32,8 @@ pub trait Key: Sized + Serialize + DeserializeOwned {
 
     fn gen_hash_key(&self, key_len: u32, value_len: u32) -> Result<Raw> {
         let mut bytes: [u8; 32] = [0; 32];
-        let bin = bincode::serialize(&self).expect("serialize a key fail"); // XXX
+        // XXX fix expect msg
+        let bin = bincode::serialize(&self).expect("serialize a key fail");
 
         let mut b = Blake2s::new(24);
         b.input(&bin);
@@ -47,7 +49,8 @@ pub trait Key: Sized + Serialize + DeserializeOwned {
 
     fn gen_hash(&self) -> Result<[u8; 24]> {
         let mut hash: [u8; 24] = [0; 24];
-        let bin = bincode::serialize(&self).expect("serialize a key fail"); // XXX
+        // XXX fix expect msg
+        let bin = bincode::serialize(&self).expect("serialize a key fail");
 
         let mut b = Blake2s::new(24);
         b.input(&bin);

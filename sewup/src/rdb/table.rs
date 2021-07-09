@@ -19,11 +19,13 @@ pub struct Table<T: Record> {
 }
 
 impl<T: Record> Table<T> {
+    /// Add a new record into table
     pub fn add_record(&mut self, instance: T) -> Result<usize> {
         self.data.push(instance.to_row(self.info.record_raw_size)?);
         Ok(self.data.len())
     }
 
+    /// Get a record with specific id
     pub fn get_record(&self, id: usize) -> Result<T> {
         return if id == 0 {
             Err(Error::RecordIdCorrect.into())
@@ -40,6 +42,7 @@ impl<T: Record> Table<T> {
         };
     }
 
+    /// Update or delete a record with specific id
     pub fn update_record(&mut self, id: usize, instance: Option<T>) -> Result<()> {
         return if id == 0 {
             Err(Error::RecordIdCorrect.into())
@@ -56,12 +59,12 @@ impl<T: Record> Table<T> {
     }
 
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn load_data(self) -> Result<Self> {
+    pub(crate) fn load_data(self) -> Result<Self> {
         Ok(self)
     }
 
     #[cfg(target_arch = "wasm32")]
-    pub fn load_data(self) -> Result<Self> {
+    pub(crate) fn load_data(self) -> Result<Self> {
         let Self { info, phantom, .. } = self;
         let mut db = Db::load(None)?;
         let mut addr: [u8; 32] = [0; 32];
@@ -90,6 +93,7 @@ impl<T: Record> Table<T> {
         Ok(0)
     }
 
+    /// Dump the data of table on chain, and also update all the table info
     #[cfg(target_arch = "wasm32")]
     pub fn commit(mut self) -> Result<u32> {
         // Currently, wasm runs in single thread mode, so it is ok to do this.

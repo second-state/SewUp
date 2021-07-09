@@ -462,9 +462,9 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
     }
 }
 
-/// `Table` derive help you implement table relating function and wrapper
-/// structure for the rdb feature
-/// ```ignore
+/// provides the handers for CRUD and the Protocol struct to communicate with these handlers.
+///
+/// ```compile_fail
 /// use sewup_derive::Table;
 /// #[derive(Table)]
 /// struct Person {
@@ -472,6 +472,54 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 ///     age: u8,
 /// }
 /// ```
+///
+/// The crud handlers are generated as `{struct_name}::get`, `{struct_name}::create`,
+/// `{struct_name}::update`, `{struct_name}::delete`, you can easily used these handlers as
+/// following example.
+///
+/// ```compile_fail
+/// #[ewasm_main]
+/// fn main() -> Result<()> {
+///     let mut contract = Contract::new()?;
+///
+///     match contract.get_function_selector()? {
+///         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract, person::get)?,
+///         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract, person::create)?,
+///         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract, person::update)?,
+///         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract, person::delete)?,
+///         _ => return Err(RDBError::UnknownHandle.into()),
+///     }
+///
+///     Ok(())
+/// }
+/// ```
+///
+/// The protocol is the input and also the output format of these handlers, besides these handlers
+/// are easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`, and use `set_id`
+/// for specify the record you want to modify.
+/// for examples.
+///
+/// ```compile_fail
+/// let handler_input = person::protocol(person);
+/// let mut default_person_input: person::Protocol = Person::default().into();
+/// default_input.set_id(2);
+/// ```
+///
+/// you can use `ewasm_output_from!` to get the exactly input/ouput binary of the protol, for
+/// example:
+/// ```
+/// let handler_input = person::protocol(person);
+/// ewasm_output_from!(handler_input)
+/// ```
+///
+/// Please note that the protocol default and the protocol for default instance may be different.
+/// This base on the implementation of the default trait of the structure.
+///
+/// ```compile_fail
+/// let default_input = person::Protocol::default();
+/// let default_person_input: person::Protocol = Person::default().into();
+/// assert!(default_input != default_person_input)
+/// '```
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table)]
 pub fn derive_table(item: TokenStream) -> TokenStream {
