@@ -53,6 +53,12 @@
 <span id="50">50</span>
 <span id="51">51</span>
 <span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Sewup - Second state eWasm Utility Program</span>
 <span class="doccomment">//! A library to help you sew up your Ethereum project with Rust and just like develop in a common backend.</span>
@@ -70,16 +76,19 @@
 <span class="doccomment">//! sewup-derive = { version = &quot;*&quot;, features = [&#39;rdb&#39;]  }</span>
 <span class="doccomment">//! ```</span>
 
+<span class="doccomment">/// help you build up you contract to handle tokens (experimental)</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;token&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">token</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;token&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">token</span>::<span class="kw-2">*</span>;
 
+<span class="doccomment">/// help you storage thing as key value object pair</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kv&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">kv</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;kv&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">kv</span>::<span class="kw-2">*</span>;
 
+<span class="doccomment">/// help you storage thing as records in tables</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">rdb</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
@@ -87,25 +96,28 @@
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">errors</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="doccomment">/// The primitvie used in contract</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">primitives</span>;
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">utils</span>;
 
+<span class="doccomment">/// The run time helps user to setup the contract testing environment</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">runtimes</span>;
 
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_variables</span>)]</span>
+<span class="doccomment">/// The basic types for storage in low level, and also easiler to used for bytes and string.</span>
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">types</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bincode</span>;
-
-<span class="doccomment">/// Re export the ewasm_api</span>
+<span class="doccomment">/// Re-export the ewasm_api</span>
 <span class="doccomment">/// these api is low level apis, it is better to keep in a library not in the contract file</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ewasm_api</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bincode</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span> <span class="kw">as</span> <span class="ident">DeserializeTrait</span>, <span class="ident">Serialize</span> <span class="kw">as</span> <span class="ident">SerializeTrait</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-js="../../search-index.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

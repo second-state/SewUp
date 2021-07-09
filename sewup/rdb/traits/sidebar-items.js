@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["HEADER_SIZE",""]],"trait":[["Record","helps to serialize struct to row or deserialized from row"]]});

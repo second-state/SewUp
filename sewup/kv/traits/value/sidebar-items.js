@@ -1,1 +1,1 @@
-initSidebarItems({"trait":[["Value",""]]});
+initSidebarItems({"trait":[["Value","helps to serialize struct as Value to row or deserialized from row"]]});

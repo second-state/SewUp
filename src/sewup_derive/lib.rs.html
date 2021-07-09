@@ -1570,7 +1570,7 @@
 <span class="doccomment">/// let default_input = person::Protocol::default();</span>
 <span class="doccomment">/// let default_person_input: person::Protocol = Person::default().into();</span>
 <span class="doccomment">/// assert!(default_input != default_person_input)</span>
-<span class="doccomment">/// &#39;```</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Table</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_table</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
@@ -1588,7 +1588,7 @@
             <span class="string">r#&quot;
             impl sewup::rdb::traits::Record for {} {{}}
 
-            #[derive(Default, Clone, sewup::rdb::Serialize, sewup::rdb::Deserialize)]
+            #[derive(Default, Clone, sewup::Serialize, sewup::Deserialize)]
             pub struct {}Wrapper {{
                 id: Option&lt;usize&gt;,
                 {}

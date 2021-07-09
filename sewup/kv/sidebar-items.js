@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Feature",""]],"mod":[["traits",""]],"struct":[["Store",""]]});
+initSidebarItems({"enum":[["Feature",""]],"mod":[["traits","traits for Key and Value"]],"struct":[["Store",""]]});
