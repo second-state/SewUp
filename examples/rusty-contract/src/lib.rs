@@ -1,7 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup::primitives::Contract;
-
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[derive(Default, Serialize, Deserialize)]
 struct SimpleStruct {
@@ -19,6 +17,9 @@ fn check_input_object(s: SimpleStruct) -> Result<(), &'static str> {
 
 #[ewasm_main(rusty)]
 fn main() -> Result<(), &'static str> {
+    use sewup::primitives::Contract;
+    use sewup_derive::ewasm_input_from;
+
     let contract = Contract::new().map_err(|_| "NewContractError")?;
     match contract
         .get_function_selector()

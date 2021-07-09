@@ -10,8 +10,8 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup ={ version = "0.0.4", path = "../../sewup", features = [ "rdb" ] }
-sewup-derive = { version = "0.0.4", path = "../../sewup-derive", features = [ "rdb" ] }
+sewup ={ version = "*", path = "../../sewup", features = [ "rdb" ] }
+sewup-derive = { version = "*", path = "../../sewup-derive", features = [ "rdb" ] }
 anyhow = "1.0.40"
 thiserror = "1.0.24"
 serde = "1.0"

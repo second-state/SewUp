@@ -15,7 +15,7 @@ use errors::RDBError;
 // to communicate with these handler, you will need protocol.
 // The protocol is easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`,
 // please check out the test case in the end of this document
-#[derive(Table, Default, sewup::rdb::Serialize, sewup::rdb::Deserialize)]
+#[derive(Table, Default, Serialize, Deserialize)]
 pub struct Person {
     trusted: bool,
     age: u8,

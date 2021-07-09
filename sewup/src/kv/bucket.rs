@@ -55,14 +55,14 @@ impl<'a, K: Key, V: Value> Iterator for Iter<'a, K, V> {
             );
 
             key_row.make_buffer();
-            let key = K::from_raw_key(&key_row).expect("parse key from raw fail");
+            let key = K::from_row_key(&key_row).expect("parse key from raw fail");
 
             let mut value_row = Row::from(
                 &self.raw_bucket.1
                     [(self.item_idx + k_size) as usize..(self.item_idx + k_size + v_size) as usize],
             );
             value_row.make_buffer();
-            let value = V::from_raw_value(&value_row).expect("parse value from raw fail");
+            let value = V::from_row_value(&value_row).expect("parse value from raw fail");
 
             self.item_idx = self.item_idx + k_size + v_size;
 
@@ -110,7 +110,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
                     &self.raw_bucket.1[(idx + k_size) as usize..(idx + k_size + v_size) as usize],
                 );
                 row.make_buffer();
-                let instance = V::from_raw_value(&row)?;
+                let instance = V::from_row_value(&row)?;
                 return Ok(Some(instance));
             }
             idx = idx + k_size + v_size;
@@ -120,15 +120,15 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
 
     /// Set an item into the bucket
     pub fn set(&mut self, key: K, value: V) -> Result<()> {
-        let mut value: Vec<Raw> = value.to_raw_value()?.into();
-        let mut raw_key: Vec<Raw> = key.to_raw_key()?.into();
+        let mut value: Vec<Raw> = value.to_row_value()?.into();
+        let mut row_key: Vec<Raw> = key.to_row_key()?.into();
 
-        let hash_key = key.gen_hash_key(raw_key.len() as u32, value.len() as u32)?;
+        let hash_key = key.gen_hash_key(row_key.len() as u32, value.len() as u32)?;
 
         // TODO: handle key duplicate here
 
         self.raw_bucket.0.push(hash_key);
-        self.raw_bucket.1.append(&mut raw_key);
+        self.raw_bucket.1.append(&mut row_key);
         self.raw_bucket.1.append(&mut value);
 
         Ok(())

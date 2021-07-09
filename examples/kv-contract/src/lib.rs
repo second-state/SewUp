@@ -1,15 +1,10 @@
-use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
 
-use sewup::kv::{Feature, Store};
-use sewup::primitives::Contract;
-use sewup::types::{Raw, Row};
+use sewup::kv::Feature;
 use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
 
 mod errors;
 use errors::KVError;
-
-const EMPTY_DB_SIZE: u32 = 8;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
 struct SimpleStruct {
@@ -18,18 +13,18 @@ struct SimpleStruct {
 }
 
 #[ewasm_fn]
-fn empty_commit() -> Result<()> {
-    let storage = Store::new()?;
+fn empty_commit() -> anyhow::Result<()> {
+    let storage = sewup::kv::Store::new()?;
     let size = storage.commit()?;
-    if size != EMPTY_DB_SIZE {
+    if size != 8u32 {
         return Err(KVError::UnexpectedDBSize(size).into());
     }
     Ok(())
 }
 
 #[ewasm_fn]
-fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<()> {
-    let storage = Store::load(None)?;
+fn check_version_and_features(version: u8, features: Vec<Feature>) -> anyhow::Result<()> {
+    let storage = sewup::kv::Store::load(None)?;
     if storage.version() != version {
         return Err(KVError::UnexpectVersion(storage.version()).into());
     };
@@ -42,8 +37,8 @@ fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<()>
 }
 
 #[ewasm_fn]
-fn check_empty_storage_size(size: u32) -> Result<()> {
-    let storage = Store::load(None)?;
+fn check_empty_storage_size(size: u32) -> anyhow::Result<()> {
+    let storage = sewup::kv::Store::load(None)?;
     let load_size = storage.load_size();
     if load_size != size {
         return Err(KVError::UnexpectedDBSize(load_size).into());
@@ -52,8 +47,10 @@ fn check_empty_storage_size(size: u32) -> Result<()> {
 }
 
 #[ewasm_fn]
-fn add_buckets() -> Result<()> {
-    let mut storage = Store::load(None)?;
+fn add_buckets() -> anyhow::Result<()> {
+    use sewup::types::{Raw, Row};
+
+    let mut storage = sewup::kv::Store::load(None)?;
     let bucket1 = storage.bucket::<Raw, Raw>("bucket1")?;
     let bucket2 = storage.bucket::<Row, Row>("bucket2")?;
     if !bucket1.is_empty() {
@@ -71,8 +68,8 @@ fn add_buckets() -> Result<()> {
 }
 
 #[ewasm_fn]
-fn check_buckets(buckets: Vec<String>) -> Result<()> {
-    let mut storage = Store::load(None)?;
+fn check_buckets(buckets: Vec<String>) -> anyhow::Result<()> {
+    let mut storage = sewup::kv::Store::load(None)?;
     let mut current_buckets = storage.buckets();
     current_buckets.sort();
     if current_buckets != buckets {
@@ -82,12 +79,12 @@ fn check_buckets(buckets: Vec<String>) -> Result<()> {
 }
 
 #[ewasm_fn]
-fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> Result<()> {
-    let mut storage = Store::load(None)?;
+fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> anyhow::Result<()> {
+    let mut storage = sewup::kv::Store::load(None)?;
     storage.drop_bucket(name)?;
     storage.commit()?;
 
-    let s = Store::load(None)?;
+    let s = sewup::kv::Store::load(None)?;
     let mut current_buckets = s.buckets();
     current_buckets.sort();
     if current_buckets != remine_buckets {
@@ -97,8 +94,10 @@ fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> Result<()>
 }
 
 #[ewasm_fn]
-fn new_bucket_with_specific_struct() -> Result<()> {
-    let mut storage = Store::new()?;
+fn new_bucket_with_specific_struct() -> anyhow::Result<()> {
+    use sewup::types::{Raw, Row};
+
+    let mut storage = sewup::kv::Store::new()?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
     let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
 
@@ -120,8 +119,10 @@ fn new_bucket_with_specific_struct() -> Result<()> {
 }
 
 #[ewasm_fn]
-fn check_objects_in_bucket() -> Result<()> {
-    let mut storage = Store::load(None)?;
+fn check_objects_in_bucket() -> anyhow::Result<()> {
+    use sewup::types::{Raw, Row};
+
+    let mut storage = sewup::kv::Store::load(None)?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
     let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
 
@@ -155,8 +156,10 @@ fn check_objects_in_bucket() -> Result<()> {
 }
 
 #[ewasm_fn]
-fn delete_object_in_bucket() -> Result<()> {
-    let mut storage = Store::load(None)?;
+fn delete_object_in_bucket() -> anyhow::Result<()> {
+    use sewup::types::{Raw, Row};
+
+    let mut storage = sewup::kv::Store::load(None)?;
     let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
 
     if bucket2.get(b"bug".into())?.is_none() {
@@ -175,21 +178,21 @@ fn delete_object_in_bucket() -> Result<()> {
 }
 
 #[ewasm_fn]
-fn non_regist_function() -> Result<()> {
+fn non_regist_function() -> anyhow::Result<()> {
     // A function forget to regist
     Ok(())
 }
 
 #[ewasm_main]
-fn main() -> Result<()> {
-    let contract = Contract::new()?;
+fn main() -> anyhow::Result<()> {
+    let contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
         ewasm_fn_sig!(empty_commit) => empty_commit()?,
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![Feature::Default])?
         }
-        ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(EMPTY_DB_SIZE)?,
+        ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(8u32)?,
         ewasm_fn_sig!(add_buckets) => add_buckets()?,
         ewasm_fn_sig!(check_buckets) => {
             check_buckets(vec!["bucket1".to_string(), "bucket2".to_string()])?

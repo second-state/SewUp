@@ -34,7 +34,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 sewup = { version = "*", features = ['kv'] }
-sewup-derive = { version = "*" }
+sewup-derive = { version = "*", features = ['kv']  }
 
 anyhow = "1.0"
 

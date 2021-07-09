@@ -1,16 +1,13 @@
-use anyhow::Result;
-
-use sewup::primitives::Contract;
 use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[ewasm_fn]
-fn hello() -> Result<String> {
+fn hello() -> anyhow::Result<String> {
     Ok("hello world".to_string())
 }
 
 #[ewasm_main(auto)]
-fn main() -> Result<String> {
-    let contract = Contract::new()?;
+fn main() -> anyhow::Result<String> {
+    let contract = sewup::primitives::Contract::new()?;
     let greeting = match contract.get_function_selector()? {
         ewasm_fn_sig!(hello) => hello()?,
         _ => panic!("unknown handle"),
