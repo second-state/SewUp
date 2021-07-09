@@ -1,11 +1,12 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/crate.io-0.0.3-green.svg)](https://crates.io/search?q=sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.0.4-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.4-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
 
-**S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like develop in a common backend.
+**S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 
 ## Slides
 | Date       | Event                 | Slides                                                      |
