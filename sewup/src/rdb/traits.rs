@@ -1,3 +1,4 @@
+//! traits for Record, which the item in an table
 use std::borrow::Borrow;
 
 use anyhow::Result;
@@ -7,13 +8,15 @@ use serde::Serialize;
 use crate::rdb::errors::Error;
 use crate::types::{Raw, Row};
 
-//XXX make Header bigger for big object storage
+//TODO make Header bigger for big object storage
 pub const HEADER_SIZE: u32 = 1;
 
 /// helps to serialize struct to row or deserialized from row
+/// ```
 /// | 1st bytes | ...    | padding                   |
 /// |-----------|--------|---------------------------|
 /// | Header    | Binary | padding to n times Byte32 |
+/// ```
 /// Header is the number of bytes for binary,
 /// Record can be delete by simple mark the header zero
 pub trait Record: Sized + Serialize + DeserializeOwned {

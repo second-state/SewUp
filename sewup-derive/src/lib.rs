@@ -519,7 +519,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 /// let default_input = person::Protocol::default();
 /// let default_person_input: person::Protocol = Person::default().into();
 /// assert!(default_input != default_person_input)
-/// '```
+/// ```
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table)]
 pub fn derive_table(item: TokenStream) -> TokenStream {
@@ -537,7 +537,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             r#"
             impl sewup::rdb::traits::Record for {} {{}}
 
-            #[derive(Default, Clone, sewup::rdb::Serialize, sewup::rdb::Deserialize)]
+            #[derive(Default, Clone, sewup::Serialize, sewup::Deserialize)]
             pub struct {}Wrapper {{
                 id: Option<usize>,
                 {}

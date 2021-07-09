@@ -22,7 +22,7 @@ pub fn calculate_balance_hash(address: &[u8; 20]) -> Vec<u8> {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_balance(address: &Address) -> StorageValue {
+pub fn get_balance(_address: &Address) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
@@ -36,7 +36,7 @@ pub fn get_balance(address: &Address) -> StorageValue {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_balance(address: &Address, value: &StorageValue) {}
+pub fn set_balance(_address: &Address, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
 pub fn set_balance(address: &Address, value: &StorageValue) {
     let hash = calculate_balance_hash(&address.bytes);
@@ -47,7 +47,7 @@ pub fn set_balance(address: &Address, value: &StorageValue) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_allowance(sender: &Address, spender: &Address) -> StorageValue {
+pub fn get_allowance(_sender: &Address, _spender: &Address) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
@@ -60,7 +60,7 @@ pub fn get_allowance(sender: &Address, spender: &Address) -> StorageValue {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) {}
+pub fn set_allowance(_sender: &Address, _spender: &Address, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
 pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) {
     let hash = calculate_allowance_hash(&sender.bytes, &spender.bytes);
@@ -71,7 +71,7 @@ pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) 
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn copy_into_storage_value(slice: &[u8]) -> StorageValue {
+pub fn copy_into_storage_value(_slice: &[u8]) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
@@ -82,7 +82,7 @@ pub fn copy_into_storage_value(slice: &[u8]) -> StorageValue {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn copy_into_address(slice: &[u8]) -> Address {
+pub fn copy_into_address(_slice: &[u8]) -> Address {
     Address {}
 }
 #[cfg(target_arch = "wasm32")]

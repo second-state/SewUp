@@ -1,40 +1,28 @@
-use anyhow::Result;
-use sewup::primitives::Contract;
-use sewup::token::{
-    erc20::{
-        allowance as erc20_allowance, approve as erc20_approve, decimals,
-        do_balance as erc20_do_balance, do_transfer as erc20_do_transfer, mint as erc20_mint, name,
-        symbol, total_supply, transfer_from as erc20_transfer_from, DECIMALS_SIG, NAME_SIG,
-        SYMBOL_SIG, TOTAL_SUPPLY_SIG,
-    },
-    helpers::{copy_into_address, copy_into_array, copy_into_storage_value},
-};
 use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::*;
 
 #[ewasm_fn]
-fn do_balance(contract: &Contract) {
+fn do_balance(contract: &sewup::primitives::Contract) {
     if contract.data_size != 24 {
         ewasm_api::revert();
     }
     let address_data = contract.input_data[4..].to_vec();
-    let address = copy_into_address(&address_data[0..20]);
-
-    erc20_do_balance(address);
+    let address = sewup::token::helpers::copy_into_address(&address_data[0..20]);
+    sewup::token::erc20::do_balance(address);
 }
 
 #[ewasm_fn]
-fn do_transfer(contract: &Contract) {
+fn do_transfer(contract: &sewup::primitives::Contract) {
     if contract.input_data.len() != 32 {
         ewasm_api::revert();
     }
 
     let recipient_data = contract.input_data[4..24].to_vec();
-    let recipient = copy_into_address(&recipient_data[0..20]);
+    let recipient = sewup::token::helpers::copy_into_address(&recipient_data[0..20]);
 
-    let value_data: [u8; 8] = copy_into_array(&contract.input_data[24..]);
+    let value_data: [u8; 8] = sewup::token::helpers::copy_into_array(&contract.input_data[24..]);
     let mut value = StorageValue::default();
     let value_len = value_data.len();
     let start = 32 - value_len;
@@ -42,72 +30,71 @@ fn do_transfer(contract: &Contract) {
     value.bytes[start..(value_len + start)]
         .clone_from_slice(&value_data[..((value_len + start) - start)]);
 
-    erc20_do_transfer(recipient, value);
+    sewup::token::erc20::do_transfer(recipient, value);
 }
 
 #[ewasm_fn]
-fn approve(contract: &Contract) {
+fn approve(contract: &sewup::primitives::Contract) {
     let spender_data = contract.input_data[4..24].to_vec();
-    let spender = copy_into_address(&spender_data[0..20]);
+    let spender = sewup::token::helpers::copy_into_address(&spender_data[0..20]);
 
     let value = contract.input_data[24..32].to_vec();
-    let storage_value = copy_into_storage_value(&value[0..8]);
-
-    erc20_approve(spender, storage_value);
+    let storage_value = sewup::token::helpers::copy_into_storage_value(&value[0..8]);
+    sewup::token::erc20::approve(spender, storage_value);
 }
 
 #[ewasm_fn]
-fn allowance(contract: &Contract) {
+fn allowance(contract: &sewup::primitives::Contract) {
     if contract.data_size != 44 {
         ewasm_api::revert();
     }
 
     let from_data = contract.input_data[4..24].to_vec();
-    let from = copy_into_address(&from_data[0..20]);
+    let from = sewup::token::helpers::copy_into_address(&from_data[0..20]);
 
     let spender_data = contract.input_data[24..44].to_vec();
-    let spender = copy_into_address(&spender_data[0..20]);
+    let spender = sewup::token::helpers::copy_into_address(&spender_data[0..20]);
 
-    erc20_allowance(from, spender);
+    sewup::token::erc20::allowance(from, spender);
 }
 
 #[ewasm_fn]
-fn transfer_from(contract: &Contract) {
+fn transfer_from(contract: &sewup::primitives::Contract) {
     if contract.data_size != 52 {
         ewasm_api::revert();
     }
 
-    let owner = copy_into_address(&contract.input_data[4..24]);
+    let owner = sewup::token::helpers::copy_into_address(&contract.input_data[4..24]);
 
-    let recipient = copy_into_address(&contract.input_data[24..44]);
+    let recipient = sewup::token::helpers::copy_into_address(&contract.input_data[24..44]);
 
-    let value_data: [u8; 8] = copy_into_array(&contract.input_data[44..52]);
+    let value_data: [u8; 8] = sewup::token::helpers::copy_into_array(&contract.input_data[44..52]);
 
     let value = u64::from_be_bytes(value_data);
 
-    erc20_transfer_from(owner, recipient, value);
+    sewup::token::erc20::transfer_from(owner, recipient, value);
 }
 
 #[ewasm_fn]
-fn mint(contract: &Contract) {
-    let adddress = copy_into_address(&contract.input_data[4..24]);
+fn mint(contract: &sewup::primitives::Contract) {
+    let adddress = sewup::token::helpers::copy_into_address(&contract.input_data[4..24]);
 
-    let value_data: [u8; 8] = copy_into_array(&contract.input_data[24..32]);
+    let value_data: [u8; 8] = sewup::token::helpers::copy_into_array(&contract.input_data[24..32]);
     let value = u64::from_be_bytes(value_data);
 
-    erc20_mint(adddress, value);
+    sewup::token::erc20::mint(adddress, value);
 }
 
 #[ewasm_main]
-fn main() -> Result<()> {
-    let contract = Contract::new()?;
+fn main() -> anyhow::Result<()> {
+    let contract = sewup::primitives::Contract::new()?;
     match contract.get_function_selector()? {
         ewasm_fn_sig!(do_balance) => do_balance(&contract),
         ewasm_fn_sig!(do_transfer) => do_transfer(&contract),
-        NAME_SIG => name(),
-        SYMBOL_SIG => symbol("ETD"),
-        DECIMALS_SIG => decimals(),
-        TOTAL_SUPPLY_SIG => total_supply(),
+        sewup::token::erc20::NAME_SIG => sewup::token::erc20::name(),
+        sewup::token::erc20::SYMBOL_SIG => sewup::token::erc20::symbol("ETD"),
+        sewup::token::erc20::DECIMALS_SIG => sewup::token::erc20::decimals(),
+        sewup::token::erc20::TOTAL_SUPPLY_SIG => sewup::token::erc20::total_supply(),
         ewasm_fn_sig!(approve) => approve(&contract),
         ewasm_fn_sig!(allowance) => allowance(&contract),
         ewasm_fn_sig!(transfer_from) => transfer_from(&contract),
@@ -121,6 +108,7 @@ fn main() -> Result<()> {
 mod tests {
     use super::*;
     use hex_literal::hex;
+    use sewup::erc20::{DECIMALS_SIG, NAME_SIG, SYMBOL_SIG, TOTAL_SUPPLY_SIG};
     use sewup_derive::ewasm_assert_eq;
 
     #[ewasm_test]

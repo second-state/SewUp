@@ -2,10 +2,11 @@ use std::convert::TryInto;
 use std::marker::PhantomData;
 use std::ops::Range;
 
+use crate::rdb::errors::Error;
 use crate::rdb::table::Table;
 use crate::rdb::traits::{Record, HEADER_SIZE};
-use crate::rdb::{errors::Error, Deserialize, Feature, Serialize, SerializeTrait};
 use crate::utils::storage_index_to_addr;
+use crate::{Deserialize, Feature, Serialize, SerializeTrait};
 
 use anyhow::Result;
 #[cfg(target_arch = "wasm32")]
@@ -18,7 +19,7 @@ const VERSION: u8 = 0;
 #[cfg(target_arch = "wasm32")]
 const CONFIG_ADDR: [u8; 32] = [0; 32];
 
-pub type TableSig = [u8; 4];
+pub(crate) type TableSig = [u8; 4];
 
 /// Metadata of table
 #[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
@@ -179,7 +180,7 @@ impl Db {
             }
 
             if VERSION != config[1] {
-                // TODO
+                // TODO data migrate from different version
                 panic!("migration not implement")
             }
 

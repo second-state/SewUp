@@ -1,8 +1,5 @@
-use anyhow::Result;
 use serde_derive::{Deserialize, Serialize};
-
-use sewup::primitives::Contract;
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
 use errors::Error;
@@ -14,7 +11,7 @@ struct SimpleStruct {
 }
 
 #[ewasm_fn]
-fn check_input_object(s: SimpleStruct) -> Result<()> {
+fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     if !s.trust {
         return Err(Error::NotTrustedInput.into());
     }
@@ -22,7 +19,10 @@ fn check_input_object(s: SimpleStruct) -> Result<()> {
 }
 
 #[ewasm_main]
-fn main() -> Result<()> {
+fn main() -> anyhow::Result<()> {
+    use sewup::primitives::Contract;
+    use sewup_derive::ewasm_input_from;
+
     let contract = Contract::new()?;
     match contract.get_function_selector()? {
         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,

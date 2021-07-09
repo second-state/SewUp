@@ -1,6 +1,7 @@
 use sewup::kv::Feature;
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Error, Debug, PartialEq)]
 pub enum KVError {
     #[error("the DB version `{0}` is unexpected.")]

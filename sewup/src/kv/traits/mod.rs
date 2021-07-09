@@ -1,3 +1,4 @@
+//! traits for Key and Value
 pub mod key;
 pub use key::Key;
 
