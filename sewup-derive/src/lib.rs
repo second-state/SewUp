@@ -1,6 +1,10 @@
+#![feature(box_into_inner)]
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro2::{Ident, Span};
+use proc_macro_error::{abort, abort_call_site, proc_macro_error};
+use quote::quote;
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
 
@@ -36,100 +40,92 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
-    let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
-        cap.name("name").unwrap().as_str().to_owned()
-    } else {
-        panic!("parse function error")
-    };
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    if !input.sig.inputs.is_empty() {
+        abort!(
+            input.sig.inputs,
+            "ewasm_main only wrap the function without inputs"
+        )
+    }
 
-    return match attr.to_string().to_lowercase().as_str() {
+    match attr.to_string().to_lowercase().as_str() {
         // Return the inner structure from unwrap result
         // This is for a scenario that you take care the result but not using Rust client
-        "auto" => format!(
-            r#"
+        "auto" => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                match {}() {{
-                    Ok(r) =>  {{
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
                         let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                         finish_data(&bin);
 
-                    }},
-                    Err(e) => {{
+                    },
+                    Err(e) => {
                         let error_msg = e.to_string();
                         finish_data(&error_msg.as_bytes());
-                    }}
-                }}
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap(),
+                    }
+                }
+            }
+        },
 
         // Return all result structure
         // This is for a scenario that you are using a rust client to operation the contract
-        "rusty" => format!(
-            r#"
+        "rusty" => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                let r = {}();
+            pub fn main() {
+                #input
+                let r = #name();
                 let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                 finish_data(&bin);
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap(),
+            }
+        },
 
         // Default only return error message,
         // This is for a scenario that you just want to modify the data on
         // chain only
-        _ => format!(
-            r#"
+        _ => quote! {
+            #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                if let Err(e) = {}() {{
+            pub fn main() {
+                #input
+                if let Err(e) = #name() {
                     let error_msg = e.to_string();
                     finish_data(&error_msg.as_bytes());
-                }}
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap()
-    };
+                }
+            }
+        }
+    }.into()
 }
 
 /// helps you to build your handlers in the contract
@@ -142,42 +138,57 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str().replace(" ", "");
-        let canonical_fn = format!(
-            "{}({})",
-            fn_name,
-            params
-                .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
-                .collect::<Vec<_>>()
-                .join(",")
-        );
-        format!(
-            r#"
-            pub(crate) const {}_SIG: [u8; 4] = {:?};
-            #[cfg(target_arch = "wasm32")]
-            {}
-        "#,
-            fn_name.to_ascii_uppercase(),
-            get_function_signature(&canonical_fn),
-            item.to_string()
-        )
-        .parse()
-        .unwrap()
-    } else {
-        panic!("parsing ewsm function fails: {}", item.to_string());
-    }
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    let args = &input
+        .sig
+        .inputs
+        .iter()
+        .map(|fn_arg| match fn_arg {
+            syn::FnArg::Receiver(r) => {
+                abort!(r, "please use ewasm_fn for function not method")
+            }
+            syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
+        })
+        .map(|ty| match ty {
+            syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
+            syn::Type::Reference(tr) => match Box::into_inner(tr.elem.clone()) {
+                syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
+                _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+            },
+            _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+        })
+        .map(|(ident, is_ref)| {
+            if is_ref {
+                format!("&{}", ident)
+            } else {
+                format!("{}", ident)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    let canonical_fn = format!("{}({})", name, args);
+    let fn_sig = get_function_signature(&canonical_fn);
+    let (sig_0, sig_1, sig_2, sig_3) = (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3]);
+    let sig_name = Ident::new(
+        &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
+    let result = quote! {
+        pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        #[cfg(target_arch = "wasm32")]
+        #input
+    };
+    result.into()
 }
 
 /// helps you to build your handler in other module
@@ -211,44 +222,55 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^pub fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str().replace(" ", "");
-        let canonical_fn = format!(
-            "{}({})",
-            fn_name,
-            params
-                .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
-                .collect::<Vec<_>>()
-                .join(",")
-        );
-        format!(
-            r#"
-            /// The siganature for fn {}
-            pub const {}_SIG: [u8; 4] = {:?};
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    let inputs = &input.sig.inputs;
+    let args = &inputs
+        .iter()
+        .map(|fn_arg| match fn_arg {
+            syn::FnArg::Receiver(r) => {
+                abort!(r, "please use ewasm_fn for function not method")
+            }
+            syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
+        })
+        .map(|ty| match ty {
+            syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
+            syn::Type::Reference(tr) => match Box::into_inner(tr.elem.clone()) {
+                syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
+                _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+            },
+            _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+        })
+        .map(|(ident, is_ref)| {
+            if is_ref {
+                format!("&{}", ident)
+            } else {
+                format!("{}", ident)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    let canonical_fn = format!("{}({})", name, args);
+    let fn_sig = get_function_signature(&canonical_fn);
+    let (sig_0, sig_1, sig_2, sig_3) = (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3]);
+    let sig_name = Ident::new(
+        &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
+    let result = quote! {
+        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
 
-            #[cfg(not(target_arch = "wasm32"))]
-            pub fn {}({}) {{}}
+        #[cfg(not(target_arch = "wasm32"))]
+        #[allow(unused)]
+        pub fn #name(#inputs) {}
 
-            #[cfg(target_arch = "wasm32")]
-            {}
-        "#,
-            fn_name,
-            fn_name.to_ascii_uppercase(),
-            get_function_signature(&canonical_fn),
-            fn_name,
-            params,
-            item.to_string()
-        )
-        .parse()
-        .unwrap()
-    } else {
-        panic!("parsing ewsm function fails: {}", item.to_string());
-    }
+        #[cfg(target_arch = "wasm32")]
+        #input
+    };
+    result.into()
 }
 
 /// helps you get you function signature
@@ -267,7 +289,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(decorated_handler) => ewasm_input_from!(contract, decorated_handler)?,
+///         ewasm_fn_sig!(decorated_handler) => ewasm_input_from!(contract move decorated_handler)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
@@ -293,13 +315,14 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
 ///         ewasm_fn_sig!(undecorated_handler(a: i32, b: String))
-///             => ewasm_input_from!(contract, undecorated_handler)?,
+///             => ewasm_input_from!(contract move undecorated_handler)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
 /// }
 /// ```
 ///
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -311,7 +334,15 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
             fn_name,
             params
                 .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
+                .map(|p| {
+                    let p_split = p.split(':').collect::<Vec<_>>();
+                    return if p_split.len() == 2 {
+                        p_split[1]
+                    } else {
+                        p_split[0]
+                    }
+                    .trim();
+                })
                 .collect::<Vec<_>>()
                 .join(",")
         );
@@ -337,7 +368,7 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///  Ok(())
@@ -346,46 +377,60 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 ///
 /// Besides, you can map the error to your customized error when something wrong happened in
 /// `ewasm_input_from!`, for example:
-/// `ewasm_input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
+/// `ewasm_input_from!(contract move check_input_object, |_| Err("DeserdeError"))`
 /// ```compile_fail
 /// #[ewasm_main(rusty)]
 /// fn main() -> Result<(), &'static str> {
 ///     let contract = Contract::new().map_err(|_| "NewContractError")?;
 ///     match contract.get_function_selector().map_err(|_| "FailGetFnSelector")? {
-///         ewasm_fn_sig!(check_input_object) =>  ewasm_input_from!(contract, check_input_object, |_| "DeserdeError")?
+///         ewasm_fn_sig!(check_input_object) =>  ewasm_input_from!(contract move check_input_object, |_| "DeserdeError")?
 ///         _ => return Err("UnknownHandle"),
 ///     };
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
+    let re =
+        Regex::new(r"^(?P<contract>\w+)\s+move\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
-        let contract = cap.name("contract").unwrap().as_str();
-        let fn_name = cap.name("name").unwrap().as_str();
-        let error_handler = cap.name("error_handler").unwrap().as_str();
-        if error_handler.is_empty() {
-            format!(
-                r#"
-                    {}(bincode::deserialize(&{}.input_data[4..])?)
-                "#,
-                fn_name, contract
-            )
-            .parse()
-            .unwrap()
+        let contract = Ident::new(cap.name("contract").unwrap().as_str(), Span::call_site());
+        let name_result: syn::Result<syn::ExprPath> =
+            syn::parse_str(cap.name("name").unwrap().as_str());
+        let name = if let Ok(name) = name_result {
+            name
         } else {
-            format!(
-                r#"
-                    {}(bincode::deserialize(&{}.input_data[4..]).map_err({})?)
-                "#,
-                fn_name, contract, error_handler
-            )
-            .parse()
-            .unwrap()
+            abort_call_site!(
+                "`{}` is not an ExprPath",
+                cap.name("name").unwrap().as_str()
+            );
+        };
+        let error_handler = cap.name("error_handler").unwrap().as_str();
+        return if error_handler.is_empty() {
+            quote! {
+                #name(sewup::bincode::deserialize(&#contract.input_data[4..])?)
+            }
+        } else {
+            let closure: syn::Result<syn::ExprClosure> = syn::parse_str(error_handler);
+            if let Ok(closure) = closure {
+                quote! {
+                    #name(sewup::bincode::deserialize(&#contract.input_data[4..]).map_err(#closure)?)
+                }
+            } else {
+                abort_call_site!("`{}` is not an closure input for map_err", error_handler);
+            }
         }
+        .into();
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!(
+            r#"fail to parsing ewasm_input_from,
+            please use
+                `ewasm_input_from( contract move handler )
+            or
+                `ewasm_input_from( contract move handler, closure_for_map_err)`
+            "#
+        );
     }
 }
 
@@ -393,9 +438,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
     format!(
-        r#"
-            bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")
-        "#,
+        r#"sewup::bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")"#,
         item.to_string(),
     )
     .parse()
@@ -415,21 +458,13 @@ pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
 #[cfg(feature = "kv")]
 #[proc_macro_derive(Key)]
 pub fn derive_key(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-            #[cfg(target_arch = "wasm32")]
-            impl sewup::kv::traits::Key for {} {{}}
-        "#,
-            struct_name,
-        )
-        .parse()
-        .unwrap()
-    } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let sturct_name = &input.ident;
+    return quote! {
+        #[cfg(target_arch = "wasm32")]
+        impl sewup::kv::traits::Key for #sturct_name {}
     }
+    .into();
 }
 
 /// `Value` derive help you implement Value trait for kv feature
@@ -445,21 +480,13 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
 #[cfg(feature = "kv")]
 #[proc_macro_derive(Value)]
 pub fn derive_value(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-            #[cfg(target_arch = "wasm32")]
-            impl sewup::kv::traits::Value for {} {{}}
-        "#,
-            struct_name,
-        )
-        .parse()
-        .unwrap()
-    } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+    let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let sturct_name = &input.ident;
+    return quote! {
+        #[cfg(target_arch = "wasm32")]
+        impl sewup::kv::traits::Value for #sturct_name {}
     }
+    .into();
 }
 
 /// provides the handers for CRUD and the Protocol struct to communicate with these handlers.
@@ -483,10 +510,10 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 ///     let mut contract = Contract::new()?;
 ///
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract, person::get)?,
-///         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract, person::create)?,
-///         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract, person::update)?,
-///         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract, person::delete)?,
+///         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get)?,
+///         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract move person::create)?,
+///         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract move person::update)?,
+///         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract move person::delete)?,
 ///         _ => return Err(RDBError::UnknownHandle.into()),
 ///     }
 ///
@@ -505,7 +532,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 /// default_input.set_id(2);
 /// ```
 ///
-/// you can use `ewasm_output_from!` to get the exactly input/ouput binary of the protol, for
+/// you can use `ewasm_output_from!` to get the exactly input/output binary of the protol, for
 /// example:
 /// ```
 /// let handler_input = person::protocol(person);
@@ -523,8 +550,10 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table)]
 pub fn derive_table(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}")
-        .unwrap();
+    let re = Regex::new(
+        r"^(pub)\s+struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}",
+    )
+    .unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let struct_name = cap.name("name").unwrap().as_str();
         let field_part = cap.name("fields").unwrap().as_str();
@@ -622,8 +651,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         self.trusted.is_none() && self.age.is_none()
                     }}
                 }}
-            }}
-        "#,
+            }}"#,
             //Record trait
             struct_name,
             // Wraper struct
@@ -673,7 +701,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+        abort_call_site!("sewup-derive parsing struct fails, currently we only support flat and simple structure");
     }
 }
 
@@ -690,6 +718,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mod_re = Regex::new(r"^mod (?P<mod_name>[^\{\s]*)(?P<to_first_bracket>[^\{]*\{)").unwrap();
@@ -713,7 +742,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         .arg("cargo build --release --target=wasm32-unknown-unknown")
                         .output()
                         .expect("failed to build wasm binary");
-                    if !dbg!(output).status.success() {
+                    if !output.status.success() {
                         panic!("return code not success: fail to build wasm binary")
                     }
                     let pkg_name = env!("CARGO_PKG_NAME");
@@ -749,7 +778,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             h.rt = Some(runtime.clone());
 
                             match h.execute(sig, input_data, 1_000_000_000_000) {
-                                Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
+                                Ok(r) => assert_eq!(r.output_data, expect_output, "{} output is unexpected", fn_name),
                                 Err(e) => {
                                     panic!("vm error: {:?}", e);
                                 }
@@ -770,14 +799,13 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
             #[test]
             fn $fn_name () {
                 let (_runtime, _run_wasm_fn) = _build_runtime_and_runner();
-                let mut _bin: Vec<u8> = Vec::new();
-        "#,
+                let mut _bin: Vec<u8> = Vec::new();"#,
             )
             .to_string()
             .parse()
             .unwrap();
     } else {
-        panic!("parse mod or function for testing error")
+        abort_call_site!("parse mod or function for testing error")
     }
 }
 /// helps you assert output from the handle of a contract with `Vec<u8>`.
@@ -793,6 +821,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
@@ -802,38 +831,22 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
         let equivalence = cap.name("equivalence").unwrap().as_str();
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        {}
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, {});"#,
                 fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        {}
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), {});"#,
                 params, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in ewasm_assert_eq");
+        abort_call_site!("fail to parsing function in ewasm_assert_eq");
     }
 }
 
@@ -841,6 +854,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_eq`, but the contract main function should be
 /// decorated with `#[ewasm_main(auto)]`, and the equivalence arm will be serialized into `Vec<u8>`
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
@@ -850,38 +864,22 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
         let equivalence = cap.name("equivalence").unwrap().as_str();
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        sewup_derive::ewasm_output_from!({})
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));"#,
                 fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        sewup_derive::ewasm_output_from!({})
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), sewup_derive::ewasm_output_from!({}));"#,
                 params, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -898,6 +896,7 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -906,38 +905,22 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        Vec::with_capacity(0)
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, Vec::with_capacity(0));"#,
                 fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        Vec::with_capacity(0)
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), Vec::with_capacity(0));"#,
                 params, fn_name, fn_name
             )
             .parse()
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -945,6 +928,7 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_ok`, this only difference is that the contract main
 /// function should be decorated with `#[ewasm_main(rusty)]`.
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -953,38 +937,22 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        vec![0, 0, 0, 0]
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);"#,
                 fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        vec![0, 0, 0, 0]
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), vec![0, 0, 0, 0]);"#,
                 params, fn_name, fn_name
             )
             .parse()
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -996,6 +964,7 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
 /// You should pass the complete Result type, as the following example
 /// `ewasm_rusty_err_output!(Err("NotTrustedInput") as Result<(), &'static str>)`
 /// such that you can easy to use any kind of rust error as you like.
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
     format!(
@@ -1026,22 +995,10 @@ pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
 ///    }
 ///}
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_err_output(item: TokenStream) -> TokenStream {
     format!("{}.to_string().as_bytes().to_vec()", &item.to_string())
         .parse()
         .unwrap()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use hex_literal::*;
-    #[test]
-    fn test_function_signature() {
-        let mut sig: [u8; 4] = hex!("c48d6d5e");
-        assert_eq!(get_function_signature("sendMessage(string,address)"), sig);
-        sig = hex!("70a08231");
-        assert_eq!(get_function_signature("balanceOf(address)"), sig);
-    }
 }

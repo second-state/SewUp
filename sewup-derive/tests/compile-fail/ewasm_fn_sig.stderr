@@ -1,0 +1,7 @@
+error[E0425]: cannot find value `SOME_SIG` in this scope
+ --> $DIR/ewasm_fn_sig.rs:4:13
+  |
+4 |     let a = ewasm_fn_sig!(some);
+  |             ^^^^^^^^^^^^^^^^^^^ not found in this scope
+  |
+  = note: this error originates in the macro `ewasm_fn_sig` (in Nightly builds, run with -Z macro-backtrace for more info)

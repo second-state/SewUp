@@ -1,0 +1,16 @@
+error: ewasm_main only wrap the function without inputs
+ --> $DIR/ewasm_main_with_inputs.rs:4:9
+  |
+4 | fn main(input: usize) -> Result<(), ()> {
+  |         ^^^^^^^^^^^^
+
+error[E0601]: `main` function not found in crate `$CRATE`
+ --> $DIR/ewasm_main_with_inputs.rs:1:1
+  |
+1 | / use sewup_derive::ewasm_main;
+2 | |
+3 | | #[ewasm_main]
+4 | | fn main(input: usize) -> Result<(), ()> {
+5 | |     Ok(())
+6 | | }
+  | |_^ consider adding a `main` function to `$DIR/tests/compile-fail/ewasm_main_with_inputs.rs`
