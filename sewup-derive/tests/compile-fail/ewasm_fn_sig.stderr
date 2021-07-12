@@ -1,5 +1,5 @@
 error[E0425]: cannot find value `SOME_SIG` in this scope
- --> $DIR/ewasm-fn-sig.rs:4:13
+ --> $DIR/ewasm_fn_sig.rs:4:13
   |
 4 |     let a = ewasm_fn_sig!(some);
   |             ^^^^^^^^^^^^^^^^^^^ not found in this scope
