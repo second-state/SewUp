@@ -1,6 +1,7 @@
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
+use proc_macro_error::{abort_call_site, proc_macro_error};
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
 
@@ -42,13 +43,14 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
     let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
         cap.name("name").unwrap().as_str().to_owned()
     } else {
-        panic!("parse function error")
+        abort_call_site!("parse function error")
     };
 
     return match attr.to_string().to_lowercase().as_str() {
@@ -148,6 +150,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -176,7 +179,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("parsing ewsm function fails: {}", item.to_string());
+        abort_call_site!("parsing ewsm function fails");
     }
 }
 
@@ -211,6 +214,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^pub fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -247,7 +251,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("parsing ewsm function fails: {}", item.to_string());
+        abort_call_site!("parsing ewsm function fails");
     }
 }
 
@@ -300,6 +304,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// }
 /// ```
 ///
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -358,6 +363,7 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
@@ -385,7 +391,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -428,7 +434,7 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+        abort_call_site!("sewup-derive parsing struct fails");
     }
 }
 
@@ -458,7 +464,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+        abort_call_site!("sewup-derive parsing struct fails");
     }
 }
 
@@ -673,7 +679,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        panic!("sewup-derive parsing struct fails: {}", item.to_string());
+        abort_call_site!("sewup-derive parsing struct fails");
     }
 }
 
@@ -690,6 +696,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let mod_re = Regex::new(r"^mod (?P<mod_name>[^\{\s]*)(?P<to_first_bracket>[^\{]*\{)").unwrap();
@@ -777,7 +784,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
             .parse()
             .unwrap();
     } else {
-        panic!("parse mod or function for testing error")
+        abort_call_site!("parse mod or function for testing error")
     }
 }
 /// helps you assert output from the handle of a contract with `Vec<u8>`.
@@ -793,6 +800,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
@@ -833,7 +841,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in ewasm_assert_eq");
+        abort_call_site!("fail to parsing function in ewasm_assert_eq");
     }
 }
 
@@ -841,6 +849,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_eq`, but the contract main function should be
 /// decorated with `#[ewasm_main(auto)]`, and the equivalence arm will be serialized into `Vec<u8>`
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
@@ -881,7 +890,7 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -898,6 +907,7 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -937,7 +947,7 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -945,6 +955,7 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_ok`, this only difference is that the contract main
 /// function should be decorated with `#[ewasm_main(rusty)]`.
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
     let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
@@ -984,7 +995,7 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
             .unwrap()
         }
     } else {
-        panic!("fail to parsing function in fn_select");
+        abort_call_site!("fail to parsing function in fn_select");
     }
 }
 
@@ -996,6 +1007,7 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
 /// You should pass the complete Result type, as the following example
 /// `ewasm_rusty_err_output!(Err("NotTrustedInput") as Result<(), &'static str>)`
 /// such that you can easy to use any kind of rust error as you like.
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
     format!(
@@ -1026,6 +1038,7 @@ pub fn ewasm_rusty_err_output(item: TokenStream) -> TokenStream {
 ///    }
 ///}
 /// ```
+#[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_err_output(item: TokenStream) -> TokenStream {
     format!("{}.to_string().as_bytes().to_vec()", &item.to_string())
