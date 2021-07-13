@@ -234,42 +234,52 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^pub fn (?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str().replace(" ", "");
-        let canonical_fn = format!(
-            "{}({})",
-            fn_name,
-            params
-                .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
-                .collect::<Vec<_>>()
-                .join(",")
-        );
-        format!(
-            r#"
-            /// The siganature for fn {}
-            pub const {}_SIG: [u8; 4] = {:?};
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    let inputs = &input.sig.inputs;
+    let args = &inputs
+        .iter()
+        .map(|fn_arg| match fn_arg {
+            syn::FnArg::Receiver(_) => {
+                abort_call_site!("please use ewasm_fn for function not method")
+            }
+            syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
+        })
+        .map(|ty| match ty {
+            syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
+            syn::Type::Reference(tr) => match Box::into_inner(tr.elem.clone()) {
+                syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
+                _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+            },
+            _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+        })
+        .map(|(ident, is_ref)| {
+            if is_ref {
+                format!("&{}", ident)
+            } else {
+                format!("{}", ident)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(",");
+    let canonical_fn = format!("{}({})", name, args);
+    let fn_sig = get_function_signature(&canonical_fn);
+    let (sig_0, sig_1, sig_2, sig_3) = (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3]);
+    let sig_name = Ident::new(
+        &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
+    let result = quote! {
+        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
 
-            #[cfg(not(target_arch = "wasm32"))]
-            pub fn {}({}) {{}}
+        #[cfg(not(target_arch = "wasm32"))]
+        #[allow(unused)]
+        pub fn #name(#inputs) {}
 
-            #[cfg(target_arch = "wasm32")]
-            {}
-        "#,
-            fn_name,
-            fn_name.to_ascii_uppercase(),
-            get_function_signature(&canonical_fn),
-            fn_name,
-            params,
-            item.to_string()
-        )
-        .parse()
-        .unwrap()
-    } else {
-        abort_call_site!("parsing ewsm function fails");
-    }
+        #[cfg(target_arch = "wasm32")]
+        #input
+    };
+    result.into()
 }
 
 /// helps you get you function signature
