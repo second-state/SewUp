@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use super::helpers::{
     copy_into_array, copy_into_storage_value, get_allowance, get_balance, set_allowance,
     set_balance,
