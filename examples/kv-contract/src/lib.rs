@@ -1,6 +1,4 @@
 use serde_derive::{Deserialize, Serialize};
-
-use sewup::kv::Feature;
 use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
 
 mod errors;
@@ -23,7 +21,7 @@ fn empty_commit() -> anyhow::Result<()> {
 }
 
 #[ewasm_fn]
-fn check_version_and_features(version: u8, features: Vec<Feature>) -> anyhow::Result<()> {
+fn check_ver_and_feat(version: u8, features: Vec<sewup::kv::Feature>) -> anyhow::Result<()> {
     let storage = sewup::kv::Store::load(None)?;
     if storage.version() != version {
         return Err(KVError::UnexpectVersion(storage.version()).into());
@@ -189,8 +187,8 @@ fn main() -> anyhow::Result<()> {
 
     match contract.get_function_selector()? {
         ewasm_fn_sig!(empty_commit) => empty_commit()?,
-        ewasm_fn_sig!(check_version_and_features) => {
-            check_version_and_features(0, vec![Feature::Default])?
+        ewasm_fn_sig!(check_ver_and_feat) => {
+            check_ver_and_feat(0, vec![sewup::kv::Feature::Default])?
         }
         ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(8u32)?,
         ewasm_fn_sig!(add_buckets) => add_buckets()?,
@@ -225,7 +223,7 @@ mod tests {
             ewasm_err_output!(KVError::UnknownHandle)
         );
 
-        ewasm_assert_ok!(check_version_and_features());
+        ewasm_assert_ok!(check_ver_and_feat());
 
         ewasm_assert_ok!(check_empty_storage_size());
 
