@@ -1,4 +1,4 @@
-#[rustversion::stable]
+#[rustversion::nightly]
 #[test]
 fn ui() {
     use trybuild::TestCases;
