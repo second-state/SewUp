@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/cryptoxide-0.3.3/src/chacha20poly1305.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>chacha20poly1305.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -434,7 +434,7 @@
 <span id="431">431</span>
 <span id="432">432</span>
 <span id="433">433</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="doccomment">//! ChaCha20Poly1305 is an authenticated symmetric stream cipher based on chacha20 and poly1305</span>
 
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -443,11 +443,11 @@
 <span class="comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">chacha20</span>::<span class="ident">ChaCha20</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cryptoutil</span>::<span class="ident">write_u64_le</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">mac</span>::<span class="ident">Mac</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">poly1305</span>::<span class="ident">Poly1305</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::<span class="ident">fixed_time_eq</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::chacha20::ChaCha20</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::cryptoutil::write_u64_le</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::mac::Mac</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::poly1305::Poly1305</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::util::fixed_time_eq</span>;
 
 <span class="doccomment">/// Chacha20Poly1305 Incremental Context for Authenticated Data (AAD)</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
@@ -481,14 +481,14 @@
 <span class="kw">impl</span> <span class="ident">Context</span> {
     <span class="doccomment">/// Create a new context given the key and nonce</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span> <span class="op">|</span><span class="op">|</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">32</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">nonce</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">8</span> <span class="op">|</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">12</span>);
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20</span>::<span class="ident">new</span>(<span class="ident">key</span>, <span class="ident">nonce</span>);
+        <span class="macro">assert!</span>(<span class="ident">key</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span> <span class="op">|</span><span class="op">|</span> <span class="ident">key</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">32</span>);
+        <span class="macro">assert!</span>(<span class="ident">nonce</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">8</span> <span class="op">|</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">12</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20::new</span>(<span class="ident">key</span>, <span class="ident">nonce</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mac_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
         <span class="kw">let</span> <span class="ident">zero_key</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
         <span class="ident">cipher</span>.<span class="ident">process</span>(<span class="kw-2">&amp;</span><span class="ident">zero_key</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">mac_key</span>);
 
-        <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">mac_key</span>[..<span class="number">32</span>]);
+        <span class="kw">let</span> <span class="ident">mac</span> <span class="op">=</span> <span class="ident">Poly1305::new</span>(<span class="kw-2">&amp;</span><span class="ident">mac_key</span>[..<span class="number">32</span>]);
         <span class="ident">Context</span> {
             <span class="ident">cipher</span>: <span class="ident">cipher</span>,
             <span class="ident">mac</span>: <span class="ident">mac</span>,
@@ -545,7 +545,7 @@
     <span class="doccomment">/// Panics:</span>
     <span class="doccomment">///     if input and output are of different size</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cipher</span>.<span class="ident">process</span>(<span class="ident">input</span>, <span class="ident">output</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_encrypted</span>(<span class="ident">output</span>);
     }
@@ -577,7 +577,7 @@
     <span class="doccomment">/// Panics:</span>
     <span class="doccomment">///     if input and output are of different size</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">input</span>.<span class="ident">len</span>(), <span class="ident">output</span>.<span class="ident">len</span>());
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">add_encrypted</span>(<span class="ident">input</span>);
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">cipher</span>.<span class="ident">process</span>(<span class="ident">input</span>, <span class="ident">output</span>);
     }
@@ -587,9 +587,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finalize</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">expected_tag</span>: <span class="kw-2">&amp;</span><span class="ident">Tag</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">DecryptionResult</span> {
         <span class="kw">let</span> <span class="ident">got_tag</span> <span class="op">=</span> <span class="ident">Tag</span>(<span class="ident">finalize_raw</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="number">0</span>));
         <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">got_tag</span> <span class="op">=</span><span class="op">=</span> <span class="ident">expected_tag</span> {
-            <span class="ident">DecryptionResult</span>::<span class="ident">Match</span>
+            <span class="ident">DecryptionResult::Match</span>
         } <span class="kw">else</span> {
-            <span class="ident">DecryptionResult</span>::<span class="ident">MisMatch</span>
+            <span class="ident">DecryptionResult::MisMatch</span>
         }
     }
 }
@@ -615,7 +615,7 @@
     <span class="doccomment">/// * key needs to be 16 or 32 bytes</span>
     <span class="doccomment">/// * nonce needs to be 8 or 12 bytes</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">aad</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ChaCha20Poly1305</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context</span>::<span class="ident">new</span>(<span class="ident">key</span>, <span class="ident">nonce</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">Context::new</span>(<span class="ident">key</span>, <span class="ident">nonce</span>);
         <span class="ident">context</span>.<span class="ident">add_data</span>(<span class="ident">aad</span>);
         <span class="ident">ChaCha20Poly1305</span> {
             <span class="ident">context</span>: <span class="ident">context</span>,
@@ -628,9 +628,9 @@
     <span class="doccomment">/// Output buffer need to be the same size as the input buffer</span>
     <span class="doccomment">/// Out_tag mutable slice need to 16 bytes exactly.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">out_tag</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">out_tag</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span>);
+        <span class="macro">assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
+        <span class="macro">assert!</span>(<span class="ident">out_tag</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span>);
 
         <span class="self">self</span>.<span class="ident">finished</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
@@ -646,9 +646,9 @@
     <span class="doccomment">/// if the calculated tag during decryption doesn&#39;t match</span>
     <span class="doccomment">/// the tag in parameter, then the function return False</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">tag</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">tag</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>());
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
+        <span class="macro">assert!</span>(<span class="ident">tag</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">16</span>);
+        <span class="macro">assert!</span>(<span class="ident">input</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>());
+        <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
 
         <span class="self">self</span>.<span class="ident">finished</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
@@ -658,14 +658,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">context</span>.<span class="ident">clone</span>().<span class="ident">to_decryption</span>();
 
         <span class="ident">ctx</span>.<span class="ident">decrypt</span>(<span class="ident">input</span>, <span class="ident">output</span>);
-        <span class="ident">ctx</span>.<span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="ident">Tag</span>(<span class="ident">tag_data</span>)) <span class="op">=</span><span class="op">=</span> <span class="ident">DecryptionResult</span>::<span class="ident">Match</span>
+        <span class="ident">ctx</span>.<span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="ident">Tag</span>(<span class="ident">tag_data</span>)) <span class="op">=</span><span class="op">=</span> <span class="ident">DecryptionResult::Match</span>
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ChaCha20Poly1305</span>;
-    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">vec</span>::<span class="ident">Vec</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::ChaCha20Poly1305</span>;
+    <span class="kw">use</span> <span class="ident">std::vec::Vec</span>;
 
     <span class="kw">struct</span> <span class="ident">TestVector</span> {
         <span class="ident">key</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
@@ -678,22 +678,22 @@
 
     <span class="kw">fn</span> <span class="ident">test_vector</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">TestVector</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0u8</span>; <span class="ident">v</span>.<span class="ident">cipher_text</span>.<span class="ident">len</span>()];
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ciphertext</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">v</span>.<span class="ident">cipher_text</span>.<span class="ident">len</span>()];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">nonce</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">aad</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">key</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">nonce</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">aad</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dcontext</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">clone</span>();
 
         <span class="comment">// test encryption</span>
         <span class="ident">context</span>.<span class="ident">encrypt</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">plain_text</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ciphertext</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tag</span>[..]);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">ciphertext</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">cipher_text</span>[..]);
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">tag</span>[..]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">ciphertext</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">cipher_text</span>[..]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">tag</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">tag</span>[..]);
 
         <span class="comment">// test decryption</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0u8</span>; <span class="ident">v</span>.<span class="ident">plain_text</span>.<span class="ident">len</span>()];
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dcontext</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">ciphertext</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">tag</span>[..]), <span class="bool-val">true</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">0u8</span>; <span class="ident">v</span>.<span class="ident">plain_text</span>.<span class="ident">len</span>()];
+        <span class="macro">assert_eq!</span>(<span class="ident">dcontext</span>.<span class="ident">decrypt</span>(<span class="kw-2">&amp;</span><span class="ident">ciphertext</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">output</span>, <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">tag</span>[..]), <span class="bool-val">true</span>);
 
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">plain_text</span>[..]);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>[..], <span class="kw-2">&amp;</span><span class="ident">v</span>.<span class="ident">plain_text</span>[..]);
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -709,7 +709,7 @@
                 <span class="ident">nonce</span>: <span class="kw-2">&amp;</span>[
                     <span class="number">0x07</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x40</span>, <span class="number">0x41</span>, <span class="number">0x42</span>, <span class="number">0x43</span>, <span class="number">0x44</span>, <span class="number">0x45</span>, <span class="number">0x46</span>, <span class="number">0x47</span>,
                 ],
-                <span class="ident">plain_text</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">plain_text</span>: <span class="macro">vec!</span>[
                     <span class="number">0x4c</span>, <span class="number">0x61</span>, <span class="number">0x64</span>, <span class="number">0x69</span>, <span class="number">0x65</span>, <span class="number">0x73</span>, <span class="number">0x20</span>, <span class="number">0x61</span>, <span class="number">0x6e</span>, <span class="number">0x64</span>, <span class="number">0x20</span>, <span class="number">0x47</span>, <span class="number">0x65</span>,
                     <span class="number">0x6e</span>, <span class="number">0x74</span>, <span class="number">0x6c</span>, <span class="number">0x65</span>, <span class="number">0x6d</span>, <span class="number">0x65</span>, <span class="number">0x6e</span>, <span class="number">0x20</span>, <span class="number">0x6f</span>, <span class="number">0x66</span>, <span class="number">0x20</span>, <span class="number">0x74</span>, <span class="number">0x68</span>,
                     <span class="number">0x65</span>, <span class="number">0x20</span>, <span class="number">0x63</span>, <span class="number">0x6c</span>, <span class="number">0x61</span>, <span class="number">0x73</span>, <span class="number">0x73</span>, <span class="number">0x20</span>, <span class="number">0x6f</span>, <span class="number">0x66</span>, <span class="number">0x20</span>, <span class="number">0x27</span>, <span class="number">0x39</span>,
@@ -720,10 +720,10 @@
                     <span class="number">0x20</span>, <span class="number">0x73</span>, <span class="number">0x75</span>, <span class="number">0x6e</span>, <span class="number">0x73</span>, <span class="number">0x63</span>, <span class="number">0x72</span>, <span class="number">0x65</span>, <span class="number">0x65</span>, <span class="number">0x6e</span>, <span class="number">0x20</span>, <span class="number">0x77</span>, <span class="number">0x6f</span>,
                     <span class="number">0x75</span>, <span class="number">0x6c</span>, <span class="number">0x64</span>, <span class="number">0x20</span>, <span class="number">0x62</span>, <span class="number">0x65</span>, <span class="number">0x20</span>, <span class="number">0x69</span>, <span class="number">0x74</span>, <span class="number">0x2e</span>,
                 ],
-                <span class="ident">aad</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">aad</span>: <span class="macro">vec!</span>[
                     <span class="number">0x50</span>, <span class="number">0x51</span>, <span class="number">0x52</span>, <span class="number">0x53</span>, <span class="number">0xc0</span>, <span class="number">0xc1</span>, <span class="number">0xc2</span>, <span class="number">0xc3</span>, <span class="number">0xc4</span>, <span class="number">0xc5</span>, <span class="number">0xc6</span>, <span class="number">0xc7</span>,
                 ],
-                <span class="ident">cipher_text</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">cipher_text</span>: <span class="macro">vec!</span>[
                     <span class="number">0xd3</span>, <span class="number">0x1a</span>, <span class="number">0x8d</span>, <span class="number">0x34</span>, <span class="number">0x64</span>, <span class="number">0x8e</span>, <span class="number">0x60</span>, <span class="number">0xdb</span>, <span class="number">0x7b</span>, <span class="number">0x86</span>, <span class="number">0xaf</span>, <span class="number">0xbc</span>, <span class="number">0x53</span>,
                     <span class="number">0xef</span>, <span class="number">0x7e</span>, <span class="number">0xc2</span>, <span class="number">0xa4</span>, <span class="number">0xad</span>, <span class="number">0xed</span>, <span class="number">0x51</span>, <span class="number">0x29</span>, <span class="number">0x6e</span>, <span class="number">0x08</span>, <span class="number">0xfe</span>, <span class="number">0xa9</span>, <span class="number">0xe2</span>,
                     <span class="number">0xb5</span>, <span class="number">0xa7</span>, <span class="number">0x36</span>, <span class="number">0xee</span>, <span class="number">0x62</span>, <span class="number">0xd6</span>, <span class="number">0x3d</span>, <span class="number">0xbe</span>, <span class="number">0xa4</span>, <span class="number">0x5e</span>, <span class="number">0x8c</span>, <span class="number">0xa9</span>, <span class="number">0x67</span>,
@@ -753,7 +753,7 @@
                     <span class="number">0xee</span>, <span class="number">0xad</span>, <span class="number">0x9d</span>, <span class="number">0x67</span>, <span class="number">0x89</span>, <span class="number">0x0c</span>, <span class="number">0xbb</span>, <span class="number">0x22</span>, <span class="number">0x39</span>, <span class="number">0x23</span>, <span class="number">0x36</span>, <span class="number">0xfe</span>, <span class="number">0xa1</span>,
                     <span class="number">0x85</span>, <span class="number">0x1f</span>, <span class="number">0x38</span>,
                 ],
-                <span class="ident">plain_text</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">plain_text</span>: <span class="macro">vec!</span>[
                     <span class="number">0x49</span>, <span class="number">0x6e</span>, <span class="number">0x74</span>, <span class="number">0x65</span>, <span class="number">0x72</span>, <span class="number">0x6e</span>, <span class="number">0x65</span>, <span class="number">0x74</span>, <span class="number">0x2d</span>, <span class="number">0x44</span>, <span class="number">0x72</span>, <span class="number">0x61</span>, <span class="number">0x66</span>,
                     <span class="number">0x74</span>, <span class="number">0x73</span>, <span class="number">0x20</span>, <span class="number">0x61</span>, <span class="number">0x72</span>, <span class="number">0x65</span>, <span class="number">0x20</span>, <span class="number">0x64</span>, <span class="number">0x72</span>, <span class="number">0x61</span>, <span class="number">0x66</span>, <span class="number">0x74</span>, <span class="number">0x20</span>,
                     <span class="number">0x64</span>, <span class="number">0x6f</span>, <span class="number">0x63</span>, <span class="number">0x75</span>, <span class="number">0x6d</span>, <span class="number">0x65</span>, <span class="number">0x6e</span>, <span class="number">0x74</span>, <span class="number">0x73</span>, <span class="number">0x20</span>, <span class="number">0x76</span>, <span class="number">0x61</span>, <span class="number">0x6c</span>,
@@ -776,7 +776,7 @@
                     <span class="number">0x6b</span>, <span class="number">0x20</span>, <span class="number">0x69</span>, <span class="number">0x6e</span>, <span class="number">0x20</span>, <span class="number">0x70</span>, <span class="number">0x72</span>, <span class="number">0x6f</span>, <span class="number">0x67</span>, <span class="number">0x72</span>, <span class="number">0x65</span>, <span class="number">0x73</span>, <span class="number">0x73</span>,
                     <span class="number">0x2e</span>, <span class="number">0x2f</span>, <span class="number">0xe2</span>, <span class="number">0x80</span>, <span class="number">0x9d</span>,
                 ],
-                <span class="ident">cipher_text</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">cipher_text</span>: <span class="macro">vec!</span>[
                     <span class="number">0x64</span>, <span class="number">0xa0</span>, <span class="number">0x86</span>, <span class="number">0x15</span>, <span class="number">0x75</span>, <span class="number">0x86</span>, <span class="number">0x1a</span>, <span class="number">0xf4</span>, <span class="number">0x60</span>, <span class="number">0xf0</span>, <span class="number">0x62</span>, <span class="number">0xc7</span>, <span class="number">0x9b</span>,
                     <span class="number">0xe6</span>, <span class="number">0x43</span>, <span class="number">0xbd</span>, <span class="number">0x5e</span>, <span class="number">0x80</span>, <span class="number">0x5c</span>, <span class="number">0xfd</span>, <span class="number">0x34</span>, <span class="number">0x5c</span>, <span class="number">0xf3</span>, <span class="number">0x89</span>, <span class="number">0xf1</span>, <span class="number">0x08</span>,
                     <span class="number">0x67</span>, <span class="number">0x0a</span>, <span class="number">0xc7</span>, <span class="number">0x6c</span>, <span class="number">0x8c</span>, <span class="number">0xb2</span>, <span class="number">0x4c</span>, <span class="number">0x6c</span>, <span class="number">0xfc</span>, <span class="number">0x18</span>, <span class="number">0x75</span>, <span class="number">0x5d</span>, <span class="number">0x43</span>,
@@ -799,7 +799,7 @@
                     <span class="number">0xdf</span>, <span class="number">0x99</span>, <span class="number">0x7b</span>, <span class="number">0x71</span>, <span class="number">0x4d</span>, <span class="number">0x6c</span>, <span class="number">0x6f</span>, <span class="number">0x2c</span>, <span class="number">0x29</span>, <span class="number">0xa6</span>, <span class="number">0xad</span>, <span class="number">0x5c</span>, <span class="number">0xb4</span>,
                     <span class="number">0x02</span>, <span class="number">0x2b</span>, <span class="number">0x02</span>, <span class="number">0x70</span>, <span class="number">0x9b</span>,
                 ],
-                <span class="ident">aad</span>: <span class="macro">vec</span><span class="macro">!</span>[
+                <span class="ident">aad</span>: <span class="macro">vec!</span>[
                     <span class="number">0xf3</span>, <span class="number">0x33</span>, <span class="number">0x88</span>, <span class="number">0x86</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x00</span>, <span class="number">0x4e</span>, <span class="number">0x91</span>,
                 ],
             },
@@ -812,16 +812,16 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;with-bench&quot;</span>))]</span>
 <span class="kw">mod</span> <span class="ident">bench</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">ChaCha20Poly1305</span>;
-    <span class="kw">use</span> <span class="ident">test</span>::<span class="ident">Bencher</span>;
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::ChaCha20Poly1305</span>;
+    <span class="kw">use</span> <span class="ident">test::Bencher</span>;
 
     <span class="attribute">#[<span class="ident">bench</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chacha20poly1305_10</span>(<span class="ident">bh</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">10</span>];
         <span class="kw">let</span> <span class="ident">aad</span> <span class="op">=</span> [<span class="number">3u8</span>; <span class="number">10</span>];
         <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">10</span>];
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
@@ -837,8 +837,8 @@
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">1024</span>];
         <span class="kw">let</span> <span class="ident">aad</span> <span class="op">=</span> [<span class="number">3u8</span>; <span class="number">1024</span>];
         <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">1024</span>];
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
@@ -855,8 +855,8 @@
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> [<span class="number">1u8</span>; <span class="number">65536</span>];
         <span class="kw">let</span> <span class="ident">aad</span> <span class="op">=</span> [<span class="number">3u8</span>; <span class="number">65536</span>];
         <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decipher</span> <span class="op">=</span> <span class="ident">ChaCha20Poly1305::new</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">8</span>], <span class="kw-2">&amp;</span><span class="ident">aad</span>);
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">65536</span>];
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">16</span>];
@@ -869,5 +869,5 @@
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cryptoxide" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="cryptoxide" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

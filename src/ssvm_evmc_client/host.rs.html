@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/ssvm-evmc-client-6.3.1-rc4/src/host.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>host.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../ssvm_evmc_client/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../ssvm_evmc_client/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -249,7 +249,7 @@
 <span id="246">246</span>
 <span id="247">247</span>
 <span id="248">248</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="comment">// Copyright (C) 2020 Second State.</span>
 <span class="comment">// This file is part of EVMC-Client.</span>
 
@@ -266,13 +266,13 @@
 <span class="comment">// You should have received a copy of the GNU Affero General Public License</span>
 <span class="comment">// along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::types</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">evmc_sys</span> <span class="kw">as</span> <span class="ident">ffi</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">std::mem</span>;
 
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">ExtendedContext</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
+    <span class="kw">pub</span> <span class="ident">context</span>: <span class="ident">ffi::evmc_context</span>,
     <span class="kw">pub</span> <span class="ident">hctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">HostContext</span>,
 }
 
@@ -308,8 +308,8 @@
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">i64</span>, <span class="ident">Address</span>, <span class="ident">StatusCode</span>);
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_evmc_host_interface</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_host_interface</span> {
-    <span class="ident">ffi</span>::<span class="ident">evmc_host_interface</span> {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">get_evmc_host_interface</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_host_interface</span> {
+    <span class="ident">ffi::evmc_host_interface</span> {
         <span class="ident">account_exists</span>: <span class="prelude-val">Some</span>(<span class="ident">account_exists</span>),
         <span class="ident">get_storage</span>: <span class="prelude-val">Some</span>(<span class="ident">get_storage</span>),
         <span class="ident">set_storage</span>: <span class="prelude-val">Some</span>(<span class="ident">set_storage</span>),
@@ -326,8 +326,8 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">account_exists</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="kw">return</span> (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
         .<span class="ident">hctx</span>
@@ -335,11 +335,11 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_storage</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
-    <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
+    <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_bytes32</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_bytes32</span> {
+    <span class="kw">return</span> <span class="ident">ffi::evmc_bytes32</span> {
         <span class="ident">bytes</span>: (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
             .<span class="ident">hctx</span>
             .<span class="ident">get_storage</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>, <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">key</span>).<span class="ident">bytes</span>),
@@ -347,11 +347,11 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">set_storage</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
-    <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span>,
-    <span class="ident">value</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_storage_status</span> {
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
+    <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_bytes32</span>,
+    <span class="ident">value</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_bytes32</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_storage_status</span> {
     <span class="kw">return</span> (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>)).<span class="ident">hctx</span>.<span class="ident">set_storage</span>(
         <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>,
         <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">key</span>).<span class="ident">bytes</span>,
@@ -360,10 +360,10 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_balance</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_uint256be</span> {
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_uint256be</span> {
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_uint256be</span> {
+    <span class="kw">return</span> <span class="ident">ffi::evmc_uint256be</span> {
         <span class="ident">bytes</span>: (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
             .<span class="ident">hctx</span>
             .<span class="ident">get_balance</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>),
@@ -371,8 +371,8 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_code_size</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
     <span class="kw">return</span> (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
         .<span class="ident">hctx</span>
@@ -380,10 +380,10 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_code_hash</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_bytes32</span> {
+    <span class="kw">return</span> <span class="ident">ffi::evmc_bytes32</span> {
         <span class="ident">bytes</span>: (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
             .<span class="ident">hctx</span>
             .<span class="ident">get_code_hash</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>),
@@ -391,8 +391,8 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">copy_code</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
     <span class="ident">code_offset</span>: <span class="ident">usize</span>,
     <span class="ident">buffer_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
     <span class="ident">buffer_size</span>: <span class="ident">usize</span>,
@@ -406,34 +406,34 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">selfdestruct</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
-    <span class="ident">beneficiary</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
+    <span class="ident">beneficiary</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
 ) {
     (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
         .<span class="ident">hctx</span>
         .<span class="ident">selfdestruct</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>, <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">beneficiary</span>).<span class="ident">bytes</span>)
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_tx_context</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_tx_context</span> {
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_tx_context</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_tx_context</span> {
     <span class="kw">let</span> (<span class="ident">gas_price</span>, <span class="ident">origin</span>, <span class="ident">coinbase</span>, <span class="ident">number</span>, <span class="ident">timestamp</span>, <span class="ident">gas_limit</span>, <span class="ident">difficulty</span>) <span class="op">=</span>
         (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>)).<span class="ident">hctx</span>.<span class="ident">get_tx_context</span>();
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_tx_context</span> {
-        <span class="ident">tx_gas_price</span>: <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> { <span class="ident">bytes</span>: <span class="ident">gas_price</span> },
-        <span class="ident">tx_origin</span>: <span class="ident">ffi</span>::<span class="ident">evmc_address</span> { <span class="ident">bytes</span>: <span class="ident">origin</span> },
-        <span class="ident">block_coinbase</span>: <span class="ident">ffi</span>::<span class="ident">evmc_address</span> { <span class="ident">bytes</span>: <span class="ident">coinbase</span> },
+    <span class="kw">return</span> <span class="ident">ffi::evmc_tx_context</span> {
+        <span class="ident">tx_gas_price</span>: <span class="ident">ffi::evmc_bytes32</span> { <span class="ident">bytes</span>: <span class="ident">gas_price</span> },
+        <span class="ident">tx_origin</span>: <span class="ident">ffi::evmc_address</span> { <span class="ident">bytes</span>: <span class="ident">origin</span> },
+        <span class="ident">block_coinbase</span>: <span class="ident">ffi::evmc_address</span> { <span class="ident">bytes</span>: <span class="ident">coinbase</span> },
         <span class="ident">block_number</span>: <span class="ident">number</span>,
         <span class="ident">block_timestamp</span>: <span class="ident">timestamp</span>,
         <span class="ident">block_gas_limit</span>: <span class="ident">gas_limit</span>,
-        <span class="ident">block_difficulty</span>: <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> { <span class="ident">bytes</span>: <span class="ident">difficulty</span> },
+        <span class="ident">block_difficulty</span>: <span class="ident">ffi::evmc_bytes32</span> { <span class="ident">bytes</span>: <span class="ident">difficulty</span> },
     };
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">get_block_hash</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
     <span class="ident">number</span>: <span class="ident">i64</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_bytes32</span> {
+    <span class="kw">return</span> <span class="ident">ffi::evmc_bytes32</span> {
         <span class="ident">bytes</span>: (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>))
             .<span class="ident">hctx</span>
             .<span class="ident">get_block_hash</span>(<span class="ident">number</span>),
@@ -441,35 +441,35 @@
 }
 
 <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">emit_log</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_address</span>,
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_address</span>,
     <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
     <span class="ident">data_size</span>: <span class="ident">usize</span>,
-    <span class="ident">topics</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_bytes32</span>,
+    <span class="ident">topics</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_bytes32</span>,
     <span class="ident">topics_count</span>: <span class="ident">usize</span>,
 ) {
-    <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(<span class="ident">topics</span>, <span class="ident">topics_count</span>)
+    <span class="kw">let</span> <span class="ident">ts</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">std::slice::from_raw_parts</span>(<span class="ident">topics</span>, <span class="ident">topics_count</span>)
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">topic</span><span class="op">|</span> <span class="ident">topic</span>.<span class="ident">bytes</span>)
         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
     (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>)).<span class="ident">hctx</span>.<span class="ident">emit_log</span>(
         <span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">address</span>).<span class="ident">bytes</span>,
         <span class="kw-2">&amp;</span><span class="ident">ts</span>,
-        <span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">data_size</span>),
+        <span class="kw-2">&amp;</span><span class="ident">std::slice::from_raw_parts</span>(<span class="ident">data</span>, <span class="ident">data_size</span>),
     );
 }
 
-<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">release</span>(<span class="ident">result</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_result</span>) {
-    <span class="ident">drop</span>(<span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(
+<span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">release</span>(<span class="ident">result</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_result</span>) {
+    <span class="ident">drop</span>(<span class="ident">std::slice::from_raw_parts</span>(
         (<span class="kw-2">*</span><span class="ident">result</span>).<span class="ident">output_data</span>,
         (<span class="kw-2">*</span><span class="ident">result</span>).<span class="ident">output_size</span>,
     ));
 }
 
 <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">call</span>(
-    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi</span>::<span class="ident">evmc_context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi</span>::<span class="ident">evmc_message</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi</span>::<span class="ident">evmc_result</span> {
+    <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::evmc_context</span>,
+    <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">ffi::evmc_message</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ffi::evmc_result</span> {
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">msg</span>;
     <span class="kw">let</span> (<span class="ident">output</span>, <span class="ident">gas_left</span>, <span class="ident">create_address</span>, <span class="ident">status_code</span>) <span class="op">=</span>
         (<span class="kw-2">*</span>(<span class="ident">context</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ExtendedContext</span>)).<span class="ident">hctx</span>.<span class="ident">call</span>(
@@ -477,7 +477,7 @@
             <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">destination</span>.<span class="ident">bytes</span>,
             <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">sender</span>.<span class="ident">bytes</span>,
             <span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">value</span>.<span class="ident">bytes</span>,
-            <span class="kw-2">&amp;</span><span class="ident">std</span>::<span class="ident">slice</span>::<span class="ident">from_raw_parts</span>(<span class="ident">msg</span>.<span class="ident">input_data</span>, <span class="ident">msg</span>.<span class="ident">input_size</span>),
+            <span class="kw-2">&amp;</span><span class="ident">std::slice::from_raw_parts</span>(<span class="ident">msg</span>.<span class="ident">input_data</span>, <span class="ident">msg</span>.<span class="ident">input_size</span>),
             <span class="ident">msg</span>.<span class="ident">gas</span>,
             <span class="ident">msg</span>.<span class="ident">depth</span>,
             <span class="ident">msg</span>.<span class="ident">flags</span> <span class="op">!</span><span class="op">=</span> <span class="number">0</span>,
@@ -485,19 +485,19 @@
         );
     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">as_ptr</span>();
     <span class="kw">let</span> <span class="ident">len</span> <span class="op">=</span> <span class="ident">output</span>.<span class="ident">len</span>();
-    <span class="ident">mem</span>::<span class="ident">forget</span>(<span class="ident">output</span>);
-    <span class="kw">return</span> <span class="ident">ffi</span>::<span class="ident">evmc_result</span> {
+    <span class="ident">mem::forget</span>(<span class="ident">output</span>);
+    <span class="kw">return</span> <span class="ident">ffi::evmc_result</span> {
         <span class="ident">status_code</span>: <span class="ident">status_code</span>,
         <span class="ident">gas_left</span>: <span class="ident">gas_left</span>,
         <span class="ident">output_data</span>: <span class="ident">ptr</span>,
         <span class="ident">output_size</span>: <span class="ident">len</span>,
         <span class="ident">release</span>: <span class="prelude-val">Some</span>(<span class="ident">release</span>),
-        <span class="ident">create_address</span>: <span class="ident">ffi</span>::<span class="ident">evmc_address</span> {
+        <span class="ident">create_address</span>: <span class="ident">ffi::evmc_address</span> {
             <span class="ident">bytes</span>: <span class="ident">create_address</span>,
         },
         <span class="ident">padding</span>: [<span class="number">0u8</span>; <span class="number">4</span>],
     };
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ssvm_evmc_client" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="ssvm_evmc_client" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

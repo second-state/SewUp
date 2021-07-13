@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/primitive-types-0.9.1/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../primitive_types/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../primitive_types/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -244,7 +244,7 @@
 <span id="241">241</span>
 <span id="242">242</span>
 <span id="243">243</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -264,10 +264,10 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;fp-conversion&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">fp_conversion</span>;
 
-<span class="kw">use</span> <span class="ident">core</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
+<span class="kw">use</span> <span class="ident">core::convert::TryFrom</span>;
 <span class="kw">use</span> <span class="ident">fixed_hash</span>::{<span class="ident">construct_fixed_hash</span>, <span class="ident">impl_fixed_hash_conversions</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">scale_info</span>::<span class="ident">TypeInfo</span>;
+<span class="kw">use</span> <span class="ident">scale_info::TypeInfo</span>;
 <span class="kw">use</span> <span class="ident">uint</span>::{<span class="ident">construct_uint</span>, <span class="ident">uint_full_mul_reg</span>};
 
 <span class="doccomment">/// Error type for conversion.</span>
@@ -277,39 +277,39 @@
 	<span class="ident">Overflow</span>,
 }
 
-<span class="macro">construct_uint</span><span class="macro">!</span> {
+<span class="macro">construct_uint!</span> {
 	<span class="doccomment">/// 128-bit unsigned integer.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">U128</span>(<span class="number">2</span>);
 }
-<span class="macro">construct_uint</span><span class="macro">!</span> {
+<span class="macro">construct_uint!</span> {
 	<span class="doccomment">/// 256-bit unsigned integer.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">U256</span>(<span class="number">4</span>);
 }
-<span class="macro">construct_uint</span><span class="macro">!</span> {
+<span class="macro">construct_uint!</span> {
 	<span class="doccomment">/// 512-bits unsigned integer.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">U512</span>(<span class="number">8</span>);
 }
 
-<span class="macro">construct_fixed_hash</span><span class="macro">!</span> {
+<span class="macro">construct_fixed_hash!</span> {
 	<span class="doccomment">/// Fixed-size uninterpreted hash type with 16 bytes (128 bits) size.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H128</span>(<span class="number">16</span>);
 }
 
-<span class="macro">construct_fixed_hash</span><span class="macro">!</span> {
+<span class="macro">construct_fixed_hash!</span> {
 	<span class="doccomment">/// Fixed-size uninterpreted hash type with 20 bytes (160 bits) size.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H160</span>(<span class="number">20</span>);
 }
-<span class="macro">construct_fixed_hash</span><span class="macro">!</span> {
+<span class="macro">construct_fixed_hash!</span> {
 	<span class="doccomment">/// Fixed-size uninterpreted hash type with 32 bytes (256 bits) size.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H256</span>(<span class="number">32</span>);
 }
-<span class="macro">construct_fixed_hash</span><span class="macro">!</span> {
+<span class="macro">construct_fixed_hash!</span> {
 	<span class="doccomment">/// Fixed-size uninterpreted hash type with 64 bytes (512 bits) size.</span>
 	<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;scale-info&quot;</span>, <span class="ident">derive</span>(<span class="ident">TypeInfo</span>))]</span>
 	<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">H512</span>(<span class="number">64</span>);
@@ -318,11 +318,11 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;num-traits&quot;</span>)]</span>
 <span class="kw">mod</span> <span class="ident">num_traits</span> {
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-	<span class="kw">use</span> <span class="ident">impl_num_traits</span>::<span class="ident">impl_uint_num_traits</span>;
+	<span class="kw">use</span> <span class="ident">impl_num_traits::impl_uint_num_traits</span>;
 
-	<span class="macro">impl_uint_num_traits</span><span class="macro">!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
-	<span class="macro">impl_uint_num_traits</span><span class="macro">!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
-	<span class="macro">impl_uint_num_traits</span><span class="macro">!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
+	<span class="macro">impl_uint_num_traits!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
+	<span class="macro">impl_uint_num_traits!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
+	<span class="macro">impl_uint_num_traits!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;impl-serde&quot;</span>)]</span>
@@ -330,14 +330,14 @@
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">impl_serde</span>::{<span class="ident">impl_fixed_hash_serde</span>, <span class="ident">impl_uint_serde</span>};
 
-	<span class="macro">impl_uint_serde</span><span class="macro">!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
-	<span class="macro">impl_uint_serde</span><span class="macro">!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
-	<span class="macro">impl_uint_serde</span><span class="macro">!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
+	<span class="macro">impl_uint_serde!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
+	<span class="macro">impl_uint_serde!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
+	<span class="macro">impl_uint_serde!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
 
-	<span class="macro">impl_fixed_hash_serde</span><span class="macro">!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
-	<span class="macro">impl_fixed_hash_serde</span><span class="macro">!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
-	<span class="macro">impl_fixed_hash_serde</span><span class="macro">!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
-	<span class="macro">impl_fixed_hash_serde</span><span class="macro">!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
+	<span class="macro">impl_fixed_hash_serde!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
+	<span class="macro">impl_fixed_hash_serde!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
+	<span class="macro">impl_fixed_hash_serde!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
+	<span class="macro">impl_fixed_hash_serde!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;impl-codec&quot;</span>)]</span>
@@ -345,14 +345,14 @@
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">impl_codec</span>::{<span class="ident">impl_fixed_hash_codec</span>, <span class="ident">impl_uint_codec</span>};
 
-	<span class="macro">impl_uint_codec</span><span class="macro">!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
-	<span class="macro">impl_uint_codec</span><span class="macro">!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
-	<span class="macro">impl_uint_codec</span><span class="macro">!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
+	<span class="macro">impl_uint_codec!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
+	<span class="macro">impl_uint_codec!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
+	<span class="macro">impl_uint_codec!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
 
-	<span class="macro">impl_fixed_hash_codec</span><span class="macro">!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
-	<span class="macro">impl_fixed_hash_codec</span><span class="macro">!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
-	<span class="macro">impl_fixed_hash_codec</span><span class="macro">!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
-	<span class="macro">impl_fixed_hash_codec</span><span class="macro">!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
+	<span class="macro">impl_fixed_hash_codec!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
+	<span class="macro">impl_fixed_hash_codec!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
+	<span class="macro">impl_fixed_hash_codec!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
+	<span class="macro">impl_fixed_hash_codec!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;impl-rlp&quot;</span>)]</span>
@@ -360,24 +360,24 @@
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 	<span class="kw">use</span> <span class="ident">impl_rlp</span>::{<span class="ident">impl_fixed_hash_rlp</span>, <span class="ident">impl_uint_rlp</span>};
 
-	<span class="macro">impl_uint_rlp</span><span class="macro">!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
-	<span class="macro">impl_uint_rlp</span><span class="macro">!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
-	<span class="macro">impl_uint_rlp</span><span class="macro">!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
+	<span class="macro">impl_uint_rlp!</span>(<span class="ident">U128</span>, <span class="number">2</span>);
+	<span class="macro">impl_uint_rlp!</span>(<span class="ident">U256</span>, <span class="number">4</span>);
+	<span class="macro">impl_uint_rlp!</span>(<span class="ident">U512</span>, <span class="number">8</span>);
 
-	<span class="macro">impl_fixed_hash_rlp</span><span class="macro">!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
-	<span class="macro">impl_fixed_hash_rlp</span><span class="macro">!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
-	<span class="macro">impl_fixed_hash_rlp</span><span class="macro">!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
-	<span class="macro">impl_fixed_hash_rlp</span><span class="macro">!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
+	<span class="macro">impl_fixed_hash_rlp!</span>(<span class="ident">H128</span>, <span class="number">16</span>);
+	<span class="macro">impl_fixed_hash_rlp!</span>(<span class="ident">H160</span>, <span class="number">20</span>);
+	<span class="macro">impl_fixed_hash_rlp!</span>(<span class="ident">H256</span>, <span class="number">32</span>);
+	<span class="macro">impl_fixed_hash_rlp!</span>(<span class="ident">H512</span>, <span class="number">64</span>);
 }
 
-<span class="macro">impl_fixed_hash_conversions</span><span class="macro">!</span>(<span class="ident">H256</span>, <span class="ident">H160</span>);
+<span class="macro">impl_fixed_hash_conversions!</span>(<span class="ident">H256</span>, <span class="ident">H160</span>);
 
 <span class="kw">impl</span> <span class="ident">U256</span> {
 	<span class="doccomment">/// Multiplies two 256-bit integers to produce full 512-bit integer</span>
 	<span class="doccomment">/// No overflow possible</span>
 	<span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
 	<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">full_mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">U256</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">U512</span> {
-		<span class="ident">U512</span>(<span class="macro">uint_full_mul_reg</span><span class="macro">!</span>(<span class="ident">U256</span>, <span class="number">4</span>, <span class="self">self</span>, <span class="ident">other</span>))
+		<span class="ident">U512</span>(<span class="macro">uint_full_mul_reg!</span>(<span class="ident">U256</span>, <span class="number">4</span>, <span class="self">self</span>, <span class="ident">other</span>))
 	}
 }
 
@@ -399,7 +399,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">U256</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U128</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">U256</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="ident">value</span>;
 		<span class="kw">if</span> <span class="ident">arr</span>[<span class="number">2</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">3</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Overflow</span>);
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Overflow</span>);
 		}
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">2</span>];
 		<span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">arr</span>[<span class="number">0</span>];
@@ -414,7 +414,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">U512</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U256</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">U512</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="ident">value</span>;
 		<span class="kw">if</span> <span class="ident">arr</span>[<span class="number">4</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">5</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">6</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">7</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Overflow</span>);
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Overflow</span>);
 		}
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
 		<span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">arr</span>[<span class="number">0</span>];
@@ -431,7 +431,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="ident">U512</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U128</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">U512</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="ident">value</span>;
 		<span class="kw">if</span> <span class="ident">arr</span>[<span class="number">2</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">3</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">4</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">5</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">6</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">7</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Overflow</span>);
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Overflow</span>);
 		}
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">2</span>];
 		<span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">arr</span>[<span class="number">0</span>];
@@ -478,7 +478,7 @@
 	<span class="kw">fn</span> <span class="ident">try_from</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">U512</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">U256</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 		<span class="kw">let</span> <span class="ident">U512</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span>;
 		<span class="kw">if</span> <span class="ident">arr</span>[<span class="number">4</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">5</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">6</span>] <span class="op">|</span> <span class="ident">arr</span>[<span class="number">7</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
-			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Overflow</span>);
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Overflow</span>);
 		}
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
 		<span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">arr</span>[<span class="number">0</span>];
@@ -489,5 +489,5 @@
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="primitive_types" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="primitive_types" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

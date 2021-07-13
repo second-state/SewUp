@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `sewup/src/rdb/db.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>db.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sewup/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sewup/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -415,19 +415,19 @@
 <span id="412">412</span>
 <span id="413">413</span>
 <span id="414">414</span>
-</pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryInto</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">Range</span>;
+</pre><pre class="rust">
+<span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
+<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use</span> <span class="ident">std::ops::Range</span>;
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rdb</span>::<span class="ident">errors</span>::<span class="ident">Error</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rdb</span>::<span class="ident">table</span>::<span class="ident">Table</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rdb</span>::<span class="ident">traits</span>::{<span class="ident">Record</span>, <span class="ident">HEADER_SIZE</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">rdb</span>::<span class="ident">Feature</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">storage_index_to_addr</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::errors::Error</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::table::Table</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::traits</span>::{<span class="ident">Record</span>, <span class="ident">HEADER_SIZE</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::Feature</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::storage_index_to_addr</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">SerializeTrait</span>};
 
-<span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
+<span class="kw">use</span> <span class="ident">anyhow::Result</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ewasm_api</span>::{<span class="ident">storage_load</span>, <span class="ident">storage_store</span>};
 <span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>};
@@ -480,20 +480,20 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Db</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">_features</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">_features</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Feature</span>::<span class="ident">Default</span> <span class="kw">as</span> <span class="ident">u16</span>;
+        <span class="ident">_features</span> <span class="op">|</span><span class="op">=</span> <span class="ident">Feature::Default</span> <span class="kw">as</span> <span class="ident">u16</span>;
 
         <span class="self">Self</span> {
             <span class="ident">_sewup_feature</span>: <span class="number">0</span>,
             <span class="ident">version</span>: <span class="ident">VERSION</span>,
             <span class="ident">_features</span>,
-            <span class="ident">table_info</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">table_info</span>: <span class="ident">Vec::new</span>(),
         }
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Db</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">Db</span>::<span class="ident">default</span>())
+        <span class="prelude-val">Ok</span>(<span class="ident">Db::default</span>())
     }
 
     <span class="doccomment">/// The version of current storage</span>
@@ -504,17 +504,17 @@
 
     <span class="doccomment">/// The feature enabled in current storage</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">features</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Feature</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Feature</span><span class="op">&gt;</span>::<span class="ident">new</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">_features</span> <span class="op">&amp;</span> <span class="ident">Feature</span>::<span class="ident">Default</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">Feature</span>::<span class="ident">Default</span>)
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">Feature</span><span class="op">&gt;</span><span class="ident">::new</span>();
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">_features</span> <span class="op">&amp;</span> <span class="ident">Feature::Default</span> <span class="kw">as</span> <span class="ident">u16</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="ident">output</span>.<span class="ident">push</span>(<span class="ident">Feature::Default</span>)
         }
         <span class="ident">output</span>
     }
 
     <span class="doccomment">/// create table for storage</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_table</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SerializeTrait</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Record</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">default_instance</span> <span class="op">=</span> <span class="ident">T</span>::<span class="ident">default</span>();
-        <span class="kw">let</span> <span class="ident">ser_size</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">serialized_size</span>(<span class="kw-2">&amp;</span><span class="ident">default_instance</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">default_instance</span> <span class="op">=</span> <span class="ident">T::default</span>();
+        <span class="kw">let</span> <span class="ident">ser_size</span> <span class="op">=</span> <span class="ident">bincode::serialized_size</span>(<span class="kw-2">&amp;</span><span class="ident">default_instance</span>)<span class="question-mark">?</span>;
         <span class="kw">let</span> <span class="ident">record_raw_size</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ser_size</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="number">0u32</span>
         } <span class="kw">else</span> {
@@ -522,7 +522,7 @@
         };
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">is_empty</span>() {
             <span class="ident">TableInfo</span> {
-                <span class="ident">sig</span>: <span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()),
+                <span class="ident">sig</span>: <span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()),
                 <span class="ident">record_raw_size</span>,
                 <span class="ident">range</span>: (<span class="number">2</span>..<span class="number">2</span>),
             }
@@ -532,7 +532,7 @@
                 ..
             } <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_info</span>[<span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>].<span class="ident">clone</span>();
             <span class="ident">TableInfo</span> {
-                <span class="ident">sig</span>: <span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()),
+                <span class="ident">sig</span>: <span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()),
                 <span class="ident">record_raw_size</span>,
                 <span class="ident">range</span>: (<span class="ident">last_table_range</span>.<span class="ident">end</span>..<span class="ident">last_table_range</span>.<span class="ident">end</span>),
             }
@@ -546,10 +546,10 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">SerializeTrait</span> <span class="op">+</span> <span class="ident">Default</span> <span class="op">+</span> <span class="ident">Sized</span> <span class="op">+</span> <span class="ident">Record</span><span class="op">&gt;</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Table</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">info</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">table_info</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()
-            .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">TableNotExist</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">into</span>()))<span class="question-mark">?</span>;
+            .<span class="ident">ok_or</span>(<span class="ident">Error::TableNotExist</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>().<span class="ident">into</span>()))<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">Table</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
             <span class="ident">info</span>,
-            <span class="ident">data</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">data</span>: <span class="ident">Vec::new</span>(),
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
         }
         .<span class="ident">load_data</span>()<span class="question-mark">?</span>)
@@ -557,8 +557,8 @@
 
     <span class="doccomment">/// drop table</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">drop_table</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_table_info</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
+        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_table_info</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>);
         <span class="kw">for</span> <span class="ident">info</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">iter</span>() {
             <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">sig</span> <span class="op">!</span><span class="op">=</span> <span class="ident">sig</span> {
                 <span class="ident">new_table_info</span>.<span class="ident">push</span>(<span class="ident">info</span>.<span class="ident">clone</span>());
@@ -573,7 +573,7 @@
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">table_info</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TableInfo</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
+        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>());
         <span class="kw">for</span> <span class="ident">info</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">iter</span>() {
             <span class="kw">if</span> <span class="ident">info</span>.<span class="ident">sig</span> <span class="op">=</span><span class="op">=</span> <span class="ident">sig</span> {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">info</span>.<span class="ident">clone</span>());
@@ -584,7 +584,7 @@
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">block_height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
-        <span class="macro">unimplemented</span><span class="macro">!</span>()
+        <span class="macro">unimplemented!</span>()
     }
 
     <span class="doccomment">/// Import the database from the specific block height</span>
@@ -592,25 +592,25 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">block_height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_block_height</span>) <span class="op">=</span> <span class="ident">block_height</span> {
-            <span class="macro">unimplemented</span><span class="macro">!</span>();
+            <span class="macro">unimplemented!</span>();
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">new</span>()<span class="question-mark">?</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::new</span>()<span class="question-mark">?</span>;
 
             <span class="kw">let</span> <span class="ident">config</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">storage_load</span>(<span class="kw-2">&amp;</span><span class="ident">CONFIG_ADDR</span>.<span class="ident">into</span>()).<span class="ident">bytes</span>;
 
             <span class="kw">if</span> <span class="ident">RDB_FEATURE</span> <span class="op">!</span><span class="op">=</span> <span class="ident">config</span>[<span class="number">0</span>] {
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Sewup feature not correct&quot;</span>)
+                <span class="macro">panic!</span>(<span class="string">&quot;Sewup feature not correct&quot;</span>)
             }
 
             <span class="kw">if</span> <span class="ident">VERSION</span> <span class="op">!</span><span class="op">=</span> <span class="ident">config</span>[<span class="number">1</span>] {
                 <span class="comment">// TODO data migrate from different version</span>
-                <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;migration not implement&quot;</span>)
+                <span class="macro">panic!</span>(<span class="string">&quot;migration not implement&quot;</span>)
             }
 
             <span class="ident">db</span>.<span class="ident">_features</span> <span class="op">=</span>
-                <span class="ident">u16</span>::<span class="ident">from_le_bytes</span>(<span class="ident">config</span>[<span class="number">2</span>..<span class="number">4</span>].<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;load rdb feature fail&quot;</span>));
+                <span class="ident">u16::from_le_bytes</span>(<span class="ident">config</span>[<span class="number">2</span>..<span class="number">4</span>].<span class="ident">try_into</span>().<span class="ident">expect</span>(<span class="string">&quot;load rdb feature fail&quot;</span>));
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table_info_size</span> <span class="op">=</span> <span class="ident">u32</span>::<span class="ident">from_be_bytes</span>(
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table_info_size</span> <span class="op">=</span> <span class="ident">u32::from_be_bytes</span>(
                 <span class="ident">config</span>[<span class="number">28</span>..<span class="number">32</span>]
                     .<span class="ident">try_into</span>()
                     .<span class="ident">expect</span>(<span class="string">&quot;load table info length fail&quot;</span>),
@@ -625,10 +625,10 @@
 
                 <span class="kw">let</span> <span class="ident">buffer</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">storage_load</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">into</span>()).<span class="ident">bytes</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info</span> <span class="op">=</span>
-                    <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>[<span class="number">0</span>..<span class="number">16</span>]).<span class="ident">expect</span>(<span class="string">&quot;load 1st info from chunk fail&quot;</span>);
+                    <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>[<span class="number">0</span>..<span class="number">16</span>]).<span class="ident">expect</span>(<span class="string">&quot;load 1st info from chunk fail&quot;</span>);
                 <span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">push</span>(<span class="ident">info</span>);
                 <span class="kw">if</span> <span class="ident">table_info_size</span> <span class="op">&gt;</span> <span class="number">1</span> {
-                    <span class="ident">info</span> <span class="op">=</span> <span class="ident">bincode</span>::<span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>[<span class="number">16</span>..<span class="number">32</span>])
+                    <span class="ident">info</span> <span class="op">=</span> <span class="ident">bincode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">buffer</span>[<span class="number">16</span>..<span class="number">32</span>])
                         .<span class="ident">expect</span>(<span class="string">&quot;load 2nd info from chunk fail&quot;</span>);
                     <span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">push</span>(<span class="ident">info</span>);
                 }
@@ -670,16 +670,16 @@
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">chunk</span>) <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">next</span>() {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tables</span> <span class="op">=</span>
-                    <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">0</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>);
+                    <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">0</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>);
                 <span class="ident">tables</span>.<span class="ident">append</span>(
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">1</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>),
+                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">chunk</span>[<span class="number">1</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>),
                 );
                 <span class="kw">let</span> <span class="ident">part</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
                 <span class="ident">storage_store</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">part</span>.<span class="ident">into</span>());
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">remainder</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">remainder</span>();
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tables</span> <span class="op">=</span>
-                    <span class="ident">bincode</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">remainder</span>[<span class="number">0</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>);
+                    <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">remainder</span>[<span class="number">0</span>]).<span class="ident">expect</span>(<span class="string">&quot;serialize 1st info of chunk fail&quot;</span>);
                 <span class="ident">tables</span>.<span class="ident">extend_from_slice</span>(<span class="kw-2">&amp;</span>[<span class="number">0u8</span>; <span class="number">16</span>]);
                 <span class="kw">let</span> <span class="ident">part</span>: [<span class="ident">u8</span>; <span class="number">32</span>] <span class="op">=</span> <span class="ident">tables</span>.<span class="ident">try_into</span>().<span class="ident">unwrap</span>();
                 <span class="ident">storage_store</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">into</span>(), <span class="kw-2">&amp;</span><span class="ident">part</span>.<span class="ident">into</span>());
@@ -695,7 +695,7 @@
         <span class="ident">sig</span>: <span class="ident">TableSig</span>,
         <span class="ident">raw_length</span>: <span class="ident">u32</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">modify_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">info_raw_length</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">2</span>;
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">%</span> <span class="number">2</span> <span class="op">&gt;</span> <span class="number">0</span> {
             <span class="ident">info_raw_length</span> <span class="op">=</span> <span class="ident">info_raw_length</span> <span class="op">+</span> <span class="number">1</span>;
@@ -729,7 +729,7 @@
 
         <span class="ident">migration_table</span>(<span class="ident">modify_list</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">output</span>.<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">TableNotExist</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Table [sig: {:?}]&quot;</span>, <span class="ident">sig</span>)).<span class="ident">into</span>())
+        <span class="ident">output</span>.<span class="ident">ok_or</span>(<span class="ident">Error::TableNotExist</span>(<span class="macro">format!</span>(<span class="string">&quot;Table [sig: {:?}]&quot;</span>, <span class="ident">sig</span>)).<span class="ident">into</span>())
     }
 }
 
@@ -766,7 +766,7 @@
 
 <span class="kw">fn</span> <span class="ident">get_table_signature</span>(<span class="ident">table_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TableSig</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
     <span class="ident">hasher</span>.<span class="ident">update</span>(<span class="ident">table_name</span>.<span class="ident">as_bytes</span>());
     <span class="ident">hasher</span>.<span class="ident">finalize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sig</span>);
     <span class="ident">sig</span>
@@ -796,21 +796,21 @@
         }
         <span class="kw">impl</span> <span class="ident">Record</span> <span class="kw">for</span> <span class="ident">Person3</span> {}
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Db</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Db::default</span>();
         <span class="ident">db</span>.<span class="ident">create_table</span>::<span class="op">&lt;</span><span class="ident">Person1</span><span class="op">&gt;</span>();
         <span class="ident">db</span>.<span class="ident">create_table</span>::<span class="op">&lt;</span><span class="ident">Person2</span><span class="op">&gt;</span>();
         <span class="ident">db</span>.<span class="ident">create_table</span>::<span class="op">&lt;</span><span class="ident">Person3</span><span class="op">&gt;</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>);
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">3</span>);
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">3</span> {
-            <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="ident">i</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">2</span> });
+            <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="ident">i</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">2</span> });
         }
         <span class="comment">// There are not record in Person1, Person3, and there 3 raw size of records in Person2</span>
         <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">db</span>
-            .<span class="ident">alloc_table_storage</span>(<span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">Person2</span><span class="op">&gt;</span>()), <span class="number">3</span>)
+            .<span class="ident">alloc_table_storage</span>(<span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">Person2</span><span class="op">&gt;</span>()), <span class="number">3</span>)
             .<span class="ident">unwrap</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">3</span>, <span class="ident">end</span>: <span class="number">3</span> });
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">1</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">3</span>, <span class="ident">end</span>: <span class="number">6</span> });
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">2</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">6</span>, <span class="ident">end</span>: <span class="number">6</span> });
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">3</span>, <span class="ident">end</span>: <span class="number">3</span> });
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">1</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">3</span>, <span class="ident">end</span>: <span class="number">6</span> });
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">2</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">6</span>, <span class="ident">end</span>: <span class="number">6</span> });
     }
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_alloc_table_storage_with_one_table</span>() {
@@ -820,16 +820,16 @@
         }
         <span class="kw">impl</span> <span class="ident">Record</span> <span class="kw">for</span> <span class="ident">Person</span> {}
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Db</span>::<span class="ident">default</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">db</span> <span class="op">=</span> <span class="ident">Db::default</span>();
         <span class="ident">db</span>.<span class="ident">create_table</span>::<span class="op">&lt;</span><span class="ident">Person</span><span class="op">&gt;</span>();
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">2</span> });
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">alloc_table_storage</span>(<span class="ident">get_table_signature</span>(<span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">type_name</span>::<span class="op">&lt;</span><span class="ident">Person</span><span class="op">&gt;</span>()), <span class="number">1</span>);
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>);
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">2</span> });
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">db</span>.<span class="ident">alloc_table_storage</span>(<span class="ident">get_table_signature</span>(<span class="ident">std::any::type_name</span>::<span class="op">&lt;</span><span class="ident">Person</span><span class="op">&gt;</span>()), <span class="number">1</span>);
 
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">r</span>.<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">3</span> });
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">3</span> });
+        <span class="macro">assert!</span>(<span class="ident">r</span>.<span class="ident">unwrap</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">3</span> });
+        <span class="macro">assert!</span>(<span class="ident">db</span>.<span class="ident">table_info</span>[<span class="number">0</span>].<span class="ident">range</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Range</span>::<span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> { <span class="ident">start</span>: <span class="number">2</span>, <span class="ident">end</span>: <span class="number">3</span> });
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/keccak-hash-0.7.0/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../keccak_hash/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../keccak_hash/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -209,7 +209,7 @@
 <span id="206">206</span>
 <span id="207">207</span>
 <span id="208">208</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="comment">// Copyright 2020 Parity Technologies</span>
 <span class="comment">//</span>
 <span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
@@ -221,9 +221,9 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>), <span class="ident">no_std</span>)]</span>
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>;
+<span class="kw">use</span> <span class="ident">std::io</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">primitive_types</span>::<span class="ident">H256</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">primitive_types::H256</span>;
 <span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>};
 
 <span class="doccomment">/// Get the KECCAK (i.e. Keccak) hash of the empty bytes string.</span>
@@ -252,7 +252,7 @@
 
 <span class="doccomment">/// Computes in-place keccak256 hash of `data`.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak256</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
 	<span class="ident">keccak256</span>.<span class="ident">update</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>());
 	<span class="ident">keccak256</span>.<span class="ident">finalize</span>(<span class="ident">data</span>);
 }
@@ -277,15 +277,15 @@
 <span class="doccomment">/// ];</span>
 <span class="doccomment">/// assert_eq!(&amp;data, &amp;expected);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak256_range</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">range</span>: <span class="ident">core</span>::<span class="ident">ops</span>::<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak256_range</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">range</span>: <span class="ident">core::ops::Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
 	<span class="ident">keccak256</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="ident">range</span>]);
 	<span class="ident">keccak256</span>.<span class="ident">finalize</span>(<span class="ident">data</span>);
 }
 
 <span class="doccomment">/// Computes in-place keccak512 hash of `data`.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak512</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v512</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak::v512</span>();
 	<span class="ident">keccak512</span>.<span class="ident">update</span>(<span class="ident">data</span>.<span class="ident">as_ref</span>());
 	<span class="ident">keccak512</span>.<span class="ident">finalize</span>(<span class="ident">data</span>);
 }
@@ -309,8 +309,8 @@
 <span class="doccomment">/// ];</span>
 <span class="doccomment">/// assert_eq!(&amp;data[..32], &amp;expected);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak512_range</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">range</span>: <span class="ident">core</span>::<span class="ident">ops</span>::<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v512</span>();
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak512_range</span>(<span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>], <span class="ident">range</span>: <span class="ident">core::ops::Range</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>) {
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak::v512</span>();
 	<span class="ident">keccak512</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="ident">range</span>]);
 	<span class="ident">keccak512</span>.<span class="ident">finalize</span>(<span class="ident">data</span>);
 }
@@ -320,22 +320,22 @@
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak_512</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">output</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v512</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak512</span> <span class="op">=</span> <span class="ident">Keccak::v512</span>();
 	<span class="ident">keccak512</span>.<span class="ident">update</span>(<span class="ident">input</span>);
 	<span class="ident">keccak512</span>.<span class="ident">finalize</span>(<span class="ident">output</span>);
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_keccak</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">s</span>: <span class="ident">T</span>, <span class="ident">dest</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
 	<span class="ident">keccak256</span>.<span class="ident">update</span>(<span class="ident">s</span>.<span class="ident">as_ref</span>());
 	<span class="ident">keccak256</span>.<span class="ident">finalize</span>(<span class="ident">dest</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak_pipe</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io</span>::<span class="ident">BufRead</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io</span>::<span class="ident">Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">H256</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak_pipe</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::BufRead</span>, <span class="ident">w</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">H256</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">1024</span>];
-	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak</span>::<span class="ident">v256</span>();
+	<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">keccak256</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
 
 	<span class="comment">// read file</span>
 	<span class="kw">loop</span> {
@@ -352,8 +352,8 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak_buffer</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io</span>::<span class="ident">BufRead</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">H256</span>, <span class="ident">io</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
-	<span class="ident">keccak_pipe</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io</span>::<span class="ident">sink</span>())
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">keccak_buffer</span>(<span class="ident">r</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="kw">dyn</span> <span class="ident">io::BufRead</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">H256</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+	<span class="ident">keccak_pipe</span>(<span class="ident">r</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">io::sink</span>())
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
@@ -361,18 +361,18 @@
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
 	<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>))]</span>
-	<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec</span>::<span class="ident">Vec</span>};
+	<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">vec</span>, <span class="ident">vec::Vec</span>};
 
 	<span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">keccak_empty</span>() {
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">keccak</span>([<span class="number">0u8</span>; <span class="number">0</span>]), <span class="ident">KECCAK_EMPTY</span>);
+		<span class="macro">assert_eq!</span>(<span class="ident">keccak</span>([<span class="number">0u8</span>; <span class="number">0</span>]), <span class="ident">KECCAK_EMPTY</span>);
 	}
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">keccak_as</span>() {
-		<span class="macro">assert_eq</span><span class="macro">!</span>(
+		<span class="macro">assert_eq!</span>(
 			<span class="ident">keccak</span>([<span class="number">0x41u8</span>; <span class="number">32</span>]),
 			<span class="ident">H256</span>([
 				<span class="number">0x59</span>, <span class="number">0xca</span>, <span class="number">0xd5</span>, <span class="number">0x94</span>, <span class="number">0x86</span>, <span class="number">0x73</span>, <span class="number">0x62</span>, <span class="number">0x2c</span>, <span class="number">0x1d</span>, <span class="number">0x64</span>, <span class="number">0xe2</span>, <span class="number">0x32</span>, <span class="number">0x24</span>, <span class="number">0x88</span>, <span class="number">0xbf</span>, <span class="number">0x01</span>, <span class="number">0x61</span>,
@@ -383,41 +383,41 @@
 
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">write_keccak_with_content</span>() {
-		<span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">From</span>::<span class="ident">from</span>(<span class="string">&quot;hello world&quot;</span>);
-		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[
+		<span class="kw">let</span> <span class="ident">data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">From::from</span>(<span class="string">&quot;hello world&quot;</span>);
+		<span class="kw">let</span> <span class="ident">expected</span> <span class="op">=</span> <span class="macro">vec!</span>[
 			<span class="number">0x47</span>, <span class="number">0x17</span>, <span class="number">0x32</span>, <span class="number">0x85</span>, <span class="number">0xa8</span>, <span class="number">0xd7</span>, <span class="number">0x34</span>, <span class="number">0x1e</span>, <span class="number">0x5e</span>, <span class="number">0x97</span>, <span class="number">0x2f</span>, <span class="number">0xc6</span>, <span class="number">0x77</span>, <span class="number">0x28</span>, <span class="number">0x63</span>, <span class="number">0x84</span>, <span class="number">0xf8</span>, <span class="number">0x02</span>,
 			<span class="number">0xf8</span>, <span class="number">0xef</span>, <span class="number">0x42</span>, <span class="number">0xa5</span>, <span class="number">0xec</span>, <span class="number">0x5f</span>, <span class="number">0x03</span>, <span class="number">0xbb</span>, <span class="number">0xfa</span>, <span class="number">0x25</span>, <span class="number">0x4c</span>, <span class="number">0xb0</span>, <span class="number">0x1f</span>, <span class="number">0xad</span>,
 		];
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dest</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
 		<span class="ident">write_keccak</span>(<span class="ident">data</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dest</span>);
 
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">dest</span>, <span class="ident">expected</span>.<span class="ident">as_ref</span>());
+		<span class="macro">assert_eq!</span>(<span class="ident">dest</span>, <span class="ident">expected</span>.<span class="ident">as_ref</span>());
 	}
 
 	<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 	<span class="attribute">#[<span class="ident">test</span>]</span>
 	<span class="kw">fn</span> <span class="ident">should_keccak_a_file</span>() {
-		<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fs</span>;
-		<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">BufReader</span>, <span class="ident">Write</span>};
+		<span class="kw">use</span> <span class="ident">std::fs</span>;
+		<span class="kw">use</span> <span class="ident">std::io</span>::{<span class="ident">BufReader</span>, <span class="ident">Write</span>};
 
 		<span class="comment">// given</span>
-		<span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempfile</span>::<span class="ident">Builder</span>::<span class="ident">new</span>().<span class="ident">prefix</span>(<span class="string">&quot;keccak&quot;</span>).<span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
+		<span class="kw">let</span> <span class="ident">tmpdir</span> <span class="op">=</span> <span class="ident">tempfile::Builder::new</span>().<span class="ident">prefix</span>(<span class="string">&quot;keccak&quot;</span>).<span class="ident">tempdir</span>().<span class="ident">unwrap</span>();
 		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">tmpdir</span>.<span class="ident">path</span>().<span class="ident">to_owned</span>();
 		<span class="ident">path</span>.<span class="ident">push</span>(<span class="string">&quot;should_keccak_a_file&quot;</span>);
 		<span class="comment">// Prepare file</span>
 		{
-			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">fs</span>::<span class="ident">File</span>::<span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
+			<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">fs::File::create</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>();
 			<span class="ident">file</span>.<span class="ident">write_all</span>(<span class="string">b&quot;something&quot;</span>).<span class="ident">unwrap</span>();
 		}
 
-		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader</span>::<span class="ident">new</span>(<span class="ident">fs</span>::<span class="ident">File</span>::<span class="ident">open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>());
+		<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">BufReader::new</span>(<span class="ident">fs::File::open</span>(<span class="kw-2">&amp;</span><span class="ident">path</span>).<span class="ident">unwrap</span>());
 		<span class="comment">// when</span>
 		<span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="ident">keccak_buffer</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">file</span>).<span class="ident">unwrap</span>();
 
 		<span class="comment">// then</span>
-		<span class="macro">assert_eq</span><span class="macro">!</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">hash</span>), <span class="string">&quot;68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87&quot;</span>);
+		<span class="macro">assert_eq!</span>(<span class="macro">format!</span>(<span class="string">&quot;{:x}&quot;</span>, <span class="ident">hash</span>), <span class="string">&quot;68371d7e884c168ae2022c82bd837d51837718a7f7dfb7aa3f753074a35e1d87&quot;</span>);
 	}
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="keccak_hash" data-search-js="../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="keccak_hash" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>

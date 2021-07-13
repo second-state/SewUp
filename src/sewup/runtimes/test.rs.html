@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `sewup/src/runtimes/test.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>test.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
-<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sewup/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
-                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../sewup/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -185,18 +185,18 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-</pre><div class="example-wrap"><pre class="rust ">
+</pre><pre class="rust">
 <span class="doccomment">//! A runtime for testing</span>
 
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">runtimes</span>::<span class="ident">traits</span>::{<span class="ident">Flags</span>, <span class="ident">VMMessage</span>, <span class="ident">VMResult</span>, <span class="ident">VmError</span>, <span class="ident">RT</span>};
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::runtimes::traits</span>::{<span class="ident">Flags</span>, <span class="ident">VMMessage</span>, <span class="ident">VMResult</span>, <span class="ident">VmError</span>, <span class="ident">RT</span>};
 
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
-<span class="kw">use</span> <span class="ident">anyhow</span>::<span class="prelude-ty">Result</span>;
-<span class="kw">use</span> <span class="ident">contract_address</span>::<span class="ident">ContractAddress</span>;
-<span class="kw">use</span> <span class="ident">ethereum_types</span>::<span class="ident">U256</span>;
+<span class="kw">use</span> <span class="ident">anyhow::Result</span>;
+<span class="kw">use</span> <span class="ident">contract_address::ContractAddress</span>;
+<span class="kw">use</span> <span class="ident">ethereum_types::U256</span>;
 <span class="kw">use</span> <span class="ident">evmc_sys</span>::{<span class="ident">evmc_call_kind</span>, <span class="ident">evmc_revision</span>, <span class="ident">evmc_status_code</span>, <span class="ident">evmc_storage_status</span>};
-<span class="kw">use</span> <span class="ident">rust_ssvm</span>::{<span class="ident">create</span> <span class="kw">as</span> <span class="ident">create_vm</span>, <span class="ident">host</span>::<span class="ident">HostContext</span>, <span class="ident">EvmcVm</span>};
+<span class="kw">use</span> <span class="ident">rust_ssvm</span>::{<span class="ident">create</span> <span class="kw">as</span> <span class="ident">create_vm</span>, <span class="ident">host::HostContext</span>, <span class="ident">EvmcVm</span>};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TestRuntime</span> {
     <span class="ident">host</span>: <span class="ident">TestHost</span>,
@@ -206,7 +206,7 @@
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">TestRuntime</span> {
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">host</span>: <span class="ident">TestHost</span>::<span class="ident">default</span>(),
+            <span class="ident">host</span>: <span class="ident">TestHost::default</span>(),
             <span class="ident">vm</span>: <span class="ident">create_vm</span>(),
         }
     }
@@ -227,15 +227,15 @@
             <span class="ident">create2_salt</span>,
         } <span class="op">=</span> <span class="ident">msg</span>;
 
-        <span class="kw">let</span> <span class="ident">null_input_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>::<span class="ident">new</span>();
+        <span class="kw">let</span> <span class="ident">null_input_data</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">v</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">32</span>];
         <span class="ident">value</span>.<span class="ident">to_big_endian</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">v</span>);
 
         <span class="kw">let</span> (<span class="ident">output_data</span>, <span class="ident">gas_left</span>, <span class="ident">status_code</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">vm</span>.<span class="ident">execute</span>(
             <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">host</span>,
-            <span class="ident">evmc_revision</span>::<span class="ident">EVMC_FRONTIER</span>,
+            <span class="ident">evmc_revision::EVMC_FRONTIER</span>,
             <span class="ident">kind</span>,
-            <span class="ident">flags</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Flags</span>::<span class="ident">Static</span>,
+            <span class="ident">flags</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Flags::Static</span>,
             <span class="ident">depth</span>,
             <span class="ident">gas</span>,
             <span class="kw-2">&amp;</span><span class="ident">destination</span>.<span class="number">0</span>,
@@ -246,49 +246,49 @@
             <span class="kw-2">&amp;</span><span class="ident">create2_salt</span>.<span class="ident">map_or_else</span>(<span class="op">|</span><span class="op">|</span> [<span class="number">0</span>; <span class="number">32</span>], <span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="number">0</span>),
         );
         <span class="kw">match</span> <span class="ident">status_code</span> {
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_SUCCESS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">VMResult</span> {
+            <span class="ident">evmc_status_code::EVMC_SUCCESS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">VMResult</span> {
                 <span class="ident">output_data</span>: <span class="ident">output_data</span>.<span class="ident">into</span>(),
                 <span class="ident">gas_left</span>,
-                ..<span class="ident">Default</span>::<span class="ident">default</span>()
+                ..<span class="ident">Default::default</span>()
             }),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">Failure</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_REVERT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">Revert</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_OUT_OF_GAS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">OutOfGas</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_INVALID_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">InvalidInstruction</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_UNDEFINED_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">UndefinedInstruction</span>.<span class="ident">into</span>())
+            <span class="ident">evmc_status_code::EVMC_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::Failure</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_REVERT</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::Revert</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_OUT_OF_GAS</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::OutOfGas</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_INVALID_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::InvalidInstruction</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_UNDEFINED_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">VmError::UndefinedInstruction</span>.<span class="ident">into</span>())
             }
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_STACK_OVERFLOW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">StackOverflow</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_STACK_UNDERFLOW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">StackUnderflow</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_BAD_JUMP_DESTINATION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">BadJumpDestination</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_INVALID_MEMORY_ACCESS</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">InvalidMemoryAccess</span>.<span class="ident">into</span>())
+            <span class="ident">evmc_status_code::EVMC_STACK_OVERFLOW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::StackOverflow</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_STACK_UNDERFLOW</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::StackUnderflow</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_BAD_JUMP_DESTINATION</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::BadJumpDestination</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_INVALID_MEMORY_ACCESS</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">VmError::InvalidMemoryAccess</span>.<span class="ident">into</span>())
             }
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_CALL_DEPTH_EXCEEDED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">CallDepthExceeded</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_STATIC_MODE_VIOLATION</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">StaticModeViolation</span>.<span class="ident">into</span>())
+            <span class="ident">evmc_status_code::EVMC_CALL_DEPTH_EXCEEDED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::CallDepthExceeded</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_STATIC_MODE_VIOLATION</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">VmError::StaticModeViolation</span>.<span class="ident">into</span>())
             }
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_PRECOMPILE_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">PrecompileFailure</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_CONTRACT_VALIDATION_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">ContractValidationFailure</span>.<span class="ident">into</span>())
+            <span class="ident">evmc_status_code::EVMC_PRECOMPILE_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::PrecompileFailure</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_CONTRACT_VALIDATION_FAILURE</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">VmError::ContractValidationFailure</span>.<span class="ident">into</span>())
             }
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_ARGUMENT_OUT_OF_RANGE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">ArgumentOutOfRange</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_WASM_UNREACHABLE_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">WasmUnreachableInstruction</span>.<span class="ident">into</span>())
+            <span class="ident">evmc_status_code::EVMC_ARGUMENT_OUT_OF_RANGE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::ArgumentOutOfRange</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_WASM_UNREACHABLE_INSTRUCTION</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">VmError::WasmUnreachableInstruction</span>.<span class="ident">into</span>())
             }
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_WASM_TRAP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">WasmTrap</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_INTERNAL_ERROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">InternalError</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_REJECTED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">Rejected</span>.<span class="ident">into</span>()),
-            <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_OUT_OF_MEMORY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError</span>::<span class="ident">OutOfMemory</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_WASM_TRAP</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::WasmTrap</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_INTERNAL_ERROR</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::InternalError</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_REJECTED</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::Rejected</span>.<span class="ident">into</span>()),
+            <span class="ident">evmc_status_code::EVMC_OUT_OF_MEMORY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">VmError::OutOfMemory</span>.<span class="ident">into</span>()),
         }
     }
 
     <span class="kw">fn</span> <span class="ident">deploy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">VMMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ContractAddress</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">msg</span>.<span class="ident">sender</span>;
         <span class="self">self</span>.<span class="ident">execute</span>(<span class="ident">msg</span>)<span class="question-mark">?</span>;
-        <span class="prelude-val">Ok</span>(<span class="ident">ContractAddress</span>::<span class="ident">from_sender_and_nonce</span>(
+        <span class="prelude-val">Ok</span>(<span class="ident">ContractAddress::from_sender_and_nonce</span>(
             <span class="kw-2">&amp;</span><span class="ident">sender</span>,
-            <span class="kw-2">&amp;</span><span class="ident">U256</span>::<span class="ident">default</span>(),
+            <span class="kw-2">&amp;</span><span class="ident">U256::default</span>(),
         ))
     }
 }
@@ -317,7 +317,7 @@
         <span class="ident">value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_storage_status</span> {
         <span class="self">self</span>.<span class="ident">store</span>.<span class="ident">insert</span>(<span class="kw-2">*</span><span class="ident">key</span>, <span class="kw-2">*</span><span class="ident">value</span>);
-        <span class="ident">evmc_storage_status</span>::<span class="ident">EVMC_STORAGE_MODIFIED</span>
+        <span class="ident">evmc_storage_status::EVMC_STORAGE_MODIFIED</span>
     }
 
     <span class="kw">fn</span> <span class="ident">get_balance</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">20</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
@@ -344,7 +344,7 @@
 
     <span class="kw">fn</span> <span class="ident">selfdestruct</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">20</span>], <span class="ident">beneficiary</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">20</span>]) {}
 
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">type_complexity</span>)]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy::type_complexity</span>)]</span>
     <span class="kw">fn</span> <span class="ident">get_tx_context</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> ([<span class="ident">u8</span>; <span class="number">32</span>], [<span class="ident">u8</span>; <span class="number">20</span>], [<span class="ident">u8</span>; <span class="number">20</span>], <span class="ident">i64</span>, <span class="ident">i64</span>, <span class="ident">i64</span>, [<span class="ident">u8</span>; <span class="number">32</span>]) {
         ([<span class="number">0</span>; <span class="number">32</span>], [<span class="number">0</span>; <span class="number">20</span>], [<span class="number">0</span>; <span class="number">20</span>], <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, [<span class="number">0</span>; <span class="number">32</span>])
     }
@@ -367,9 +367,9 @@
         <span class="ident">is_static</span>: <span class="ident">bool</span>,
         <span class="ident">salt</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">32</span>],
     ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">i64</span>, [<span class="ident">u8</span>; <span class="number">20</span>], <span class="ident">evmc_status_code</span>) {
-        (<span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="ident">gas</span>, [<span class="number">0</span>; <span class="number">20</span>], <span class="ident">evmc_status_code</span>::<span class="ident">EVMC_SUCCESS</span>)
+        (<span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">32</span>], <span class="ident">gas</span>, [<span class="number">0</span>; <span class="number">20</span>], <span class="ident">evmc_status_code::EVMC_SUCCESS</span>)
     }
 }
 </pre></div>
-</section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-js="../../../search-index.js"></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
     <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>
