@@ -396,7 +396,16 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
         Regex::new(r"^(?P<contract>\w+)\s+move\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let contract = Ident::new(cap.name("contract").unwrap().as_str(), Span::call_site());
-        let name = Ident::new(cap.name("name").unwrap().as_str(), Span::call_site());
+        let name_result: syn::Result<syn::ExprPath> =
+            syn::parse_str(cap.name("name").unwrap().as_str());
+        let name = if let Ok(name) = name_result {
+            name
+        } else {
+            abort_call_site!(
+                "`{}` is not an ExprPath",
+                cap.name("name").unwrap().as_str()
+            );
+        };
         let error_handler = cap.name("error_handler").unwrap().as_str();
         return if error_handler.is_empty() {
             quote! {
