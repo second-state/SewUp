@@ -438,9 +438,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
     format!(
-        r#"
-            sewup::bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")
-        "#,
+        r#"sewup::bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")"#,
         item.to_string(),
     )
     .parse()
@@ -534,7 +532,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 /// default_input.set_id(2);
 /// ```
 ///
-/// you can use `ewasm_output_from!` to get the exactly input/ouput binary of the protol, for
+/// you can use `ewasm_output_from!` to get the exactly input/output binary of the protol, for
 /// example:
 /// ```
 /// let handler_input = person::protocol(person);
@@ -653,8 +651,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         self.trusted.is_none() && self.age.is_none()
                     }}
                 }}
-            }}
-        "#,
+            }}"#,
             //Record trait
             struct_name,
             // Wraper struct
@@ -781,7 +778,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             h.rt = Some(runtime.clone());
 
                             match h.execute(sig, input_data, 1_000_000_000_000) {
-                                Ok(r) => assert_eq!(r.output_data, expect_output, "{} ouput is unexpected", fn_name),
+                                Ok(r) => assert_eq!(r.output_data, expect_output, "{} output is unexpected", fn_name),
                                 Err(e) => {
                                     panic!("vm error: {:?}", e);
                                 }
@@ -834,31 +831,15 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
         let equivalence = cap.name("equivalence").unwrap().as_str();
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        {}
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, {});"#,
                 fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        {}
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), {});"#,
                 params, fn_name, fn_name, equivalence
             )
             .parse()
@@ -883,31 +864,15 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
         let equivalence = cap.name("equivalence").unwrap().as_str();
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        sewup_derive::ewasm_output_from!({})
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));"#,
                 fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        sewup_derive::ewasm_output_from!({})
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), sewup_derive::ewasm_output_from!({}));"#,
                 params, fn_name, fn_name, equivalence
             )
             .parse()
@@ -940,31 +905,15 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        Vec::with_capacity(0)
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, Vec::with_capacity(0));"#,
                 fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        Vec::with_capacity(0)
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), Vec::with_capacity(0));"#,
                 params, fn_name, fn_name
             )
             .parse()
@@ -988,31 +937,15 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         if params.is_empty() {
             format!(
-                r#"
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        None,
-                        vec![0, 0, 0, 0]
-                    );
-                "#,
+                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);"#,
                 fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
-                r#"
-                    _bin = bincode::serialize(&{}).unwrap();
-                    _run_wasm_fn(
-                        _runtime.clone(),
-                        "{}",
-                        ewasm_fn_sig!({}),
-                        Some(&_bin),
-                        vec![0, 0, 0, 0]
-                    );
-                "#,
+                r#"_bin = bincode::serialize(&{}).unwrap();
+                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), vec![0, 0, 0, 0]);"#,
                 params, fn_name, fn_name
             )
             .parse()
