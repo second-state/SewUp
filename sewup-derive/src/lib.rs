@@ -460,21 +460,13 @@ pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
 #[cfg(feature = "kv")]
 #[proc_macro_derive(Key)]
 pub fn derive_key(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-            #[cfg(target_arch = "wasm32")]
-            impl sewup::kv::traits::Key for {} {{}}
-        "#,
-            struct_name,
-        )
-        .parse()
-        .unwrap()
-    } else {
-        abort_call_site!("sewup-derive parsing struct fails");
+    let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let sturct_name = &input.ident;
+    return quote! {
+        #[cfg(target_arch = "wasm32")]
+        impl sewup::kv::traits::Key for #sturct_name {}
     }
+    .into();
 }
 
 /// `Value` derive help you implement Value trait for kv feature
@@ -490,21 +482,13 @@ pub fn derive_key(item: TokenStream) -> TokenStream {
 #[cfg(feature = "kv")]
 #[proc_macro_derive(Value)]
 pub fn derive_value(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)").unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        format!(
-            r#"
-            #[cfg(target_arch = "wasm32")]
-            impl sewup::kv::traits::Value for {} {{}}
-        "#,
-            struct_name,
-        )
-        .parse()
-        .unwrap()
-    } else {
-        abort_call_site!("sewup-derive parsing struct fails");
+    let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let sturct_name = &input.ident;
+    return quote! {
+        #[cfg(target_arch = "wasm32")]
+        impl sewup::kv::traits::Value for #sturct_name {}
     }
+    .into();
 }
 
 /// provides the handers for CRUD and the Protocol struct to communicate with these handlers.
