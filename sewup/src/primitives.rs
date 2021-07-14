@@ -45,4 +45,14 @@ impl Contract {
     pub fn get_function_selector(&self) -> Result<FunctionSignature> {
         Ok(self.fn_sig)
     }
+    pub fn mock() -> Self {
+        let data_size = 5;
+        let input_data = vec![0, 0, 0, 0, 0];
+        let fn_sig = [0, 0, 0, 0];
+        Contract {
+            data_size,
+            input_data,
+            fn_sig,
+        }
+    }
 }

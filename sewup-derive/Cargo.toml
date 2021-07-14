@@ -23,6 +23,8 @@ quote = "1.0.9"
 hex-literal = "0.3.1"
 trybuild = "1"
 rustversion = "1"
+sewup = { path = "../sewup" }
+anyhow = "1.0.40"
 
 [features]
 kv = []
