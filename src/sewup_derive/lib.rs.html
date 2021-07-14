@@ -1074,6 +1074,10 @@
 <span id="1071">1071</span>
 <span id="1072">1072</span>
 <span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1117,7 +1121,7 @@
 <span class="doccomment">/// fn main() -&gt; Result&lt;()&gt; {</span>
 <span class="doccomment">///     let contract = Contract::new()?;</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract, check_input_object)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract move check_input_object)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(Error::UnknownHandle.into()),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///     Ok(())</span>
@@ -1215,7 +1219,7 @@
 <span class="doccomment">/// fn main() -&gt; Result&lt;()&gt; {</span>
 <span class="doccomment">///     let contract = Contract::new()?;</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract, check_input_object)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract move check_input_object)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(Error::UnknownHandle.into()),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///     Ok(())</span>
@@ -1366,7 +1370,7 @@
 <span class="doccomment">/// fn main() -&gt; Result&lt;()&gt; {</span>
 <span class="doccomment">///     let contract = Contract::new()?;</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(decorated_handler) =&gt; ewasm_input_from!(contract, decorated_handler)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(decorated_handler) =&gt; ewasm_input_from!(contract move decorated_handler)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(Error::UnknownHandle.into()),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///     Ok(())</span>
@@ -1392,7 +1396,7 @@
 <span class="doccomment">///     let contract = Contract::new()?;</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
 <span class="doccomment">///         ewasm_fn_sig!(undecorated_handler(a: i32, b: String))</span>
-<span class="doccomment">///             =&gt; ewasm_input_from!(contract, undecorated_handler)?,</span>
+<span class="doccomment">///             =&gt; ewasm_input_from!(contract move undecorated_handler)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(Error::UnknownHandle.into()),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///     Ok(())</span>
@@ -1445,7 +1449,7 @@
 <span class="doccomment">/// fn main() -&gt; Result&lt;()&gt; {</span>
 <span class="doccomment">///     let contract = Contract::new()?;</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract, check_input_object)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt; ewasm_input_from!(contract move check_input_object)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(Error::UnknownHandle.into()),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///  Ok(())</span>
@@ -1454,13 +1458,13 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Besides, you can map the error to your customized error when something wrong happened in</span>
 <span class="doccomment">/// `ewasm_input_from!`, for example:</span>
-<span class="doccomment">/// `ewasm_input_from!(contract, check_input_object, |_| Err(&quot;DeserdeError&quot;))`</span>
+<span class="doccomment">/// `ewasm_input_from!(contract move check_input_object, |_| Err(&quot;DeserdeError&quot;))`</span>
 <span class="doccomment">/// ```compile_fail</span>
 <span class="doccomment">/// #[ewasm_main(rusty)]</span>
 <span class="doccomment">/// fn main() -&gt; Result&lt;(), &amp;&#39;static str&gt; {</span>
 <span class="doccomment">///     let contract = Contract::new().map_err(|_| &quot;NewContractError&quot;)?;</span>
 <span class="doccomment">///     match contract.get_function_selector().map_err(|_| &quot;FailGetFnSelector&quot;)? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt;  ewasm_input_from!(contract, check_input_object, |_| &quot;DeserdeError&quot;)?</span>
+<span class="doccomment">///         ewasm_fn_sig!(check_input_object) =&gt;  ewasm_input_from!(contract move check_input_object, |_| &quot;DeserdeError&quot;)?</span>
 <span class="doccomment">///         _ =&gt; return Err(&quot;UnknownHandle&quot;),</span>
 <span class="doccomment">///     };</span>
 <span class="doccomment">///     Ok(())</span>
@@ -1469,32 +1473,36 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_input_from</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+),\s+(?P&lt;name&gt;[^,]+),?(?P&lt;error_handler&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span>
+        <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+)\s+move\s+(?P&lt;name&gt;[^,]+),?(?P&lt;error_handler&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
-        <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;contract&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;contract&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">Span::call_site</span>());
         <span class="kw">let</span> <span class="ident">error_handler</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;error_handler&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">if</span> <span class="ident">error_handler</span>.<span class="ident">is_empty</span>() {
-            <span class="macro">format!</span>(
-                <span class="string">r#&quot;
-                    {}(bincode::deserialize(&amp;{}.input_data[4..])?)
-                &quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">contract</span>
-            )
-            .<span class="ident">parse</span>()
-            .<span class="ident">unwrap</span>()
+        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">error_handler</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">quote!</span> {
+                #<span class="ident">name</span>(<span class="ident">sewup::bincode::deserialize</span>(<span class="kw-2">&amp;</span>#<span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">4</span>..])<span class="question-mark">?</span>)
+            }
         } <span class="kw">else</span> {
-            <span class="macro">format!</span>(
-                <span class="string">r#&quot;
-                    {}(bincode::deserialize(&amp;{}.input_data[4..]).map_err({})?)
-                &quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">contract</span>, <span class="ident">error_handler</span>
-            )
-            .<span class="ident">parse</span>()
-            .<span class="ident">unwrap</span>()
+            <span class="kw">let</span> <span class="ident">closure</span>: <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="ident">syn::ExprClosure</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">syn::parse_str</span>(<span class="ident">error_handler</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">closure</span>) <span class="op">=</span> <span class="ident">closure</span> {
+                <span class="macro">quote!</span> {
+                    #<span class="ident">name</span>(<span class="ident">sewup::bincode::deserialize</span>(<span class="kw-2">&amp;</span>#<span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">4</span>..]).<span class="ident">map_err</span>(#<span class="ident">closure</span>)<span class="question-mark">?</span>)
+                }
+            } <span class="kw">else</span> {
+                <span class="macro">abort_call_site!</span>(<span class="string">&quot;`{}` is not an closure input for map_err&quot;</span>, <span class="ident">error_handler</span>);
+            }
         }
+        .<span class="ident">into</span>();
     } <span class="kw">else</span> {
-        <span class="macro">abort_call_site!</span>(<span class="string">&quot;fail to parsing function in fn_select&quot;</span>);
+        <span class="macro">abort_call_site!</span>(
+            <span class="string">r#&quot;fail to parsing ewasm_input_from,
+            please use
+                `ewasm_input_from( contract move handler )
+            or
+                `ewasm_input_from( contract move handler, closure_for_map_err)`
+            &quot;#</span>
+        );
     }
 }
 
@@ -1592,10 +1600,10 @@
 <span class="doccomment">///     let mut contract = Contract::new()?;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">///     match contract.get_function_selector()? {</span>
-<span class="doccomment">///         ewasm_fn_sig!(person::get) =&gt; ewasm_input_from!(contract, person::get)?,</span>
-<span class="doccomment">///         ewasm_fn_sig!(person::create) =&gt; ewasm_input_from!(contract, person::create)?,</span>
-<span class="doccomment">///         ewasm_fn_sig!(person::update) =&gt; ewasm_input_from!(contract, person::update)?,</span>
-<span class="doccomment">///         ewasm_fn_sig!(person::delete) =&gt; ewasm_input_from!(contract, person::delete)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(person::get) =&gt; ewasm_input_from!(contract move person::get)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(person::create) =&gt; ewasm_input_from!(contract move person::create)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(person::update) =&gt; ewasm_input_from!(contract move person::update)?,</span>
+<span class="doccomment">///         ewasm_fn_sig!(person::delete) =&gt; ewasm_input_from!(contract move person::delete)?,</span>
 <span class="doccomment">///         _ =&gt; return Err(RDBError::UnknownHandle.into()),</span>
 <span class="doccomment">///     }</span>
 <span class="doccomment">///</span>

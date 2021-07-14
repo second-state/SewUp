@@ -18,7 +18,7 @@ which function should be decorated with <code>#[ewasm_fn]</code>, for example,
 <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>()<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>()<span class="question-mark">?</span> {
-        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">decorated_handler</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span>, <span class="ident">decorated_handler</span>)<span class="question-mark">?</span>,
+        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">decorated_handler</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">decorated_handler</span>)<span class="question-mark">?</span>,
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownHandle</span>.<span class="ident">into</span>()),
     };
     <span class="prelude-val">Ok</span>(())
@@ -43,7 +43,7 @@ ex: <code>ewasm_fn_sig!(undecorated_handler( a: i32, b: String ))</code></li>
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>()<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>()<span class="question-mark">?</span> {
         <span class="macro">ewasm_fn_sig!</span>(<span class="ident">undecorated_handler</span>(<span class="ident">a</span>: <span class="ident">i32</span>, <span class="ident">b</span>: <span class="ident">String</span>))
-            <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span>, <span class="ident">undecorated_handler</span>)<span class="question-mark">?</span>,
+            <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">undecorated_handler</span>)<span class="question-mark">?</span>,
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownHandle</span>.<span class="ident">into</span>()),
     };
     <span class="prelude-val">Ok</span>(())

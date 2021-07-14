@@ -21,7 +21,7 @@ and you are only care the happy case of excuting the contract.</p>
 <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>()<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>()<span class="question-mark">?</span> {
-        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span>, <span class="ident">check_input_object</span>)<span class="question-mark">?</span>,
+        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">check_input_object</span>)<span class="question-mark">?</span>,
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownHandle</span>.<span class="ident">into</span>()),
     };
     <span class="prelude-val">Ok</span>(())

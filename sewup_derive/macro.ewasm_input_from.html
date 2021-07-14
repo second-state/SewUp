@@ -10,21 +10,21 @@
 <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>()<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>()<span class="question-mark">?</span> {
-        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span>, <span class="ident">check_input_object</span>)<span class="question-mark">?</span>,
+        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">check_input_object</span>)<span class="question-mark">?</span>,
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnknownHandle</span>.<span class="ident">into</span>()),
     };
  <span class="prelude-val">Ok</span>(())
  }</pre></div>
 <p>Besides, you can map the error to your customized error when something wrong happened in
 <code>ewasm_input_from!</code>, for example:
-<code>ewasm_input_from!(contract, check_input_object, |_| Err(&quot;DeserdeError&quot;))</code></p>
+<code>ewasm_input_from!(contract move check_input_object, |_| Err(&quot;DeserdeError&quot;))</code></p>
 
 <div class='information'><div class='tooltip compile_fail'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered compile_fail">
 <span class="attribute">#[<span class="ident">ewasm_main</span>(<span class="ident">rusty</span>)]</span>
 <span class="kw">fn</span> <span class="ident">main</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;NewContractError&quot;</span>)<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>().<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;FailGetFnSelector&quot;</span>)<span class="question-mark">?</span> {
-        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span>  <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span>, <span class="ident">check_input_object</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;DeserdeError&quot;</span>)<span class="question-mark">?</span>
+        <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) <span class="op">=</span><span class="op">&gt;</span>  <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">check_input_object</span>, <span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;DeserdeError&quot;</span>)<span class="question-mark">?</span>
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;UnknownHandle&quot;</span>),
     };
     <span class="prelude-val">Ok</span>(())
