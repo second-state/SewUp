@@ -745,7 +745,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                         .arg("cargo build --release --target=wasm32-unknown-unknown")
                         .output()
                         .expect("failed to build wasm binary");
-                    if !dbg!(output).status.success() {
+                    if !output.status.success() {
                         panic!("return code not success: fail to build wasm binary")
                     }
                     let pkg_name = env!("CARGO_PKG_NAME");
@@ -781,7 +781,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                             h.rt = Some(runtime.clone());
 
                             match h.execute(sig, input_data, 1_000_000_000_000) {
-                                Ok(r) => assert_eq!((fn_name, r.output_data), (fn_name, expect_output)),
+                                Ok(r) => assert_eq!(r.output_data, expect_output, "{} ouput is unexpected", fn_name),
                                 Err(e) => {
                                     panic!("vm error: {:?}", e);
                                 }
@@ -802,8 +802,7 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
             #[test]
             fn $fn_name () {
                 let (_runtime, _run_wasm_fn) = _build_runtime_and_runner();
-                let mut _bin: Vec<u8> = Vec::new();
-        "#,
+                let mut _bin: Vec<u8> = Vec::new();"#,
             )
             .to_string()
             .parse()
