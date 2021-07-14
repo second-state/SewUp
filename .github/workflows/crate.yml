@@ -33,6 +33,3 @@ jobs:
 
       - name: RDB feature test
         run: nix-shell --run 'cargo test -p sewup --features=rdb --no-default-features'
-
-      - name: Derive test
-        run: nix-shell --run 'cargo test -p sewup-derive'
