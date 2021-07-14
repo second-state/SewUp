@@ -552,8 +552,10 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table)]
 pub fn derive_table(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}")
-        .unwrap();
+    let re = Regex::new(
+        r"^(pub)\s+struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}",
+    )
+    .unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
         let struct_name = cap.name("name").unwrap().as_str();
         let field_part = cap.name("fields").unwrap().as_str();
@@ -702,7 +704,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
     } else {
-        abort_call_site!("sewup-derive parsing struct fails");
+        abort_call_site!("sewup-derive parsing struct fails, currently we only support flat and simple structure");
     }
 }
 
