@@ -3,7 +3,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use proc_macro_error::{abort_call_site, proc_macro_error};
+use proc_macro_error::{abort, abort_call_site, proc_macro_error};
 use quote::quote;
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
@@ -49,92 +49,83 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"fn (?P<name>[^(]+?)\(").unwrap();
-    let fn_name = if let Some(cap) = re.captures(&item.to_string()) {
-        cap.name("name").unwrap().as_str().to_owned()
-    } else {
-        abort_call_site!("parse function error")
-    };
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    if !input.sig.inputs.is_empty() {
+        abort!(
+            input.sig.inputs,
+            "ewasm_main only wrap the function without inputs"
+        )
+    }
 
-    return match attr.to_string().to_lowercase().as_str() {
+    match attr.to_string().to_lowercase().as_str() {
         // Return the inner structure from unwrap result
         // This is for a scenario that you take care the result but not using Rust client
-        "auto" => format!(
-            r#"
+        "auto" => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                match {}() {{
-                    Ok(r) =>  {{
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
                         let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                         finish_data(&bin);
 
-                    }},
-                    Err(e) => {{
+                    },
+                    Err(e) => {
                         let error_msg = e.to_string();
                         finish_data(&error_msg.as_bytes());
-                    }}
-                }}
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap(),
+                    }
+                }
+            }
+        },
 
         // Return all result structure
         // This is for a scenario that you are using a rust client to operation the contract
-        "rusty" => format!(
-            r#"
+        "rusty" => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                let r = {}();
+            pub fn main() {
+                #input
+                let r = #name();
                 let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                 finish_data(&bin);
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap(),
+            }
+        },
 
         // Default only return error message,
         // This is for a scenario that you just want to modify the data on
         // chain only
-        _ => format!(
-            r#"
+        _ => quote! {
+            #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
             #[no_mangle]
-            pub fn main() {{
-                {}
-                if let Err(e) = {}() {{
+            pub fn main() {
+                #input
+                if let Err(e) = #name() {
                     let error_msg = e.to_string();
                     finish_data(&error_msg.as_bytes());
-                }}
-            }}
-        "#,
-            item.to_string(),
-            fn_name
-        )
-        .parse()
-        .unwrap()
-    };
+                }
+            }
+        }
+    }.into()
 }
 
 /// helps you to build your handlers in the contract
@@ -163,8 +154,8 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         .inputs
         .iter()
         .map(|fn_arg| match fn_arg {
-            syn::FnArg::Receiver(_) => {
-                abort_call_site!("please use ewasm_fn for function not method")
+            syn::FnArg::Receiver(r) => {
+                abort!(r, "please use ewasm_fn for function not method")
             }
             syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
         })
@@ -240,8 +231,8 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let args = &inputs
         .iter()
         .map(|fn_arg| match fn_arg {
-            syn::FnArg::Receiver(_) => {
-                abort_call_site!("please use ewasm_fn for function not method")
+            syn::FnArg::Receiver(r) => {
+                abort!(r, "please use ewasm_fn for function not method")
             }
             syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
         })
