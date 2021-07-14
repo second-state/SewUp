@@ -13,4 +13,5 @@ fn main() {
     let _c = ewasm_fn_sig!(other_handle2(x: usize, y: String));
     let _d = ewasm_fn_sig!(other::mod::handle(x: usize, y: String));
     let _e = ewasm_fn_sig!(other::mod::handle(x: other::MyUsize, y: other::MyString));
+    let _f = ewasm_fn_sig!(other_handle2(usize, String));
 }
