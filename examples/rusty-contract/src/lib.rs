@@ -26,7 +26,7 @@ fn main() -> Result<(), &'static str> {
         .map_err(|_| "FailGetFnSelector")?
     {
         ewasm_fn_sig!(check_input_object) => {
-            ewasm_input_from!(contract, check_input_object, |_| "DeserdeError")?
+            ewasm_input_from!(contract move check_input_object, |_| "DeserdeError")?
         }
         _ => return Err("UnknownHandle"),
     };

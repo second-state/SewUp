@@ -80,10 +80,10 @@ fn main() -> Result<()> {
     let mut contract = Contract::new()?;
 
     match contract.get_function_selector()? {
-        ewasm_fn_sig!(person::get) => ewasm_input_from!(contract, person::get)?,
-        ewasm_fn_sig!(person::create) => ewasm_input_from!(contract, person::create)?,
-        ewasm_fn_sig!(person::update) => ewasm_input_from!(contract, person::update)?,
-        ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract, person::delete)?,
+        ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get)?,
+        ewasm_fn_sig!(person::create) => ewasm_input_from!(contract move person::create)?,
+        ewasm_fn_sig!(person::update) => ewasm_input_from!(contract move person::update)?,
+        ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract move person::delete)?,
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![Feature::Default])?
         }

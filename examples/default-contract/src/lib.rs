@@ -25,7 +25,7 @@ fn main() -> anyhow::Result<()> {
 
     let contract = Contract::new()?;
     match contract.get_function_selector()? {
-        ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+        ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
         _ => return Err(Error::UnknownHandle.into()),
     };
 

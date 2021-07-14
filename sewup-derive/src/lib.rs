@@ -40,7 +40,7 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
@@ -138,7 +138,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
@@ -289,7 +289,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(decorated_handler) => ewasm_input_from!(contract, decorated_handler)?,
+///         ewasm_fn_sig!(decorated_handler) => ewasm_input_from!(contract move decorated_handler)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
@@ -315,7 +315,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
 ///         ewasm_fn_sig!(undecorated_handler(a: i32, b: String))
-///             => ewasm_input_from!(contract, undecorated_handler)?,
+///             => ewasm_input_from!(contract move undecorated_handler)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///     Ok(())
@@ -368,7 +368,7 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract, check_input_object)?,
+///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
 ///         _ => return Err(Error::UnknownHandle.into()),
 ///     };
 ///  Ok(())
@@ -377,13 +377,13 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 ///
 /// Besides, you can map the error to your customized error when something wrong happened in
 /// `ewasm_input_from!`, for example:
-/// `ewasm_input_from!(contract, check_input_object, |_| Err("DeserdeError"))`
+/// `ewasm_input_from!(contract move check_input_object, |_| Err("DeserdeError"))`
 /// ```compile_fail
 /// #[ewasm_main(rusty)]
 /// fn main() -> Result<(), &'static str> {
 ///     let contract = Contract::new().map_err(|_| "NewContractError")?;
 ///     match contract.get_function_selector().map_err(|_| "FailGetFnSelector")? {
-///         ewasm_fn_sig!(check_input_object) =>  ewasm_input_from!(contract, check_input_object, |_| "DeserdeError")?
+///         ewasm_fn_sig!(check_input_object) =>  ewasm_input_from!(contract move check_input_object, |_| "DeserdeError")?
 ///         _ => return Err("UnknownHandle"),
 ///     };
 ///     Ok(())
@@ -392,32 +392,36 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<contract>\w+),\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
+    let re =
+        Regex::new(r"^(?P<contract>\w+)\s+move\s+(?P<name>[^,]+),?(?P<error_handler>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
-        let contract = cap.name("contract").unwrap().as_str();
-        let fn_name = cap.name("name").unwrap().as_str();
+        let contract = Ident::new(cap.name("contract").unwrap().as_str(), Span::call_site());
+        let name = Ident::new(cap.name("name").unwrap().as_str(), Span::call_site());
         let error_handler = cap.name("error_handler").unwrap().as_str();
-        if error_handler.is_empty() {
-            format!(
-                r#"
-                    {}(bincode::deserialize(&{}.input_data[4..])?)
-                "#,
-                fn_name, contract
-            )
-            .parse()
-            .unwrap()
+        return if error_handler.is_empty() {
+            quote! {
+                #name(sewup::bincode::deserialize(&#contract.input_data[4..])?)
+            }
         } else {
-            format!(
-                r#"
-                    {}(bincode::deserialize(&{}.input_data[4..]).map_err({})?)
-                "#,
-                fn_name, contract, error_handler
-            )
-            .parse()
-            .unwrap()
+            let closure: syn::Result<syn::ExprClosure> = syn::parse_str(error_handler);
+            if let Ok(closure) = closure {
+                quote! {
+                    #name(sewup::bincode::deserialize(&#contract.input_data[4..]).map_err(#closure)?)
+                }
+            } else {
+                abort_call_site!("`{}` is not an closure input for map_err", error_handler);
+            }
         }
+        .into();
     } else {
-        abort_call_site!("fail to parsing function in fn_select");
+        abort_call_site!(
+            r#"fail to parsing ewasm_input_from,
+            please use
+                `ewasm_input_from( contract move handler )
+            or
+                `ewasm_input_from( contract move handler, closure_for_map_err)`
+            "#
+        );
     }
 }
 
@@ -515,10 +519,10 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 ///     let mut contract = Contract::new()?;
 ///
 ///     match contract.get_function_selector()? {
-///         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract, person::get)?,
-///         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract, person::create)?,
-///         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract, person::update)?,
-///         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract, person::delete)?,
+///         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get)?,
+///         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract move person::create)?,
+///         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract move person::update)?,
+///         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract move person::delete)?,
 ///         _ => return Err(RDBError::UnknownHandle.into()),
 ///     }
 ///
