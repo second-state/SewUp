@@ -334,7 +334,15 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
             fn_name,
             params
                 .split(',')
-                .map(|p| p.split(':').nth(1).unwrap_or("").trim())
+                .map(|p| {
+                    let p_split = p.split(':').collect::<Vec<_>>();
+                    return if p_split.len() == 2 {
+                        p_split[1]
+                    } else {
+                        p_split[0]
+                    }
+                    .trim();
+                })
                 .collect::<Vec<_>>()
                 .join(",")
         );
