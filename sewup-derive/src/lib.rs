@@ -439,7 +439,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
 pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
     format!(
         r#"
-            bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")
+            sewup::bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")
         "#,
         item.to_string(),
     )
