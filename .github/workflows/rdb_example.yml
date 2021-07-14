@@ -1,4 +1,4 @@
-name: Crate
+name: Example
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  rdb-example:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -28,11 +28,5 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-21.05-small
 
-      - name: Default feature test
-        run: nix-shell --run 'cargo test -p sewup --features=default'
-
-      - name: RDB feature test
-        run: nix-shell --run 'cargo test -p sewup --features=rdb --no-default-features'
-
-      - name: Derive test
-        run: nix-shell --run 'cargo test -p sewup-derive'
+      - name: RDB example test
+        run: nix-shell --run 'run-example-test rdb'
