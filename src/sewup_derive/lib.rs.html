@@ -1066,22 +1066,13 @@
 <span id="1063">1063</span>
 <span id="1064">1064</span>
 <span id="1065">1065</span>
-<span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
-<span class="kw">use</span> <span class="ident">proc_macro_error</span>::{<span class="ident">abort_call_site</span>, <span class="ident">proc_macro_error</span>};
+<span class="kw">use</span> <span class="ident">proc_macro_error</span>::{<span class="ident">abort</span>, <span class="ident">abort_call_site</span>, <span class="ident">proc_macro_error</span>};
 <span class="kw">use</span> <span class="ident">quote::quote</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
 <span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>};
@@ -1127,92 +1118,83 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_main</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;fn (?P&lt;name&gt;[^(]+?)\(&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
-        <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">to_owned</span>()
-    } <span class="kw">else</span> {
-        <span class="macro">abort_call_site!</span>(<span class="string">&quot;parse function error&quot;</span>)
-    };
+    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>.<span class="ident">is_empty</span>() {
+        <span class="macro">abort!</span>(
+            <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>,
+            <span class="string">&quot;ewasm_main only wrap the function without inputs&quot;</span>
+        )
+    }
 
-    <span class="kw">return</span> <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
+    <span class="kw">match</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
         <span class="comment">// Return the inner structure from unwrap result</span>
         <span class="comment">// This is for a scenario that you take care the result but not using Rust client</span>
-        <span class="string">&quot;auto&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            use sewup::bincode;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            use sewup::ewasm_api::finish_data;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            #[no_mangle]
-            pub fn main() {{
-                {}
-                match {}() {{
-                    Ok(r) =&gt;  {{
-                        let bin = bincode::serialize(&amp;r).expect(&quot;The resuslt of `ewasm_main` should be serializable&quot;);
-                        finish_data(&amp;bin);
+        <span class="string">&quot;auto&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::bincode</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::ewasm_api::finish_data</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+                #<span class="ident">input</span>
+                <span class="kw">match</span> #<span class="ident">name</span>() {
+                    <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span>  {
+                        <span class="kw">let</span> <span class="ident">bin</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>).<span class="ident">expect</span>(<span class="string">&quot;The resuslt of `ewasm_main` should be serializable&quot;</span>);
+                        <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">bin</span>);
 
-                    }},
-                    Err(e) =&gt; {{
-                        let error_msg = e.to_string();
-                        finish_data(&amp;error_msg.as_bytes());
-                    }}
-                }}
-            }}
-        &quot;#</span>,
-            <span class="ident">item</span>.<span class="ident">to_string</span>(),
-            <span class="ident">fn_name</span>
-        )
-        .<span class="ident">parse</span>()
-        .<span class="ident">unwrap</span>(),
+                    },
+                    <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">let</span> <span class="ident">error_msg</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">to_string</span>();
+                        <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">error_msg</span>.<span class="ident">as_bytes</span>());
+                    }
+                }
+            }
+        },
 
         <span class="comment">// Return all result structure</span>
         <span class="comment">// This is for a scenario that you are using a rust client to operation the contract</span>
-        <span class="string">&quot;rusty&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            use sewup::bincode;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            use sewup::ewasm_api::finish_data;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            #[no_mangle]
-            pub fn main() {{
-                {}
-                let r = {}();
-                let bin = bincode::serialize(&amp;r).expect(&quot;The resuslt of `ewasm_main` should be serializable&quot;);
-                finish_data(&amp;bin);
-            }}
-        &quot;#</span>,
-            <span class="ident">item</span>.<span class="ident">to_string</span>(),
-            <span class="ident">fn_name</span>
-        )
-        .<span class="ident">parse</span>()
-        .<span class="ident">unwrap</span>(),
+        <span class="string">&quot;rusty&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::bincode</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::ewasm_api::finish_data</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+                #<span class="ident">input</span>
+                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> #<span class="ident">name</span>();
+                <span class="kw">let</span> <span class="ident">bin</span> <span class="op">=</span> <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>).<span class="ident">expect</span>(<span class="string">&quot;The resuslt of `ewasm_main` should be serializable&quot;</span>);
+                <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">bin</span>);
+            }
+        },
 
         <span class="comment">// Default only return error message,</span>
         <span class="comment">// This is for a scenario that you just want to modify the data on</span>
         <span class="comment">// chain only</span>
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(
-            <span class="string">r#&quot;
-            use sewup::bincode;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            use sewup::ewasm_api::finish_data;
-            #[cfg(target_arch = &quot;wasm32&quot;)]
-            #[no_mangle]
-            pub fn main() {{
-                {}
-                if let Err(e) = {}() {{
-                    let error_msg = e.to_string();
-                    finish_data(&amp;error_msg.as_bytes());
-                }}
-            }}
-        &quot;#</span>,
-            <span class="ident">item</span>.<span class="ident">to_string</span>(),
-            <span class="ident">fn_name</span>
-        )
-        .<span class="ident">parse</span>()
-        .<span class="ident">unwrap</span>()
-    };
+        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">quote!</span> {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::bincode</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="kw">use</span> <span class="ident">sewup::ewasm_api::finish_data</span>;
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+            <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+                #<span class="ident">input</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span> #<span class="ident">name</span>() {
+                    <span class="kw">let</span> <span class="ident">error_msg</span> <span class="op">=</span> <span class="ident">e</span>.<span class="ident">to_string</span>();
+                    <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">error_msg</span>.<span class="ident">as_bytes</span>());
+                }
+            }
+        }
+    }.<span class="ident">into</span>()
 }
 
 <span class="doccomment">/// helps you to build your handlers in the contract</span>
@@ -1241,8 +1223,8 @@
         .<span class="ident">inputs</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fn_arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">fn_arg</span> {
-            <span class="ident">syn::FnArg::Receiver</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">abort_call_site!</span>(<span class="string">&quot;please use ewasm_fn for function not method&quot;</span>)
+            <span class="ident">syn::FnArg::Receiver</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">abort!</span>(<span class="ident">r</span>, <span class="string">&quot;please use ewasm_fn for function not method&quot;</span>)
             }
             <span class="ident">syn::FnArg::Typed</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::into_inner</span>(<span class="ident">p</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
         })
@@ -1318,8 +1300,8 @@
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">inputs</span>
         .<span class="ident">iter</span>()
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">fn_arg</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">fn_arg</span> {
-            <span class="ident">syn::FnArg::Receiver</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="macro">abort_call_site!</span>(<span class="string">&quot;please use ewasm_fn for function not method&quot;</span>)
+            <span class="ident">syn::FnArg::Receiver</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">abort!</span>(<span class="ident">r</span>, <span class="string">&quot;please use ewasm_fn for function not method&quot;</span>)
             }
             <span class="ident">syn::FnArg::Typed</span>(<span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Box::into_inner</span>(<span class="ident">p</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
         })
