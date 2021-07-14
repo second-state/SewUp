@@ -1066,6 +1066,14 @@
 <span id="1063">1063</span>
 <span id="1064">1064</span>
 <span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1403,7 +1411,15 @@
             <span class="ident">fn_name</span>,
             <span class="ident">params</span>
                 .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
-                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">nth</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>).<span class="ident">trim</span>())
+                .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
+                    <span class="kw">let</span> <span class="ident">p_split</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                    <span class="kw">return</span> <span class="kw">if</span> <span class="ident">p_split</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+                        <span class="ident">p_split</span>[<span class="number">1</span>]
+                    } <span class="kw">else</span> {
+                        <span class="ident">p_split</span>[<span class="number">0</span>]
+                    }
+                    .<span class="ident">trim</span>();
+                })
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>)
         );
