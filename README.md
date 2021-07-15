@@ -61,7 +61,9 @@ use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[ewasm_fn]
 fn hello() -> Result<String> {
-    Ok("hello world".to_string())
+    let target = "world";
+    let greeting = "hello ".to_string() + sewup::ewasm_dbg!(target);
+    Ok(greeting)
 }
 
 #[ewasm_main(auto)]
@@ -87,7 +89,7 @@ mod tests {
 ```
 
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
-Besides, you also can easily run test with `cargo test`, the ewasm contract automatically test with [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+Besides, you also can easily run test with debug message `cargo test -- --nocapture`, the ewasm contract automatically test with [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 Furthermore, you can learn more from other examples in the [example](./examples/) folder.
 
 ## Development

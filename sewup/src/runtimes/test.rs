@@ -3,11 +3,14 @@
 use crate::runtimes::traits::{Flags, VMMessage, VMResult, VmError, RT};
 
 use std::collections::HashMap;
+use std::fs::{self, OpenOptions};
+use std::io::prelude::*;
 
 use anyhow::Result;
 use contract_address::ContractAddress;
 use ethereum_types::U256;
 use evmc_sys::{evmc_call_kind, evmc_revision, evmc_status_code, evmc_storage_status};
+use hex::encode;
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
 
 pub struct TestRuntime {
@@ -20,6 +23,15 @@ impl Default for TestRuntime {
         Self {
             host: TestHost::default(),
             vm: create_vm(),
+        }
+    }
+}
+
+impl TestRuntime {
+    pub fn set_log_file(self, log_file: String) -> Self {
+        Self {
+            host: self.host.set_log_file(log_file),
+            vm: self.vm,
         }
     }
 }
@@ -108,6 +120,17 @@ impl RT for TestRuntime {
 #[derive(Default)]
 struct TestHost {
     store: HashMap<[u8; 32], [u8; 32]>,
+    log_file: Option<String>,
+}
+
+impl TestHost {
+    pub(crate) fn set_log_file(self, file_name: String) -> Self {
+        fs::write(&file_name, "").expect("written log fail");
+        Self {
+            store: self.store,
+            log_file: Some(file_name),
+        }
+    }
 }
 
 impl HostContext for TestHost {
@@ -165,7 +188,58 @@ impl HostContext for TestHost {
         [0; 32]
     }
 
-    fn emit_log(&mut self, addr: &[u8; 20], topics: &Vec<[u8; 32]>, data: &[u8]) {}
+    fn emit_log(&mut self, addr: &[u8; 20], topics: &Vec<[u8; 32]>, data: &[u8]) {
+        let addr_str = encode(addr);
+        let topic_str = topics
+            .iter()
+            .map(|t| {
+                let msg = if let Ok(s) = std::str::from_utf8(t) {
+                    if s.len() >= 8 {
+                        s[0..8].into()
+                    } else {
+                        s.into()
+                    }
+                } else {
+                    let t_str = encode(t);
+                    format!("{}..{}", &t_str[0..4], &t_str[60..64])
+                };
+                msg
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let msg = if let Ok(s) = std::str::from_utf8(data) {
+            s.into()
+        } else {
+            format!("{:?}", data)
+        };
+
+        eprintln!(
+            "{}..{}|{}|{}",
+            &addr_str[0..4],
+            &addr_str[36..40],
+            topic_str,
+            msg
+        );
+
+        if let Some(log) = self.log_file.take() {
+            let mut file = OpenOptions::new()
+                .write(true)
+                .append(true)
+                .open(&log)
+                .unwrap();
+
+            writeln!(
+                file,
+                "{}..{}|{}|{}",
+                &addr_str[0..4],
+                &addr_str[36..40],
+                topic_str,
+                msg
+            )
+            .expect("written log fail");
+            self.log_file = Some(log);
+        }
+    }
 
     fn call(
         &mut self,
@@ -180,5 +254,23 @@ impl HostContext for TestHost {
         salt: &[u8; 32],
     ) -> (Vec<u8>, i64, [u8; 20], evmc_status_code) {
         (vec![0; 32], gas, [0; 20], evmc_status_code::EVMC_SUCCESS)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn test_host_log_function() {
+        let mut host = TestHost::default().set_log_file("/tmp/host.log".to_string());
+        let addr = [255; 20];
+        let topics = vec![[255; 32], [65; 32]];
+        let data = vec![0u8, 1u8, 2u8, 3u8, 255u8];
+        let readable_data = vec![74u8, 79u8, 86u8, 89u8];
+        host.emit_log(&addr, &topics, &data);
+        host.emit_log(&addr, &topics, &readable_data);
+        assert!(fs::metadata("/tmp/host.log").is_ok());
     }
 }
