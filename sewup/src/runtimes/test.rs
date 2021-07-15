@@ -27,6 +27,16 @@ impl Default for TestRuntime {
     }
 }
 
+impl TestRuntime {
+    fn create_with_log(log_file: String) -> Self {
+        let host = TestHost::default().set_log_file(log_file);
+        Self {
+            host,
+            vm: create_vm(),
+        }
+    }
+}
+
 impl RT for TestRuntime {
     fn execute(&mut self, msg: VMMessage) -> Result<VMResult> {
         let VMMessage {
