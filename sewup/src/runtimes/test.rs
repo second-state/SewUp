@@ -28,11 +28,10 @@ impl Default for TestRuntime {
 }
 
 impl TestRuntime {
-    fn create_with_log(log_file: String) -> Self {
-        let host = TestHost::default().set_log_file(log_file);
+    pub fn set_log_file(self, log_file: String) -> Self {
         Self {
-            host,
-            vm: create_vm(),
+            host: self.host.set_log_file(log_file),
+            vm: self.vm,
         }
     }
 }

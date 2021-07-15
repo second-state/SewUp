@@ -719,14 +719,37 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 /// ```
 /// The test runtime will be create in the module, and all the test case will use the same test
 /// runtime, if you can create more runtimes for testing by setup more test modules.
+/// You can setup a log file when running the test as following, then use `ewasm_dbg!` to debug the
+/// ewasm contract in the excuting in the runtime.
+/// ```compile_fail
+/// #[ewasm_test(log=/path/to/logfile)]
+/// mod tests {
+///     use super::*;
+///
+///     #[ewasm_test]
+///     fn test_execute_basic_operations() {
+///         ewasm_assert_ok!(contract_fn());
+///     }
+/// }
+/// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
-pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
     let mod_re = Regex::new(r"^mod (?P<mod_name>[^\{\s]*)(?P<to_first_bracket>[^\{]*\{)").unwrap();
     let fn_re = Regex::new(r"^fn (?P<fn_name>[^\(\s]*)(?P<to_first_bracket>[^\{]*\{)").unwrap();
     let context = item.to_string();
     if mod_re.captures(&context).is_some() {
-        return mod_re.replace(&context, r#"
+        let attr_str = attr.to_string().replace(" ", "");
+        let runtime_log_option = if attr_str.is_empty() {
+            "".to_string()
+        } else {
+            let options = attr_str.split("=").collect::<Vec<_>>();
+            match options[0].to_lowercase().as_str() {
+                "log" => format!(".set_log_file({:?}.into())", options[1]),
+                _ => abort_call_site!("no support option"),
+            }
+        };
+        let template = r#"
             #[cfg(test)]
             mod $mod_name {
                 use sewup::bincode;
@@ -765,7 +788,10 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                     impl Fn(Arc<RefCell<TestRuntime>>, &str, [u8; 4], Option<&[u8]>, Vec<u8>) -> (),
                 ) {
                     (
-                        Arc::new(RefCell::new(TestRuntime::default())),
+                        Arc::new(RefCell::new(TestRuntime::default()"#
+            .to_string()
+            + &runtime_log_option
+            + r#")),
                         |runtime: Arc<RefCell<TestRuntime>>,
                          fn_name: &str,
                          sig: [u8; 4],
@@ -791,8 +817,17 @@ pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
                 #[test]
                 fn _compile_test() {
                     _build_wasm();
-                }"#).to_string().parse().unwrap();
+                }"#;
+        return mod_re
+            .replace(&context, &template)
+            .to_string()
+            .parse()
+            .unwrap();
     } else if fn_re.captures(&context).is_some() {
+        let attr_str = attr.to_string().replace(" ", "");
+        if !attr_str.is_empty() {
+            abort_call_site!("no support option when wrapping on function")
+        };
         return fn_re
             .replace(
                 &context,

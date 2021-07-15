@@ -32,7 +32,7 @@ fn main() -> anyhow::Result<()> {
     Ok(())
 }
 
-#[ewasm_test]
+#[ewasm_test(log=/tmp/default.log)]
 mod tests {
     use super::*;
     use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output};
