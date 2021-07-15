@@ -12,7 +12,12 @@ struct SimpleStruct {
 
 #[ewasm_fn]
 fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
-    if !s.trust {
+    // ewasm_dbg! help you debug things when this ewasm is running by testruntime
+    // To show the debug message pllease run the test case as following command
+    // `cargo test -- --nocapture`
+    // Or you may checkout the log file set by following `ewasm_test` macro
+    // `#[ewasm_test(log=/tmp/default.log)]`
+    if !sewup::ewasm_dbg!(s.trust) {
         return Err(Error::NotTrustedInput.into());
     }
     Ok(())

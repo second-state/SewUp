@@ -719,7 +719,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 /// ```
 /// The test runtime will be create in the module, and all the test case will use the same test
 /// runtime, if you can create more runtimes for testing by setup more test modules.
-/// You can setup a log file when running the test as following, then use `ewasm_dbg!` to debug the
+/// You can setup a log file when running the test as following, then use `sewup::ewasm_dbg!` to debug the
 /// ewasm contract in the excuting in the runtime.
 /// ```compile_fail
 /// #[ewasm_test(log=/path/to/logfile)]

@@ -1,6 +1,41 @@
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::finish_data;
+#[cfg(target_arch = "wasm32")]
+use ewasm_api::log0;
 use tiny_keccak::{Hasher, Sha3};
+
+/// helps you debug the ewasm contract when excuting in the test runtime
+/// To show the debug message pllease run the test case as following command
+/// `cargo test -- --nocapture`
+/// Or you may checkout the log file set by following `ewasm_test` macro
+/// `#[ewasm_test(log=/tmp/default.log)]`
+#[cfg(target_arch = "wasm32")]
+#[macro_export]
+macro_rules! ewasm_dbg {
+    () => { };
+    ($val:expr $(,)?) => {
+        match $val {
+            tmp => {
+                $crate::utils::log(format!("[{}:{}] {} = {:#?}", file!(), line!(), stringify!($val), &tmp));
+                tmp
+            }
+        }
+    };
+    ($($val:expr),+ $(,)?) => {
+        ($($crate::ewasm_dbg!($val)),+,)
+    };
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+#[macro_export]
+macro_rules! ewasm_dbg {
+    () => {};
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn log(s: String) {
+    log0(s.as_bytes());
+}
 
 #[cfg(target_arch = "wasm32")]
 pub fn ewasm_return(bytes: Vec<u8>) {

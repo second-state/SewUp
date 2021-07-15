@@ -189,35 +189,45 @@ impl HostContext for TestHost {
     }
 
     fn emit_log(&mut self, addr: &[u8; 20], topics: &Vec<[u8; 32]>, data: &[u8]) {
-        if let Some(log) = self.log_file.take() {
-            let addr_str = encode(addr);
-            let topic_str = topics
-                .iter()
-                .map(|t| {
-                    let msg = if let Ok(s) = std::str::from_utf8(t) {
-                        if s.len() >= 5 {
-                            s[0..5].into()
-                        } else {
-                            s.into()
-                        }
+        let addr_str = encode(addr);
+        let topic_str = topics
+            .iter()
+            .map(|t| {
+                let msg = if let Ok(s) = std::str::from_utf8(t) {
+                    if s.len() >= 8 {
+                        s[0..8].into()
                     } else {
-                        let t_str = encode(t);
-                        format!("{}..{}", &t_str[0..4], &t_str[60..64])
-                    };
-                    msg
-                })
-                .collect::<Vec<_>>()
-                .join(",");
-            let msg = if let Ok(s) = std::str::from_utf8(data) {
-                s.into()
-            } else {
-                format!("{:?}", data)
-            };
+                        s.into()
+                    }
+                } else {
+                    let t_str = encode(t);
+                    format!("{}..{}", &t_str[0..4], &t_str[60..64])
+                };
+                msg
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let msg = if let Ok(s) = std::str::from_utf8(data) {
+            s.into()
+        } else {
+            format!("{:?}", data)
+        };
+
+        eprintln!(
+            "{}..{}|{}|{}",
+            &addr_str[0..4],
+            &addr_str[36..40],
+            topic_str,
+            msg
+        );
+
+        if let Some(log) = self.log_file.take() {
             let mut file = OpenOptions::new()
                 .write(true)
                 .append(true)
                 .open(&log)
                 .unwrap();
+
             writeln!(
                 file,
                 "{}..{}|{}|{}",
