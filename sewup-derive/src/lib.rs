@@ -706,7 +706,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 }
 
 /// helps you setup the test mododule, and test cases in contract.
-///
 /// ```compile_fail
 /// #[ewasm_test]
 /// mod tests {
@@ -718,6 +717,8 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+/// The test runtime will be create in the module, and all the test case will use the same test
+/// runtime, if you can create more runtimes for testing by setup more test modules.
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_test(_attr: TokenStream, item: TokenStream) -> TokenStream {
