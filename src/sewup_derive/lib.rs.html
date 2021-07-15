@@ -1005,6 +1005,42 @@
 <span id="1002">1002</span>
 <span id="1003">1003</span>
 <span id="1004">1004</span>
+<span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
+<span id="1011">1011</span>
+<span id="1012">1012</span>
+<span id="1013">1013</span>
+<span id="1014">1014</span>
+<span id="1015">1015</span>
+<span id="1016">1016</span>
+<span id="1017">1017</span>
+<span id="1018">1018</span>
+<span id="1019">1019</span>
+<span id="1020">1020</span>
+<span id="1021">1021</span>
+<span id="1022">1022</span>
+<span id="1023">1023</span>
+<span id="1024">1024</span>
+<span id="1025">1025</span>
+<span id="1026">1026</span>
+<span id="1027">1027</span>
+<span id="1028">1028</span>
+<span id="1029">1029</span>
+<span id="1030">1030</span>
+<span id="1031">1031</span>
+<span id="1032">1032</span>
+<span id="1033">1033</span>
+<span id="1034">1034</span>
+<span id="1035">1035</span>
+<span id="1036">1036</span>
+<span id="1037">1037</span>
+<span id="1038">1038</span>
+<span id="1039">1039</span>
+<span id="1040">1040</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1714,7 +1750,6 @@
 }
 
 <span class="doccomment">/// helps you setup the test mododule, and test cases in contract.</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// ```compile_fail</span>
 <span class="doccomment">/// #[ewasm_test]</span>
 <span class="doccomment">/// mod tests {</span>
@@ -1726,14 +1761,39 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">/// The test runtime will be create in the module, and all the test case will use the same test</span>
+<span class="doccomment">/// runtime, if you can create more runtimes for testing by setup more test modules.</span>
+<span class="doccomment">/// You can setup a log file when running the test as following, then use `sewup::ewasm_dbg!` to debug the</span>
+<span class="doccomment">/// ewasm contract in the excuting in the runtime.</span>
+<span class="doccomment">/// ```compile_fail</span>
+<span class="doccomment">/// #[ewasm_test(log=/path/to/logfile)]</span>
+<span class="doccomment">/// mod tests {</span>
+<span class="doccomment">///     use super::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///     #[ewasm_test]</span>
+<span class="doccomment">///     fn test_execute_basic_operations() {</span>
+<span class="doccomment">///         ewasm_assert_ok!(contract_fn());</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_test</span>(<span class="ident">_attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_test</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">mod_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^mod (?P&lt;mod_name&gt;[^\{\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">fn_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^fn (?P&lt;fn_name&gt;[^\(\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">to_string</span>();
     <span class="kw">if</span> <span class="ident">mod_re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>).<span class="ident">is_some</span>() {
-        <span class="kw">return</span> <span class="ident">mod_re</span>.<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="string">r#&quot;
+        <span class="kw">let</span> <span class="ident">attr_str</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">runtime_log_option</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attr_str</span>.<span class="ident">is_empty</span>() {
+            <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">attr_str</span>.<span class="ident">split</span>(<span class="string">&quot;=&quot;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="kw">match</span> <span class="ident">options</span>[<span class="number">0</span>].<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
+                <span class="string">&quot;log&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;.set_log_file({:?}.into())&quot;</span>, <span class="ident">options</span>[<span class="number">1</span>]),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">abort_call_site!</span>(<span class="string">&quot;no support option&quot;</span>),
+            }
+        };
+        <span class="kw">let</span> <span class="ident">template</span> <span class="op">=</span> <span class="string">r#&quot;
             #[cfg(test)]
             mod $mod_name {
                 use sewup::bincode;
@@ -1772,7 +1832,10 @@
                     impl Fn(Arc&lt;RefCell&lt;TestRuntime&gt;&gt;, &amp;str, [u8; 4], Option&lt;&amp;[u8]&gt;, Vec&lt;u8&gt;) -&gt; (),
                 ) {
                     (
-                        Arc::new(RefCell::new(TestRuntime::default())),
+                        Arc::new(RefCell::new(TestRuntime::default()&quot;#</span>
+            .<span class="ident">to_string</span>()
+            <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">runtime_log_option</span>
+            <span class="op">+</span> <span class="string">r#&quot;)),
                         |runtime: Arc&lt;RefCell&lt;TestRuntime&gt;&gt;,
                          fn_name: &amp;str,
                          sig: [u8; 4],
@@ -1798,8 +1861,17 @@
                 #[test]
                 fn _compile_test() {
                     _build_wasm();
-                }&quot;#</span>).<span class="ident">to_string</span>().<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+                }&quot;#</span>;
+        <span class="kw">return</span> <span class="ident">mod_re</span>
+            .<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">template</span>)
+            .<span class="ident">to_string</span>()
+            .<span class="ident">parse</span>()
+            .<span class="ident">unwrap</span>();
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">fn_re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>).<span class="ident">is_some</span>() {
+        <span class="kw">let</span> <span class="ident">attr_str</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">attr_str</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">abort_call_site!</span>(<span class="string">&quot;no support option when wrapping on function&quot;</span>)
+        };
         <span class="kw">return</span> <span class="ident">fn_re</span>
             .<span class="ident">replace</span>(
                 <span class="kw-2">&amp;</span><span class="ident">context</span>,
