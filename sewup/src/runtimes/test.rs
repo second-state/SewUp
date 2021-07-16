@@ -14,7 +14,7 @@ use hex::encode;
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
 
 pub struct TestRuntime {
-    host: TestHost,
+    pub host: TestHost,
     vm: EvmcVm,
 }
 
@@ -33,6 +33,10 @@ impl TestRuntime {
             host: self.host.set_log_file(log_file),
             vm: self.vm,
         }
+    }
+    pub fn set_host(self, mut host: TestHost) -> Self {
+        host.log_file = self.host.log_file;
+        Self { host, vm: self.vm }
     }
 }
 
@@ -118,8 +122,9 @@ impl RT for TestRuntime {
 }
 
 #[derive(Default)]
-struct TestHost {
-    store: HashMap<[u8; 32], [u8; 32]>,
+pub struct TestHost {
+    store: HashMap<[u8; 20], HashMap<[u8; 32], [u8; 32]>>,
+    balance: HashMap<[u8; 20], [u8; 32]>,
     log_file: Option<String>,
 }
 
@@ -128,18 +133,76 @@ impl TestHost {
         fs::write(&file_name, "").expect("written log fail");
         Self {
             store: self.store,
+            balance: self.balance,
             log_file: Some(file_name),
         }
     }
 }
 
+/// Impl methods that developer easily modify the state to setup the test runtime as they want
+impl TestHost {
+    pub fn set_balance_raw(&mut self, addr: &[u8; 20], balance: [u8; 32]) {
+        self.balance.insert(*addr, balance);
+    }
+
+    pub fn reset_balance(&mut self, addr: &[u8; 20]) {
+        self.balance.insert(*addr, Default::default());
+    }
+
+    pub fn set_balance(&mut self, addr: &[u8; 20], x: u128) {
+        self.balance.insert(
+            *addr,
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                ((x >> 120) & 0xff) as u8,
+                ((x >> 112) & 0xff) as u8,
+                ((x >> 104) & 0xff) as u8,
+                (x >> 96) as u8,
+                ((x >> 88) & 0xff) as u8,
+                ((x >> 80) & 0xff) as u8,
+                ((x >> 72) & 0xff) as u8,
+                (x >> 64) as u8,
+                ((x >> 56) & 0xff) as u8,
+                ((x >> 48) & 0xff) as u8,
+                ((x >> 40) & 0xff) as u8,
+                (x >> 32) as u8,
+                ((x >> 24) & 0xff) as u8,
+                ((x >> 16) & 0xff) as u8,
+                ((x >> 8) & 0xff) as u8,
+                (x & 0xff) as u8,
+            ],
+        );
+    }
+}
+
 impl HostContext for TestHost {
     fn account_exists(&mut self, addr: &[u8; 20]) -> bool {
-        true
+        self.balance.contains_key(addr)
     }
 
     fn get_storage(&mut self, addr: &[u8; 20], key: &[u8; 32]) -> [u8; 32] {
-        match self.store.get(key) {
+        if !self.store.contains_key(addr) {
+            self.store.insert(*addr, Default::default());
+        }
+
+        let store = self.store.get_mut(addr).unwrap();
+
+        match store.get(key) {
             Some(v) => *v,
             None => [0; 32],
         }
@@ -151,12 +214,20 @@ impl HostContext for TestHost {
         key: &[u8; 32],
         value: &[u8; 32],
     ) -> evmc_storage_status {
-        self.store.insert(*key, *value);
+        if !self.store.contains_key(addr) {
+            self.store.insert(*addr, Default::default());
+        }
+
+        let store = self.store.get_mut(addr).unwrap();
+        store.insert(*key, *value);
         evmc_storage_status::EVMC_STORAGE_MODIFIED
     }
 
     fn get_balance(&mut self, addr: &[u8; 20]) -> [u8; 32] {
-        [0; 32]
+        match self.balance.get(addr) {
+            Some(v) => *v,
+            None => [0; 32],
+        }
     }
 
     fn get_code_size(&mut self, addr: &[u8; 20]) -> usize {
@@ -272,5 +343,26 @@ mod tests {
         host.emit_log(&addr, &topics, &data);
         host.emit_log(&addr, &topics, &readable_data);
         assert!(fs::metadata("/tmp/host.log").is_ok());
+    }
+    #[test]
+    fn test_adding_balance() {
+        let mut host = TestHost::default();
+        let addr = [1; 20];
+        host.set_balance(&addr, 1);
+        assert_eq!(
+            host.get_balance(&addr),
+            [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1
+            ]
+        );
+        host.set_balance(&addr, 340282366920938463463374607431768211455);
+        assert_eq!(
+            host.get_balance(&addr),
+            [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 255, 255, 255, 255
+            ]
+        );
     }
 }
