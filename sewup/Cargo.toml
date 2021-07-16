@@ -1,6 +1,6 @@
 [package]
 name = "sewup"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2018"
 build="build.rs"
@@ -17,7 +17,7 @@ serde_derive = "1.0"
 toml = "0.5.8"
 ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 tiny-keccak = { version = "2.0.2", features = ["sha3", "keccak"] }
-sewup-derive = { version = "0.0.5" }
+sewup-derive = { version = "0.0.6", path = "../sewup-derive" }
 bincode = "1.3"
 cryptoxide = "0.3.3"
 

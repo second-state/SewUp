@@ -1,9 +1,9 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.0.4-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.0.5-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.4-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.5-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
@@ -89,8 +89,9 @@ mod tests {
 ```
 
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
-Besides, you also can easily run test with debug message `cargo test -- --nocapture`, the ewasm contract automatically test with [WasmEdge](https://github.com/WasmEdge/WasmEdge).
-Furthermore, you can learn more from other examples in the [example](./examples/) folder.
+Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/WasmEdge/WasmEdge) and run tests on it with `cargo test`.
+Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
+To learn more about the usage, you check out the examples in the [example](./examples/) folder.
 
 ## Development
 The workspace have several project, the contract project should build with target
@@ -98,3 +99,4 @@ The workspace have several project, the contract project should build with targe
 
 You can run `cargo test` in each example to check on the test your modification.
 It is easy to participate with help want issues and the good first issues.
+Less but not least, please feel free to open any issue on this porject.
