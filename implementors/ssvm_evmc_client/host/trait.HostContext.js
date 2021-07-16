@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["sewup"] = [{"text":"impl <a class=\"trait\" href=\"ssvm_evmc_client/host/trait.HostContext.html\" title=\"trait ssvm_evmc_client::host::HostContext\">HostContext</a> for <a class=\"struct\" href=\"sewup/runtimes/test/struct.TestHost.html\" title=\"struct sewup::runtimes::test::TestHost\">TestHost</a>","synthetic":false,"types":["sewup::runtimes::test::TestHost"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

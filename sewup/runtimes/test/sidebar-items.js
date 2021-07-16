@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["TestRuntime",""]]});
+initSidebarItems({"struct":[["TestHost",""],["TestRuntime",""]]});
