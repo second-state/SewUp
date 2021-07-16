@@ -139,7 +139,7 @@ impl TestHost {
     }
 }
 
-/// Impl methods that developer to easy to modify the state to setup the test runtime as they want
+/// Impl methods that developer easily modify the state to setup the test runtime as they want
 impl TestHost {
     pub fn set_balance_raw(&mut self, addr: &[u8; 20], balance: [u8; 32]) {
         self.balance.insert(*addr, balance);
@@ -149,12 +149,44 @@ impl TestHost {
         self.balance.insert(*addr, Default::default());
     }
 
-    pub fn set_balance(&mut self, addr: &[u8; 20], balance: usize) {
-        let mut byte32 = [0u8; 32];
-        for (j, byte) in byte32.iter_mut().enumerate().take((balance / 32) + 1) {
-            *byte = (balance >> (5 * j) & 31) as u8;
-        }
-        self.balance.insert(*addr, byte32);
+    pub fn set_balance(&mut self, addr: &[u8; 20], x: u128) {
+        self.balance.insert(
+            *addr,
+            [
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                ((x >> 120) & 0xff) as u8,
+                ((x >> 112) & 0xff) as u8,
+                ((x >> 104) & 0xff) as u8,
+                (x >> 96) as u8,
+                ((x >> 88) & 0xff) as u8,
+                ((x >> 80) & 0xff) as u8,
+                ((x >> 72) & 0xff) as u8,
+                (x >> 64) as u8,
+                ((x >> 56) & 0xff) as u8,
+                ((x >> 48) & 0xff) as u8,
+                ((x >> 40) & 0xff) as u8,
+                (x >> 32) as u8,
+                ((x >> 24) & 0xff) as u8,
+                ((x >> 16) & 0xff) as u8,
+                ((x >> 8) & 0xff) as u8,
+                (x & 0xff) as u8,
+            ],
+        );
     }
 }
 
@@ -311,5 +343,26 @@ mod tests {
         host.emit_log(&addr, &topics, &data);
         host.emit_log(&addr, &topics, &readable_data);
         assert!(fs::metadata("/tmp/host.log").is_ok());
+    }
+    #[test]
+    fn test_adding_balance() {
+        let mut host = TestHost::default();
+        let addr = [1; 20];
+        host.set_balance(&addr, 1);
+        assert_eq!(
+            host.get_balance(&addr),
+            [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 1
+            ]
+        );
+        host.set_balance(&addr, 340282366920938463463374607431768211455);
+        assert_eq!(
+            host.get_balance(&addr),
+            [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255, 255,
+                255, 255, 255, 255, 255, 255, 255, 255, 255
+            ]
+        );
     }
 }
