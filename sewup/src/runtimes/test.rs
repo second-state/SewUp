@@ -14,7 +14,7 @@ use hex::encode;
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
 
 pub struct TestRuntime {
-    host: TestHost,
+    pub host: TestHost,
     vm: EvmcVm,
 }
 
@@ -33,6 +33,10 @@ impl TestRuntime {
             host: self.host.set_log_file(log_file),
             vm: self.vm,
         }
+    }
+    pub fn set_host(self, mut host: TestHost) -> Self {
+        host.log_file = self.host.log_file;
+        Self { host, vm: self.vm }
     }
 }
 
@@ -118,8 +122,9 @@ impl RT for TestRuntime {
 }
 
 #[derive(Default)]
-struct TestHost {
-    store: HashMap<[u8; 32], [u8; 32]>,
+pub struct TestHost {
+    store: HashMap<[u8; 20], HashMap<[u8; 32], [u8; 32]>>,
+    balance: HashMap<[u8; 20], [u8; 32]>,
     log_file: Option<String>,
 }
 
@@ -128,18 +133,44 @@ impl TestHost {
         fs::write(&file_name, "").expect("written log fail");
         Self {
             store: self.store,
+            balance: self.balance,
             log_file: Some(file_name),
         }
     }
 }
 
+/// Impl methods that developer to easy to modify the state to setup the test runtime as they want
+impl TestHost {
+    pub fn set_balance_raw(&mut self, addr: &[u8; 20], balance: [u8; 32]) {
+        self.balance.insert(*addr, balance);
+    }
+
+    pub fn reset_balance(&mut self, addr: &[u8; 20]) {
+        self.balance.insert(*addr, Default::default());
+    }
+
+    pub fn set_balance(&mut self, addr: &[u8; 20], balance: usize) {
+        let mut byte32 = [0u8; 32];
+        for (j, byte) in byte32.iter_mut().enumerate().take((balance / 32) + 1) {
+            *byte = (balance >> (5 * j) & 31) as u8;
+        }
+        self.balance.insert(*addr, byte32);
+    }
+}
+
 impl HostContext for TestHost {
     fn account_exists(&mut self, addr: &[u8; 20]) -> bool {
-        true
+        self.balance.contains_key(addr)
     }
 
     fn get_storage(&mut self, addr: &[u8; 20], key: &[u8; 32]) -> [u8; 32] {
-        match self.store.get(key) {
+        if !self.store.contains_key(addr) {
+            self.store.insert(*addr, Default::default());
+        }
+
+        let store = self.store.get_mut(addr).unwrap();
+
+        match store.get(key) {
             Some(v) => *v,
             None => [0; 32],
         }
@@ -151,12 +182,20 @@ impl HostContext for TestHost {
         key: &[u8; 32],
         value: &[u8; 32],
     ) -> evmc_storage_status {
-        self.store.insert(*key, *value);
+        if !self.store.contains_key(addr) {
+            self.store.insert(*addr, Default::default());
+        }
+
+        let store = self.store.get_mut(addr).unwrap();
+        store.insert(*key, *value);
         evmc_storage_status::EVMC_STORAGE_MODIFIED
     }
 
     fn get_balance(&mut self, addr: &[u8; 20]) -> [u8; 32] {
-        [0; 32]
+        match self.balance.get(addr) {
+            Some(v) => *v,
+            None => [0; 32],
+        }
     }
 
     fn get_code_size(&mut self, addr: &[u8; 20]) -> usize {
