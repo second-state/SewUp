@@ -566,7 +566,34 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             r#"
             impl sewup::rdb::traits::Record for {} {{}}
 
-            #[derive(Default, Clone, sewup::Serialize, sewup::Deserialize)]
+            #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
+            pub struct {}Protocol {{
+                // select_fields: Vec<&'static str>,
+                filter: bool,
+                records: Vec<{}Wrapper>
+            }}
+
+            impl Default for {}Protocol {{
+                fn default() -> Self {{
+                    Self {{
+                        // select_fields: Vec::new(),
+                        filter: false,
+                        records: vec![Default::default()]
+                    }}
+                }}
+            }}
+
+            impl From<{}> for {}Protocol {{
+                fn from(instance: {}) -> Self {{
+                    Self {{
+                        // select_fields: Vec::new(),
+                        filter: false,
+                        records: vec![instance.into()]
+                    }}
+                }}
+            }}
+
+            #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
             pub struct {}Wrapper {{
                 id: Option<usize>,
                 {}
@@ -601,36 +628,36 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             mod {} {{
                 use super::*;
-                pub fn get(instance: {}Wrapper) -> Result<()> {{
+                pub fn get(proc: {}Protocol) -> Result<()> {{
                     let table = sewup::rdb::Db::load(None)?.table::<{}>()?;
-                    let raw_output = table.get_record(instance.id.unwrap_or_default())?;
-                    let mut output: {}Wrapper = raw_output.into();
-                    output.id = instance.id;
+                    let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
+                    let mut output: {}Protocol = raw_output.into();
+                    output.records[0].id = proc.records[0].id;
                     sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn create(instance: {}Wrapper) -> Result<()> {{
+                pub fn create(proc: {}Protocol) -> Result<()> {{
                     let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
-                    let mut output = instance.clone();
-                    output.id = Some(table.add_record(instance.into())?);
+                    let mut output = proc.clone();
+                    output.records[0].id = Some(table.add_record(proc.records[0].into())?);
                     table.commit()?;
                     sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn update(instance: {}Wrapper) -> Result<()> {{
+                pub fn update(proc: {}Protocol) -> Result<()> {{
                     let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
-                    let id = instance.id.unwrap_or_default();
-                    table.update_record(id, Some(instance.clone().into()))?;
+                    let id = proc.records[0].id.unwrap_or_default();
+                    table.update_record(id, Some(proc.records[0].clone().into()))?;
                     table.commit()?;
-                    sewup::utils::ewasm_return(ewasm_output_from!(instance));
+                    sewup::utils::ewasm_return(ewasm_output_from!(proc));
                     Ok(())
                 }}
-                pub fn delete(instance: {}Wrapper) -> Result<()> {{
+                pub fn delete(proc: {}Protocol) -> Result<()> {{
                     let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
-                    let id = instance.id.unwrap_or_default();
+                    let id = proc.records[0].id.unwrap_or_default();
                     table.update_record(id, None)?;
                     table.commit()?;
-                    sewup::utils::ewasm_return(ewasm_output_from!(instance));
+                    sewup::utils::ewasm_return(ewasm_output_from!(proc));
                     Ok(())
                 }}
             }}
@@ -639,20 +666,27 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             mod {} {{
                 use super::*;
                 #[inline]
-                pub fn protocol(instance: {}) -> {}Wrapper {{
+                pub fn protocol(instance: {}) -> {}Protocol {{
                     instance.into()
                 }}
-                pub type Protocol = {}Wrapper;
+                pub type Protocol = {}Protocol;
                 impl Protocol {{
                     pub fn set_id(&mut self, id: usize) {{
-                        self.id = Some(id);
+                        self.records[0].id = Some(id);
                     }}
                     pub fn is_empty(&self) -> bool {{
-                        self.trusted.is_none() && self.age.is_none()
+                        {}
                     }}
                 }}
             }}"#,
-            //Record trait
+            // Record trait
+            struct_name,
+            // Protocol struct
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
             struct_name,
             // Wraper struct
             struct_name,
@@ -697,6 +731,11 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             struct_name,
             struct_name,
+            fields
+                .iter()
+                .map(|f| format!("self.records[0].{}.is_none()", f))
+                .collect::<Vec<_>>()
+                .join("&&"),
         )
         .parse()
         .unwrap()

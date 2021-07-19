@@ -145,7 +145,7 @@ mod tests {
         let mut delete_input = person::Protocol::default();
         assert!(delete_input.is_empty());
 
-        delete_input.id = Some(1);
+        delete_input.set_id(1);
         ewasm_assert_eq!(
             person::delete(delete_input),
             ewasm_output_from!(delete_input)
