@@ -1334,7 +1334,7 @@
         })
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
             <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>),
-            <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>.<span class="ident">clone</span>()) {
+            <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>) {
                 <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">true</span>),
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">abort_call_site!</span>(<span class="string">&quot;please pass Path type or Reference type to ewasm_fn_sig&quot;</span>),
             },
@@ -1411,7 +1411,7 @@
         })
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
             <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>),
-            <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>.<span class="ident">clone</span>()) {
+            <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>) {
                 <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">true</span>),
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">abort_call_site!</span>(<span class="string">&quot;please pass Path type or Reference type to ewasm_fn_sig&quot;</span>),
             },
@@ -1509,12 +1509,12 @@
                 .<span class="ident">split</span>(<span class="string">&#39;,&#39;</span>)
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">p_split</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">split</span>(<span class="string">&#39;:&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
-                    <span class="kw">return</span> <span class="kw">if</span> <span class="ident">p_split</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+                    <span class="kw">if</span> <span class="ident">p_split</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
                         <span class="ident">p_split</span>[<span class="number">1</span>]
                     } <span class="kw">else</span> {
                         <span class="ident">p_split</span>[<span class="number">0</span>]
                     }
-                    .<span class="ident">trim</span>();
+                    .<span class="ident">trim</span>()
                 })
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;,&quot;</span>)
@@ -2045,7 +2045,7 @@
         <span class="kw">let</span> <span class="ident">runtime_log_option</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">attr_str</span>.<span class="ident">is_empty</span>() {
             <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">attr_str</span>.<span class="ident">split</span>(<span class="string">&quot;=&quot;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">attr_str</span>.<span class="ident">split</span>(<span class="string">&#39;=&#39;</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
             <span class="kw">match</span> <span class="ident">options</span>[<span class="number">0</span>].<span class="ident">to_lowercase</span>().<span class="ident">as_str</span>() {
                 <span class="string">&quot;log&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format!</span>(<span class="string">&quot;.set_log_file({:?}.into())&quot;</span>, <span class="ident">options</span>[<span class="number">1</span>]),
                 <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">abort_call_site!</span>(<span class="string">&quot;no support option&quot;</span>),
