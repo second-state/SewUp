@@ -152,11 +152,18 @@ mod tests {
         get_input.set_id(1);
         ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(update_input));
 
+        // Here is the advance query with filter and selector
+        // In the example, the query only want to get the age of trusted person
         let mut person_query = person::Query::default();
         person_query.trusted = Some(true);
-        let person_query_protocol: person::Protocol = person_query.into();
+        let mut person_query_protocol: person::Protocol = person_query.into();
         assert!(person_query_protocol.filter);
+        person_query_protocol.set_select_fields(vec!["age".to_string()]);
+
+        // The expect result only return the age of the trusted person,
+        // and other fields will be None
         expect_output = vec![older_person].into();
+        expect_output.records[0].trusted = None;
         ewasm_assert_eq!(
             person::get(person_query_protocol),
             ewasm_output_from!(expect_output)
