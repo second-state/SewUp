@@ -1,3 +1,4 @@
+#![feature(allocator_api)]
 //! Sewup - Second state eWasm Utility Program
 //! A library to help you sew up your Ethereum project with Rust and just like develop in a common backend.
 //!
@@ -54,5 +55,7 @@ pub mod types;
 pub use ewasm_api;
 
 pub use bincode;
+pub use serde::de::DeserializeOwned;
 pub use serde::{Deserialize as DeserializeTrait, Serialize as SerializeTrait};
 pub use serde_derive::{Deserialize, Serialize};
+pub use serde_value::{to_value, Value};

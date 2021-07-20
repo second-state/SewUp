@@ -16,6 +16,7 @@ anyhow = "1.0.40"
 thiserror = "1.0.24"
 serde = "1.0"
 serde_derive = "1.0"
+serde-value = "0.7.0"
 
 [profile.release]
 incremental = false
