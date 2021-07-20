@@ -161,7 +161,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         })
         .map(|ty| match ty {
             syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
-            syn::Type::Reference(tr) => match Box::into_inner(tr.elem.clone()) {
+            syn::Type::Reference(tr) => match Box::into_inner(tr.elem) {
                 syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
                 _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
             },
@@ -238,7 +238,7 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         })
         .map(|ty| match ty {
             syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
-            syn::Type::Reference(tr) => match Box::into_inner(tr.elem.clone()) {
+            syn::Type::Reference(tr) => match Box::into_inner(tr.elem) {
                 syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
                 _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
             },
@@ -336,12 +336,12 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
                 .split(',')
                 .map(|p| {
                     let p_split = p.split(':').collect::<Vec<_>>();
-                    return if p_split.len() == 2 {
+                    if p_split.len() == 2 {
                         p_split[1]
                     } else {
                         p_split[0]
                     }
-                    .trim();
+                    .trim()
                 })
                 .collect::<Vec<_>>()
                 .join(",")
@@ -872,7 +872,7 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         let runtime_log_option = if attr_str.is_empty() {
             "".to_string()
         } else {
-            let options = attr_str.split("=").collect::<Vec<_>>();
+            let options = attr_str.split('=').collect::<Vec<_>>();
             match options[0].to_lowercase().as_str() {
                 "log" => format!(".set_log_file({:?}.into())", options[1]),
                 _ => abort_call_site!("no support option"),
