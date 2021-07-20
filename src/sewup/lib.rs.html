@@ -59,7 +59,11 @@
 <span id="56">56</span>
 <span id="57">57</span>
 <span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
 </pre><pre class="rust">
+<span class="attribute">#![<span class="ident">feature</span>(<span class="ident">allocator_api</span>)]</span>
 <span class="doccomment">//! Sewup - Second state eWasm Utility Program</span>
 <span class="doccomment">//! A library to help you sew up your Ethereum project with Rust and just like develop in a common backend.</span>
 <span class="doccomment">//!</span>
@@ -116,8 +120,10 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ewasm_api</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bincode</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span> <span class="kw">as</span> <span class="ident">DeserializeTrait</span>, <span class="ident">Serialize</span> <span class="kw">as</span> <span class="ident">SerializeTrait</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_value</span>::{<span class="ident">to_value</span>, <span class="ident">Value</span>};
 </pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
     <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script></body></html>
