@@ -160,7 +160,7 @@ mod tests {
         assert!(person_query_protocol.filter);
         person_query_protocol.set_select_fields(vec!["age".to_string()]);
 
-        // The expect result only return the age of the trusted person,
+        // The expected result only return the age of the trusted person,
         // and other fields will be None
         expect_output = vec![older_person].into();
         expect_output.records[0].trusted = None;
