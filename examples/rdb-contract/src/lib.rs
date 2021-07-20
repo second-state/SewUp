@@ -15,7 +15,7 @@ use errors::RDBError;
 // to communicate with these handler, you will need protocol.
 // The protocol is easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`,
 // please check out the test case in the end of this document
-#[derive(Table, Default, Serialize, Deserialize)]
+#[derive(Table, Default, Clone, Serialize, Deserialize)]
 pub struct Person {
     trusted: bool,
     age: u8,
@@ -111,7 +111,7 @@ mod tests {
             age: 18,
         };
 
-        let create_input = person::protocol(person);
+        let mut create_input = person::protocol(person.clone());
         let mut expect_output = create_input.clone();
         expect_output.set_id(1);
         ewasm_assert_eq!(
@@ -123,17 +123,44 @@ mod tests {
         get_input.set_id(1);
         ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(expect_output));
 
+        let child = Person {
+            trusted: false,
+            age: 9,
+        };
+
+        create_input = person::protocol(child);
+        expect_output = create_input.clone();
+        expect_output.set_id(2);
+        ewasm_assert_eq!(
+            person::create(create_input),
+            ewasm_output_from!(expect_output)
+        );
+
+        get_input.set_id(2);
+        ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(expect_output));
+
         let older_person = Person {
             trusted: true,
             age: 20,
         };
-        let mut update_input = person::protocol(older_person);
+        let mut update_input = person::protocol(older_person.clone());
         update_input.set_id(1);
         ewasm_assert_eq!(
             person::update(update_input),
             ewasm_output_from!(update_input)
         );
+        get_input.set_id(1);
         ewasm_assert_eq!(person::get(get_input), ewasm_output_from!(update_input));
+
+        let mut person_query = person::Query::default();
+        person_query.trusted = Some(true);
+        let person_query_protocol: person::Protocol = person_query.into();
+        assert!(person_query_protocol.filter);
+        expect_output = vec![older_person].into();
+        ewasm_assert_eq!(
+            person::get(person_query_protocol),
+            ewasm_output_from!(expect_output)
+        );
 
         // Please Notice that protocol from the default instance may not be empty,
         // this dependents on the default implementation of the struct.

@@ -559,18 +559,45 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         let field_part = cap.name("fields").unwrap().as_str();
         let fields = field_part
             .split(',')
-            .map(|p| p.split(':').nth(0).unwrap_or("").trim())
-            .filter(|s| !s.is_empty())
+            .map(|p| {
+                (
+                    p.split(':').nth(0).unwrap_or("").trim(),
+                    p.split(':').nth(1).unwrap_or("").trim(),
+                )
+            })
+            .filter(|s| !s.0.is_empty())
             .collect::<Vec<_>>();
         format!(
             r#"
+            fn get_field_by_name<T, R>(data: T, field: &str) -> R
+            where
+                T: sewup::SerializeTrait,
+                R: sewup::DeserializeOwned,
+            {{
+                let mut map = match sewup::to_value(data) {{
+                    Ok(sewup::Value::Map(map)) => map,
+                    _ => panic!("expected a struct"),
+                }};
+
+                let key = sewup::Value::String(field.to_owned());
+                let value = match map.remove(&key) {{
+                    Some(value) => value,
+                    None => panic!("no such field"),
+                }};
+
+                match R::deserialize(value) {{
+                    Ok(r) => r,
+                    Err(_) => panic!("type uncorrect"),
+                }}
+            }}
+
             impl sewup::rdb::traits::Record for {} {{}}
 
             #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
             pub struct {}Protocol {{
                 // select_fields: Vec<&'static str>,
-                filter: bool,
-                records: Vec<{}Wrapper>
+                pub filter: bool,
+                pub records: Vec<{}Wrapper>
             }}
 
             impl Default for {}Protocol {{
@@ -589,6 +616,16 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         // select_fields: Vec::new(),
                         filter: false,
                         records: vec![instance.into()]
+                    }}
+                }}
+            }}
+
+            impl From<Vec<{}>> for {}Protocol {{
+                fn from(instances: Vec<{}>) -> Self {{
+                    Self {{
+                        // select_fields: Vec::new(),
+                        filter: false,
+                        records: instances.into_iter().map(|i| i.into()).collect::<Vec<_>>()
                     }}
                 }}
             }}
@@ -630,10 +667,25 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 use super::*;
                 pub fn get(proc: {}Protocol) -> Result<()> {{
                     let table = sewup::rdb::Db::load(None)?.table::<{}>()?;
-                    let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
-                    let mut output: {}Protocol = raw_output.into();
-                    output.records[0].id = proc.records[0].id;
-                    sewup::utils::ewasm_return(ewasm_output_from!(output));
+                    if proc.filter {{
+                        let mut raw_output: Vec<{}> = Vec::new();
+                        for r in table.all_records()?.drain(..){{
+                            let mut all_field_match = true;
+
+                            {}
+
+                            if all_field_match {{
+                                raw_output.push(r);
+                            }}
+                        }}
+                        let output: {}Protocol = raw_output.into();
+                        sewup::utils::ewasm_return(ewasm_output_from!(output));
+                    }} else {{
+                        let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
+                        let mut output: {}Protocol = raw_output.into();
+                        output.records[0].id = proc.records[0].id;
+                        sewup::utils::ewasm_return(ewasm_output_from!(output));
+                    }}
                     Ok(())
                 }}
                 pub fn create(proc: {}Protocol) -> Result<()> {{
@@ -678,6 +730,20 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         {}
                     }}
                 }}
+                pub fn query(instance: {}) -> {}Wrapper {{
+                    instance.into()
+                }}
+                pub type Query = {}Wrapper;
+
+                impl From<Query> for {}Protocol {{
+                    fn from(instance: Query) -> Self {{
+                        Self {{
+                            // select_fields: Vec::new(),
+                            filter: true,
+                            records: vec![instance.into()]
+                        }}
+                    }}
+                }}
             }}"#,
             // Record trait
             struct_name,
@@ -688,7 +754,10 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             struct_name,
             struct_name,
-            // Wraper struct
+            struct_name,
+            struct_name,
+            struct_name,
+            // Wrapper struct
             struct_name,
             field_part.replace(":", ":Option<").replace(",", ">,"),
             // impl From for warper
@@ -697,7 +766,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             fields
                 .iter()
-                .map(|f| format!("{}:Some(instance.{})", f, f))
+                .map(|f| format!("{}:Some(instance.{})", f.0, f.0))
                 .collect::<Vec<_>>()
                 .join(","),
             // impl From for instance
@@ -706,7 +775,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             fields
                 .iter()
-                .map(|f| format!(r#"{}:wrapper.{}.expect("{} field missing")"#, f, f, f))
+                .map(|f| format!(r#"{}:wrapper.{}.expect("{} field missing")"#, f.0, f.0, f.0))
                 .collect::<Vec<_>>()
                 .join(","),
             // mod for signature
@@ -717,9 +786,26 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             // mod for handlers
             struct_name.to_ascii_lowercase(),
+            // get
             struct_name,
             struct_name,
             struct_name,
+            fields
+                .iter()
+                .map(|f| format!(
+                    r#"
+                let {}_field_filter: Option<{}> = get_field_by_name(proc.records[0], "{}");
+                let {}_field: {} = get_field_by_name(&r, "{}");
+                if {}_field_filter.is_some() {{
+                    all_field_match &= {}_field_filter.unwrap() == {}_field;
+                }} "#,
+                    f.0, f.1, f.0, f.0, f.1, f.0, f.0, f.0, f.0
+                ))
+                .collect::<Vec<_>>()
+                .join("\n"),
+            struct_name,
+            struct_name,
+            // post
             struct_name,
             struct_name,
             struct_name,
@@ -733,9 +819,13 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             fields
                 .iter()
-                .map(|f| format!("self.records[0].{}.is_none()", f))
+                .map(|f| format!("self.records[0].{}.is_none()", f.0))
                 .collect::<Vec<_>>()
                 .join("&&"),
+            struct_name,
+            struct_name,
+            struct_name,
+            struct_name,
         )
         .parse()
         .unwrap()
