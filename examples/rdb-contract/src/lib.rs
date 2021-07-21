@@ -75,6 +75,19 @@ fn check_tables_again() -> Result<()> {
     }
     Ok(())
 }
+
+#[ewasm_fn]
+fn get_childern() -> Result<()> {
+    let table = sewup::rdb::Db::load(None)?.table::<Person>()?;
+    let people = table.filter_records(&|p: &Person| p.age < 12)?;
+
+    // you can do much complicate filter logic here as you like
+
+    let output: person::Protocol = people.into();
+    sewup::utils::ewasm_return(ewasm_output_from!(output));
+    Ok(())
+}
+
 #[ewasm_main]
 fn main() -> Result<()> {
     let mut contract = Contract::new()?;
@@ -87,6 +100,7 @@ fn main() -> Result<()> {
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![Feature::Default])?
         }
+        ewasm_fn_sig!(get_childern) => get_childern()?,
         ewasm_fn_sig!(init_db_with_tables) => init_db_with_tables()?,
         ewasm_fn_sig!(check_tables) => check_tables()?,
         ewasm_fn_sig!(drop_table) => drop_table()?,
@@ -128,7 +142,7 @@ mod tests {
             age: 9,
         };
 
-        create_input = person::protocol(child);
+        create_input = person::protocol(child.clone());
         expect_output = create_input.clone();
         expect_output.set_id(2);
         ewasm_assert_eq!(
@@ -168,6 +182,10 @@ mod tests {
             person::get(person_query_protocol),
             ewasm_output_from!(expect_output)
         );
+
+        // Get the childern by the customized handler
+        expect_output = vec![child].into();
+        ewasm_assert_eq!(get_childern(), ewasm_output_from!(expect_output));
 
         // Please Notice that protocol from the default instance may not be empty,
         // this dependents on the default implementation of the struct.

@@ -689,15 +689,18 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             mod {} {{
                 use super::*;
-                pub fn get(proc: {}Protocol) -> Result<()> {{
-                    let table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                pub type Protocol = {}Protocol;
+                pub type Wrapper = {}Wrapper;
+                pub type _Instance = {};
+                pub fn get(proc: Protocol) -> Result<()> {{
+                    let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                     if proc.filter {{
-                        let mut raw_output: Vec<{}Wrapper> = Vec::new();
+                        let mut raw_output: Vec<Wrapper> = Vec::new();
                         for r in table.all_records()?.drain(..){{
                             let mut all_field_match = true;
                             {}
                             if all_field_match {{
-                                let mut wrapper: {}Wrapper = r.into();
+                                let mut wrapper: Wrapper = r.into();
                                 raw_output.push(wrapper);
                             }}
                         }}
@@ -706,34 +709,34 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                                 {}
                             }}
                         }}
-                        let output: {}Protocol = raw_output.into();
+                        let output: Protocol = raw_output.into();
                         sewup::utils::ewasm_return(ewasm_output_from!(output));
                     }} else {{
                         let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
-                        let mut output: {}Protocol = raw_output.into();
+                        let mut output: Protocol = raw_output.into();
                         output.records[0].id = proc.records[0].id;
                         sewup::utils::ewasm_return(ewasm_output_from!(output));
                     }}
                     Ok(())
                 }}
-                pub fn create(proc: {}Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                pub fn create(proc: Protocol) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                     let mut output = proc.clone();
                     output.records[0].id = Some(table.add_record(proc.records[0].into())?);
                     table.commit()?;
                     sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn update(proc: {}Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                pub fn update(proc: Protocol) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                     let id = proc.records[0].id.unwrap_or_default();
                     table.update_record(id, Some(proc.records[0].clone().into()))?;
                     table.commit()?;
                     sewup::utils::ewasm_return(ewasm_output_from!(proc));
                     Ok(())
                 }}
-                pub fn delete(proc: {}Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<{}>()?;
+                pub fn delete(proc: Protocol) -> Result<()> {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                     let id = proc.records[0].id.unwrap_or_default();
                     table.update_record(id, None)?;
                     table.commit()?;
@@ -745,11 +748,14 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             #[cfg(not(target_arch = "wasm32"))]
             mod {} {{
                 use super::*;
+                pub type Protocol = {}Protocol;
+                pub type Wrapper = {}Wrapper;
+                pub type Query = Wrapper;
+                pub type _Instance = {};
                 #[inline]
-                pub fn protocol(instance: {}) -> {}Protocol {{
+                pub fn protocol(instance: _Instance) -> Protocol {{
                     instance.into()
                 }}
-                pub type Protocol = {}Protocol;
                 impl Protocol {{
                     pub fn set_id(&mut self, id: usize) {{
                         self.records[0].id = Some(id);
@@ -758,12 +764,11 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         {}
                     }}
                 }}
-                pub fn query(instance: {}) -> {}Wrapper {{
+                pub fn query(instance: _Instance) -> Wrapper {{
                     instance.into()
                 }}
-                pub type Query = {}Wrapper;
 
-                impl From<Query> for {}Protocol {{
+                impl From<Query> for Protocol {{
                     fn from(instance: Query) -> Self {{
                         Self {{
                             select_fields: None,
@@ -818,9 +823,9 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             struct_name,
             // mod for handlers
             struct_name.to_ascii_lowercase(),
+            struct_name,
+            struct_name,
             // get
-            struct_name,
-            struct_name,
             struct_name,
             fields
                 .iter()
@@ -835,7 +840,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 ))
                 .collect::<Vec<_>>()
                 .join("\n"),
-            struct_name,
             fields
                 .iter()
                 .map(|f| format!(
@@ -847,15 +851,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 ))
                 .collect::<Vec<_>>()
                 .join("\n"),
-            struct_name,
-            struct_name,
-            // post
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
             // mod for protocol
             struct_name.to_ascii_lowercase(),
             struct_name,
@@ -866,10 +861,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 .map(|f| format!("self.records[0].{}.is_none()", f.0))
                 .collect::<Vec<_>>()
                 .join("&&"),
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
         )
         .parse()
         .unwrap()
