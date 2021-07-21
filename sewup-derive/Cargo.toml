@@ -33,3 +33,6 @@ serde-value = "0.7.0"
 kv = []
 rdb = []
 test = ["rdb", "kv"]
+
+[package.metadata.docs.rs]
+all-features = true

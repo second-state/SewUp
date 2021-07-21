@@ -37,3 +37,6 @@ default = [ ]
 token = [ ]
 kv = []
 rdb = []
+
+[package.metadata.docs.rs]
+all-features = true
