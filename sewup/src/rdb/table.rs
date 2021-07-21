@@ -55,6 +55,21 @@ impl<T: Record> Table<T> {
         Ok(output)
     }
 
+    /// Filter the records
+    pub fn filter_records(&self, filter: &Fn(&T) -> bool) -> Result<Vec<T>> {
+        let mut output: Vec<T> = Vec::new();
+        for r in self.data.iter() {
+            let mut buffer_row = r.clone();
+            buffer_row.make_buffer();
+            if let Some(i) = T::from_row(&buffer_row) {
+                if filter(&i) {
+                    output.push(i);
+                }
+            }
+        }
+        Ok(output)
+    }
+
     /// Update or delete a record with specific id
     pub fn update_record(&mut self, id: usize, instance: Option<T>) -> Result<()> {
         return if id == 0 {
