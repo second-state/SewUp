@@ -1205,15 +1205,6 @@
 <span id="1202">1202</span>
 <span id="1203">1203</span>
 <span id="1204">1204</span>
-<span id="1205">1205</span>
-<span id="1206">1206</span>
-<span id="1207">1207</span>
-<span id="1208">1208</span>
-<span id="1209">1209</span>
-<span id="1210">1210</span>
-<span id="1211">1211</span>
-<span id="1212">1212</span>
-<span id="1213">1213</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1906,15 +1897,18 @@
             #[cfg(target_arch = &quot;wasm32&quot;)]
             mod {} {{
                 use super::*;
-                pub fn get(proc: {}Protocol) -&gt; Result&lt;()&gt; {{
-                    let table = sewup::rdb::Db::load(None)?.table::&lt;{}&gt;()?;
+                pub type Protocol = {}Protocol;
+                pub type Wrapper = {}Wrapper;
+                pub type _Instance = {};
+                pub fn get(proc: Protocol) -&gt; Result&lt;()&gt; {{
+                    let table = sewup::rdb::Db::load(None)?.table::&lt;_Instance&gt;()?;
                     if proc.filter {{
-                        let mut raw_output: Vec&lt;{}Wrapper&gt; = Vec::new();
+                        let mut raw_output: Vec&lt;Wrapper&gt; = Vec::new();
                         for r in table.all_records()?.drain(..){{
                             let mut all_field_match = true;
                             {}
                             if all_field_match {{
-                                let mut wrapper: {}Wrapper = r.into();
+                                let mut wrapper: Wrapper = r.into();
                                 raw_output.push(wrapper);
                             }}
                         }}
@@ -1923,34 +1917,34 @@
                                 {}
                             }}
                         }}
-                        let output: {}Protocol = raw_output.into();
+                        let output: Protocol = raw_output.into();
                         sewup::utils::ewasm_return(ewasm_output_from!(output));
                     }} else {{
                         let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
-                        let mut output: {}Protocol = raw_output.into();
+                        let mut output: Protocol = raw_output.into();
                         output.records[0].id = proc.records[0].id;
                         sewup::utils::ewasm_return(ewasm_output_from!(output));
                     }}
                     Ok(())
                 }}
-                pub fn create(proc: {}Protocol) -&gt; Result&lt;()&gt; {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;{}&gt;()?;
+                pub fn create(proc: Protocol) -&gt; Result&lt;()&gt; {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;_Instance&gt;()?;
                     let mut output = proc.clone();
                     output.records[0].id = Some(table.add_record(proc.records[0].into())?);
                     table.commit()?;
                     sewup::utils::ewasm_return(ewasm_output_from!(output));
                     Ok(())
                 }}
-                pub fn update(proc: {}Protocol) -&gt; Result&lt;()&gt; {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;{}&gt;()?;
+                pub fn update(proc: Protocol) -&gt; Result&lt;()&gt; {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;_Instance&gt;()?;
                     let id = proc.records[0].id.unwrap_or_default();
                     table.update_record(id, Some(proc.records[0].clone().into()))?;
                     table.commit()?;
                     sewup::utils::ewasm_return(ewasm_output_from!(proc));
                     Ok(())
                 }}
-                pub fn delete(proc: {}Protocol) -&gt; Result&lt;()&gt; {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;{}&gt;()?;
+                pub fn delete(proc: Protocol) -&gt; Result&lt;()&gt; {{
+                    let mut table = sewup::rdb::Db::load(None)?.table::&lt;_Instance&gt;()?;
                     let id = proc.records[0].id.unwrap_or_default();
                     table.update_record(id, None)?;
                     table.commit()?;
@@ -1962,11 +1956,14 @@
             #[cfg(not(target_arch = &quot;wasm32&quot;))]
             mod {} {{
                 use super::*;
+                pub type Protocol = {}Protocol;
+                pub type Wrapper = {}Wrapper;
+                pub type Query = Wrapper;
+                pub type _Instance = {};
                 #[inline]
-                pub fn protocol(instance: {}) -&gt; {}Protocol {{
+                pub fn protocol(instance: _Instance) -&gt; Protocol {{
                     instance.into()
                 }}
-                pub type Protocol = {}Protocol;
                 impl Protocol {{
                     pub fn set_id(&amp;mut self, id: usize) {{
                         self.records[0].id = Some(id);
@@ -1975,12 +1972,11 @@
                         {}
                     }}
                 }}
-                pub fn query(instance: {}) -&gt; {}Wrapper {{
+                pub fn query(instance: _Instance) -&gt; Wrapper {{
                     instance.into()
                 }}
-                pub type Query = {}Wrapper;
 
-                impl From&lt;Query&gt; for {}Protocol {{
+                impl From&lt;Query&gt; for Protocol {{
                     fn from(instance: Query) -&gt; Self {{
                         Self {{
                             select_fields: None,
@@ -2035,9 +2031,9 @@
             <span class="ident">struct_name</span>,
             <span class="comment">// mod for handlers</span>
             <span class="ident">struct_name</span>.<span class="ident">to_ascii_lowercase</span>(),
+            <span class="ident">struct_name</span>,
+            <span class="ident">struct_name</span>,
             <span class="comment">// get</span>
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
             <span class="ident">struct_name</span>,
             <span class="ident">fields</span>
                 .<span class="ident">iter</span>()
@@ -2052,7 +2048,6 @@
                 ))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
-            <span class="ident">struct_name</span>,
             <span class="ident">fields</span>
                 .<span class="ident">iter</span>()
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(
@@ -2064,15 +2059,6 @@
                 ))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;\n&quot;</span>),
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="comment">// post</span>
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
             <span class="comment">// mod for protocol</span>
             <span class="ident">struct_name</span>.<span class="ident">to_ascii_lowercase</span>(),
             <span class="ident">struct_name</span>,
@@ -2083,10 +2069,6 @@
                 .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;self.records[0].{}.is_none()&quot;</span>, <span class="ident">f</span>.<span class="number">0</span>))
                 .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
                 .<span class="ident">join</span>(<span class="string">&quot;&amp;&amp;&quot;</span>),
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
-            <span class="ident">struct_name</span>,
         )
         .<span class="ident">parse</span>()
         .<span class="ident">unwrap</span>()
