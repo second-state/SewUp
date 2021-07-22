@@ -54,6 +54,7 @@ pub mod types;
 #[cfg(target_arch = "wasm32")]
 pub use ewasm_api;
 
+pub use anyhow::Result;
 pub use bincode;
 pub use serde::de::DeserializeOwned;
 pub use serde::{Deserialize as DeserializeTrait, Serialize as SerializeTrait};
