@@ -550,323 +550,261 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table)]
 pub fn derive_table(item: TokenStream) -> TokenStream {
-    let re = Regex::new(
-        r"^(pub)\s+struct (?P<name>\w+)(?P<to_first_bracket>[^\{]*\{)(?P<fields>[^\}]*)}",
-    )
-    .unwrap();
-    if let Some(cap) = re.captures(&item.to_string()) {
-        let struct_name = cap.name("name").unwrap().as_str();
-        let field_part = cap.name("fields").unwrap().as_str();
-        let fields = field_part
-            .split(',')
-            .map(|p| {
+    let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let struct_name = &input.ident;
+    let fields_with_type = match &input.data {
+        syn::Data::Struct(syn::DataStruct {
+            fields: syn::Fields::Named(f),
+            ..
+        }) => f
+            .clone()
+            .named
+            .into_pairs()
+            .map(|p| p.into_value())
+            .map(|f| (f.ident.unwrap(), f.ty))
+            .collect::<Vec<_>>(),
+        _ => abort!(&input.ident, "Table derive only use for struct"),
+    };
+
+    let mut wrapper_fields = vec![(
+        Ident::new("id", Span::call_site()),
+        syn::Type::Path(syn::TypePath {
+            qself: None,
+            path: syn::parse("Option<usize>".parse().unwrap()).unwrap(),
+        }),
+    )];
+    wrapper_fields.append(
+        &mut fields_with_type
+            .iter()
+            .map(|(f, t)| {
                 (
-                    p.split(':').nth(0).unwrap_or("").trim(),
-                    p.split(':').nth(1).unwrap_or("").trim(),
+                    f.clone(),
+                    syn::parse(quote!(Option<#t>).to_string().parse().unwrap()).unwrap(),
                 )
             })
-            .filter(|s| !s.0.is_empty())
-            .collect::<Vec<_>>();
-        format!(
-            r#"
-            fn get_field_by_name<T, R>(data: T, field: &str) -> R
-            where
-                T: sewup::SerializeTrait,
-                R: sewup::DeserializeOwned,
-            {{
-                let mut map = match sewup::to_value(data) {{
-                    Ok(sewup::Value::Map(map)) => map,
-                    _ => panic!("expected a struct"),
-                }};
+            .collect::<Vec<_>>(),
+    );
+    let wrapper_field_names = wrapper_fields.iter().map(|(f, _)| f);
+    let wrapper_field_types = wrapper_fields.iter().map(|(_, t)| t);
+    let field_names = fields_with_type.iter().map(|(f, _)| f);
+    let clone_field_names = field_names.clone();
+    let clone_field_names2 = field_names.clone();
+    let clone_field_names3 = field_names.clone();
+    let clone_field_names4 = field_names.clone();
+    let field_types = fields_with_type.iter().map(|(_, t)| t);
 
-                let key = sewup::Value::String(field.to_owned());
-                let value = match map.remove(&key) {{
-                    Some(value) => value,
-                    None => panic!("no such field"),
-                }};
+    let protocol_name = Ident::new(&format!("{}Protocol", struct_name), Span::call_site());
+    let wrapper_name = Ident::new(&format!("{}Wrapper", struct_name), Span::call_site());
+    let captal_mod_name = Ident::new(
+        &format!("{}", struct_name).to_ascii_uppercase(),
+        Span::call_site(),
+    );
+    let lower_mod_name = Ident::new(
+        &format!("{}", struct_name).to_ascii_lowercase(),
+        Span::call_site(),
+    );
 
-                match R::deserialize(value) {{
-                    Ok(r) => r,
-                    Err(_) => panic!("type uncorrect"),
-                }}
-            }}
+    quote!(
+        impl sewup::rdb::traits::Record for #struct_name {}
 
-            impl sewup::rdb::traits::Record for {} {{}}
+        #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
+        pub struct #protocol_name {
+            pub select_fields: Option<std::collections::HashSet::<String>>,
+            pub filter: bool,
+            pub records: Vec<#wrapper_name>
+        }
 
-            #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
-            pub struct {}Protocol {{
-                pub select_fields: Option<std::collections::HashSet::<String>>,
-                pub filter: bool,
-                pub records: Vec<{}Wrapper>
-            }}
+        impl #protocol_name {
+            fn set_select_fields(&mut self, fields: Vec<String>) {
+                if fields.is_empty() {
+                    self.select_fields = None;
+                } else {
+                    let mut select_fields = std::collections::HashSet::<String>::new();
+                    for field in fields.iter() {
+                        select_fields.insert(field.into());
+                    }
+                    self.select_fields = Some(select_fields);
+                }
+            }
+        }
 
-            impl {}Protocol {{
-                fn set_select_fields(&mut self, fields: Vec<String>) {{
-                    if fields.is_empty() {{
-                        self.select_fields = None;
-                    }} else {{
-                        let mut select_fields = std::collections::HashSet::<String>::new();
-                        for field in fields.iter() {{
-                            select_fields.insert(field.into());
-                        }}
-                        self.select_fields = Some(select_fields);
-                    }}
-                }}
-            }}
+        impl Default for #protocol_name {
+            fn default() -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records: vec![Default::default()]
+                }
+            }
+        }
+        impl From<#struct_name> for #protocol_name {
+            fn from(instance: #struct_name) -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records: vec![instance.into()]
+                }
+            }
+        }
 
-            impl Default for {}Protocol {{
-                fn default() -> Self {{
-                    Self {{
-                        select_fields: None,
-                        filter: false,
-                        records: vec![Default::default()]
-                    }}
-                }}
-            }}
+        impl From<Vec<#struct_name>> for #protocol_name {
+            fn from(instances: Vec<#struct_name>) -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records: instances.into_iter().map(|i| i.into()).collect::<Vec<_>>()
+                }
+            }
+        }
+        impl From<Vec<#wrapper_name>> for #protocol_name {
+            fn from(records: Vec<#wrapper_name>) -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records,
+                }
+            }
+        }
+        mod #captal_mod_name {
+            use sewup_derive::ewasm_fn_sig;
+            pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
+            pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::create());
+            pub(crate) const UPDATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::update());
+            pub(crate) const DELETE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::delete());
+        }
 
-            impl From<{}> for {}Protocol {{
-                fn from(instance: {}) -> Self {{
-                    Self {{
-                        select_fields: None,
-                        filter: false,
-                        records: vec![instance.into()]
-                    }}
-                }}
-            }}
+        #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
+        pub struct #wrapper_name {
+            #(#wrapper_field_names: #wrapper_field_types,)*
+        }
+        impl From<#struct_name> for #wrapper_name {
+            fn from(instance: #struct_name) -> Self {
+                Self {
+                    id: None,
+                    #(#field_names: Some(instance.#field_names),)*
+                }
+            }
+        }
+        impl From<#wrapper_name> for #struct_name {
+            fn from(wrapper: #wrapper_name) -> Self {
+                Self {
+                    #(#clone_field_names: wrapper.#clone_field_names.expect("#clone_field_names field missing"),)*
+                }
+            }
+        }
+        #[cfg(target_arch = "wasm32")]
+        mod #lower_mod_name {
+            use super::*;
+            pub type Protocol = #protocol_name;
+            pub type Wrapper = #wrapper_name;
+            pub type _Instance = #struct_name;
+            pub fn get(proc: Protocol) -> Result<()> {
+                let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                if proc.filter {
+                    let mut raw_output: Vec<Wrapper> = Vec::new();
+                    for r in table.all_records()?.drain(..){
+                        let mut all_field_match = true;
+                        #(
+                            paste::paste! {
+                                let [<#clone_field_names2 _filed_filter>] : Option<#field_types> =
+                                    sewup::utils::get_field_by_name(proc.records[0], stringify!(#clone_field_names2));
 
-            impl From<Vec<{}>> for {}Protocol {{
-                fn from(instances: Vec<{}>) -> Self {{
-                    Self {{
-                        select_fields: None,
-                        filter: false,
-                        records: instances.into_iter().map(|i| i.into()).collect::<Vec<_>>()
-                    }}
-                }}
-            }}
+                                let  [< #clone_field_names2 _field>] : #field_types =
+                                    sewup::utils::get_field_by_name(&r, stringify!(#clone_field_names2));
 
-            impl From<Vec<{}Wrapper>> for {}Protocol {{
-                fn from(records: Vec<{}Wrapper>) -> Self {{
-                    Self {{
-                        select_fields: None,
-                        filter: false,
-                        records,
-                    }}
-                }}
-            }}
+                                if [<#clone_field_names2 _filed_filter>].is_some() {
+                                    all_field_match &=
+                                        [<#clone_field_names2 _filed_filter>].unwrap()
+                                            == [< #clone_field_names2 _field>];
+                                }
+                            }
+                         )*
 
-            #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
-            pub struct {}Wrapper {{
-                id: Option<usize>,
-                {}
-            }}
-
-            impl From<{}> for {}Wrapper {{
-                fn from(instance: {}) -> Self {{
-                    Self {{
-                        id: None,
-                        {}
-                    }}
-                }}
-            }}
-
-            impl From<{}Wrapper> for {} {{
-                fn from(wrapper: {}Wrapper) -> Self {{
-                    Self {{
-                        {}
-                    }}
-                }}
-            }}
-
-            mod {} {{
-                use sewup_derive::ewasm_fn_sig;
-
-                pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!({}::get());
-                pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!({}::create());
-                pub(crate) const UPDATE_SIG: [u8; 4] = ewasm_fn_sig!({}::update());
-                pub(crate) const DELETE_SIG: [u8; 4] = ewasm_fn_sig!({}::delete());
-            }}
-
-            #[cfg(target_arch = "wasm32")]
-            mod {} {{
-                use super::*;
-                pub type Protocol = {}Protocol;
-                pub type Wrapper = {}Wrapper;
-                pub type _Instance = {};
-                pub fn get(proc: Protocol) -> Result<()> {{
-                    let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
-                    if proc.filter {{
-                        let mut raw_output: Vec<Wrapper> = Vec::new();
-                        for r in table.all_records()?.drain(..){{
-                            let mut all_field_match = true;
-                            {}
-                            if all_field_match {{
-                                let mut wrapper: Wrapper = r.into();
-                                raw_output.push(wrapper);
-                            }}
-                        }}
-                        if let Some(select_fields) = proc.select_fields {{
-                            for w in raw_output.iter_mut() {{
-                                {}
-                            }}
-                        }}
-                        let output: Protocol = raw_output.into();
-                        sewup::utils::ewasm_return(ewasm_output_from!(output));
-                    }} else {{
-                        let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
-                        let mut output: Protocol = raw_output.into();
-                        output.records[0].id = proc.records[0].id;
-                        sewup::utils::ewasm_return(ewasm_output_from!(output));
-                    }}
-                    Ok(())
-                }}
-                pub fn create(proc: Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
-                    let mut output = proc.clone();
-                    output.records[0].id = Some(table.add_record(proc.records[0].into())?);
-                    table.commit()?;
+                        if all_field_match {
+                            let mut wrapper: Wrapper = r.into();
+                            raw_output.push(wrapper);
+                        }
+                    }
+                    if let Some(select_fields) = proc.select_fields {
+                        for w in raw_output.iter_mut() {
+                            #(
+                                if ! select_fields.contains(stringify!(#clone_field_names3)) {
+                                    w.#clone_field_names3 = None;
+                                }
+                             )*
+                        }
+                    }
+                    let output: Protocol = raw_output.into();
                     sewup::utils::ewasm_return(ewasm_output_from!(output));
-                    Ok(())
-                }}
-                pub fn update(proc: Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
-                    let id = proc.records[0].id.unwrap_or_default();
-                    table.update_record(id, Some(proc.records[0].clone().into()))?;
-                    table.commit()?;
-                    sewup::utils::ewasm_return(ewasm_output_from!(proc));
-                    Ok(())
-                }}
-                pub fn delete(proc: Protocol) -> Result<()> {{
-                    let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
-                    let id = proc.records[0].id.unwrap_or_default();
-                    table.update_record(id, None)?;
-                    table.commit()?;
-                    sewup::utils::ewasm_return(ewasm_output_from!(proc));
-                    Ok(())
-                }}
-            }}
+                } else {
+                    let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
+                    let mut output: Protocol = raw_output.into();
+                    output.records[0].id = proc.records[0].id;
+                    sewup::utils::ewasm_return(ewasm_output_from!(output));
+                }
+                Ok(())
+            }
+            pub fn create(proc: Protocol) -> Result<()> {
+                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let mut output = proc.clone();
+                output.records[0].id = Some(table.add_record(proc.records[0].into())?);
+                table.commit()?;
+                sewup::utils::ewasm_return(ewasm_output_from!(output));
+                Ok(())
+            }
+            pub fn update(proc: Protocol) -> Result<()> {
+                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let id = proc.records[0].id.unwrap_or_default();
+                table.update_record(id, Some(proc.records[0].clone().into()))?;
+                table.commit()?;
+                sewup::utils::ewasm_return(ewasm_output_from!(proc));
+                Ok(())
+            }
+            pub fn delete(proc: Protocol) -> Result<()> {
+                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let id = proc.records[0].id.unwrap_or_default();
+                table.update_record(id, None)?;
+                table.commit()?;
+                sewup::utils::ewasm_return(ewasm_output_from!(proc));
+                Ok(())
+            }
+        }
+        #[cfg(not(target_arch = "wasm32"))]
+        mod #lower_mod_name {
+            use super::*;
+            pub type Protocol = #protocol_name;
+            pub type Wrapper = #wrapper_name;
+            pub type _Instance = #struct_name;
+            pub type Query = Wrapper;
 
-            #[cfg(not(target_arch = "wasm32"))]
-            mod {} {{
-                use super::*;
-                pub type Protocol = {}Protocol;
-                pub type Wrapper = {}Wrapper;
-                pub type Query = Wrapper;
-                pub type _Instance = {};
-                #[inline]
-                pub fn protocol(instance: _Instance) -> Protocol {{
-                    instance.into()
-                }}
-                impl Protocol {{
-                    pub fn set_id(&mut self, id: usize) {{
-                        self.records[0].id = Some(id);
-                    }}
-                    pub fn is_empty(&self) -> bool {{
-                        {}
-                    }}
-                }}
-                pub fn query(instance: _Instance) -> Wrapper {{
-                    instance.into()
-                }}
+            #[inline]
+            pub fn protocol(instance: _Instance) -> Protocol {
+                instance.into()
+            }
+            impl Protocol {
+                pub fn set_id(&mut self, id: usize) {
+                    self.records[0].id = Some(id);
+                }
+                pub fn is_empty(&self) -> bool {
+                    #(self.records[0].#clone_field_names4.is_none() && )*
+                    true
+                }
+            }
+            pub fn query(instance: _Instance) -> Wrapper {
+                instance.into()
+            }
 
-                impl From<Query> for Protocol {{
-                    fn from(instance: Query) -> Self {{
-                        Self {{
-                            select_fields: None,
-                            filter: true,
-                            records: vec![instance.into()]
-                        }}
-                    }}
-                }}
-            }}"#,
-            // Record trait
-            struct_name,
-            // Protocol struct
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            // Wrapper struct
-            struct_name,
-            field_part.replace(":", ":Option<").replace(",", ">,"),
-            // impl From for warper
-            struct_name,
-            struct_name,
-            struct_name,
-            fields
-                .iter()
-                .map(|f| format!("{}:Some(instance.{})", f.0, f.0))
-                .collect::<Vec<_>>()
-                .join(","),
-            // impl From for instance
-            struct_name,
-            struct_name,
-            struct_name,
-            fields
-                .iter()
-                .map(|f| format!(r#"{}:wrapper.{}.expect("{} field missing")"#, f.0, f.0, f.0))
-                .collect::<Vec<_>>()
-                .join(","),
-            // mod for signature
-            struct_name.to_ascii_uppercase(),
-            struct_name,
-            struct_name,
-            struct_name,
-            struct_name,
-            // mod for handlers
-            struct_name.to_ascii_lowercase(),
-            struct_name,
-            struct_name,
-            // get
-            struct_name,
-            fields
-                .iter()
-                .map(|f| format!(
-                    r#"
-                    let {}_field_filter: Option<{}> = get_field_by_name(proc.records[0], "{}");
-                    let {}_field: {} = get_field_by_name(&r, "{}");
-                    if {}_field_filter.is_some() {{
-                        all_field_match &= {}_field_filter.unwrap() == {}_field;
-                    }} "#,
-                    f.0, f.1, f.0, f.0, f.1, f.0, f.0, f.0, f.0
-                ))
-                .collect::<Vec<_>>()
-                .join("\n"),
-            fields
-                .iter()
-                .map(|f| format!(
-                    r#"
-                    if ! select_fields.contains("{}") {{
-                        w.{} = None;
-                    }}"#,
-                    f.0, f.0
-                ))
-                .collect::<Vec<_>>()
-                .join("\n"),
-            // mod for protocol
-            struct_name.to_ascii_lowercase(),
-            struct_name,
-            struct_name,
-            struct_name,
-            fields
-                .iter()
-                .map(|f| format!("self.records[0].{}.is_none()", f.0))
-                .collect::<Vec<_>>()
-                .join("&&"),
-        )
-        .parse()
-        .unwrap()
-    } else {
-        abort_call_site!("sewup-derive parsing struct fails, currently we only support flat and simple structure");
-    }
+            impl From<Query> for Protocol {
+                fn from(instance: Query) -> Self {
+                    Self {
+                        select_fields: None,
+                        filter: true,
+                        records: vec![instance.into()]
+                    }
+                }
+            }
+        }
+    ).into()
 }
 
 /// helps you setup the test mododule, and test cases in contract.
