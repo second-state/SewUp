@@ -4,6 +4,10 @@ use ewasm_api::finish_data;
 use ewasm_api::log0;
 use tiny_keccak::{Hasher, Sha3};
 
+pub use serde::de::DeserializeOwned;
+pub use serde::Serialize;
+pub use serde_value::{to_value, Value};
+
 /// helps you debug the ewasm contract when excuting in the test runtime
 /// To show the debug message pllease run the test case as following command
 /// `cargo test -- --nocapture`
@@ -65,6 +69,28 @@ pub fn storage_index_to_addr(idx: usize, addr: &mut [u8; 32]) {
     for (j, byte) in addr.iter_mut().enumerate().take((idx / 32) + 1) {
         assert!(j < 32, "Too big to store on chain");
         *byte = (idx >> (5 * j) & 31) as u8;
+    }
+}
+
+pub fn get_field_by_name<T, R>(data: T, field: &str) -> R
+where
+    T: Serialize,
+    R: DeserializeOwned,
+{
+    let mut map = match to_value(data) {
+        Ok(Value::Map(map)) => map,
+        _ => panic!("expected a struct"),
+    };
+
+    let key = Value::String(field.to_owned());
+    let value = match map.remove(&key) {
+        Some(value) => value,
+        None => panic!("no such field"),
+    };
+
+    match R::deserialize(value) {
+        Ok(r) => r,
+        Err(_) => panic!("type uncorrect"),
     }
 }
 
