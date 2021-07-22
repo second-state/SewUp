@@ -615,7 +615,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         }
 
         impl #protocol_name {
-            fn set_select_fields(&mut self, fields: Vec<String>) {
+            pub fn set_select_fields(&mut self, fields: Vec<String>) {
                 if fields.is_empty() {
                     self.select_fields = None;
                 } else {
@@ -665,7 +665,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
-        mod #captal_mod_name {
+        pub mod #captal_mod_name {
             use sewup_derive::ewasm_fn_sig;
             pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
             pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::create());
@@ -675,7 +675,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 
         #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
         pub struct #wrapper_name {
-            #(#wrapper_field_names: #wrapper_field_types,)*
+            #(pub #wrapper_field_names: #wrapper_field_types,)*
         }
         impl From<#struct_name> for #wrapper_name {
             fn from(instance: #struct_name) -> Self {
@@ -693,12 +693,12 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             }
         }
         #[cfg(target_arch = "wasm32")]
-        mod #lower_mod_name {
+        pub mod #lower_mod_name {
             use super::*;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;
             pub type _Instance = #struct_name;
-            pub fn get(proc: Protocol) -> Result<()> {
+            pub fn get(proc: Protocol) -> sewup::Result<()> {
                 let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 if proc.filter {
                     let mut raw_output: Vec<Wrapper> = Vec::new();
@@ -735,42 +735,42 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         }
                     }
                     let output: Protocol = raw_output.into();
-                    sewup::utils::ewasm_return(ewasm_output_from!(output));
+                    sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
                 } else {
                     let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
                     let mut output: Protocol = raw_output.into();
                     output.records[0].id = proc.records[0].id;
-                    sewup::utils::ewasm_return(ewasm_output_from!(output));
+                    sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
                 }
                 Ok(())
             }
-            pub fn create(proc: Protocol) -> Result<()> {
+            pub fn create(proc: Protocol) -> sewup::Result<()> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 let mut output = proc.clone();
                 output.records[0].id = Some(table.add_record(proc.records[0].into())?);
                 table.commit()?;
-                sewup::utils::ewasm_return(ewasm_output_from!(output));
+                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
                 Ok(())
             }
-            pub fn update(proc: Protocol) -> Result<()> {
+            pub fn update(proc: Protocol) -> sewup::Result<()> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, Some(proc.records[0].clone().into()))?;
                 table.commit()?;
-                sewup::utils::ewasm_return(ewasm_output_from!(proc));
+                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(proc));
                 Ok(())
             }
-            pub fn delete(proc: Protocol) -> Result<()> {
+            pub fn delete(proc: Protocol) -> sewup::Result<()> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, None)?;
                 table.commit()?;
-                sewup::utils::ewasm_return(ewasm_output_from!(proc));
+                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(proc));
                 Ok(())
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
-        mod #lower_mod_name {
+        pub mod #lower_mod_name {
             use super::*;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;

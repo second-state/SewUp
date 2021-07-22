@@ -3,23 +3,15 @@ use serde_derive::{Deserialize, Serialize};
 
 use sewup::primitives::Contract;
 use sewup::rdb::{errors::Error as LibError, Db, Feature};
-use sewup::types::{Raw, Row};
 use sewup_derive::{
-    ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_output_from, ewasm_test, Table,
+    ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_output_from, ewasm_test,
 };
 
 mod errors;
 use errors::RDBError;
 
-// Table derive provides the handers for CRUD,
-// to communicate with these handler, you will need protocol.
-// The protocol is easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`,
-// please check out the test case in the end of this document
-#[derive(Table, Default, Clone, Serialize, Deserialize)]
-pub struct Person {
-    trusted: bool,
-    age: u8,
-}
+mod modules;
+use modules::{person, Person, PERSON};
 
 #[ewasm_fn]
 fn init_db_with_tables() -> Result<()> {
