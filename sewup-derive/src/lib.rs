@@ -58,7 +58,62 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         )
     }
 
+    let output_type = match input.sig.clone().output {
+        syn::ReturnType::Type(_, boxed) => match Box::into_inner(boxed) {
+            syn::Type::Path(syn::TypePath { path: p, .. }) => match p.segments.first() {
+                Some(syn::PathSegment {
+                    arguments:
+                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
+                            args: a,
+                            ..
+                        }),
+                    ..
+                }) => match a.first() {
+                    Some(a) => match a {
+                        syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
+                            path: p,
+                            ..
+                        })) => {
+                            if let Some(syn::PathSegment { ident: i, .. }) = p.segments.first() {
+                                Some(i.to_string())
+                            } else {
+                                None
+                            }
+                        }
+                        _ => None,
+                    },
+                    _ => None,
+                },
+                _ => None,
+            },
+            _ => None,
+        },
+        _ => None,
+    };
+
     match attr.to_string().to_lowercase().as_str() {
+        "auto" if Some("EwasmAny".to_string()) == output_type  => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            #[cfg(target_arch = "wasm32")]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
+                        finish_data(&r.bin);
+                    },
+                    Err(e) => {
+                        let error_msg = e.to_string();
+                        finish_data(&error_msg.as_bytes());
+                    }
+                }
+            }
+        },
         // Return the inner structure from unwrap result
         // This is for a scenario that you take care the result but not using Rust client
         "auto" => quote! {
@@ -76,7 +131,6 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                     Ok(r) =>  {
                         let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                         finish_data(&bin);
-
                     },
                     Err(e) => {
                         let error_msg = e.to_string();
@@ -614,6 +668,14 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             pub records: Vec<#wrapper_name>
         }
 
+        impl sewup::primitives::IntoEwasmAny for #protocol_name {
+            fn into_ewasm_any(self) -> sewup::primitives::EwasmAny {
+                sewup::primitives::EwasmAny {
+                    bin: sewup::bincode::serialize(&self).expect("The input should be serializable")
+                }
+            }
+        }
+
         impl #protocol_name {
             pub fn set_select_fields(&mut self, fields: Vec<String>) {
                 if fields.is_empty() {
@@ -695,10 +757,11 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         #[cfg(target_arch = "wasm32")]
         pub mod #lower_mod_name {
             use super::*;
+            use sewup::primitives::IntoEwasmAny;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;
             pub type _Instance = #struct_name;
-            pub fn get(proc: Protocol) -> sewup::Result<()> {
+            pub fn get(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 if proc.filter {
                     let mut raw_output: Vec<Wrapper> = Vec::new();
@@ -734,39 +797,35 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                              )*
                         }
                     }
-                    let output: Protocol = raw_output.into();
-                    sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
+                    let p: #protocol_name = raw_output.into();
+                    Ok(p.into_ewasm_any())
                 } else {
                     let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
-                    let mut output: Protocol = raw_output.into();
-                    output.records[0].id = proc.records[0].id;
-                    sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
+                    let mut output_proc: Protocol = raw_output.into();
+                    output_proc.records[0].id = proc.records[0].id;
+                    Ok(output_proc.into_ewasm_any())
                 }
-                Ok(())
             }
-            pub fn create(proc: Protocol) -> sewup::Result<()> {
+            pub fn create(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
-                let mut output = proc.clone();
-                output.records[0].id = Some(table.add_record(proc.records[0].into())?);
+                let mut output_proc = proc.clone();
+                output_proc.records[0].id = Some(table.add_record(proc.records[0].into())?);
                 table.commit()?;
-                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(output));
-                Ok(())
+                Ok(output_proc.into_ewasm_any())
             }
-            pub fn update(proc: Protocol) -> sewup::Result<()> {
+            pub fn update(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, Some(proc.records[0].clone().into()))?;
                 table.commit()?;
-                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(proc));
-                Ok(())
+                Ok(proc.into_ewasm_any())
             }
-            pub fn delete(proc: Protocol) -> sewup::Result<()> {
+            pub fn delete(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, None)?;
                 table.commit()?;
-                sewup::utils::ewasm_return(sewup_derive::ewasm_output_from!(proc));
-                Ok(())
+                Ok(proc.into_ewasm_any())
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
