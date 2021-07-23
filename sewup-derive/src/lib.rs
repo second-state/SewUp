@@ -709,13 +709,13 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                                 let [<#clone_field_names2 _filed_filter>] : Option<#field_types> =
                                     sewup::utils::get_field_by_name(proc.records[0], stringify!(#clone_field_names2));
 
-                                let  [< #clone_field_names2 _field>] : #field_types =
+                                let  [<#clone_field_names2 _field>] : #field_types =
                                     sewup::utils::get_field_by_name(&r, stringify!(#clone_field_names2));
 
                                 if [<#clone_field_names2 _filed_filter>].is_some() {
                                     all_field_match &=
                                         [<#clone_field_names2 _filed_filter>].unwrap()
-                                            == [< #clone_field_names2 _field>];
+                                            == [<#clone_field_names2 _field>];
                                 }
                             }
                          )*
