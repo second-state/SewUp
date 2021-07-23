@@ -1,9 +1,8 @@
+use serde::Serialize;
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
 use super::errors::ContractError::ContractSizeError;
-
-use anyhow::Result;
 
 pub type FunctionSignature = [u8; 4];
 
@@ -14,7 +13,7 @@ pub struct Contract {
 }
 
 impl Contract {
-    pub fn new() -> Result<Self> {
+    pub fn new() -> anyhow::Result<Self> {
         #[cfg(target_arch = "wasm32")]
         let data_size = ewasm_api::calldata_size();
         #[cfg(not(target_arch = "wasm32"))]
@@ -42,7 +41,7 @@ impl Contract {
             })
         }
     }
-    pub fn get_function_selector(&self) -> Result<FunctionSignature> {
+    pub fn get_function_selector(&self) -> anyhow::Result<FunctionSignature> {
         Ok(self.fn_sig)
     }
     pub fn mock() -> Self {
@@ -55,4 +54,34 @@ impl Contract {
             fn_sig,
         }
     }
+}
+
+/// helps you return different type of date in the contract handlers
+/// The any serializable data can easy to become EwasmAny by following command
+/// `EwasmAny::from(protocol)`
+/// and the data will preserialized and store in the EwasmAny structure,
+/// once the `ewasm_main` function try to retrun the instance of EwasmAny, the preserialized data
+/// will be returned.
+pub struct EwasmAny {
+    pub bin: Vec<u8>,
+}
+
+impl EwasmAny {
+    pub fn from<T: Serialize>(instance: T) -> Self {
+        Self {
+            bin: bincode::serialize(&instance).expect("The input should be serializable"),
+        }
+    }
+}
+
+impl From<()> for EwasmAny {
+    fn from(_: ()) -> Self {
+        Self {
+            bin: Vec::with_capacity(0),
+        }
+    }
+}
+
+pub trait IntoEwasmAny: Serialize {
+    fn into_ewasm_any(self) -> EwasmAny;
 }
