@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["copy_into_array",""],["sha3_256",""],["storage_index_to_addr",""]]});
+initSidebarItems({"derive":[["Serialize",""]],"enum":[["Value",""]],"fn":[["copy_into_array",""],["get_field_by_name",""],["sha3_256",""],["storage_index_to_addr",""],["to_value",""]],"trait":[["DeserializeOwned","A data structure that can be deserialized without borrowing any data from the deserializer."],["Serialize","A data structure that can be serialized into any data format supported by Serde."]]});

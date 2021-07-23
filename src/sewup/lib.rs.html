@@ -62,6 +62,7 @@
 <span id="59">59</span>
 <span id="60">60</span>
 <span id="61">61</span>
+<span id="62">62</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">allocator_api</span>)]</span>
 <span class="doccomment">//! Sewup - Second state eWasm Utility Program</span>
@@ -119,6 +120,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">ewasm_api</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">anyhow::Result</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">bincode</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde::de::DeserializeOwned</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span> <span class="kw">as</span> <span class="ident">DeserializeTrait</span>, <span class="ident">Serialize</span> <span class="kw">as</span> <span class="ident">SerializeTrait</span>};

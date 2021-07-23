@@ -40,6 +40,7 @@ sourcesIndex["num_traits"] = {"name":"","dirs":[{"name":"ops","files":["checked.
 sourcesIndex["ordered_float"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["parity_scale_codec"] = {"name":"","files":["codec.rs","compact.rs","decode_all.rs","depth_limit.rs","encode_append.rs","encode_like.rs","error.rs","joiner.rs","keyedvec.rs","lib.rs","max_encoded_len.rs"]};
 sourcesIndex["parity_scale_codec_derive"] = {"name":"","files":["decode.rs","encode.rs","lib.rs","max_encoded_len.rs","trait_bounds.rs","utils.rs"]};
+sourcesIndex["paste"] = {"name":"","files":["attr.rs","error.rs","lib.rs","segment.rs"]};
 sourcesIndex["ppv_lite86"] = {"name":"","dirs":[{"name":"x86_64","files":["mod.rs","sse2.rs"]}],"files":["lib.rs","soft.rs","types.rs"]};
 sourcesIndex["primitive_types"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["proc_macro2"] = {"name":"","files":["detection.rs","fallback.rs","lib.rs","marker.rs","parse.rs","wrapper.rs"]};
