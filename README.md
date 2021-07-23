@@ -1,13 +1,13 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.0.5-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.0.6-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.5-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.6-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
-There is [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
+There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
 
 ## Slides
 | Date       | Event                 | Slides                                                      |
@@ -25,6 +25,9 @@ Features list (should select none or one of following)
 
 Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
 if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
+If you want to write a contract return different type of data base on different handlers,
+please checkout `#[ewasm_main(auto)]` and `EwasmAny` or the example of rdb feature to learn
+how to write a flexible smart contract with ewasm.
 
 ```toml
 [package]
@@ -89,15 +92,18 @@ mod tests {
 }
 ```
 
+### Testing
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
 Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/WasmEdge/WasmEdge) and run tests on it with `cargo test`.
+
+### Debugging
 Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
 To learn more about the usage, you check out the examples in the [example](./examples/) folder.
 
-## Development
-The workspace have several project, the contract project should build with target
+## SewUp Development
+There are two projects and serveral examples in the workspace, the contract project should build with target
 `wasm32-unknown-unknown` and the flag `-C link-arg=--export-table`.
+You can run `cargo test` in each example folder to check on the test your modification.
 
-You can run `cargo test` in each example to check on the test your modification.
 It is easy to participate with help want issues and the good first issues.
 Less but not least, please feel free to open any issue on this porject.
