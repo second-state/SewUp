@@ -1,6 +1,7 @@
 use sewup::rdb::Feature;
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Error, Debug, PartialEq)]
 pub enum RDBError {
     #[error("the DB version `{0}` is unexpected.")]

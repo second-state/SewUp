@@ -60,32 +60,43 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 
     let output_type = match input.sig.clone().output {
         syn::ReturnType::Type(_, boxed) => match Box::into_inner(boxed) {
-            syn::Type::Path(syn::TypePath { path: p, .. }) => match p.segments.first() {
-                Some(syn::PathSegment {
-                    arguments:
-                        syn::PathArguments::AngleBracketed(syn::AngleBracketedGenericArguments {
-                            args: a,
+            syn::Type::Path(syn::TypePath { path: p, .. }) => {
+                let mut ok_type: Option<String> = None;
+                let mut segments = p.segments.clone();
+                while let Some(pair) = segments.pop() {
+                    ok_type = match pair.into_value() {
+                        syn::PathSegment {
+                            arguments:
+                                syn::PathArguments::AngleBracketed(
+                                    syn::AngleBracketedGenericArguments { args: a, .. },
+                                ),
                             ..
-                        }),
-                    ..
-                }) => match a.first() {
-                    Some(a) => match a {
-                        syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
-                            path: p,
-                            ..
-                        })) => {
-                            if let Some(syn::PathSegment { ident: i, .. }) = p.segments.first() {
-                                Some(i.to_string())
-                            } else {
-                                None
-                            }
-                        }
+                        } => match a.first() {
+                            Some(a) => match a {
+                                syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
+                                    path: p,
+                                    ..
+                                })) => {
+                                    if let Some(syn::PathSegment { ident: i, .. }) =
+                                        p.segments.last()
+                                    {
+                                        Some(i.to_string())
+                                    } else {
+                                        None
+                                    }
+                                }
+                                _ => None,
+                            },
+                            _ => None,
+                        },
                         _ => None,
-                    },
-                    _ => None,
-                },
-                _ => None,
-            },
+                    };
+                    if ok_type.is_some() {
+                        break;
+                    }
+                }
+                ok_type
+            }
             _ => None,
         },
         _ => None,

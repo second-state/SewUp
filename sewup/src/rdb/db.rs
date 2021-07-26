@@ -1,3 +1,4 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 use std::marker::PhantomData;
 use std::ops::Range;
@@ -6,6 +7,7 @@ use crate::rdb::errors::Error;
 use crate::rdb::table::Table;
 use crate::rdb::traits::{Record, HEADER_SIZE};
 use crate::rdb::Feature;
+#[cfg(target_arch = "wasm32")]
 use crate::utils::storage_index_to_addr;
 use crate::{Deserialize, Serialize, SerializeTrait};
 
@@ -165,7 +167,7 @@ impl Db {
     }
 
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn load(block_height: Option<i64>) -> Result<Self> {
+    pub fn load(_block_height: Option<i64>) -> Result<Self> {
         unimplemented!()
     }
 
@@ -271,6 +273,7 @@ impl Db {
         Ok(())
     }
 
+    #[cfg(any(target_arch = "wasm32", test))]
     /// alloc storage space for table
     pub(crate) fn alloc_table_storage(
         &mut self,
@@ -316,7 +319,7 @@ impl Db {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-fn migration_table(list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
+fn migration_table(mut _list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
     Ok(())
 }
 

@@ -1,89 +1,86 @@
-use anyhow::Result;
-use serde_derive::{Deserialize, Serialize};
-
-use sewup::primitives::{Contract, EwasmAny};
-use sewup::rdb::{errors::Error as LibError, Db, Feature};
-use sewup_derive::{
-    ewasm_fn, ewasm_fn_sig, ewasm_input_from, ewasm_main, ewasm_output_from, ewasm_test,
-};
+use sewup::rdb::errors::Error as LibError;
+use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
-use errors::RDBError;
 
 mod modules;
 use modules::{person, Person, PERSON};
 
 #[ewasm_fn]
-fn init_db_with_tables() -> Result<EwasmAny> {
-    let mut db = Db::new()?;
+fn init_db_with_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let mut db = sewup::rdb::Db::new()?;
     db.create_table::<Person>();
     db.commit()?;
     Ok(().into())
 }
 
 #[ewasm_fn]
-fn check_version_and_features(version: u8, features: Vec<Feature>) -> Result<EwasmAny> {
-    let db = Db::load(None)?;
+fn check_version_and_features(
+    version: u8,
+    features: Vec<sewup::rdb::Feature>,
+) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let db = sewup::rdb::Db::load(None)?;
     if db.version() != version {
-        return Err(RDBError::UnexpectVersion(db.version()).into());
+        return Err(errors::RDBError::UnexpectVersion(db.version()).into());
     };
     let current_features = db.features();
     if current_features != features {
-        return Err(RDBError::IncompatibleFeatures(current_features).into());
+        return Err(errors::RDBError::IncompatibleFeatures(current_features).into());
     };
 
     Ok(().into())
 }
 
 #[ewasm_fn]
-fn check_tables() -> Result<EwasmAny> {
-    let mut db = Db::load(None)?;
+fn check_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let mut db = sewup::rdb::Db::load(None)?;
     let info = db.table_info::<Person>().unwrap();
     if info.record_raw_size != 1 {
-        return Err(RDBError::SimpleError("Person record_raw_size not correct".into()).into());
+        return Err(
+            errors::RDBError::SimpleError("Person record_raw_size not correct".into()).into(),
+        );
     }
     if info.range.start != 2 {
-        return Err(RDBError::SimpleError("Person range start not correct".into()).into());
+        return Err(errors::RDBError::SimpleError("Person range start not correct".into()).into());
     }
     if info.range.end != 2 {
-        return Err(RDBError::SimpleError("Person range end not correct".into()).into());
+        return Err(errors::RDBError::SimpleError("Person range end not correct".into()).into());
     }
     Ok(().into())
 }
 
 #[ewasm_fn]
-fn drop_table() -> Result<EwasmAny> {
-    let mut db = Db::load(None)?;
+fn drop_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let mut db = sewup::rdb::Db::load(None)?;
     db.drop_table::<Person>();
     db.commit()?;
     Ok(().into())
 }
 
 #[ewasm_fn]
-fn check_tables_again() -> Result<EwasmAny> {
-    let mut db = Db::load(None)?;
+fn check_tables_again() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let mut db = sewup::rdb::Db::load(None)?;
     if db.table_info::<Person>().is_some() {
-        return Err(RDBError::SimpleError("Person table should be deleted".into()).into());
+        return Err(errors::RDBError::SimpleError("Person table should be deleted".into()).into());
     }
     Ok(().into())
 }
 
 #[ewasm_fn]
-fn get_childern() -> Result<EwasmAny> {
-    use sewup::primitives::IntoEwasmAny;
-
+fn get_childern() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let table = sewup::rdb::Db::load(None)?.table::<Person>()?;
     let people = table.filter_records(&|p: &Person| p.age < 12)?;
 
     // you can do much complicate filter logic here as you like
 
     let protocol: person::Protocol = people.into();
-    Ok(EwasmAny::from(protocol))
+    Ok(sewup::primitives::EwasmAny::from(protocol))
 }
 
 #[ewasm_main(auto)]
-fn main() -> Result<EwasmAny> {
-    let mut contract = Contract::new()?;
+fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup_derive::ewasm_input_from;
+    let mut contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get),
@@ -91,14 +88,14 @@ fn main() -> Result<EwasmAny> {
         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract move person::update),
         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract move person::delete),
         ewasm_fn_sig!(check_version_and_features) => {
-            check_version_and_features(0, vec![Feature::Default])
+            check_version_and_features(0, vec![sewup::rdb::Feature::Default])
         }
         ewasm_fn_sig!(get_childern) => get_childern(),
         ewasm_fn_sig!(init_db_with_tables) => init_db_with_tables(),
         ewasm_fn_sig!(check_tables) => check_tables(),
         ewasm_fn_sig!(drop_table) => drop_table(),
         ewasm_fn_sig!(check_tables_again) => check_tables_again(),
-        _ => return Err(RDBError::UnknownHandle.into()),
+        _ => return Err(errors::RDBError::UnknownHandle.into()),
     }
 }
 
