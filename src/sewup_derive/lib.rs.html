@@ -1202,6 +1202,17 @@
 <span id="1199">1199</span>
 <span id="1200">1200</span>
 <span id="1201">1201</span>
+<span id="1202">1202</span>
+<span id="1203">1203</span>
+<span id="1204">1204</span>
+<span id="1205">1205</span>
+<span id="1206">1206</span>
+<span id="1207">1207</span>
+<span id="1208">1208</span>
+<span id="1209">1209</span>
+<span id="1210">1210</span>
+<span id="1211">1211</span>
+<span id="1212">1212</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1265,32 +1276,43 @@
 
     <span class="kw">let</span> <span class="ident">output_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">clone</span>().<span class="ident">output</span> {
         <span class="ident">syn::ReturnType::Type</span>(<span class="kw">_</span>, <span class="ident">boxed</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">boxed</span>) {
-            <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> { <span class="ident">path</span>: <span class="ident">p</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">first</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">syn::PathSegment</span> {
-                    <span class="ident">arguments</span>:
-                        <span class="ident">syn::PathArguments::AngleBracketed</span>(<span class="ident">syn::AngleBracketedGenericArguments</span> {
-                            <span class="ident">args</span>: <span class="ident">a</span>,
+            <span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> { <span class="ident">path</span>: <span class="ident">p</span>, .. }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ok_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">segments</span> <span class="op">=</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">clone</span>();
+                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pair</span>) <span class="op">=</span> <span class="ident">segments</span>.<span class="ident">pop</span>() {
+                    <span class="ident">ok_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">into_value</span>() {
+                        <span class="ident">syn::PathSegment</span> {
+                            <span class="ident">arguments</span>:
+                                <span class="ident">syn::PathArguments::AngleBracketed</span>(
+                                    <span class="ident">syn::AngleBracketedGenericArguments</span> { <span class="ident">args</span>: <span class="ident">a</span>, .. },
+                                ),
                             ..
-                        }),
-                    ..
-                }) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">first</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">a</span> {
-                        <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> {
-                            <span class="ident">path</span>: <span class="ident">p</span>,
-                            ..
-                        })) <span class="op">=</span><span class="op">&gt;</span> {
-                            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">syn::PathSegment</span> { <span class="ident">ident</span>: <span class="ident">i</span>, .. }) <span class="op">=</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">first</span>() {
-                                <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">to_string</span>())
-                            } <span class="kw">else</span> {
-                                <span class="prelude-val">None</span>
-                            }
-                        }
+                        } <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">a</span>.<span class="ident">first</span>() {
+                            <span class="prelude-val">Some</span>(<span class="ident">a</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">a</span> {
+                                <span class="ident">syn::GenericArgument::Type</span>(<span class="ident">syn::Type::Path</span>(<span class="ident">syn::TypePath</span> {
+                                    <span class="ident">path</span>: <span class="ident">p</span>,
+                                    ..
+                                })) <span class="op">=</span><span class="op">&gt;</span> {
+                                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">syn::PathSegment</span> { <span class="ident">ident</span>: <span class="ident">i</span>, .. }) <span class="op">=</span>
+                                        <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">last</span>()
+                                    {
+                                        <span class="prelude-val">Some</span>(<span class="ident">i</span>.<span class="ident">to_string</span>())
+                                    } <span class="kw">else</span> {
+                                        <span class="prelude-val">None</span>
+                                    }
+                                }
+                                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                            },
+                            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        },
                         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                    },
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                },
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-            },
+                    };
+                    <span class="kw">if</span> <span class="ident">ok_type</span>.<span class="ident">is_some</span>() {
+                        <span class="kw">break</span>;
+                    }
+                }
+                <span class="ident">ok_type</span>
+            }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         },
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,

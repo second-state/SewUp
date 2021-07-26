@@ -151,6 +151,12 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
@@ -158,12 +164,17 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ewasm_api</span>::{<span class="ident">storage_load</span>, <span class="ident">storage_store</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::db</span>::{<span class="ident">Db</span>, <span class="ident">TableInfo</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::db::Db</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::db::TableInfo</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb</span>::{
     <span class="ident">errors::Error</span>,
     <span class="ident">traits</span>::{<span class="ident">Record</span>, <span class="ident">HEADER_SIZE</span>},
 };
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::types</span>::{<span class="ident">Raw</span>, <span class="ident">Row</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::types::Raw</span>;
+<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::types::Row</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::storage_index_to_addr</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Table</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">Record</span><span class="op">&gt;</span> {
@@ -209,6 +220,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">output</span>)
     }
 
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">bare_trait_objects</span>)]</span>
     <span class="doccomment">/// Filter the records</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_records</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">filter</span>: <span class="kw-2">&amp;</span><span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();

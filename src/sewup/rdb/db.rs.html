@@ -415,7 +415,11 @@
 <span id="412">412</span>
 <span id="413">413</span>
 <span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
 </pre><pre class="rust">
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std::ops::Range</span>;
@@ -424,6 +428,7 @@
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::table::Table</span>;
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::traits</span>::{<span class="ident">Record</span>, <span class="ident">HEADER_SIZE</span>};
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rdb::Feature</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils::storage_index_to_addr</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>, <span class="ident">SerializeTrait</span>};
 
@@ -583,7 +588,7 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">block_height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">load</span>(<span class="ident">_block_height</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">i64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="macro">unimplemented!</span>()
     }
 
@@ -689,6 +694,7 @@
         <span class="prelude-val">Ok</span>(())
     }
 
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>, <span class="ident">test</span>))]</span>
     <span class="doccomment">/// alloc storage space for table</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">alloc_table_storage</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
@@ -734,7 +740,7 @@
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">migration_table</span>(<span class="ident">list</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">migration_table</span>(<span class="kw-2">mut</span> <span class="ident">_list</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>, <span class="ident">Range</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(())
 }
 
