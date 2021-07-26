@@ -4,12 +4,17 @@ use anyhow::Result;
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::{storage_load, storage_store};
 
-use crate::rdb::db::{Db, TableInfo};
+#[cfg(target_arch = "wasm32")]
+use crate::rdb::db::Db;
+use crate::rdb::db::TableInfo;
 use crate::rdb::{
     errors::Error,
     traits::{Record, HEADER_SIZE},
 };
-use crate::types::{Raw, Row};
+#[cfg(target_arch = "wasm32")]
+use crate::types::Raw;
+use crate::types::Row;
+#[cfg(target_arch = "wasm32")]
 use crate::utils::storage_index_to_addr;
 
 pub struct Table<T: Record> {
@@ -55,6 +60,7 @@ impl<T: Record> Table<T> {
         Ok(output)
     }
 
+    #[allow(bare_trait_objects)]
     /// Filter the records
     pub fn filter_records(&self, filter: &Fn(&T) -> bool) -> Result<Vec<T>> {
         let mut output: Vec<T> = Vec::new();

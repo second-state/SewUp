@@ -6,7 +6,7 @@ use serde::de::DeserializeOwned;
 use serde::Serialize;
 
 use crate::rdb::errors::Error;
-use crate::types::{Raw, Row};
+use crate::types::Row;
 
 //TODO make Header bigger for big object storage
 pub const HEADER_SIZE: u32 = 1;
