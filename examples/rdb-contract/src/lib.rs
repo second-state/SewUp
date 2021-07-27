@@ -4,7 +4,7 @@ use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 mod errors;
 
 mod modules;
-use modules::{person, Person, PERSON};
+use modules::{person, post, Person, Post, PERSON, POST};
 
 #[ewasm_fn]
 fn init_db_with_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
