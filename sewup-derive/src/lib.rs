@@ -893,18 +893,20 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
     ).to_string();
 
     if let Some(parent_table) = belongs_to {
-        assert_eq!(parent_table, "Person".to_string());
         let lower_parent_table = &format!("{}", &parent_table).to_ascii_lowercase();
         let parent_table = Ident::new(&parent_table, Span::call_site());
-        output += &quote!{
+        let lower_parent_table_ident = Ident::new(&lower_parent_table, Span::call_site());
+
+        output += &quote! {
             impl #struct_name {
-                pub fn #lower_name (&self) -> sewup::Result<#parent_table> {
-                    let id: usize = sewup::utils::get_field_by_name(self, &format!("{}_id", stringify!(#lower_parent_table)));
+                pub fn #lower_parent_table_ident (&self) -> sewup::Result<#parent_table> {
+                    // let id: usize = sewup::utils::get_field_by_name(self, &format!("{}_id", stringify!(#lower_parent_table)));
                     let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
-                    parent_table.get_record(id)
+                    parent_table.get_record(1)
                 }
             }
-        }.to_string();
+        }
+        .to_string();
     }
 
     output.parse().unwrap()
