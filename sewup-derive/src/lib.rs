@@ -677,7 +677,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 
     let protocol_name = Ident::new(&format!("{}Protocol", struct_name), Span::call_site());
     let wrapper_name = Ident::new(&format!("{}Wrapper", struct_name), Span::call_site());
-    let captal_mod_name = Ident::new(
+    let captal_name = Ident::new(
         &format!("{}", struct_name).to_ascii_uppercase(),
         Span::call_site(),
     );
@@ -754,7 +754,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
-        pub mod #captal_mod_name {
+        pub mod #captal_name {
             use sewup_derive::ewasm_fn_sig;
             pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
             pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::create());
@@ -896,13 +896,14 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         let lower_parent_table = &format!("{}", &parent_table).to_ascii_lowercase();
         let parent_table = Ident::new(&parent_table, Span::call_site());
         let lower_parent_table_ident = Ident::new(&lower_parent_table, Span::call_site());
+        let field_name = &format!("{}_id", lower_parent_table);
 
         output += &quote! {
             impl #struct_name {
                 pub fn #lower_parent_table_ident (&self) -> sewup::Result<#parent_table> {
-                    // let id: usize = sewup::utils::get_field_by_name(self, &format!("{}_id", stringify!(#lower_parent_table)));
+                    let id: usize = sewup::utils::get_field_by_name(self, #field_name);
                     let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
-                    parent_table.get_record(1)
+                    parent_table.get_record(id)
                 }
             }
         }
