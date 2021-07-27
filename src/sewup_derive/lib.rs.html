@@ -1213,6 +1213,41 @@
 <span id="1210">1210</span>
 <span id="1211">1211</span>
 <span id="1212">1212</span>
+<span id="1213">1213</span>
+<span id="1214">1214</span>
+<span id="1215">1215</span>
+<span id="1216">1216</span>
+<span id="1217">1217</span>
+<span id="1218">1218</span>
+<span id="1219">1219</span>
+<span id="1220">1220</span>
+<span id="1221">1221</span>
+<span id="1222">1222</span>
+<span id="1223">1223</span>
+<span id="1224">1224</span>
+<span id="1225">1225</span>
+<span id="1226">1226</span>
+<span id="1227">1227</span>
+<span id="1228">1228</span>
+<span id="1229">1229</span>
+<span id="1230">1230</span>
+<span id="1231">1231</span>
+<span id="1232">1232</span>
+<span id="1233">1233</span>
+<span id="1234">1234</span>
+<span id="1235">1235</span>
+<span id="1236">1236</span>
+<span id="1237">1237</span>
+<span id="1238">1238</span>
+<span id="1239">1239</span>
+<span id="1240">1240</span>
+<span id="1241">1241</span>
+<span id="1242">1242</span>
+<span id="1243">1243</span>
+<span id="1244">1244</span>
+<span id="1245">1245</span>
+<span id="1246">1246</span>
+<span id="1247">1247</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1829,9 +1864,26 @@
 <span class="doccomment">/// assert!(default_input != default_person_input)</span>
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rdb&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Table</span>)]</span>
+<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">Table</span>, <span class="ident">attributes</span>(<span class="ident">belongs_to</span>, <span class="ident">belongs_none_or</span>))]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_table</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::DeriveInput</span>);
+    <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">belongs_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="ident">attrs</span>.<span class="ident">iter</span>() {
+        <span class="kw">let</span> <span class="ident">syn::Attribute</span> { <span class="ident">path</span>, <span class="ident">tokens</span>, .. } <span class="op">=</span> <span class="ident">a</span>;
+        <span class="kw">let</span> <span class="ident">attr_name</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>());
+        <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="string">&quot;belongs_to&quot;</span>.<span class="ident">to_string</span>()) <span class="op">=</span><span class="op">=</span> <span class="ident">attr_name</span> {
+            <span class="ident">belongs_to</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+                <span class="ident">tokens</span>
+                    .<span class="ident">to_string</span>()
+                    .<span class="ident">strip_prefix</span>(<span class="string">&#39;(&#39;</span>)
+                    .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_to(table_name)] is not correct&quot;</span>)
+                    .<span class="ident">strip_suffix</span>(<span class="string">&#39;)&#39;</span>)
+                    .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_to(table_name)] is not correct&quot;</span>)
+                    .<span class="ident">to_string</span>(),
+            );
+        }
+    }
     <span class="kw">let</span> <span class="ident">struct_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">ident</span>;
     <span class="kw">let</span> <span class="ident">fields_with_type</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">data</span> {
         <span class="ident">syn::Data::Struct</span>(<span class="ident">syn::DataStruct</span> {
@@ -1880,12 +1932,11 @@
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">struct_name</span>).<span class="ident">to_ascii_uppercase</span>(),
         <span class="ident">Span::call_site</span>(),
     );
-    <span class="kw">let</span> <span class="ident">lower_mod_name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
+    <span class="kw">let</span> <span class="ident">lower_name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
         <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">struct_name</span>).<span class="ident">to_ascii_lowercase</span>(),
         <span class="ident">Span::call_site</span>(),
     );
-
-    <span class="macro">quote!</span>(
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span>(
         <span class="kw">impl</span> <span class="ident">sewup::rdb::traits::Record</span> <span class="kw">for</span> #<span class="ident">struct_name</span> {}
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
@@ -1982,14 +2033,14 @@
             }
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-        <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">lower_mod_name</span> {
+        <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">lower_name</span> {
             <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
             <span class="kw">use</span> <span class="ident">sewup::primitives::IntoEwasmAny</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Protocol</span> <span class="op">=</span> #<span class="ident">protocol_name</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Wrapper</span> <span class="op">=</span> #<span class="ident">wrapper_name</span>;
-            <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_Instance</span> <span class="op">=</span> #<span class="ident">struct_name</span>;
+            <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_InstanceType</span> <span class="op">=</span> #<span class="ident">struct_name</span>;
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_Instance</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">proc</span>.<span class="ident">filter</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw_output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Wrapper</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
                     <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">all_records</span>()<span class="question-mark">?</span>.<span class="ident">drain</span>(..){
@@ -2034,21 +2085,21 @@
                 }
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_Instance</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_proc</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">clone</span>();
                 <span class="ident">output_proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">add_record</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">into</span>())<span class="question-mark">?</span>);
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into_ewasm_any</span>())
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_Instance</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>.<span class="ident">unwrap_or_default</span>();
                 <span class="ident">table</span>.<span class="ident">update_record</span>(<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">clone</span>().<span class="ident">into</span>()))<span class="question-mark">?</span>;
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">proc</span>.<span class="ident">into_ewasm_any</span>())
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_Instance</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>.<span class="ident">unwrap_or_default</span>();
                 <span class="ident">table</span>.<span class="ident">update_record</span>(<span class="ident">id</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
@@ -2056,15 +2107,15 @@
             }
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
-        <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">lower_mod_name</span> {
+        <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">lower_name</span> {
             <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Protocol</span> <span class="op">=</span> #<span class="ident">protocol_name</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Wrapper</span> <span class="op">=</span> #<span class="ident">wrapper_name</span>;
-            <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_Instance</span> <span class="op">=</span> #<span class="ident">struct_name</span>;
+            <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_InstanceType</span> <span class="op">=</span> #<span class="ident">struct_name</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Query</span> <span class="op">=</span> <span class="ident">Wrapper</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol</span>(<span class="ident">instance</span>: <span class="ident">_Instance</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Protocol</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">protocol</span>(<span class="ident">instance</span>: <span class="ident">_InstanceType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Protocol</span> {
                 <span class="ident">instance</span>.<span class="ident">into</span>()
             }
             <span class="kw">impl</span> <span class="ident">Protocol</span> {
@@ -2076,7 +2127,7 @@
                     <span class="bool-val">true</span>
                 }
             }
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">instance</span>: <span class="ident">_Instance</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Wrapper</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">query</span>(<span class="ident">instance</span>: <span class="ident">_InstanceType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Wrapper</span> {
                 <span class="ident">instance</span>.<span class="ident">into</span>()
             }
 
@@ -2090,7 +2141,26 @@
                 }
             }
         }
-    ).<span class="ident">into</span>()
+    ).<span class="ident">to_string</span>();
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_table</span>) <span class="op">=</span> <span class="ident">belongs_to</span> {
+        <span class="kw">let</span> <span class="ident">lower_parent_table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">parent_table</span>).<span class="ident">to_ascii_lowercase</span>();
+        <span class="kw">let</span> <span class="ident">parent_table</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_table</span>, <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">lower_parent_table_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">lower_parent_table</span>, <span class="ident">Span::call_site</span>());
+
+        <span class="ident">output</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">quote!</span> {
+            <span class="kw">impl</span> #<span class="ident">struct_name</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">lower_parent_table_ident</span> (<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span>#<span class="ident">parent_table</span><span class="op">&gt;</span> {
+                    <span class="comment">// let id: usize = sewup::utils::get_field_by_name(self, &amp;format!(&quot;{}_id&quot;, stringify!(#lower_parent_table)));</span>
+                    <span class="kw">let</span> <span class="ident">parent_table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span>#<span class="ident">parent_table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                    <span class="ident">parent_table</span>.<span class="ident">get_record</span>(<span class="number">1</span>)
+                }
+            }
+        }
+        .<span class="ident">to_string</span>();
+    }
+
+    <span class="ident">output</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()
 }
 
 <span class="doccomment">/// helps you setup the test mododule, and test cases in contract.</span>
