@@ -1,15 +1,23 @@
+use serde_derive::{Deserialize, Serialize};
+
 use sewup::rdb::errors::Error as LibError;
 use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
 
 mod modules;
-use modules::{person, Person, PERSON};
+use modules::{person, post, Person, Post, PERSON, POST};
+
+#[derive(Serialize, Deserialize)]
+pub struct Input {
+    id: usize,
+}
 
 #[ewasm_fn]
 fn init_db_with_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut db = sewup::rdb::Db::new()?;
     db.create_table::<Person>();
+    db.create_table::<Post>();
     db.commit()?;
     Ok(().into())
 }
@@ -77,6 +85,20 @@ fn get_childern() -> anyhow::Result<sewup::primitives::EwasmAny> {
     Ok(sewup::primitives::EwasmAny::from(protocol))
 }
 
+#[ewasm_fn]
+fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let table = sewup::rdb::Db::load(None)?.table::<Post>()?;
+    let post = table.get_record(input.id)?;
+
+    // ( Person <- 1 --- many -> Post )
+    // use relationship to get the post owner
+    let owner = post.person()?;
+
+    // This is an example show output not wrappered into protocol,
+    // just return instance itself
+    Ok(sewup::primitives::EwasmAny::from(owner))
+}
+
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup_derive::ewasm_input_from;
@@ -87,9 +109,14 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
         ewasm_fn_sig!(person::create) => ewasm_input_from!(contract move person::create),
         ewasm_fn_sig!(person::update) => ewasm_input_from!(contract move person::update),
         ewasm_fn_sig!(person::delete) => ewasm_input_from!(contract move person::delete),
+        ewasm_fn_sig!(post::get) => ewasm_input_from!(contract move post::get),
+        ewasm_fn_sig!(post::create) => ewasm_input_from!(contract move post::create),
+        ewasm_fn_sig!(post::update) => ewasm_input_from!(contract move post::update),
+        ewasm_fn_sig!(post::delete) => ewasm_input_from!(contract move post::delete),
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![sewup::rdb::Feature::Default])
         }
+        ewasm_fn_sig!(get_post_author) => ewasm_input_from!(contract move get_post_author),
         ewasm_fn_sig!(get_childern) => get_childern(),
         ewasm_fn_sig!(init_db_with_tables) => init_db_with_tables(),
         ewasm_fn_sig!(check_tables) => check_tables(),
@@ -118,9 +145,20 @@ mod tests {
         expect_output.set_id(1);
         ewasm_auto_assert_eq!(person::create(create_input), expect_output);
 
+        let post = Post {
+            words: 100,
+            person_id: 1,
+        };
+        let mut create_post_input = post::protocol(post);
+        let mut expect_post_output = create_post_input.clone();
+        expect_post_output.set_id(1);
+        ewasm_auto_assert_eq!(post::create(create_post_input), expect_post_output);
+
         let mut get_input: person::Protocol = Person::default().into();
         get_input.set_id(1);
         ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+
+        ewasm_auto_assert_eq!(get_post_author(Input { id: 1 }), person);
 
         let child = Person {
             trusted: false,

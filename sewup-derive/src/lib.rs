@@ -613,9 +613,26 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 /// assert!(default_input != default_person_input)
 /// ```
 #[cfg(feature = "rdb")]
-#[proc_macro_derive(Table)]
+#[proc_macro_derive(Table, attributes(belongs_to, belongs_none_or))]
 pub fn derive_table(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
+    let attrs = &input.attrs;
+    let mut belongs_to: Option<String> = None;
+    for a in attrs.iter() {
+        let syn::Attribute { path, tokens, .. } = a;
+        let attr_name = path.segments.first().map(|s| s.ident.to_string());
+        if Some("belongs_to".to_string()) == attr_name {
+            belongs_to = Some(
+                tokens
+                    .to_string()
+                    .strip_prefix('(')
+                    .expect("#[belongs_to(table_name)] is not correct")
+                    .strip_suffix(')')
+                    .expect("#[belongs_to(table_name)] is not correct")
+                    .to_string(),
+            );
+        }
+    }
     let struct_name = &input.ident;
     let fields_with_type = match &input.data {
         syn::Data::Struct(syn::DataStruct {
@@ -664,12 +681,11 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         &format!("{}", struct_name).to_ascii_uppercase(),
         Span::call_site(),
     );
-    let lower_mod_name = Ident::new(
+    let lower_name = Ident::new(
         &format!("{}", struct_name).to_ascii_lowercase(),
         Span::call_site(),
     );
-
-    quote!(
+    let mut output = quote!(
         impl sewup::rdb::traits::Record for #struct_name {}
 
         #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
@@ -766,14 +782,14 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             }
         }
         #[cfg(target_arch = "wasm32")]
-        pub mod #lower_mod_name {
+        pub mod #lower_name {
             use super::*;
             use sewup::primitives::IntoEwasmAny;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;
-            pub type _Instance = #struct_name;
+            pub type _InstanceType = #struct_name;
             pub fn get(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
-                let table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 if proc.filter {
                     let mut raw_output: Vec<Wrapper> = Vec::new();
                     for r in table.all_records()?.drain(..){
@@ -818,21 +834,21 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
             pub fn create(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
-                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let mut output_proc = proc.clone();
                 output_proc.records[0].id = Some(table.add_record(proc.records[0].into())?);
                 table.commit()?;
                 Ok(output_proc.into_ewasm_any())
             }
             pub fn update(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
-                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, Some(proc.records[0].clone().into()))?;
                 table.commit()?;
                 Ok(proc.into_ewasm_any())
             }
             pub fn delete(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
-                let mut table = sewup::rdb::Db::load(None)?.table::<_Instance>()?;
+                let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, None)?;
                 table.commit()?;
@@ -840,15 +856,15 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
-        pub mod #lower_mod_name {
+        pub mod #lower_name {
             use super::*;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;
-            pub type _Instance = #struct_name;
+            pub type _InstanceType = #struct_name;
             pub type Query = Wrapper;
 
             #[inline]
-            pub fn protocol(instance: _Instance) -> Protocol {
+            pub fn protocol(instance: _InstanceType) -> Protocol {
                 instance.into()
             }
             impl Protocol {
@@ -860,7 +876,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                     true
                 }
             }
-            pub fn query(instance: _Instance) -> Wrapper {
+            pub fn query(instance: _InstanceType) -> Wrapper {
                 instance.into()
             }
 
@@ -874,7 +890,26 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
-    ).into()
+    ).to_string();
+
+    if let Some(parent_table) = belongs_to {
+        let lower_parent_table = &format!("{}", &parent_table).to_ascii_lowercase();
+        let parent_table = Ident::new(&parent_table, Span::call_site());
+        let lower_parent_table_ident = Ident::new(&lower_parent_table, Span::call_site());
+
+        output += &quote! {
+            impl #struct_name {
+                pub fn #lower_parent_table_ident (&self) -> sewup::Result<#parent_table> {
+                    // let id: usize = sewup::utils::get_field_by_name(self, &format!("{}_id", stringify!(#lower_parent_table)));
+                    let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
+                    parent_table.get_record(1)
+                }
+            }
+        }
+        .to_string();
+    }
+
+    output.parse().unwrap()
 }
 
 /// helps you setup the test mododule, and test cases in contract.
