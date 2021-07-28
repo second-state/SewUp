@@ -3,6 +3,7 @@
 members = [
     "sewup",
     "sewup-derive",
+    "cargo-sewup",
 ]
 exclude = [
     "examples/hello-contract",
