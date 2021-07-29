@@ -9,3 +9,4 @@ resources/test/rusty_contract.wasm
 .direnv
 examples/*/target
 cargo-sewup/target
+scripts

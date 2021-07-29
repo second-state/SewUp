@@ -26,3 +26,11 @@ opt-level = "z"
 [profile.release.package.default-contract]
 incremental = false
 opt-level = "z"
+
+[deploy]
+url = "http://localhost:8545"
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+value_log_10 = 17  # 0.1 Eth
+gas = 5
+gas_price = 3000000

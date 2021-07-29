@@ -28,3 +28,8 @@ opt-level = "z"
 [profile.release.package.rdb-contract]
 incremental = false
 opt-level = "z"
+
+[deploy]
+url = "http://localhost:8545"
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"

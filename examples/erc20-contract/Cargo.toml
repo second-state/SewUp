@@ -27,3 +27,8 @@ opt-level = "z"
 [profile.release.package.erc20-contract]
 incremental = false
 opt-level = "z"
+
+[deploy]
+url = "http://localhost:8545"
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"

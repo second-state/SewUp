@@ -5,7 +5,7 @@ let
       rev = "57c8084c7ef41366993909c20491e359bbb90f54";
     });
   nixpkgs = import <nixpkgs> { overlays = [ mozillaOverlay ]; };
-  rust-stable = with nixpkgs; ((rustChannelOf { date = "2021-05-14"; channel = "nightly"; }).rust.override {
+  rust-nightly = with nixpkgs; ((rustChannelOf { date = "2021-05-14"; channel = "nightly"; }).rust.override {
     targets = [ "wasm32-unknown-unknown" ];
   });
   exampleTestScript = nixpkgs.writeShellScriptBin "run-example-test" ''
@@ -18,11 +18,13 @@ let
 in
 with nixpkgs; pkgs.mkShell {
   buildInputs = [
+    boost
     clang
     cmake
+    openssl
     pkg-config
-    rust-stable
-    boost
+    rust-nightly
+
     exampleTestScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
