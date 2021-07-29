@@ -77,12 +77,12 @@ fn transfer_from(contract: &sewup::primitives::Contract) {
 
 #[ewasm_fn]
 fn mint(contract: &sewup::primitives::Contract) {
-    let adddress = sewup::token::helpers::copy_into_address(&contract.input_data[4..24]);
+    let address = sewup::token::helpers::copy_into_address(&contract.input_data[4..24]);
 
     let value_data: [u8; 8] = sewup::token::helpers::copy_into_array(&contract.input_data[24..32]);
     let value = u64::from_be_bytes(value_data);
 
-    sewup::token::erc20::mint(adddress, value);
+    sewup::token::erc20::mint(address, value);
 }
 
 #[ewasm_main]

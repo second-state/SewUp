@@ -29,7 +29,7 @@ fn check_version_and_features(
 ) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let db = sewup::rdb::Db::load(None)?;
     if db.version() != version {
-        return Err(errors::RDBError::UnexpectVersion(db.version()).into());
+        return Err(errors::RDBError::UnexpectedVersion(db.version()).into());
     };
     let current_features = db.features();
     if current_features != features {
@@ -75,7 +75,7 @@ fn check_tables_again() -> anyhow::Result<sewup::primitives::EwasmAny> {
 }
 
 #[ewasm_fn]
-fn get_childern() -> anyhow::Result<sewup::primitives::EwasmAny> {
+fn get_children() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let table = sewup::rdb::Db::load(None)?.table::<Person>()?;
     let people = table.filter_records(&|p: &Person| p.age < 12)?;
 
@@ -94,7 +94,7 @@ fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> 
     // use relationship to get the post owner
     let owner = post.person()?;
 
-    // This is an example show output not wrappered into protocol,
+    // This is an example show output not wrapped into protocol,
     // just return instance itself
     Ok(sewup::primitives::EwasmAny::from(owner))
 }
@@ -117,7 +117,7 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
             check_version_and_features(0, vec![sewup::rdb::Feature::Default])
         }
         ewasm_fn_sig!(get_post_author) => ewasm_input_from!(contract move get_post_author),
-        ewasm_fn_sig!(get_childern) => get_childern(),
+        ewasm_fn_sig!(get_children) => get_children(),
         ewasm_fn_sig!(init_db_with_tables) => init_db_with_tables(),
         ewasm_fn_sig!(check_tables) => check_tables(),
         ewasm_fn_sig!(drop_table) => drop_table(),
@@ -197,9 +197,9 @@ mod tests {
         expect_output.records[0].trusted = None;
         ewasm_auto_assert_eq!(person::get(person_query_protocol), expect_output);
 
-        // Get the childern by the customized handler
+        // Get the children by the customized handler
         expect_output = vec![child].into();
-        ewasm_auto_assert_eq!(get_childern(), expect_output);
+        ewasm_auto_assert_eq!(get_children(), expect_output);
 
         // Please Notice that protocol from the default instance may not be empty,
         // this dependents on the default implementation of the struct.

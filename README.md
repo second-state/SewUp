@@ -101,9 +101,9 @@ Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_db
 To learn more about the usage, you check out the examples in the [example](./examples/) folder.
 
 ## SewUp Development
-There are two projects and serveral examples in the workspace, the contract project should build with target
+There are two projects and several examples in the workspace, the contract project should build with target
 `wasm32-unknown-unknown` and the flag `-C link-arg=--export-table`.
 You can run `cargo test` in each example folder to check on the test your modification.
 
 It is easy to participate with help want issues and the good first issues.
-Less but not least, please feel free to open any issue on this porject.
+Less but not least, please feel free to open any issue on this project.

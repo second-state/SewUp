@@ -17,7 +17,7 @@ pub enum VmError {
     Failure,
     #[error("revert")]
     Revert,
-    #[error("out fo gas")]
+    #[error("out of gas")]
     OutOfGas,
     #[error("invalid instruction")]
     InvalidInstruction,
@@ -55,7 +55,7 @@ pub enum VmError {
     #[error("there shoulbe be a caller(sender) for the message")]
     UnknownCaller,
 
-    /// If the EWASM erorrs are not enough for your VM,
+    /// If the EWASM errors are not enough for your VM,
     /// you can use this error type to help you customized you error message
     #[error("`{0}`")]
     CustomizedError(String),

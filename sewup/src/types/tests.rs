@@ -2,7 +2,7 @@ use crate::types::*;
 
 #[cfg(feature = "default")]
 #[test]
-fn test_ser_de_for_raw() {
+fn test_serde_for_raw() {
     let raw = Raw::from(vec![0, 1]);
     assert_eq!(
         raw.bytes,
@@ -20,7 +20,7 @@ fn test_ser_de_for_raw() {
 
 #[cfg(feature = "default")]
 #[test]
-fn test_ser_de_for_raw2() {
+fn test_serde_for_raw2() {
     let raw = Raw::from(vec![
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 200, 201, 202, 203, 204, 205, 206,
         207, 208, 209, 210, 211, 212, 213, 214, 215,
@@ -87,7 +87,7 @@ fn test_box() {
 
 #[cfg(feature = "default")]
 #[test]
-fn test_ser_de_for_row() {
+fn test_serde_for_row() {
     let row = Row::from(vec![
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 200, 201, 202, 203, 204, 205, 206,
         207, 208, 209, 210, 211, 212, 213, 214, 215, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,

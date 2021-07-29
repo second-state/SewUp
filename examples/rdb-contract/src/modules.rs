@@ -16,6 +16,6 @@ pub struct Person {
 pub struct Post {
     pub(crate) words: u8,
 
-    // Curretly, this field need to set up manually, this will be enhance later
+    // Currently, this field need to set up manually, this will be enhance later
     pub(crate) person_id: usize,
 }

@@ -24,7 +24,7 @@ fn empty_commit() -> anyhow::Result<()> {
 fn check_ver_and_feat(version: u8, features: Vec<sewup::kv::Feature>) -> anyhow::Result<()> {
     let storage = sewup::kv::Store::load(None)?;
     if storage.version() != version {
-        return Err(KVError::UnexpectVersion(storage.version()).into());
+        return Err(KVError::UnexpectedVersion(storage.version()).into());
     };
     let current_features = storage.features();
     if current_features != features {
@@ -176,8 +176,8 @@ fn delete_object_in_bucket() -> anyhow::Result<()> {
 }
 
 #[ewasm_fn]
-fn non_regist_function() -> anyhow::Result<()> {
-    // A function forget to regist
+fn non_register_function() -> anyhow::Result<()> {
+    // A function forget to register
     Ok(())
 }
 
@@ -219,7 +219,7 @@ mod tests {
         ewasm_assert_ok!(empty_commit());
 
         ewasm_assert_eq!(
-            non_regist_function(),
+            non_register_function(),
             ewasm_err_output!(KVError::UnknownHandle)
         );
 
