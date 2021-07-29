@@ -1,7 +1,9 @@
 [package]
 name = "cargo-sewup"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2018"
+description = "A cli tool build sewup project to a deploy wasm"
+license = "Apache-2.0"
 
 [dependencies]
 anyhow = "1.0.40"
