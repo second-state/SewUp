@@ -98,11 +98,11 @@ impl Db {
     /// create table for storage
     pub fn create_table<T: SerializeTrait + Default + Sized + Record>(&mut self) -> Result<()> {
         let default_instance = T::default();
-        let ser_size = bincode::serialized_size(&default_instance)?;
-        let record_raw_size = if ser_size == 0 {
+        let size = bincode::serialized_size(&default_instance)?;
+        let record_raw_size = if size == 0 {
             0u32
         } else {
-            (ser_size as u32 + HEADER_SIZE) / 32 + 1
+            (size as u32 + HEADER_SIZE) / 32 + 1
         };
         let info = if self.table_info.is_empty() {
             TableInfo {

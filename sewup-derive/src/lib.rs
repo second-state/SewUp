@@ -33,7 +33,7 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 /// `#[ewasm_main(auto)]`
 /// Auto unwrap the output of the result object from ewasm_main function.
 /// This is for a scenario that you are using a rust non-rust client,
-/// and you are only care the happy case of excuting the contract.
+/// and you are only care the happy case of executing the contract.
 ///
 /// ```compile_fail
 /// #[ewasm_main]
@@ -928,7 +928,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
 /// The test runtime will be create in the module, and all the test case will use the same test
 /// runtime, if you can create more runtimes for testing by setup more test modules.
 /// You can setup a log file when running the test as following, then use `sewup::ewasm_dbg!` to debug the
-/// ewasm contract in the excuting in the runtime.
+/// ewasm contract in the executing in the runtime.
 /// ```compile_fail
 /// #[ewasm_test(log=/path/to/logfile)]
 /// mod tests {

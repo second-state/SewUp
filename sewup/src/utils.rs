@@ -8,7 +8,7 @@ pub use serde::de::DeserializeOwned;
 pub use serde::Serialize;
 pub use serde_value::{to_value, Value};
 
-/// helps you debug the ewasm contract when excuting in the test runtime
+/// helps you debug the ewasm contract when executing in the test runtime
 /// To show the debug message pllease run the test case as following command
 /// `cargo test -- --nocapture`
 /// Or you may checkout the log file set by following `ewasm_test` macro
@@ -90,7 +90,7 @@ where
 
     match R::deserialize(value) {
         Ok(r) => r,
-        Err(_) => panic!("type uncorrect"),
+        Err(_) => panic!("type incorrect"),
     }
 }
 
