@@ -153,7 +153,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_value</span>::{<span class="ident">to_value</span>, <span class="ident">Value</span>};
 
-<span class="doccomment">/// helps you debug the ewasm contract when excuting in the test runtime</span>
+<span class="doccomment">/// helps you debug the ewasm contract when executing in the test runtime</span>
 <span class="doccomment">/// To show the debug message pllease run the test case as following command</span>
 <span class="doccomment">/// `cargo test -- --nocapture`</span>
 <span class="doccomment">/// Or you may checkout the log file set by following `ewasm_test` macro</span>
@@ -235,7 +235,7 @@
 
     <span class="kw">match</span> <span class="ident">R::deserialize</span>(<span class="ident">value</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">r</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">r</span>,
-        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;type uncorrect&quot;</span>),
+        <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;type incorrect&quot;</span>),
     }
 }
 
