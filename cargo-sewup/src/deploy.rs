@@ -8,13 +8,13 @@ use tokio::fs::{read_to_string, File};
 use tokio::io::AsyncReadExt;
 use tokio::time::{sleep, Duration};
 use web3::{
-    types::{Address, TransactionParameters, U256},
+    types::{Address, TransactionParameters},
     Web3,
 };
 
 use crate::config::Deploy;
 use crate::config::Toml;
-use crate::constants::{DEFAULT_GAS, DEFAULT_GAS_PRICE, DEFAULT_VALUE_LOG};
+use crate::constants::{DEFAULT_GAS, DEFAULT_GAS_PRICE};
 use crate::deploy_wasm;
 use crate::errors::DeployError;
 
@@ -40,7 +40,6 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
         url,
         private,
         address,
-        value_log_10,
         gas,
         gas_price,
     } = config;
@@ -62,7 +61,6 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
 
     let tx_object = TransactionParameters {
         data: contents.into(),
-        value: U256::exp10(value_log_10.unwrap_or(DEFAULT_VALUE_LOG)),
         gas: gas.unwrap_or(DEFAULT_GAS).into(),
         gas_price: Some(gas_price.unwrap_or(DEFAULT_GAS_PRICE).into()),
         ..Default::default()
@@ -112,7 +110,7 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
         retry_times -= 1;
     }
     if let Some(contract_address) = contract_address {
-        println!("contract address: {}", contract_address.unwrap_or_default());
+        println!("contract address: {}", contract_address);
     } else {
         println!("contract deploy fail");
     }

@@ -5,13 +5,5 @@ macro_rules! deploy_wasm {
     };
 }
 
-#[macro_export]
-macro_rules! deploy_file {
-    () => {
-        "./target/wasm32-unknown-unknown/release/{}.deploy"
-    };
-}
-
-pub const DEFAULT_VALUE_LOG: usize = 17;
-pub const DEFAULT_GAS: usize = 5;
-pub const DEFAULT_GAS_PRICE: usize = 3_000_000;
+pub const DEFAULT_GAS: usize = 500_000_000;
+pub const DEFAULT_GAS_PRICE: usize = 1;
