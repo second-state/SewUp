@@ -1,3 +1,6 @@
 [submodule "ssvm-evmc"]
 	path = ssvm-evmc
 	url = git@github.com:second-state/ssvm-evmc.git
+[submodule "SewUp.wiki"]
+	path = SewUp.wiki
+	url = git@github.com:second-state/SewUp.wiki.git
