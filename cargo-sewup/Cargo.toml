@@ -4,6 +4,8 @@ version = "0.0.2"
 edition = "2018"
 description = "A cli tool build sewup project to a deploy wasm"
 license = "Apache-2.0"
+repository = "https://github.com/second-state/SewUp"
+readme = "../README.md"
 
 [dependencies]
 anyhow = "1.0.40"

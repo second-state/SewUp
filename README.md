@@ -5,6 +5,7 @@
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
 [![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.6-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
+[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.0.2-green.svg)](https://crates.io/crates/cargo-sewup)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
@@ -99,6 +100,9 @@ Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/
 ### Debugging
 Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
 To learn more about the usage, you check out the examples in the [example](./examples/) folder.
+
+### Deployment
+Once you want to deploy your contract to any network which support Ewasm by sweup command line tool, please read the [wiki](https://github.com/second-state/SewUp/wiki/Deploy-Guide).
 
 ## SewUp Development
 There are two projects and several examples in the workspace, the contract project should build with target
