@@ -95,8 +95,14 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
             .await?;
         contract_address = match receipt {
             Value::Object(m) => match m.get("result") {
-                Some(Value::Object(r)) => match r.get("contractAddress") {
-                    Some(Value::String(s)) => Some(s.to_owned()),
+                Some(Value::Object(r)) => match (r.get("contractAddress"), r.get("status")) {
+                    (Some(Value::String(addr)), Some(Value::String(code))) => {
+                        if code == "0x1" {
+                            Some(addr.to_owned())
+                        } else {
+                            None
+                        }
+                    }
                     _ => None,
                 },
                 _ => None,
@@ -105,6 +111,10 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
         };
         retry_times -= 1;
     }
-    println!("contract address: {}", contract_address.unwrap_or_default());
+    if let Some(contract_address) = contract_address {
+        println!("contract address: {}", contract_address.unwrap_or_default());
+    } else {
+        println!("contract deploy fail");
+    }
     Ok(())
 }
