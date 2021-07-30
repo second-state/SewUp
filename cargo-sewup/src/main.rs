@@ -25,6 +25,10 @@ struct Opt {
     /// Verbose mode
     #[structopt(short, long)]
     verbose: bool,
+
+    /// Debug mode, generate hexstring format for deploy wasm
+    #[structopt(short, long)]
+    debug: bool,
 }
 
 #[tokio::main]
@@ -39,7 +43,7 @@ async fn main() -> Result<()> {
         println!("project   : {}", env::current_dir()?.display());
     }
 
-    let contract_name = build::run().await?;
+    let contract_name = build::run(opt.debug).await?;
 
     if !opt.build_only {
         if opt.verbose {

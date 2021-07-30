@@ -9,7 +9,7 @@ use tokio::{
 };
 
 use crate::config::Toml;
-use crate::{deploy_file, deploy_wasm};
+use crate::deploy_wasm;
 
 async fn check_dependency() -> Result<()> {
     Command::new("wat2wasm")
@@ -99,7 +99,7 @@ async fn generate_deploy_wasm_hex(wasm_path: &str, text_path: &str) -> Result<()
     Ok(())
 }
 
-pub async fn run() -> Result<String> {
+pub async fn run(debug: bool) -> Result<String> {
     let res = tokio::try_join!(check_dependency(), check_cargo_toml());
 
     let contract_name = match res {
@@ -118,11 +118,19 @@ pub async fn run() -> Result<String> {
         "./target/wasm32-unknown-unknown/release/{}.wat",
         contract_name
     );
+
     let wasm_path = format!(deploy_wasm!(), contract_name);
-    let text_path = format!(deploy_file!(), contract_name);
 
     build_wat(&wat_path, bin_size, mem_size, hex_string).await?;
     build_deploy_wasm(&wat_path, &wasm_path).await?;
-    generate_deploy_wasm_hex(&wasm_path, &text_path).await?;
+
+    if debug {
+        let text_path = format!(
+            "./target/wasm32-unknown-unknown/release/{}.deploy",
+            contract_name
+        );
+        generate_deploy_wasm_hex(&wasm_path, &text_path).await?;
+    }
+
     Ok(contract_name)
 }
