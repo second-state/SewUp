@@ -10,6 +10,16 @@ struct SimpleStruct {
     description: String,
 }
 
+#[cfg(feature = "constructor")]
+#[no_mangle]
+fn constructor() {
+    let a = 1;
+    let b = 2;
+    let c = a + b;
+    sewup::utils::ewasm_return(vec![1, 2, c, 4]);
+}
+
+#[cfg(not(feature = "constructor"))]
 #[ewasm_fn]
 fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     // ewasm_dbg! help you debug things when this ewasm is running by testruntime
@@ -23,6 +33,7 @@ fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     Ok(())
 }
 
+#[cfg(not(feature = "constructor"))]
 #[ewasm_main]
 fn main() -> anyhow::Result<()> {
     use sewup::primitives::Contract;
