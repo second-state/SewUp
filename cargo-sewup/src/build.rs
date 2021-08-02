@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::process::Stdio;
 
 use anyhow::{Context, Result};
 use hex::encode;
@@ -7,18 +6,10 @@ use tokio::{
     fs::{read, read_to_string, write},
     process::Command,
 };
+use wat;
 
 use crate::config::Toml;
 use crate::deploy_wasm;
-
-async fn check_dependency() -> Result<()> {
-    Command::new("wat2wasm")
-        .stderr(Stdio::null())
-        .output()
-        .await
-        .context("wat2wasm not found")?;
-    Ok(())
-}
 
 async fn check_cargo_toml() -> Result<String> {
     let config_contents = read_to_string("Cargo.toml")
@@ -58,12 +49,7 @@ async fn generate_runtime_info(rt_wasm_path: String) -> Result<(usize, usize, St
     Ok((bin_size, mem_size, hex_string))
 }
 
-async fn build_wat(
-    wat_path: &str,
-    bin_size: usize,
-    mem_size: usize,
-    hex_string: String,
-) -> Result<()> {
+async fn build_wat(bin_size: usize, mem_size: usize, hex_string: String) -> Result<String> {
     let wat_content = format!(
         r#"(module (import "ethereum" "finish" (func (param i32 i32)))
       (func (export "main")
@@ -75,18 +61,12 @@ async fn build_wat(
     "#,
         bin_size, mem_size, hex_string
     );
-    write(wat_path, wat_content)
-        .await
-        .context("fail to write deploy wasm script")?;
-    Ok(())
+    Ok(wat_content)
 }
 
-async fn build_deploy_wasm(wat_path: &str, wasm_path: &str) -> Result<()> {
-    Command::new("wat2wasm")
-        .args(&[wat_path, "-o", wasm_path])
-        .output()
-        .await
-        .context("fail to build deploy wasm")?;
+async fn build_deploy_wasm(wat_content: String, wasm_path: &str) -> Result<()> {
+    let binary = wat::parse_str(wat_content)?;
+    write(wasm_path, binary).await?;
     Ok(())
 }
 
@@ -100,12 +80,7 @@ async fn generate_deploy_wasm_hex(wasm_path: &str, text_path: &str) -> Result<()
 }
 
 pub async fn run(debug: bool) -> Result<String> {
-    let res = tokio::try_join!(check_dependency(), check_cargo_toml());
-
-    let contract_name = match res {
-        Ok((_, contract_name)) => contract_name,
-        Err(err) => return Err(err),
-    };
+    let contract_name = check_cargo_toml().await?;
     build_runtime_wasm().await?;
 
     let (bin_size, mem_size, hex_string) = generate_runtime_info(format!(
@@ -114,15 +89,10 @@ pub async fn run(debug: bool) -> Result<String> {
     ))
     .await?;
 
-    let wat_path = format!(
-        "./target/wasm32-unknown-unknown/release/{}.wat",
-        contract_name
-    );
+    let wat_content = build_wat(bin_size, mem_size, hex_string).await?;
 
     let wasm_path = format!(deploy_wasm!(), contract_name);
-
-    build_wat(&wat_path, bin_size, mem_size, hex_string).await?;
-    build_deploy_wasm(&wat_path, &wasm_path).await?;
+    build_deploy_wasm(wat_content, &wasm_path).await?;
 
     if debug {
         let text_path = format!(

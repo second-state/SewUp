@@ -15,6 +15,15 @@ let
     cd ../../
     exit $rc
   '';
+  cliTestScript = nixpkgs.writeShellScriptBin "cli-test" ''
+    cd cargo-sewup
+    cargo run -- -v -d -b -p ../examples/default-contract
+    cd ../
+    diff examples/default-contract/target/wasm32-unknown-unknown/release/default_contract.deploy \
+      resources/test/default_contract.deploy
+    rc=$?
+    exit $rc
+  '';
 in
 with nixpkgs; pkgs.mkShell {
   buildInputs = [
@@ -26,6 +35,7 @@ with nixpkgs; pkgs.mkShell {
     rust-nightly
 
     exampleTestScript
+    cliTestScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
