@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
 use errors::Error;
@@ -10,8 +10,7 @@ struct SimpleStruct {
     description: String,
 }
 
-#[cfg(feature = "constructor")]
-#[no_mangle]
+#[ewasm_constructor]
 fn constructor() {
     let a = 1;
     let b = 2;
@@ -19,7 +18,6 @@ fn constructor() {
     sewup::utils::ewasm_return(vec![1, 2, c, 4]);
 }
 
-#[cfg(not(feature = "constructor"))]
 #[ewasm_fn]
 fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     // ewasm_dbg! help you debug things when this ewasm is running by testruntime
@@ -33,7 +31,6 @@ fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     Ok(())
 }
 
-#[cfg(not(feature = "constructor"))]
 #[ewasm_main]
 fn main() -> anyhow::Result<()> {
     use sewup::primitives::Contract;
