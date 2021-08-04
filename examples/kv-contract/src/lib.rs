@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
 
 mod errors;
 use errors::KVError;
@@ -8,6 +8,11 @@ use errors::KVError;
 struct SimpleStruct {
     trust: bool,
     description: String,
+}
+
+#[ewasm_constructor]
+fn constructor() {
+    let storage = sewup::kv::Store::new().expect("there is no return for constructor currently");
 }
 
 #[ewasm_fn]

@@ -124,12 +124,13 @@ async fn build_wat(
             bin_size, eth_finish_sig
         )
     } else {
-        let module_re = Regex::new(r#"\(func \$constructor "#).unwrap();
+        let module_re = Regex::new(r#"\n\s*\(func \$"#).unwrap();
         content = module_re
             .replace(
                 &content,
-                r#"(import "ethereum" "finish" (func $$_Eth_Finish (param i32 i32)))
-  (func $$constructor "#,
+                r#"
+  (import "ethereum" "finish" (func $$_Eth_Finish (param i32 i32)))
+  (func $$"#,
             )
             .trim_end()
             .to_string();
@@ -188,6 +189,14 @@ pub async fn run(debug: bool) -> Result<String> {
     );
 
     let wasm_tmpl = build_constructor_template(&wasm_path).await?;
+
+    if debug {
+        let tmpl_path = format!(
+            "./target/wasm32-unknown-unknown/release/{}.tmpl.wat",
+            contract_name
+        );
+        generate_debug_wat(&tmpl_path, &wasm_tmpl).await?;
+    }
 
     build_runtime_wasm().await?;
 

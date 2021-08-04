@@ -1,11 +1,14 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[derive(Default, Serialize, Deserialize)]
 struct SimpleStruct {
     trust: bool,
     description: String,
 }
+
+#[ewasm_constructor]
+fn constructor() {}
 
 #[ewasm_fn]
 fn check_input_object(s: SimpleStruct) -> Result<(), &'static str> {
