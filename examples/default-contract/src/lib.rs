@@ -1,5 +1,5 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
 use errors::Error;
@@ -8,6 +8,14 @@ use errors::Error;
 struct SimpleStruct {
     trust: bool,
     description: String,
+}
+
+#[ewasm_constructor]
+fn constructor() {
+    let a = 1;
+    let b = 2;
+    let c = a + b;
+    sewup::utils::ewasm_return(vec![1, 2, c, 4]);
 }
 
 #[ewasm_fn]

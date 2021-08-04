@@ -10,6 +10,7 @@ mod config;
 mod constants;
 mod deploy;
 mod errors;
+mod inspect;
 
 #[derive(StructOpt)]
 #[structopt(name = "cargo-sewup")]
@@ -29,11 +30,19 @@ struct Opt {
     /// Debug mode, generate hexstring format for deploy wasm
     #[structopt(short, long)]
     debug: bool,
+
+    /// Inspect the .deploy file to wat
+    #[structopt(short, long)]
+    inspect_file: Option<String>,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let opt = Opt::from_args();
+
+    if let Some(inspect_file) = opt.inspect_file {
+        return inspect::run(inspect_file).await;
+    }
 
     if let Some(path) = opt.project_path {
         env::set_current_dir(&Path::new(&path))?
@@ -49,7 +58,7 @@ async fn main() -> Result<()> {
         if opt.verbose {
             println!("contract  : {}", contract_name);
         }
-        deploy::run(contract_name, opt.verbose).await?;
+        deploy::run(contract_name, opt.verbose, opt.debug).await?;
     }
 
     Ok(())

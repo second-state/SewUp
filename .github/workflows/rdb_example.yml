@@ -20,5 +20,8 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-21.05-small
 
-      - name: RDB example test
+      - name: Run test
         run: nix-shell --run 'run-example-test rdb'
+
+      - name: Deploy test
+        run: nix-shell --run 'cli-test rdb'

@@ -111,6 +111,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
+            #[cfg(not(feature = "constructor"))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -135,6 +136,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
+            #[cfg(not(feature = "constructor"))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -161,6 +163,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
+            #[cfg(not(feature = "constructor"))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -181,6 +184,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
+            #[cfg(not(feature = "constructor"))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -251,6 +255,25 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let result = quote! {
         pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
         #[cfg(target_arch = "wasm32")]
+        #[cfg(not(feature = "constructor"))]
+        #input
+    };
+    result.into()
+}
+
+/// helps you to build your constructor for the contract
+#[proc_macro_error]
+#[proc_macro_attribute]
+pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+    if name.to_string() != "constructor" {
+        abort!(input.sig.ident, "please name the function as `constructor`");
+    }
+    let result = quote! {
+        #[cfg(target_arch = "wasm32")]
+        #[cfg(feature = "constructor")]
+        #[no_mangle]
         #input
     };
     result.into()

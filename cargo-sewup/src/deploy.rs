@@ -31,7 +31,7 @@ async fn get_deploy_config() -> Result<Deploy> {
     }
 }
 
-pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
+pub async fn run(contract_name: String, verbose: bool, debug: bool) -> Result<()> {
     let config = get_deploy_config().await?;
     if verbose {
         println!("{}", config);
@@ -91,6 +91,14 @@ pub async fn run(contract_name: String, verbose: bool) -> Result<()> {
             .await?
             .json()
             .await?;
+
+        if debug {
+            println!(
+                "==> Try get receipt in {} time:\n {:?}",
+                retry_times, receipt
+            );
+        }
+
         contract_address = match receipt {
             Value::Object(m) => match m.get("result") {
                 Some(Value::Object(r)) => match (r.get("contractAddress"), r.get("status")) {

@@ -1,4 +1,7 @@
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+
+#[ewasm_constructor]
+fn constructor() {}
 
 #[ewasm_fn]
 fn hello() -> anyhow::Result<String> {

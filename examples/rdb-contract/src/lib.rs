@@ -1,7 +1,7 @@
 use serde_derive::{Deserialize, Serialize};
 
 use sewup::rdb::errors::Error as LibError;
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 mod errors;
 
@@ -11,6 +11,15 @@ use modules::{person, post, Person, Post, PERSON, POST};
 #[derive(Serialize, Deserialize)]
 pub struct Input {
     id: usize,
+}
+
+#[ewasm_constructor]
+fn constructor() {
+    let mut db = sewup::rdb::Db::new().expect("there is no return for constructor currently");
+    db.create_table::<Person>();
+    db.create_table::<Post>();
+    db.commit()
+        .expect("there is no return for constructor currently");
 }
 
 #[ewasm_fn]
