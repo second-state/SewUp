@@ -94,7 +94,7 @@ async fn build_wat(
         None
     };
 
-    let memory_re = Regex::new(r#"\(export "memory" \(memory (?P<mem_size>\d*)"#).unwrap();
+    let memory_re = Regex::new(r#"\(memory \(;0;\) (?P<mem_size>\d*)"#).unwrap();
     let mem_size = if let Some(cap) = memory_re.captures(&tmpl) {
         cap.name("mem_size")
             .unwrap()
@@ -105,28 +105,48 @@ async fn build_wat(
     } else {
         mem_size
     };
+
     let mut content = memory_re
-        .replace(&tmpl, &format!(r#"(export "memory" (memory {}"#, mem_size))
+        .replace(&tmpl, &format!(r#"(memory (;0;) {}"#, mem_size))
         .trim_end()
         .to_string();
 
     content.truncate(content.len() - 1);
+
+    let export_re = Regex::new(r#"\(export.*\)\)\n"#).unwrap();
+    content = export_re.replace_all(&content, "").trim_end().to_string();
+
     let main_call = if let Some(eth_finish_sig) = eth_finish_sig {
         format!(
-            r#"  (func (export "main") call $constructor i32.const 0 i32.const {} call {})"#,
+            r#"
+  (export "memory" (memory 0))
+  (func (export "main") call $constructor i32.const 0 i32.const {} call {})"#,
             bin_size, eth_finish_sig
         )
     } else {
+        let module_re = Regex::new(r#"\(func \$constructor "#).unwrap();
+        content = module_re
+            .replace(
+                &content,
+                r#"(import "ethereum" "finish" (func $$_Eth_Finish (param i32 i32)))
+  (func $$constructor "#,
+            )
+            .trim_end()
+            .to_string();
         format!(
             r#"
-  (import "ethereum" "finish" (func $_eth_finish (param i32 i32)))
-  (func (export "main") call $constructor i32.const 0 i32.const {} call $_eth_finish)
+  (export "memory" (memory 0))
+  (func (export "main") call $constructor i32.const 0 i32.const {} call $_Eth_Finish)
         "#,
             bin_size
         )
     };
     content.push_str(&main_call);
-    let data_section = format!(r#"  (data (i32.const 0) "{}")"#, hex_string);
+    let data_section = format!(
+        r#"
+  (data (i32.const 0) "{}")"#,
+        hex_string
+    );
     content.push_str(&data_section);
     content.push(')');
 
@@ -145,6 +165,13 @@ async fn generate_deploy_wasm_hex(wasm_path: &str, text_path: &str) -> Result<()
     write(text_path, hex_string)
         .await
         .context("fail to generate hex string for deploy wasm")?;
+    Ok(())
+}
+
+async fn generate_debug_wat(wat_path: &str, wat_content: &str) -> Result<()> {
+    write(wat_path, wat_content)
+        .await
+        .context("fail to write deploy wat")?;
     Ok(())
 }
 
@@ -167,6 +194,14 @@ pub async fn run(debug: bool) -> Result<String> {
     let (bin_size, mem_size, hex_string) = generate_runtime_info(&wasm_path).await?;
 
     let wat_content = build_wat(wasm_tmpl, bin_size, mem_size, hex_string).await?;
+
+    if debug {
+        let wat_path = format!(
+            "./target/wasm32-unknown-unknown/release/{}.wat",
+            contract_name
+        );
+        generate_debug_wat(&wat_path, &wat_content).await?;
+    }
 
     wasm_path = format!(deploy_wasm!(), contract_name);
     build_deploy_wasm(wat_content, &wasm_path).await?;

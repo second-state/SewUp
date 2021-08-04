@@ -49,7 +49,7 @@ async fn main() -> Result<()> {
         if opt.verbose {
             println!("contract  : {}", contract_name);
         }
-        deploy::run(contract_name, opt.verbose).await?;
+        deploy::run(contract_name, opt.verbose, opt.debug).await?;
     }
 
     Ok(())
