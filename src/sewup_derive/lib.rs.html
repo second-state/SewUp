@@ -1272,6 +1272,28 @@
 <span id="1269">1269</span>
 <span id="1270">1270</span>
 <span id="1271">1271</span>
+<span id="1272">1272</span>
+<span id="1273">1273</span>
+<span id="1274">1274</span>
+<span id="1275">1275</span>
+<span id="1276">1276</span>
+<span id="1277">1277</span>
+<span id="1278">1278</span>
+<span id="1279">1279</span>
+<span id="1280">1280</span>
+<span id="1281">1281</span>
+<span id="1282">1282</span>
+<span id="1283">1283</span>
+<span id="1284">1284</span>
+<span id="1285">1285</span>
+<span id="1286">1286</span>
+<span id="1287">1287</span>
+<span id="1288">1288</span>
+<span id="1289">1289</span>
+<span id="1290">1290</span>
+<span id="1291">1291</span>
+<span id="1292">1292</span>
+<span id="1293">1293</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -1386,7 +1408,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)))]</span>
             <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
                 #<span class="ident">input</span>
@@ -1411,7 +1433,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)))]</span>
             <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
                 #<span class="ident">input</span>
@@ -1438,7 +1460,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)))]</span>
             <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
                 #<span class="ident">input</span>
@@ -1459,7 +1481,7 @@
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>), <span class="ident">not</span>(<span class="ident">test</span>)))]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() { <span class="macro">compile_error!</span>(<span class="string">&quot;The function wrapped with ewasm_main need to be compiled with wasm32 target&quot;</span>); }
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)))]</span>
             <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
                 #<span class="ident">input</span>
@@ -1530,7 +1552,7 @@
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> {
         <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> #<span class="ident">sig_name</span> : [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> [#<span class="ident">sig_0</span>, #<span class="ident">sig_1</span>, #<span class="ident">sig_2</span>, #<span class="ident">sig_3</span>];
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>))]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)))]</span>
         #<span class="ident">input</span>
     };
     <span class="ident">result</span>.<span class="ident">into</span>()
@@ -1547,9 +1569,16 @@
     }
     <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">quote!</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>))]</span>
         <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
         #<span class="ident">input</span>
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;constructor-test&quot;</span>)]</span>
+        <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+            #<span class="ident">name</span>();
+        }
     };
     <span class="ident">result</span>.<span class="ident">into</span>()
 }
@@ -2266,10 +2295,11 @@
                 use std::process::Command;
                 use std::sync::Arc;
 
-                fn _build_wasm() -&gt; String {
+                fn _build_wasm(opt: Option&lt;String&gt;) -&gt; String {
+                    let cargo_cmd = format!(&quot;cargo build --release --target=wasm32-unknown-unknown {}&quot;, opt.unwrap_or_default());
                     let output = Command::new(&quot;sh&quot;)
                         .arg(&quot;-c&quot;)
-                        .arg(&quot;cargo build --release --target=wasm32-unknown-unknown&quot;)
+                        .arg(&amp;cargo_cmd)
                         .output()
                         .expect(&quot;failed to build wasm binary&quot;);
                     if !output.status.success() {
@@ -2293,22 +2323,31 @@
                     Arc&lt;RefCell&lt;TestRuntime&gt;&gt;,
                     impl Fn(Arc&lt;RefCell&lt;TestRuntime&gt;&gt;, &amp;str, [u8; 4], Option&lt;&amp;[u8]&gt;, Vec&lt;u8&gt;) -&gt; (),
                 ) {
-                    (
-                        Arc::new(RefCell::new(TestRuntime::default()&quot;#</span>
-            .<span class="ident">to_string</span>()
-            <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">runtime_log_option</span>
-            <span class="op">+</span> <span class="string">r#&quot;)),
+                    let rt = Arc::new(RefCell::new(TestRuntime::default()&quot;#</span>.<span class="ident">to_string</span>()
+                            <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">runtime_log_option</span>
+                            <span class="op">+</span> <span class="string">r#&quot;));
+                    let mut h = ContractHandler {
+                        call_data: None,
+                        rt: Some(rt.clone())
+                    };
+
+                    match h.run_fn(_build_wasm(Some(&quot;--features=constructor-test&quot;.to_string())), None, 1_000_000_000_000) {
+                        Ok(_) =&gt; (),
+                        Err(e) =&gt; {
+                            panic!(&quot;vm run constructor error: {:?}&quot;, e);
+                        }
+                    };
+
+                    (rt,
                         |runtime: Arc&lt;RefCell&lt;TestRuntime&gt;&gt;,
                          fn_name: &amp;str,
                          sig: [u8; 4],
                          input_data: Option&lt;&amp;[u8]&gt;,
                          expect_output: Vec&lt;u8&gt;| {
                             let mut h = ContractHandler {
-                                call_data: Some(_build_wasm()),
-                                ..Default::default()
+                                call_data: Some(_build_wasm(None)),
+                                rt: Some(runtime.clone())
                             };
-
-                            h.rt = Some(runtime.clone());
 
                             match h.execute(sig, input_data, 1_000_000_000_000) {
                                 Ok(r) =&gt; assert_eq!(r.output_data, expect_output, &quot;{} output is unexpected&quot;, fn_name),
@@ -2321,8 +2360,13 @@
                 }
 
                 #[test]
-                fn _compile_test() {
-                    _build_wasm();
+                fn _compile_runtime_test() {
+                    _build_wasm(None);
+                }
+
+                #[test]
+                fn _compile_constructor_test() {
+                    _build_wasm(Some(&quot;--features=constructor-test&quot;.to_string()));
                 }&quot;#</span>;
         <span class="kw">return</span> <span class="ident">mod_re</span>
             .<span class="ident">replace</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">template</span>)
