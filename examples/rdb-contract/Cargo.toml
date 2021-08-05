@@ -36,3 +36,4 @@ address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 [features]
 constructor = []
+constructor-test = []

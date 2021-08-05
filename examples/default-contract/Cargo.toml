@@ -36,3 +36,4 @@ gas_price = 1
 
 [features]
 constructor = []
+constructor-test = []

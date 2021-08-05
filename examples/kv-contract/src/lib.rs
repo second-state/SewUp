@@ -13,16 +13,9 @@ struct SimpleStruct {
 #[ewasm_constructor]
 fn constructor() {
     let storage = sewup::kv::Store::new().expect("there is no return for constructor currently");
-}
-
-#[ewasm_fn]
-fn empty_commit() -> anyhow::Result<()> {
-    let storage = sewup::kv::Store::new()?;
-    let size = storage.commit()?;
-    if size != 8u32 {
-        return Err(KVError::UnexpectedDBSize(size).into());
-    }
-    Ok(())
+    storage
+        .commit()
+        .expect("there is no return for constructor currently");
 }
 
 #[ewasm_fn]
@@ -191,7 +184,6 @@ fn main() -> anyhow::Result<()> {
     let contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
-        ewasm_fn_sig!(empty_commit) => empty_commit()?,
         ewasm_fn_sig!(check_ver_and_feat) => {
             check_ver_and_feat(0, vec![sewup::kv::Feature::Default])?
         }
@@ -221,8 +213,6 @@ mod tests {
 
     #[ewasm_test]
     fn test_execute_storage_operations() {
-        ewasm_assert_ok!(empty_commit());
-
         ewasm_assert_eq!(
             non_register_function(),
             ewasm_err_output!(KVError::UnknownHandle)

@@ -111,7 +111,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
-            #[cfg(not(feature = "constructor"))]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -136,7 +136,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
-            #[cfg(not(feature = "constructor"))]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -163,7 +163,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
-            #[cfg(not(feature = "constructor"))]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -184,7 +184,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
             pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
             #[cfg(target_arch = "wasm32")]
-            #[cfg(not(feature = "constructor"))]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
             pub fn main() {
                 #input
@@ -255,7 +255,7 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let result = quote! {
         pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
         #[cfg(target_arch = "wasm32")]
-        #[cfg(not(feature = "constructor"))]
+        #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
         #input
     };
     result.into()
@@ -272,9 +272,16 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
     let result = quote! {
         #[cfg(target_arch = "wasm32")]
-        #[cfg(feature = "constructor")]
+        #[cfg(any(feature = "constructor", feature = "constructor-test"))]
         #[no_mangle]
         #input
+
+        #[cfg(target_arch = "wasm32")]
+        #[cfg(feature = "constructor-test")]
+        #[no_mangle]
+        pub fn main() {
+            #name();
+        }
     };
     result.into()
 }
@@ -991,10 +998,11 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 use std::process::Command;
                 use std::sync::Arc;
 
-                fn _build_wasm() -> String {
+                fn _build_wasm(opt: Option<String>) -> String {
+                    let cargo_cmd = format!("cargo build --release --target=wasm32-unknown-unknown {}", opt.unwrap_or_default());
                     let output = Command::new("sh")
                         .arg("-c")
-                        .arg("cargo build --release --target=wasm32-unknown-unknown")
+                        .arg(&cargo_cmd)
                         .output()
                         .expect("failed to build wasm binary");
                     if !output.status.success() {
@@ -1018,22 +1026,31 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                     Arc<RefCell<TestRuntime>>,
                     impl Fn(Arc<RefCell<TestRuntime>>, &str, [u8; 4], Option<&[u8]>, Vec<u8>) -> (),
                 ) {
-                    (
-                        Arc::new(RefCell::new(TestRuntime::default()"#
-            .to_string()
-            + &runtime_log_option
-            + r#")),
+                    let rt = Arc::new(RefCell::new(TestRuntime::default()"#.to_string()
+                            + &runtime_log_option
+                            + r#"));
+                    let mut h = ContractHandler {
+                        call_data: None,
+                        rt: Some(rt.clone())
+                    };
+
+                    match h.run_fn(_build_wasm(Some("--features=constructor-test".to_string())), None, 1_000_000_000_000) {
+                        Ok(_) => (),
+                        Err(e) => {
+                            panic!("vm run constructor error: {:?}", e);
+                        }
+                    };
+
+                    (rt,
                         |runtime: Arc<RefCell<TestRuntime>>,
                          fn_name: &str,
                          sig: [u8; 4],
                          input_data: Option<&[u8]>,
                          expect_output: Vec<u8>| {
                             let mut h = ContractHandler {
-                                call_data: Some(_build_wasm()),
-                                ..Default::default()
+                                call_data: Some(_build_wasm(None)),
+                                rt: Some(runtime.clone())
                             };
-
-                            h.rt = Some(runtime.clone());
 
                             match h.execute(sig, input_data, 1_000_000_000_000) {
                                 Ok(r) => assert_eq!(r.output_data, expect_output, "{} output is unexpected", fn_name),
@@ -1046,8 +1063,13 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
 
                 #[test]
-                fn _compile_test() {
-                    _build_wasm();
+                fn _compile_runtime_test() {
+                    _build_wasm(None);
+                }
+
+                #[test]
+                fn _compile_constructor_test() {
+                    _build_wasm(Some("--features=constructor-test".to_string()));
                 }"#;
         return mod_re
             .replace(&context, &template)
