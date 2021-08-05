@@ -326,37 +326,39 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_str = attr.to_string().replace(" ", "");
+    let attr_str = attr.to_string().replace(" ", "").replace("\"", "");
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
     let inputs = &input.sig.inputs;
-    let args = &inputs
-        .iter()
-        .map(|fn_arg| match fn_arg {
-            syn::FnArg::Receiver(r) => {
-                abort!(r, "please use ewasm_fn for function not method")
-            }
-            syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
-        })
-        .map(|ty| match ty {
-            syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
-            syn::Type::Reference(tr) => match Box::into_inner(tr.elem) {
-                syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
-                _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
-            },
-            _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
-        })
-        .map(|(ident, is_ref)| {
-            if is_ref {
-                format!("&{}", ident).to_ascii_lowercase()
-            } else {
-                format!("{}", ident).to_ascii_lowercase()
-            }
-        })
-        .collect::<Vec<_>>()
-        .join(",");
-    let canonical_fn = format!("{}({})", name, args);
     let (sig_0, sig_1, sig_2, sig_3) = if attr_str.is_empty() {
+        let args = &inputs
+            .iter()
+            .map(|fn_arg| match fn_arg {
+                syn::FnArg::Receiver(r) => {
+                    abort!(r, "please use ewasm_fn for function not method")
+                }
+                syn::FnArg::Typed(p) => Box::into_inner(p.ty.clone()),
+            })
+            .map(|ty| match ty {
+                syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), false),
+                syn::Type::Reference(tr) => match Box::into_inner(tr.elem) {
+                    syn::Type::Path(tp) => (tp.path.segments.first().unwrap().ident.clone(), true),
+                    _ => {
+                        abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig")
+                    }
+                },
+                _ => abort_call_site!("please pass Path type or Reference type to ewasm_fn_sig"),
+            })
+            .map(|(ident, is_ref)| {
+                if is_ref {
+                    format!("&{}", ident).to_ascii_lowercase()
+                } else {
+                    format!("{}", ident).to_ascii_lowercase()
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(",");
+        let canonical_fn = format!("{}({})", name, args);
         let fn_sig = get_function_signature(&canonical_fn);
         (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
     } else {

@@ -1,7 +1,11 @@
+use std::convert::TryInto;
+
+use crate::primitives::Contract;
+
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_array, copy_into_storage_value, get_allowance, get_balance, set_allowance,
-    set_balance,
+    copy_into_address, copy_into_array, copy_into_storage_value, get_allowance, get_balance,
+    set_allowance, set_balance,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -12,8 +16,24 @@ use super::helpers::{Address, StorageValue};
 
 use sewup_derive::ewasm_lib_fn;
 
-#[ewasm_lib_fn]
-pub fn do_transfer(recipient: Address, value: StorageValue) {
+/// Implement ERC-20 transfer(address,uint256)
+#[ewasm_lib_fn(5d359fbd)]
+pub fn transfer(contract: &Contract) {
+    if contract.input_data.len() != 32 {
+        ewasm_api::revert();
+    }
+
+    let recipient_data = contract.input_data[4..24].to_vec();
+    let recipient = copy_into_address(&recipient_data[0..20]);
+
+    let value_data: [u8; 8] = copy_into_array(&contract.input_data[24..]);
+    let mut value = StorageValue::default();
+    let value_len = value_data.len();
+    let start = 32 - value_len;
+
+    value.bytes[start..(value_len + start)]
+        .clone_from_slice(&value_data[..((value_len + start) - start)]);
+
     let sender = ewasm_api::caller();
     let sender_balance = get_balance(&sender);
 
@@ -42,62 +62,98 @@ pub fn do_transfer(recipient: Address, value: StorageValue) {
     set_balance(&recipient, &rc_value);
 }
 
-#[ewasm_lib_fn]
-pub fn do_balance(account: Address) {
-    let balance = get_balance(&account);
+/// Implement ERC-20 balanceOf(address)
+#[ewasm_lib_fn(70a08231)]
+pub fn balance_of(contract: &Contract) {
+    if contract.data_size != 24 {
+        ewasm_api::revert();
+    }
+    let address_data = contract.input_data[4..].to_vec();
+    let address = copy_into_address(&address_data[0..20]);
+
+    let balance = get_balance(&address);
 
     if balance.bytes != StorageValue::default().bytes {
         ewasm_api::finish_data(&balance.bytes);
     }
 }
 
-#[ewasm_lib_fn]
-pub fn name() {
-    let token_name = "ERC20TokenDemo".to_string().into_bytes();
+/// Implement ERC-20 name() and easy to change the name
+#[ewasm_lib_fn(06fdde03)]
+pub fn name(s: &str) {
+    let token_name = s.to_string().into_bytes();
     ewasm_api::finish_data(&token_name);
 }
 
-#[ewasm_lib_fn]
+/// Implement ERC-20 symbol() and easy to change the symbol
+#[ewasm_lib_fn(95d89b41)]
 pub fn symbol(s: &str) {
     let symbol = s.to_string().into_bytes();
     ewasm_api::finish_data(&symbol);
 }
 
-#[ewasm_lib_fn]
+/// Implement ERC-20 decimals()
+#[ewasm_lib_fn(313ce567)]
 pub fn decimals() {
     let decimals = 0_u64.to_be_bytes();
     ewasm_api::finish_data(&decimals);
 }
 
-#[ewasm_lib_fn]
+/// Implement ERC-20 totalSupply()
+#[ewasm_lib_fn(18160ddd)]
 pub fn total_supply() {
     let total_supply = 100000000_u64.to_be_bytes();
     ewasm_api::finish_data(&total_supply);
 }
 
-#[ewasm_lib_fn]
-pub fn approve(spender: Address, value: StorageValue) {
-    let sender = ewasm_api::caller();
+/// Implement ERC-20 approve(address,uint256)
+#[ewasm_lib_fn("095ea7b3")]
+pub fn approve(contract: &Contract) {
+    let spender_data = contract.input_data[4..24].to_vec();
+    let spender = copy_into_address(&spender_data[0..20]);
 
-    set_allowance(&sender, &spender, &value);
+    let value = contract.input_data[24..56].to_vec();
+    let storage_value = copy_into_storage_value(&value[0..8]);
+
+    let sender = ewasm_api::caller();
+    let byte32: [u8; 32] = value.try_into().expect("value should be byte32");
+
+    set_allowance(&sender, &spender, &byte32.into());
 }
 
-#[ewasm_lib_fn]
-pub fn allowance(owner: Address, spender: Address) {
+/// Implement ERC-20 allowance(address,address)
+#[ewasm_lib_fn(dd62ed3e)]
+pub fn allowance(contract: &Contract) {
+    if contract.data_size != 44 {
+        ewasm_api::revert();
+    }
+
+    let from_data = contract.input_data[4..24].to_vec();
+    let owner = copy_into_address(&from_data[0..20]);
+
+    let spender_data = contract.input_data[24..44].to_vec();
+    let spender = copy_into_address(&spender_data[0..20]);
+
     let allowance_value = get_allowance(&owner, &spender);
 
     ewasm_api::finish_data(&allowance_value.bytes);
 }
 
-#[ewasm_lib_fn]
-pub fn mint(the: Address, value: u64) {
-    let value: [u8; 8] = value.to_be_bytes();
-    let stv_owner_balance = copy_into_storage_value(&value[0..8]);
-    set_balance(&the, &stv_owner_balance);
-}
+/// Implement ERC-20 transferFrom(address,address,uint256)
+#[ewasm_lib_fn(23b872dd)]
+pub fn transfer_from(contract: &Contract) {
+    if contract.data_size != 52 {
+        ewasm_api::revert();
+    }
 
-#[ewasm_lib_fn]
-pub fn transfer_from(owner: Address, recipient: Address, value: u64) {
+    let owner = copy_into_address(&contract.input_data[4..24]);
+
+    let recipient = copy_into_address(&contract.input_data[24..44]);
+
+    let value_data: [u8; 8] = copy_into_array(&contract.input_data[44..52]);
+
+    let value = u64::from_be_bytes(value_data);
+
     let sender = ewasm_api::caller();
     let owner_balance = get_balance(&owner);
 
