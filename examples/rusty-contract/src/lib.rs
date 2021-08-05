@@ -10,7 +10,7 @@ struct SimpleStruct {
 #[ewasm_constructor]
 fn constructor() {}
 
-#[ewasm_fn]
+#[ewasm_fn(4a6f7679)]
 fn check_input_object(s: SimpleStruct) -> Result<(), &'static str> {
     if !s.trust {
         return Err("NotTrustedInput");
@@ -45,6 +45,8 @@ mod tests {
 
     #[ewasm_test]
     fn test_execute_rusty_contract() {
+        assert!(CHECK_INPUT_OBJECT_SIG == [74, 111, 118, 121]);
+
         let mut simple_struct = SimpleStruct::default();
 
         // You can easily use any kind of rust error like this

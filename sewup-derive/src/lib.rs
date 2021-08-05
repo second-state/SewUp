@@ -1,13 +1,13 @@
 #![feature(box_into_inner)]
 extern crate proc_macro;
 
+use hex;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
 use quote::quote;
 use regex::Regex;
 use tiny_keccak::{Hasher, Keccak};
-
 fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
@@ -215,7 +215,8 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
-pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr_str = attr.to_string().replace(" ", "");
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
     let args = &input
@@ -238,16 +239,21 @@ pub fn ewasm_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         })
         .map(|(ident, is_ref)| {
             if is_ref {
-                format!("&{}", ident)
+                format!("&{}", ident).to_ascii_lowercase()
             } else {
-                format!("{}", ident)
+                format!("{}", ident).to_ascii_lowercase()
             }
         })
         .collect::<Vec<_>>()
         .join(",");
     let canonical_fn = format!("{}({})", name, args);
-    let fn_sig = get_function_signature(&canonical_fn);
-    let (sig_0, sig_1, sig_2, sig_3) = (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3]);
+    let (sig_0, sig_1, sig_2, sig_3) = if attr_str.is_empty() {
+        let fn_sig = get_function_signature(&canonical_fn);
+        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
+    } else {
+        let fn_sig = hex::decode(attr_str).expect("function signature is not correct");
+        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
+    };
     let sig_name = Ident::new(
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
@@ -319,7 +325,8 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
-pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
+pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
+    let attr_str = attr.to_string().replace(" ", "");
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
     let inputs = &input.sig.inputs;
@@ -341,16 +348,21 @@ pub fn ewasm_lib_fn(_attr: TokenStream, item: TokenStream) -> TokenStream {
         })
         .map(|(ident, is_ref)| {
             if is_ref {
-                format!("&{}", ident)
+                format!("&{}", ident).to_ascii_lowercase()
             } else {
-                format!("{}", ident)
+                format!("{}", ident).to_ascii_lowercase()
             }
         })
         .collect::<Vec<_>>()
         .join(",");
     let canonical_fn = format!("{}({})", name, args);
-    let fn_sig = get_function_signature(&canonical_fn);
-    let (sig_0, sig_1, sig_2, sig_3) = (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3]);
+    let (sig_0, sig_1, sig_2, sig_3) = if attr_str.is_empty() {
+        let fn_sig = get_function_signature(&canonical_fn);
+        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
+    } else {
+        let fn_sig = hex::decode(attr_str).expect("function signature is not correct");
+        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
+    };
     let sig_name = Ident::new(
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
