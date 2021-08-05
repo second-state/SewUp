@@ -31,6 +31,34 @@ impl fmt::Debug for ContractHandler {
 }
 
 impl ContractHandler {
+    /// run the call data as function directly, this function is suppose to be used for constructor
+    pub fn run_fn(
+        &mut self,
+        call_data: String,
+        input: Option<&[u8]>,
+        gas: i64,
+    ) -> Result<VMResult> {
+        if let Some(rt) = self.rt.take() {
+            let call_data = ContractHandler::get_call_data(call_data)?;
+            let mut input_data: Vec<u8> = Vec::new();
+            if let Some(input) = input {
+                input_data.extend_from_slice(input);
+            }
+            let sender = Address::default();
+            let msg = VMMessageBuilder {
+                sender: Some(&sender),
+                input_data: Some(&input_data),
+                gas,
+                code: Some(&call_data),
+                ..Default::default()
+            }
+            .build()?;
+            let result = Ok(rt.borrow_mut().execute(msg)?);
+            self.rt = Some(rt);
+            return result;
+        }
+        panic!("rt should be init when parsing the connection string")
+    }
     pub fn execute(
         &mut self,
         fun_sig: [u8; 4],
