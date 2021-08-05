@@ -53,6 +53,20 @@ opt-level = "z"
 [profile.release.package.hello-contract]  # package name
 incremental = false
 opt-level = "z"
+
+# Following section including the parameters to deploy the contract
+[deploy]
+url = "http://localhost:8545"  # url for rpc node
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"  # private key
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # account address
+# gas = 5000000 # optional
+# gas_price = 1 # optional
+
+
+# Following features helps are used when building or testing a contract
+[features]
+constructor = []  # required
+constructor-test = [] # required
 ```
 Place [.cargo/config](./examples/hello-contract/.cargo/config) file in your project to specify the flags for build.
 
@@ -62,7 +76,12 @@ Here is minimize example for writing a contract with sewup
 use anyhow::Result;
 
 use sewup::primitives::Contract;
-use sewup_derive::{ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+
+#[ewasm_constructor]
+fn constructor() {
+  # do something you want when the contract deploy on chain
+}
 
 #[ewasm_fn]
 fn hello() -> Result<String> {
@@ -95,7 +114,8 @@ mod tests {
 
 ### Testing
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
-Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/WasmEdge/WasmEdge) and run tests on it with `cargo test`.
+Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/WasmEdge/WasmEdge) and run tests on it with `cargo test`,
+furthermore the constructor will also run when the contract deploying on [WasmEdge](https://github.com/WasmEdge/WasmEdge).
 
 ### Debugging
 Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
