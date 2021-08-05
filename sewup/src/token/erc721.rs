@@ -1,0 +1,9 @@
+// balanceOf(address): 70a08231
+// ownerOf(uint256): 6352211e
+// safeTransferFrom(address,address,uint256,bytes): b88d4fde
+// safeTransferFrom(address,address,uint256): 42842e0e
+// transferFrom(address,address,uint256): 23b872dd
+// approve(address,uint256): 095ea7b3
+// setApprovalForAll(address,bool): a22cb465
+// getApproved(uint256): 081812fc
+// isApprovedForAll(address,address): e985e9c5
