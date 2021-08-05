@@ -23,15 +23,6 @@ fn constructor() {
 }
 
 #[ewasm_fn]
-fn init_db_with_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let mut db = sewup::rdb::Db::new()?;
-    db.create_table::<Person>();
-    db.create_table::<Post>();
-    db.commit()?;
-    Ok(().into())
-}
-
-#[ewasm_fn]
 fn check_version_and_features(
     version: u8,
     features: Vec<sewup::rdb::Feature>,
@@ -127,7 +118,6 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
         }
         ewasm_fn_sig!(get_post_author) => ewasm_input_from!(contract move get_post_author),
         ewasm_fn_sig!(get_children) => get_children(),
-        ewasm_fn_sig!(init_db_with_tables) => init_db_with_tables(),
         ewasm_fn_sig!(check_tables) => check_tables(),
         ewasm_fn_sig!(drop_table) => drop_table(),
         ewasm_fn_sig!(check_tables_again) => check_tables_again(),
@@ -142,8 +132,6 @@ mod tests {
 
     #[ewasm_test]
     fn test_execute_crud_handler() {
-        ewasm_assert_ok!(init_db_with_tables());
-
         let person = Person {
             trusted: true,
             age: 18,
@@ -231,7 +219,6 @@ mod tests {
 
     #[ewasm_test]
     fn test_table_management() {
-        ewasm_assert_ok!(init_db_with_tables());
         ewasm_assert_ok!(check_version_and_features());
         ewasm_assert_ok!(check_tables());
         ewasm_assert_ok!(drop_table());
