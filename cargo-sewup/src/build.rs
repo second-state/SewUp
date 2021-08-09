@@ -53,13 +53,23 @@ async fn build_constructor_template(contract_wasm_path: &str) -> Result<String> 
     Ok(tmpl.to_string())
 }
 
-async fn build_runtime_wasm() -> Result<()> {
+async fn build_runtime_wasm(debug: bool, contract_wasm_path: &str) -> Result<Option<String>> {
     Command::new("cargo")
         .args(&["build", "--release", "--target=wasm32-unknown-unknown"])
         .output()
         .await
         .context("fail to build runtime wasm")?;
-    Ok(())
+
+    if debug {
+        let output = Command::new("wasm2wat")
+            .args(&[contract_wasm_path])
+            .output()
+            .await
+            .context("fail to build runtime wasm")?;
+        let rt_content = String::from_utf8_lossy(&output.stdout);
+        return Ok(Some(rt_content.to_string()));
+    }
+    Ok(None)
 }
 
 async fn generate_runtime_info(rt_wasm_path: &str) -> Result<(usize, usize, String)> {
@@ -198,7 +208,13 @@ pub async fn run(debug: bool) -> Result<String> {
         generate_debug_wat(&tmpl_path, &wasm_tmpl).await?;
     }
 
-    build_runtime_wasm().await?;
+    if let Some(rt_content) = build_runtime_wasm(debug, &wasm_path).await? {
+        let tmpl_path = format!(
+            "./target/wasm32-unknown-unknown/release/{}.rt.wat",
+            contract_name
+        );
+        generate_debug_wat(&tmpl_path, &rt_content).await?;
+    }
 
     let (bin_size, mem_size, hex_string) = generate_runtime_info(&wasm_path).await?;
 
