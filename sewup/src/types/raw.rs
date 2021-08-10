@@ -134,11 +134,17 @@ impl Raw {
             panic!("input slice is bigger than a Raw");
         }
     }
+
     pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
         std::str::from_utf8(&self.bytes)
     }
+
     pub fn to_bytes32(&self) -> [u8; 32] {
         self.bytes
+    }
+
+    pub fn as_bytes(&self) -> &[u8] {
+        &self.bytes
     }
 
     /// wipe the header with header size in bytes
@@ -157,6 +163,47 @@ impl FromIterator<u8> for Raw {
     {
         let bs: Vec<u8> = iter.into_iter().collect();
         bs.into()
+    }
+}
+
+impl From<u32> for Raw {
+    fn from(num: u32) -> Self {
+        let bytes = num.to_be_bytes();
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2],
+            bytes[3],
+        ])
+    }
+}
+
+impl From<u64> for Raw {
+    fn from(num: u64) -> Self {
+        let bytes = num.to_be_bytes();
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2], bytes[3], bytes[4],
+            bytes[5], bytes[6], bytes[7],
+        ])
+    }
+}
+
+impl From<usize> for Raw {
+    fn from(num: usize) -> Self {
+        let bytes = num.to_be_bytes();
+        #[cfg(target_pointer_width = "64")]
+        return Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2], bytes[3], bytes[4],
+            bytes[5], bytes[6], bytes[7],
+        ]);
+
+        #[cfg(target_pointer_width = "32")]
+        return Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2],
+            bytes[3],
+        ]);
     }
 }
 
