@@ -53,29 +53,28 @@ async fn build_constructor_template(contract_wasm_path: &str) -> Result<String> 
     Ok(tmpl.to_string())
 }
 
-async fn build_runtime_wasm(debug: bool, contract_wasm_path: &str) -> Result<Option<String>> {
+async fn build_runtime_wat(contract_wasm_path: &str) -> Result<String> {
     Command::new("cargo")
         .args(&["build", "--release", "--target=wasm32-unknown-unknown"])
         .output()
         .await
         .context("fail to build runtime wasm")?;
+    let output = Command::new("wasm2wat")
+        .args(&[contract_wasm_path])
+        .output()
+        .await
+        .context("fail to build runtime wasm")?;
+    let rt_content = String::from_utf8_lossy(&output.stdout);
 
-    if debug {
-        let output = Command::new("wasm2wat")
-            .args(&[contract_wasm_path])
-            .output()
-            .await
-            .context("fail to build runtime wasm")?;
-        let rt_content = String::from_utf8_lossy(&output.stdout);
-        return Ok(Some(rt_content.to_string()));
-    }
-    Ok(None)
+    let hinden_export_re = Regex::new(r#"\(export "__.*\)\)\n"#).unwrap();
+    Ok(hinden_export_re
+        .replace_all(&rt_content, "")
+        .trim_end()
+        .to_string())
 }
 
-async fn generate_runtime_info(rt_wasm_path: &str) -> Result<(usize, usize, String)> {
-    let bin = read(Path::new(rt_wasm_path))
-        .await
-        .context("fail to read runtime wasm")?;
+async fn generate_runtime_info(wat_content: String) -> Result<(usize, usize, String)> {
+    let bin = wat::parse_str(wat_content).context("fail to rebuild runtime wasm")?;
     let bin_size = bin.len();
     let mem_size = bin_size / (64 * 1024) + 1;
     let hex_string = encode(bin)
@@ -208,15 +207,17 @@ pub async fn run(debug: bool) -> Result<String> {
         generate_debug_wat(&tmpl_path, &wasm_tmpl).await?;
     }
 
-    if let Some(rt_content) = build_runtime_wasm(debug, &wasm_path).await? {
-        let tmpl_path = format!(
+    let rt_content = build_runtime_wat(&wasm_path).await?;
+
+    if debug {
+        let rt_path = format!(
             "./target/wasm32-unknown-unknown/release/{}.rt.wat",
             contract_name
         );
-        generate_debug_wat(&tmpl_path, &rt_content).await?;
+        generate_debug_wat(&rt_path, &rt_content).await?;
     }
 
-    let (bin_size, mem_size, hex_string) = generate_runtime_info(&wasm_path).await?;
+    let (bin_size, mem_size, hex_string) = generate_runtime_info(rt_content).await?;
 
     let wat_content = build_wat(wasm_tmpl, bin_size, mem_size, hex_string).await?;
 
