@@ -13,7 +13,6 @@ crate-type = ["cdylib"]
 sewup ={ version = "*", path = "../../sewup", features = [ "token" ] }
 sewup-derive = { version = "*", path = "../../sewup-derive" }
 anyhow = "1.0.40"
-ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
 
 [dev-dependencies]
 hex-literal = "0.3.1"

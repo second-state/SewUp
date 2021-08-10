@@ -1,8 +1,5 @@
 use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
-#[cfg(target_arch = "wasm32")]
-use ewasm_api::types::*;
-
 #[ewasm_constructor]
 fn constructor() {}
 
