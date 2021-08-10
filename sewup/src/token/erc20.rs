@@ -1,6 +1,7 @@
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+use crate::types::Raw;
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
@@ -8,6 +9,8 @@ use super::helpers::{
     set_allowance, set_balance,
 };
 
+#[cfg(target_arch = "wasm32")]
+use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::{Address, StorageValue};
 
@@ -79,31 +82,63 @@ pub fn balance_of(contract: &Contract) {
 }
 
 /// Implement ERC-20 name() and easy to change the name
+/// ```json
+/// { "constant": true,
+///     "inputs": [],
+///     "name": "symbol",
+///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+///     "payable": false, "stateMutability": "view",
+///     "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(06fdde03)]
 pub fn name(s: &str) {
-    let token_name = s.to_string().into_bytes();
-    ewasm_api::finish_data(&token_name);
+    ewasm_return_str(s);
 }
 
 /// Implement ERC-20 symbol() and easy to change the symbol
+/// ```json
+/// { "constant": true,
+///     "inputs": [],
+///     "name": "symbol",
+///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+///     "payable": false, "stateMutability": "view",
+///     "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(95d89b41)]
 pub fn symbol(s: &str) {
-    let symbol = s.to_string().into_bytes();
-    ewasm_api::finish_data(&symbol);
+    ewasm_return_str(s);
 }
 
 /// Implement ERC-20 decimals()
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [],
+///     "name": "decimals",
+///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+///     "payable": false, "stateMutability": "view", "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(313ce567)]
-pub fn decimals() {
-    let decimals = 0_u64.to_be_bytes();
-    ewasm_api::finish_data(&decimals);
+pub fn decimals(i: usize) {
+    ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
 }
 
 /// Implement ERC-20 totalSupply()
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [],
+///     "name": "totalSupply",
+///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+///     "payable": false, "stateMutability": "view", "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(18160ddd)]
-pub fn total_supply() {
-    let total_supply = 100000000_u64.to_be_bytes();
-    ewasm_api::finish_data(&total_supply);
+pub fn total_supply(i: usize) {
+    ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
 }
 
 /// Implement ERC-20 approve(address,uint256)

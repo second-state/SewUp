@@ -8,6 +8,9 @@ pub use serde::de::DeserializeOwned;
 pub use serde::Serialize;
 pub use serde_value::{to_value, Value};
 
+#[cfg(target_arch = "wasm32")]
+use crate::types::Raw;
+
 /// helps you debug the ewasm contract when executing in the test runtime
 /// To show the debug message pllease run the test case as following command
 /// `cargo test -- --nocapture`
@@ -44,6 +47,14 @@ pub fn log(s: String) {
 #[cfg(target_arch = "wasm32")]
 pub fn ewasm_return(bytes: Vec<u8>) {
     finish_data(&bytes);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn ewasm_return_str(s: &str) {
+    let mut output = Raw::from(32u32).as_bytes().to_vec();
+    output.append(&mut Raw::from(s.len()).as_bytes().to_vec());
+    output.append(&mut Raw::from(s).as_bytes().to_vec());
+    finish_data(&output);
 }
 
 pub fn copy_into_array<A, T>(slice: &[T]) -> A
