@@ -77,7 +77,7 @@ pub fn copy_into_storage_value(_slice: &[u8]) -> StorageValue {
 #[cfg(target_arch = "wasm32")]
 pub fn copy_into_storage_value(slice: &[u8]) -> StorageValue {
     let mut sk = StorageKey::default();
-    sk.bytes[24..32].copy_from_slice(slice);
+    sk.bytes[0..32].copy_from_slice(slice);
     sk
 }
 
