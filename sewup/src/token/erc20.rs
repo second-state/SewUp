@@ -12,54 +12,60 @@ use super::helpers::{
 #[cfg(target_arch = "wasm32")]
 use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
+use bitcoin::util::uint::Uint256;
+#[cfg(target_arch = "wasm32")]
 use ewasm_api::types::{Address, StorageValue};
+#[cfg(target_arch = "wasm32")]
+use hex::decode;
 
 #[cfg(not(target_arch = "wasm32"))]
 use super::helpers::{Address, StorageValue};
 
-use hex::decode;
 use sewup_derive::ewasm_lib_fn;
 
 /// Implement ERC-20 transfer(address,uint256)
-#[ewasm_lib_fn(5d359fbd)]
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [
+///         { "internalType": "address", "name": "recipient", "type": "address" },
+///         { "internalType": "uint256", "name": "amount", "type": "uint256" }
+///     ],
+///     "name": "transfer",
+///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+///     "payable": false,
+///     "stateMutability": "nonpayable",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn(a9059cbb)]
 pub fn transfer(contract: &Contract) {
-    let recipient_data = contract.input_data[4..24].to_vec();
-    let recipient = copy_into_address(&recipient_data[0..20]);
-
-    let value_data: [u8; 8] = copy_into_array(&contract.input_data[24..]);
-    let mut value = StorageValue::default();
-    let value_len = value_data.len();
-    let start = 32 - value_len;
-
-    value.bytes[start..(value_len + start)]
-        .clone_from_slice(&value_data[..((value_len + start) - start)]);
-
     let sender = ewasm_api::caller();
-    let sender_balance = get_balance(&sender);
+    let recipient = copy_into_address(&contract.input_data[16..36]);
 
-    let recipient_balance = get_balance(&recipient);
+    let value = {
+        let value_data: [u8; 32] = copy_into_array(&contract.input_data[36..68]);
+        Uint256::from_be_bytes(value_data)
+    };
 
-    let sb_bytes: [u8; 8] = copy_into_array(&sender_balance.bytes[24..32]);
-    let sb_u64 = u64::from_be_bytes(sb_bytes);
+    let sender_storage_value = {
+        let balance = get_balance(&sender);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+        let new_value = origin_value - value;
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
 
-    let val_bytes: [u8; 8] = copy_into_array(&value.bytes[24..32]);
-    let val_u64 = u64::from_be_bytes(val_bytes);
+    let recipient_storage_value = {
+        let balance = get_balance(&recipient);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+        let new_value = origin_value + value;
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
 
-    let new_sb_u64 = sb_u64 - val_u64;
-
-    let new_sb_bytes: [u8; 8] = new_sb_u64.to_be_bytes();
-    let sb_value = copy_into_storage_value(&new_sb_bytes[0..8]);
-
-    let rc_bytes: [u8; 8] = copy_into_array(&recipient_balance.bytes[24..32]);
-    let rc_u64 = u64::from_be_bytes(rc_bytes);
-
-    let new_rc_u64 = rc_u64 + val_u64;
-
-    let new_rc_bytes: [u8; 8] = new_rc_u64.to_be_bytes();
-    let rc_value = copy_into_storage_value(&new_rc_bytes[0..8]);
-
-    set_balance(&sender, &sb_value);
-    set_balance(&recipient, &rc_value);
+    set_balance(&sender, &sender_storage_value);
+    set_balance(&recipient, &recipient_storage_value);
 }
 
 /// Implement ERC-20 balanceOf(address)
@@ -73,6 +79,7 @@ pub fn transfer(contract: &Contract) {
 ///     "stateMutability": "view",
 ///     "type": "function"
 /// }
+/// ```
 #[ewasm_lib_fn(70a08231)]
 pub fn balance_of(contract: &Contract) {
     let address = copy_into_address(&contract.input_data[16..36]);
@@ -118,12 +125,12 @@ pub fn symbol(s: &str) {
 ///     "constant": true,
 ///     "inputs": [],
 ///     "name": "decimals",
-///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint8" }],
 ///     "payable": false, "stateMutability": "view", "type": "function"
 /// }
 /// ```
 #[ewasm_lib_fn(313ce567)]
-pub fn decimals(i: usize) {
+pub fn decimals(i: u8) {
     ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
 }
 

@@ -23,6 +23,7 @@ bincode = "1.3"
 cryptoxide = "0.3.3"
 hex-literal = "0.3.1"
 hex = "0.4.3"
+bitcoin = { version = "0.27.0", features = ["no-std"], default-features = false }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 ethereum-types = { version = "0.11.0", features = ["serialize"] }
