@@ -17,15 +17,12 @@ use ewasm_api::types::{Address, StorageValue};
 #[cfg(not(target_arch = "wasm32"))]
 use super::helpers::{Address, StorageValue};
 
+use hex::decode;
 use sewup_derive::ewasm_lib_fn;
 
 /// Implement ERC-20 transfer(address,uint256)
 #[ewasm_lib_fn(5d359fbd)]
 pub fn transfer(contract: &Contract) {
-    if contract.input_data.len() != 32 {
-        ewasm_api::revert();
-    }
-
     let recipient_data = contract.input_data[4..24].to_vec();
     let recipient = copy_into_address(&recipient_data[0..20]);
 
@@ -66,24 +63,27 @@ pub fn transfer(contract: &Contract) {
 }
 
 /// Implement ERC-20 balanceOf(address)
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+///     "name": "balanceOf",
+///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+///     "payable": false,
+///     "stateMutability": "view",
+///     "type": "function"
+/// }
 #[ewasm_lib_fn(70a08231)]
 pub fn balance_of(contract: &Contract) {
-    if contract.data_size != 24 {
-        ewasm_api::revert();
-    }
-    let address_data = contract.input_data[4..].to_vec();
-    let address = copy_into_address(&address_data[0..20]);
-
+    let address = copy_into_address(&contract.input_data[16..36]);
     let balance = get_balance(&address);
-
-    if balance.bytes != StorageValue::default().bytes {
-        ewasm_api::finish_data(&balance.bytes);
-    }
+    ewasm_api::finish_data(&balance.bytes);
 }
 
 /// Implement ERC-20 name() and easy to change the name
 /// ```json
-/// { "constant": true,
+/// {
+///     "constant": true,
 ///     "inputs": [],
 ///     "name": "symbol",
 ///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
@@ -98,7 +98,8 @@ pub fn name(s: &str) {
 
 /// Implement ERC-20 symbol() and easy to change the symbol
 /// ```json
-/// { "constant": true,
+/// {
+///     "constant": true,
 ///     "inputs": [],
 ///     "name": "symbol",
 ///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
@@ -229,4 +230,16 @@ pub fn transfer_from(contract: &Contract) {
     set_balance(&owner, &stv_owner_balance);
     set_balance(&recipient, &stv_recipient_balance);
     set_allowance(&owner, &sender, &stv_allowed);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn mint(addr: &str, value: usize) {
+    let byte20: [u8; 20] = decode(addr)
+        .expect("address should be hex format")
+        .try_into()
+        .expect("address should be byte20");
+    set_balance(
+        &Address::from(byte20),
+        &Raw::from(value).to_bytes32().into(),
+    );
 }

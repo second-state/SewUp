@@ -1,7 +1,9 @@
 use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[ewasm_constructor]
-fn constructor() {}
+fn constructor() {
+    sewup::token::erc20::mint("8663DBF0cC68AaF37fC8BA262F2df4c666a41993", 1000);
+}
 
 #[ewasm_main]
 fn main() -> anyhow::Result<()> {
@@ -12,7 +14,7 @@ fn main() -> anyhow::Result<()> {
         sewup::token::erc20::NAME_SIG => sewup::token::erc20::name("Demo"),
         sewup::token::erc20::SYMBOL_SIG => sewup::token::erc20::symbol("ETD"),
         sewup::token::erc20::DECIMALS_SIG => sewup::token::erc20::decimals(0),
-        sewup::token::erc20::TOTAL_SUPPLY_SIG => sewup::token::erc20::total_supply(100000000),
+        sewup::token::erc20::TOTAL_SUPPLY_SIG => sewup::token::erc20::total_supply(1000),
         sewup::token::erc20::APPROVE_SIG => sewup::token::erc20::approve(&contract),
         sewup::token::erc20::ALLOWANCE_SIG => sewup::token::erc20::allowance(&contract),
         sewup::token::erc20::TRANSFER_FROM_SIG => sewup::token::erc20::transfer_from(&contract),
@@ -59,10 +61,19 @@ mod tests {
             total_supply(),
             vec![
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                5, 245, 225, 0
+                0, 0, 3, 232
             ]
         );
-        let balance_input = hex!("00000000000000000000000000000000FACEB00C");
-        ewasm_assert_eq!(balance_of(balance_input), vec![]);
+
+        let balance_input = hex!("8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
+        let mut input_data = vec![0u8, 0u8, 0u8, 0u8];
+        input_data.append(&mut balance_input.to_vec());
+        ewasm_assert_eq!(
+            balance_of(input_data),
+            vec![
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 3, 232
+            ]
+        );
     }
 }
