@@ -13,7 +13,7 @@ fn main() -> anyhow::Result<()> {
         sewup::token::erc20::TRANSFER_SIG => sewup::token::erc20::transfer(&contract),
         sewup::token::erc20::NAME_SIG => sewup::token::erc20::name("Demo"),
         sewup::token::erc20::SYMBOL_SIG => sewup::token::erc20::symbol("ETD"),
-        sewup::token::erc20::DECIMALS_SIG => sewup::token::erc20::decimals(0),
+        sewup::token::erc20::DECIMALS_SIG => sewup::token::erc20::decimals(8),
         sewup::token::erc20::TOTAL_SUPPLY_SIG => sewup::token::erc20::total_supply(1000),
         sewup::token::erc20::APPROVE_SIG => sewup::token::erc20::approve(&contract),
         sewup::token::erc20::ALLOWANCE_SIG => sewup::token::erc20::allowance(&contract),
@@ -54,7 +54,7 @@ mod tests {
             decimals(),
             vec![
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0
+                0, 0, 0, 8
             ]
         );
         ewasm_assert_eq!(
