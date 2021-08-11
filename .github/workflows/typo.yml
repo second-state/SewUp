@@ -16,4 +16,4 @@ jobs:
         run: nix-shell --run "cargo install typos-cli"
 
       - name: Check typo
-        run: nix-shell --run "typos"
+        run: nix-shell --run "typos --exclude examples"
