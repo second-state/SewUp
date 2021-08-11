@@ -166,6 +166,25 @@ impl FromIterator<u8> for Raw {
     }
 }
 
+impl From<u8> for Raw {
+    fn from(num: u8) -> Self {
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, num,
+        ])
+    }
+}
+
+impl From<u16> for Raw {
+    fn from(num: u16) -> Self {
+        let bytes = num.to_be_bytes();
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1],
+        ])
+    }
+}
+
 impl From<u32> for Raw {
     fn from(num: u32) -> Self {
         let bytes = num.to_be_bytes();
