@@ -1,0 +1,1023 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitcoin-0.27.0/src/blockdata/block.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>block.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+</pre><pre class="rust">
+<span class="comment">// Rust Bitcoin Library</span>
+<span class="comment">// Written in 2014 by</span>
+<span class="comment">//     Andrew Poelstra &lt;apoelstra@wpsoftware.net&gt;</span>
+<span class="comment">//</span>
+<span class="comment">// To the extent possible under law, the author(s) have dedicated all</span>
+<span class="comment">// copyright and related and neighboring rights to this software to</span>
+<span class="comment">// the public domain worldwide. This software is distributed without</span>
+<span class="comment">// any warranty.</span>
+<span class="comment">//</span>
+<span class="comment">// You should have received a copy of the CC0 Public Domain Dedication</span>
+<span class="comment">// along with this software.</span>
+<span class="comment">// If not, see &lt;http://creativecommons.org/publicdomain/zero/1.0/&gt;.</span>
+<span class="comment">//</span>
+
+<span class="doccomment">//! Bitcoin Block</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! A block is a bundle of transactions with a proof-of-work attached,</span>
+<span class="doccomment">//! which commits to an earlier block to form the blockchain. This</span>
+<span class="doccomment">//! module describes structures and functions needed to describe</span>
+<span class="doccomment">//! these blocks and the blockchain.</span>
+<span class="doccomment">//!</span>
+
+<span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+
+<span class="kw">use</span> <span class="ident">util</span>;
+<span class="kw">use</span> <span class="ident">util::Error</span>::{<span class="ident">BlockBadTarget</span>, <span class="ident">BlockBadProofOfWork</span>};
+<span class="kw">use</span> <span class="ident">util::hash::bitcoin_merkle_root</span>;
+<span class="kw">use</span> <span class="ident">hashes</span>::{<span class="ident">Hash</span>, <span class="ident">HashEngine</span>};
+<span class="kw">use</span> <span class="ident">hash_types</span>::{<span class="ident">Wtxid</span>, <span class="ident">BlockHash</span>, <span class="ident">TxMerkleNode</span>, <span class="ident">WitnessMerkleNode</span>, <span class="ident">WitnessCommitment</span>};
+<span class="kw">use</span> <span class="ident">util::uint::Uint256</span>;
+<span class="kw">use</span> <span class="ident">consensus::encode::Encodable</span>;
+<span class="kw">use</span> <span class="ident">network::constants::Network</span>;
+<span class="kw">use</span> <span class="ident">blockdata::transaction::Transaction</span>;
+<span class="kw">use</span> <span class="ident">blockdata::constants</span>::{<span class="ident">max_target</span>, <span class="ident">WITNESS_SCALE_FACTOR</span>};
+<span class="kw">use</span> <span class="ident">blockdata::script</span>;
+<span class="kw">use</span> <span class="ident">VarInt</span>;
+
+<span class="doccomment">/// A block header, which contains all the block&#39;s information except</span>
+<span class="doccomment">/// the actual transactions</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BlockHeader</span> {
+    <span class="doccomment">/// The protocol version. Should always be 1.</span>
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">i32</span>,
+    <span class="doccomment">/// Reference to the previous block in the chain</span>
+    <span class="kw">pub</span> <span class="ident">prev_blockhash</span>: <span class="ident">BlockHash</span>,
+    <span class="doccomment">/// The root hash of the merkle tree of transactions in the block</span>
+    <span class="kw">pub</span> <span class="ident">merkle_root</span>: <span class="ident">TxMerkleNode</span>,
+    <span class="doccomment">/// The timestamp of the block, as claimed by the miner</span>
+    <span class="kw">pub</span> <span class="ident">time</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The target value below which the blockhash must lie, encoded as a</span>
+    <span class="doccomment">/// a float (with well-defined rounding, of course)</span>
+    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u32</span>,
+    <span class="doccomment">/// The nonce, selected to obtain a low enough blockhash</span>
+    <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="ident">u32</span>,
+}
+
+<span class="macro">impl_consensus_encoding!</span>(<span class="ident">BlockHeader</span>, <span class="ident">version</span>, <span class="ident">prev_blockhash</span>, <span class="ident">merkle_root</span>, <span class="ident">time</span>, <span class="ident">bits</span>, <span class="ident">nonce</span>);
+
+<span class="kw">impl</span> <span class="ident">BlockHeader</span> {
+    <span class="doccomment">/// Return the block hash.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockHash</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">engine</span> <span class="op">=</span> <span class="ident">BlockHash::engine</span>();
+        <span class="self">self</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">engine</span>).<span class="ident">expect</span>(<span class="string">&quot;engines don&#39;t error&quot;</span>);
+        <span class="ident">BlockHash::from_engine</span>(<span class="ident">engine</span>)
+    }
+
+    <span class="doccomment">/// Computes the target [0, T] that a blockhash must land in to be valid</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">target</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uint256</span> {
+        <span class="self">Self</span><span class="ident">::u256_from_compact_target</span>(<span class="self">self</span>.<span class="ident">bits</span>)
+    }
+
+    <span class="doccomment">/// Computes the target value in [`Uint256`] format, from a compact representation.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Uint256`]: ../../util/uint/struct.Uint256.html</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```</span>
+    <span class="doccomment">/// use bitcoin::blockdata::block::BlockHeader;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// assert_eq!(0x1d00ffff,</span>
+    <span class="doccomment">///     BlockHeader::compact_target_from_u256(</span>
+    <span class="doccomment">///         &amp;BlockHeader::u256_from_compact_target(0x1d00ffff)</span>
+    <span class="doccomment">///     )</span>
+    <span class="doccomment">/// );</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">u256_from_compact_target</span>(<span class="ident">bits</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uint256</span> {
+        <span class="comment">// This is a floating-point &quot;compact&quot; encoding originally used by</span>
+        <span class="comment">// OpenSSL, which satoshi put into consensus code, so we&#39;re stuck</span>
+        <span class="comment">// with it. The exponent needs to have 3 subtracted from it, hence</span>
+        <span class="comment">// this goofy decoding code:</span>
+        <span class="kw">let</span> (<span class="ident">mant</span>, <span class="ident">expt</span>) <span class="op">=</span> {
+            <span class="kw">let</span> <span class="ident">unshifted_expt</span> <span class="op">=</span> <span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>;
+            <span class="kw">if</span> <span class="ident">unshifted_expt</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span> {
+                ((<span class="ident">bits</span> <span class="op">&amp;</span> <span class="number">0xFFFFFF</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">8</span> <span class="op">*</span> (<span class="number">3</span> <span class="op">-</span> <span class="ident">unshifted_expt</span> <span class="kw">as</span> <span class="ident">usize</span>)), <span class="number">0</span>)
+            } <span class="kw">else</span> {
+                (<span class="ident">bits</span> <span class="op">&amp;</span> <span class="number">0xFFFFFF</span>, <span class="number">8</span> <span class="op">*</span> ((<span class="ident">bits</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">24</span>) <span class="op">-</span> <span class="number">3</span>))
+            }
+        };
+
+        <span class="comment">// The mantissa is signed but may not be negative</span>
+        <span class="kw">if</span> <span class="ident">mant</span> <span class="op">&gt;</span> <span class="number">0x7FFFFF</span> {
+            <span class="ident">Default::default</span>()
+        } <span class="kw">else</span> {
+            <span class="ident">Uint256::from_u64</span>(<span class="ident">mant</span> <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">unwrap</span>() <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">expt</span> <span class="kw">as</span> <span class="ident">usize</span>)
+        }
+    }
+
+    <span class="doccomment">/// Computes the target value in float format from Uint256 format.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compact_target_from_u256</span>(<span class="ident">value</span>: <span class="kw-2">&amp;</span><span class="ident">Uint256</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">size</span> <span class="op">=</span> (<span class="ident">value</span>.<span class="ident">bits</span>() <span class="op">+</span> <span class="number">7</span>) <span class="op">/</span> <span class="number">8</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">compact</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">size</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">3</span> {
+            (<span class="ident">value</span>.<span class="ident">low_u64</span>() <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">8</span> <span class="op">*</span> (<span class="number">3</span> <span class="op">-</span> <span class="ident">size</span>))) <span class="kw">as</span> <span class="ident">u32</span>
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="ident">bn</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">value</span> <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">8</span> <span class="op">*</span> (<span class="ident">size</span> <span class="op">-</span> <span class="number">3</span>));
+            <span class="ident">bn</span>.<span class="ident">low_u32</span>()
+        };
+
+        <span class="kw">if</span> (<span class="ident">compact</span> <span class="op">&amp;</span> <span class="number">0x00800000</span>) <span class="op">!</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="ident">compact</span> <span class="op">&gt;</span><span class="op">&gt;</span><span class="op">=</span> <span class="number">8</span>;
+            <span class="ident">size</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        }
+
+        <span class="ident">compact</span> <span class="op">|</span> (<span class="ident">size</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">24</span>) <span class="kw">as</span> <span class="ident">u32</span>
+    }
+
+    <span class="doccomment">/// Compute the popular &quot;difficulty&quot; measure for mining</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">difficulty</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        (<span class="ident">max_target</span>(<span class="ident">network</span>) <span class="op">/</span> <span class="self">self</span>.<span class="ident">target</span>()).<span class="ident">low_u64</span>()
+    }
+
+    <span class="doccomment">/// Checks that the proof-of-work for the block is valid, returning the block hash.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">required_target</span>: <span class="kw-2">&amp;</span><span class="ident">Uint256</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BlockHash</span>, <span class="ident">util::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">target</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">target</span>();
+        <span class="kw">if</span> <span class="ident">target</span> <span class="op">!</span><span class="op">=</span> <span class="ident">required_target</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">BlockBadTarget</span>);
+        }
+        <span class="kw">let</span> <span class="ident">block_hash</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">block_hash</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="number">4</span>];
+        <span class="ident">util::endian::bytes_to_u64_slice_le</span>(<span class="ident">block_hash</span>.<span class="ident">as_inner</span>(), <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>);
+        <span class="kw">let</span> <span class="ident">hash</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">Uint256</span>(<span class="ident">ret</span>);
+        <span class="kw">if</span> <span class="ident">hash</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">target</span> { <span class="prelude-val">Ok</span>(<span class="ident">block_hash</span>) } <span class="kw">else</span> { <span class="prelude-val">Err</span>(<span class="ident">BlockBadProofOfWork</span>) }
+    }
+
+    <span class="doccomment">/// Returns the total work of the block</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">work</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uint256</span> {
+        <span class="comment">// 2**256 / (target + 1) == ~target / (target+1) + 1    (eqn shamelessly stolen from bitcoind)</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">target</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">target</span>();
+        <span class="ident">ret1</span>.<span class="ident">increment</span>();
+        <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ret</span> <span class="op">/</span> <span class="ident">ret1</span>;
+        <span class="ident">ret</span>.<span class="ident">increment</span>();
+        <span class="ident">ret</span>
+    }
+}
+
+<span class="doccomment">/// A Bitcoin block, which is a collection of transactions with an attached</span>
+<span class="doccomment">/// proof of work.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>, <span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>))]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Block</span> {
+    <span class="doccomment">/// The block header</span>
+    <span class="kw">pub</span> <span class="ident">header</span>: <span class="ident">BlockHeader</span>,
+    <span class="doccomment">/// List of transactions contained in the block</span>
+    <span class="kw">pub</span> <span class="ident">txdata</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&gt;</span>
+}
+
+<span class="macro">impl_consensus_encoding!</span>(<span class="ident">Block</span>, <span class="ident">header</span>, <span class="ident">txdata</span>);
+
+<span class="kw">impl</span> <span class="ident">Block</span> {
+    <span class="doccomment">/// Return the block hash.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">block_hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockHash</span> {
+        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">block_hash</span>()
+    }
+
+    <span class="doccomment">/// check if merkle root of header matches merkle root of the transaction list</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_merkle_root</span> (<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">merkle_root</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">merkle_root</span>()
+    }
+
+    <span class="doccomment">/// check if witness commitment in coinbase is matching the transaction list</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check_witness_commitment</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+
+        <span class="comment">// witness commitment is optional if there are no transactions using SegWit in the block</span>
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">input</span>.<span class="ident">iter</span>().<span class="ident">all</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">witness</span>.<span class="ident">is_empty</span>())) {
+            <span class="kw">return</span> <span class="bool-val">true</span>;
+        }
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">let</span> <span class="ident">coinbase</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">txdata</span>[<span class="number">0</span>];
+            <span class="kw">if</span> <span class="ident">coinbase</span>.<span class="ident">is_coin_base</span>() {
+                <span class="comment">// commitment is in the last output that starts with below magic</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">coinbase</span>.<span class="ident">output</span>.<span class="ident">iter</span>()
+                    .<span class="ident">rposition</span>(<span class="op">|</span><span class="ident">o</span><span class="op">|</span> {
+                        <span class="ident">o</span>.<span class="ident">script_pubkey</span>.<span class="ident">len</span> () <span class="op">&gt;</span><span class="op">=</span> <span class="number">38</span> <span class="op">&amp;&amp;</span>
+                        <span class="ident">o</span>.<span class="ident">script_pubkey</span>[<span class="number">0</span>..<span class="number">6</span>] <span class="op">=</span><span class="op">=</span> [<span class="number">0x6a</span>, <span class="number">0x24</span>, <span class="number">0xaa</span>, <span class="number">0x21</span>, <span class="number">0xa9</span>, <span class="number">0xed</span>] }) {
+                    <span class="kw">let</span> <span class="ident">commitment</span> <span class="op">=</span> <span class="ident">WitnessCommitment::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">coinbase</span>.<span class="ident">output</span>[<span class="ident">pos</span>].<span class="ident">script_pubkey</span>.<span class="ident">as_bytes</span>()[<span class="number">6</span>..<span class="number">38</span>]).<span class="ident">unwrap</span>();
+                    <span class="comment">// witness reserved value is in coinbase input witness</span>
+                    <span class="kw">if</span> <span class="ident">coinbase</span>.<span class="ident">input</span>[<span class="number">0</span>].<span class="ident">witness</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> <span class="op">&amp;&amp;</span> <span class="ident">coinbase</span>.<span class="ident">input</span>[<span class="number">0</span>].<span class="ident">witness</span>[<span class="number">0</span>].<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">32</span> {
+                        <span class="kw">let</span> <span class="ident">witness_root</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">witness_root</span>();
+                        <span class="kw">return</span> <span class="ident">commitment</span> <span class="op">=</span><span class="op">=</span> <span class="self">Self</span><span class="ident">::compute_witness_commitment</span>(<span class="kw-2">&amp;</span><span class="ident">witness_root</span>, <span class="ident">coinbase</span>.<span class="ident">input</span>[<span class="number">0</span>].<span class="ident">witness</span>[<span class="number">0</span>].<span class="ident">as_slice</span>())
+                    }
+                }
+            }
+        }
+        <span class="bool-val">false</span>
+    }
+
+    <span class="doccomment">/// Calculate the transaction merkle root.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merkle_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TxMerkleNode</span> {
+        <span class="kw">let</span> <span class="ident">hashes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">obj</span><span class="op">|</span> <span class="ident">obj</span>.<span class="ident">txid</span>().<span class="ident">as_hash</span>());
+        <span class="ident">bitcoin_merkle_root</span>(<span class="ident">hashes</span>).<span class="ident">into</span>()
+    }
+
+    <span class="doccomment">/// compute witness commitment for the transaction list</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_witness_commitment</span> (<span class="ident">witness_root</span>: <span class="kw-2">&amp;</span><span class="ident">WitnessMerkleNode</span>, <span class="ident">witness_reserved_value</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WitnessCommitment</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">WitnessCommitment::engine</span>();
+        <span class="ident">witness_root</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap</span>();
+        <span class="ident">encoder</span>.<span class="ident">input</span>(<span class="ident">witness_reserved_value</span>);
+        <span class="ident">WitnessCommitment::from_engine</span>(<span class="ident">encoder</span>)
+    }
+
+    <span class="doccomment">/// Merkle root of transactions hashed for witness</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">witness_root</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WitnessMerkleNode</span> {
+        <span class="kw">let</span> <span class="ident">hashes</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">enumerate</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">i</span>, <span class="ident">t</span>)<span class="op">|</span>
+            <span class="kw">if</span> <span class="ident">i</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="comment">// Replace the first hash with zeroes.</span>
+                <span class="ident">Wtxid::default</span>().<span class="ident">as_hash</span>()
+            } <span class="kw">else</span> {
+                <span class="ident">t</span>.<span class="ident">wtxid</span>().<span class="ident">as_hash</span>()
+            }
+        );
+        <span class="ident">bitcoin_merkle_root</span>(<span class="ident">hashes</span>).<span class="ident">into</span>()
+    }
+
+    <span class="doccomment">/// Get the size of the block</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_size</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="comment">// The size of the header + the size of the varint with the tx count + the txs themselves</span>
+        <span class="kw">let</span> <span class="ident">base_size</span> <span class="op">=</span> <span class="number">80</span> <span class="op">+</span> <span class="ident">VarInt</span>(<span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">len</span>();
+        <span class="kw">let</span> <span class="ident">txs_size</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Transaction::get_size</span>).<span class="ident">sum</span>();
+        <span class="ident">base_size</span> <span class="op">+</span> <span class="ident">txs_size</span>
+    }
+
+    <span class="doccomment">/// Get the weight of the block</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_weight</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+        <span class="kw">let</span> <span class="ident">base_weight</span> <span class="op">=</span> <span class="ident">WITNESS_SCALE_FACTOR</span> <span class="op">*</span> (<span class="number">80</span> <span class="op">+</span> <span class="ident">VarInt</span>(<span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">len</span>());
+        <span class="kw">let</span> <span class="ident">txs_weight</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="ident">Transaction::get_weight</span>).<span class="ident">sum</span>();
+        <span class="ident">base_weight</span> <span class="op">+</span> <span class="ident">txs_weight</span>
+    }
+
+    <span class="doccomment">/// Get the coinbase transaction, if one is present.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coinbase</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Transaction</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">txdata</span>.<span class="ident">first</span>()
+    }
+
+    <span class="doccomment">/// Get the block height as encoded into the coinbase according to BIP34.</span>
+    <span class="doccomment">/// Returns [None] if not present.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bip34_block_height</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">Bip34Error</span><span class="op">&gt;</span> {
+        <span class="comment">// Citing the spec:</span>
+        <span class="comment">// Add height as the first item in the coinbase transaction&#39;s scriptSig,</span>
+        <span class="comment">// and increase block version to 2. The format of the height is</span>
+        <span class="comment">// &quot;serialized CScript&quot; -- first byte is number of bytes in the number</span>
+        <span class="comment">// (will be 0x03 on main net for the next 150 or so years with 2^23-1</span>
+        <span class="comment">// blocks), following bytes are little-endian representation of the</span>
+        <span class="comment">// number (including a sign bit). Height is the height of the mined</span>
+        <span class="comment">// block in the block chain, where the genesis block is height zero (0).</span>
+
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">header</span>.<span class="ident">version</span> <span class="op">&lt;</span> <span class="number">2</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Bip34Error::Unsupported</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">cb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">coinbase</span>().<span class="ident">ok_or</span>(<span class="ident">Bip34Error::NotPresent</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">cb</span>.<span class="ident">input</span>.<span class="ident">first</span>().<span class="ident">ok_or</span>(<span class="ident">Bip34Error::NotPresent</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">push</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">script_sig</span>.<span class="ident">instructions_minimal</span>().<span class="ident">next</span>().<span class="ident">ok_or</span>(<span class="ident">Bip34Error::NotPresent</span>)<span class="question-mark">?</span>;
+        <span class="kw">match</span> <span class="ident">push</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Bip34Error::NotPresent</span>)<span class="question-mark">?</span> {
+            <span class="ident">script::Instruction::PushBytes</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="comment">// Expand the push to exactly 8 bytes (LE).</span>
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">full</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">8</span>];
+                <span class="ident">full</span>[<span class="number">0</span>..<span class="ident">b</span>.<span class="ident">len</span>()].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>[..]);
+                <span class="prelude-val">Ok</span>(<span class="ident">util::endian::slice_to_u64_le</span>(<span class="kw-2">&amp;</span><span class="ident">full</span>))
+            }
+            <span class="ident">script::Instruction::PushBytes</span>(<span class="ident">b</span>) <span class="kw">if</span> <span class="ident">b</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">8</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="prelude-val">Err</span>(<span class="ident">Bip34Error::UnexpectedPush</span>(<span class="ident">b</span>.<span class="ident">to_vec</span>()))
+            }
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(<span class="ident">Bip34Error::NotPresent</span>),
+        }
+    }
+}
+
+<span class="doccomment">/// An error when looking up a BIP34 block height.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Bip34Error</span> {
+    <span class="doccomment">/// The block does not support BIP34 yet.</span>
+    <span class="ident">Unsupported</span>,
+    <span class="doccomment">/// No push was present where the BIP34 push was expected.</span>
+    <span class="ident">NotPresent</span>,
+    <span class="doccomment">/// The BIP34 push was larger than 8 bytes.</span>
+    <span class="ident">UnexpectedPush</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>),
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Bip34Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Bip34Error::Unsupported</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;block doesn&#39;t support BIP34&quot;</span>),
+            <span class="ident">Bip34Error::NotPresent</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;BIP34 push not present in block&#39;s coinbase&quot;</span>),
+            <span class="ident">Bip34Error::UnexpectedPush</span>(<span class="kw-2">ref</span> <span class="ident">p</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unexpected byte push of &gt; 8 bytes: {:?}&quot;</span>, <span class="ident">p</span>)
+            }
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Bip34Error</span> {}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">hashes::hex::FromHex</span>;
+
+    <span class="kw">use</span> <span class="ident">blockdata::block</span>::{<span class="ident">Block</span>, <span class="ident">BlockHeader</span>};
+    <span class="kw">use</span> <span class="ident">consensus::encode</span>::{<span class="ident">deserialize</span>, <span class="ident">serialize</span>};
+    <span class="kw">use</span> <span class="ident">util::uint::Uint256</span>;
+    <span class="kw">use</span> <span class="ident">util::Error</span>::{<span class="ident">BlockBadTarget</span>, <span class="ident">BlockBadProofOfWork</span>};
+    <span class="kw">use</span> <span class="ident">network::constants::Network</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_coinbase_and_bip34</span>() {
+        <span class="comment">// testnet block 100,000</span>
+        <span class="kw">let</span> <span class="ident">block_hex</span> <span class="op">=</span> <span class="string">&quot;0200000035ab154183570282ce9afc0b494c9fc6a3cfea05aa8c1add2ecc56490000000038ba3d78e4500a5a7570dbe61960398add4410d278b21cd9708e6d9743f374d544fc055227f1001c29c1ea3b0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3703a08601000427f1001c046a510100522cfabe6d6d0000000000000000000068692066726f6d20706f6f6c7365727665726aac1eeeed88ffffffff0100f2052a010000001976a914912e2b234f941f30b18afbb4fa46171214bf66c888ac00000000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from_hex</span>(<span class="ident">block_hex</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">cb_txid</span> <span class="op">=</span> <span class="string">&quot;d574f343976d8e70d91cb278d21044dd8a396019e6db70755a0a50e4783dba38&quot;</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">coinbase</span>().<span class="ident">unwrap</span>().<span class="ident">txid</span>().<span class="ident">to_string</span>(), <span class="ident">cb_txid</span>);
+
+        <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">bip34_block_height</span>(), <span class="prelude-val">Ok</span>(<span class="number">100_000</span>));
+
+
+        <span class="comment">// block with 9-byte bip34 push</span>
+        <span class="kw">let</span> <span class="ident">bad_hex</span> <span class="op">=</span> <span class="string">&quot;0200000035ab154183570282ce9afc0b494c9fc6a3cfea05aa8c1add2ecc56490000000038ba3d78e4500a5a7570dbe61960398add4410d278b21cd9708e6d9743f374d544fc055227f1001c29c1ea3b0101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff3d09a08601112233445566000427f1001c046a510100522cfabe6d6d0000000000000000000068692066726f6d20706f6f6c7365727665726aac1eeeed88ffffffff0100f2052a010000001976a914912e2b234f941f30b18afbb4fa46171214bf66c888ac00000000&quot;</span>;
+        <span class="kw">let</span> <span class="ident">bad</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from_hex</span>(<span class="ident">bad_hex</span>).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">push</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="ident">::from_hex</span>(<span class="string">&quot;a08601112233445566&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">bad</span>.<span class="ident">bip34_block_height</span>(), <span class="prelude-val">Err</span>(<span class="kw">super</span><span class="ident">::Bip34Error::UnexpectedPush</span>(<span class="ident">push</span>)));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">block_test</span>() {
+        <span class="comment">// Mainnet block 00000000b0c5a240b2a61d2e75692224efd4cbecdf6eaf4cc2cf477ca7c270e7</span>
+        <span class="kw">let</span> <span class="ident">some_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;010000004ddccd549d28f385ab457e98d1b11ce80bfea2c5ab93015ade4973e400000000bf4473e53794beae34e64fccc471dace6ae544180816f89591894e0f417a914cd74d6e49ffff001d323b3a7b0201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0804ffff001d026e04ffffffff0100f2052a0100000043410446ef0102d1ec5240f0d061a4246c1bdef63fc3dbab7733052fbbf0ecd8f41fc26bf049ebb4f9527f374280259e7cfa99c48b0e3f39c51347a19a5819651503a5ac00000000010000000321f75f3139a013f50f315b23b0c9a2b6eac31e2bec98e5891c924664889942260000000049483045022100cb2c6b346a978ab8c61b18b5e9397755cbd17d6eb2fe0083ef32e067fa6c785a02206ce44e613f31d9a6b0517e46f3db1576e9812cc98d159bfdaf759a5014081b5c01ffffffff79cda0945903627c3da1f85fc95d0b8ee3e76ae0cfdc9a65d09744b1f8fc85430000000049483045022047957cdd957cfd0becd642f6b84d82f49b6cb4c51a91f49246908af7c3cfdf4a022100e96b46621f1bffcf5ea5982f88cef651e9354f5791602369bf5a82a6cd61a62501fffffffffe09f5fe3ffbf5ee97a54eb5e5069e9da6b4856ee86fc52938c2f979b0f38e82000000004847304402204165be9a4cbab8049e1af9723b96199bfd3e85f44c6b4c0177e3962686b26073022028f638da23fc003760861ad481ead4099312c60030d4cb57820ce4d33812a5ce01ffffffff01009d966b01000000434104ea1feff861b51fe3f5f8a3b12d0f4712db80e919548a80839fc47c6a21e66d957e9c5d8cd108c7a2d2324bad71f9904ac0ae7336507d785b17a2c115e427a32fac00000000&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">cutoff_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;010000004ddccd549d28f385ab457e98d1b11ce80bfea2c5ab93015ade4973e400000000bf4473e53794beae34e64fccc471dace6ae544180816f89591894e0f417a914cd74d6e49ffff001d323b3a7b0201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0804ffff001d026e04ffffffff0100f2052a0100000043410446ef0102d1ec5240f0d061a4246c1bdef63fc3dbab7733052fbbf0ecd8f41fc26bf049ebb4f9527f374280259e7cfa99c48b0e3f39c51347a19a5819651503a5ac00000000010000000321f75f3139a013f50f315b23b0c9a2b6eac31e2bec98e5891c924664889942260000000049483045022100cb2c6b346a978ab8c61b18b5e9397755cbd17d6eb2fe0083ef32e067fa6c785a02206ce44e613f31d9a6b0517e46f3db1576e9812cc98d159bfdaf759a5014081b5c01ffffffff79cda0945903627c3da1f85fc95d0b8ee3e76ae0cfdc9a65d09744b1f8fc85430000000049483045022047957cdd957cfd0becd642f6b84d82f49b6cb4c51a91f49246908af7c3cfdf4a022100e96b46621f1bffcf5ea5982f88cef651e9354f5791602369bf5a82a6cd61a62501fffffffffe09f5fe3ffbf5ee97a54eb5e5069e9da6b4856ee86fc52938c2f979b0f38e82000000004847304402204165be9a4cbab8049e1af9723b96199bfd3e85f44c6b4c0177e3962686b26073022028f638da23fc003760861ad481ead4099312c60030d4cb57820ce4d33812a5ce01ffffffff01009d966b01000000434104ea1feff861b51fe3f5f8a3b12d0f4712db80e919548a80839fc47c6a21e66d957e9c5d8cd108c7a2d2324bad71f9904ac0ae7336507d785b17a2c115e427a32fac&quot;</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">prevhash</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;4ddccd549d28f385ab457e98d1b11ce80bfea2c5ab93015ade4973e400000000&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">merkle</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;bf4473e53794beae34e64fccc471dace6ae544180816f89591894e0f417a914c&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">work</span> <span class="op">=</span> <span class="ident">Uint256</span>([<span class="number">0x100010001u64</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+
+        <span class="kw">let</span> <span class="ident">decode</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">some_block</span>);
+        <span class="kw">let</span> <span class="ident">bad_decode</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">cutoff_block</span>);
+
+        <span class="macro">assert!</span>(<span class="ident">decode</span>.<span class="ident">is_ok</span>());
+        <span class="macro">assert!</span>(<span class="ident">bad_decode</span>.<span class="ident">is_err</span>());
+        <span class="kw">let</span> <span class="ident">real_decode</span> <span class="op">=</span> <span class="ident">decode</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">version</span>, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">prev_blockhash</span>), <span class="ident">prevhash</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">merkle_root</span>, <span class="ident">real_decode</span>.<span class="ident">merkle_root</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">merkle_root</span>), <span class="ident">merkle</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">time</span>, <span class="number">1231965655</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">bits</span>, <span class="number">486604799</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">nonce</span>, <span class="number">2067413810</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">work</span>(), <span class="ident">work</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">target</span>()).<span class="ident">unwrap</span>(), <span class="ident">real_decode</span>.<span class="ident">block_hash</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">difficulty</span>(<span class="ident">Network::Bitcoin</span>), <span class="number">1</span>);
+        <span class="comment">// [test] TODO: check the transaction data</span>
+
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">get_size</span>(), <span class="ident">some_block</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">get_weight</span>(), <span class="ident">some_block</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">4</span>);
+
+        <span class="comment">// should be also ok for a non-witness block as commitment is optional in that case</span>
+        <span class="macro">assert!</span>(<span class="ident">real_decode</span>.<span class="ident">check_witness_commitment</span>());
+
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>), <span class="ident">some_block</span>);
+    }
+
+    <span class="comment">// Check testnet block 000000000000045e0b1660b6445b5e5c5ab63c9a4f956be7e1e69be04fa4497b</span>
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">segwit_block_test</span>() {
+        <span class="kw">let</span> <span class="ident">segwit_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;000000202aa2f2ca794ccbd40c16e2f3333f6b8b683f9e7179b2c4d7490600000000000010bc26e70a2f672ad420a6153dd0c28b40a6002c55531bfc99bf8994a8e8f67e5503bd5750d4061a4ed90a700f010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff3603da1b0e00045503bd5704c7dd8a0d0ced13bb5785010800000000000a636b706f6f6c122f4e696e6a61506f6f6c2f5345475749542fffffffff02b4e5a212000000001976a914876fbb82ec05caa6af7a3b5e5a983aae6c6cc6d688ac0000000000000000266a24aa21a9edf91c46b49eb8a29089980f02ee6b57e7d63d33b18b4fddac2bcd7db2a3983704012000000000000000000000000000000000000000000000000000000000000000000000000001000000017e4f81175332a733e26d4ba4e29f53f67b7a5d7c2adebb276e447ca71d130b55000000006b483045022100cac809cd1a3d9ad5d5e31a84e2e1d8ec5542841e4d14c6b52e8b38cbe1ff1728022064470b7fb0c2efeccb2e84bfa36ec5f9e434c84b1101c00f7ee32f726371b7410121020e62280798b6b8c37f068df0915b0865b63fabc401c2457cbc3ef96887dd3647ffffffff02ca2f780c000000001976a914c6b5545b3592cb477d709896fa705592c9b6113a88ac663b2a06000000001976a914e7c1345fc8f87c68170b3aa798a956c2fe6a9eff88ac0000000001000000011e99f5a785e677e017d36b50aa4fd10010ffd039f38f42f447ca8895250e121f01000000d90047304402200d3d296ad641a281dd5c0d68b9ab0d1ad5f7052bec148c1fb81fb1ba69181ec502201a372bb16fb8e054ee9bef41e300d292153830f841a4db0ab7f7407f6581b9bc01473044022002584f313ae990236b6bebb82fbbb006a2b02a448dd5c93434428991eae960d60220491d67d2660c4dde19025cf86e5164a559e2c79c3b98b40e146fab974acd24690147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a9140ffdcf96700455074292a821c74922e8652993998788997bc60000000017a9148ce5408cfeaddb7ccb2545ded41ef478109454848700000000010000000113100b09e6a78d63ec4850654ab0f68806de29710b09172eddfef730652b155501000000da00473044022015389408e3446a3f36a05060e0e4a3c8b92ff3901ba2511aa944ec91a537a1cb022045a33b6ec47605b1718ed2e753263e54918edbf6126508ff039621fb928d28a001483045022100bb952fde81f216f7063575c0bb2bedc050ce08c96d9b437ea922f5eb98c882da02201b7cbf3a2f94ea4c5eb7f0df3af2ebcafa8705af7f410ab5d3d4bac13d6bc6120147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a914d3db9a20312c3ab896a316eb108dbd01e47e17d687e0ba7ac60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000016e3cca1599cde54878e2f27f434df69df0afd1f313cb6e38c08d3ffb57f97a6c01000000da0048304502210095623b70ec3194fa4037a1c1106c2580caedc390e25e5b330bbeb3111e8184bc02205ae973c4a4454be2a3a03beb66297143c1044a3c4743742c5cdd1d516a1ad3040147304402202f3d6d89996f5b42773dd6ebaf367f1af1f3a95c7c7b487ec040131c40f4a4a30220524ffbb0b563f37b3eb1341228f792e8f84111b7c4a9f49cdd998e052ee42efa0147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a9141ade6b95896dde8ec4dee9e59af8849d3797348e8728af7ac60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000011d9dc3a5df9b5b2eeb2bd11a2db243be9e8cc23e2f180bf317d32a499904c15501000000db00483045022100ebbd1c9a8ce626edbb1a7881df81e872ef8c6424feda36faa8a5745157400c6a02206eb463bc8acd5ea06a289e86115e1daae0c2cf10d9cbbd199e1311170d5543ef01483045022100809411a917dc8cf4f3a777f0388fdea6de06243ef7691e500c60abd1c7f19ae602205255d2b1191d8adedb77b814ccb66471eb8486cb4ff8727824254ee5589f176b0147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a914759a49c772347be81c49517f9e1e6def6a88d4dd87800b85c60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000018c51902affd8e5247dfcc2e5d0528a3815f53c8b6d2c200ff290b2b2b486d7704f0000006a47304402201be0d485f6a3ce871be80064c593c5327b3fd7e450f05ab7fae38385bc40cfbe02206e2a6c9970b5d1d10207892376733757486634fce4f352e772149c486857612101210350c33bc9a790c9495195761577b34912a949b73d5bc5ae5343f5ba08b33220ccffffffff0110270000000000001976a9142ab1c62710a7bdfdb4bb6394bbedc58b32b4d5a388ac0000000001000000018c51902affd8e5247dfcc2e5d0528a3815f53c8b6d2c200ff290b2b2b486d7704e0000006b483045022100ccc8c0ac90bdb0402842aec91830c765cdead7a728552a6a34de7d13a6dab28e02206c96f8640cf3444054e9632b197be30598a09c3d5defcd95750bdb922a60d64801210350c33bc9a790c9495195761577b34912a949b73d5bc5ae5343f5ba08b33220ccffffffff0110270000000000001976a9142ab1c62710a7bdfdb4bb6394bbedc58b32b4d5a388ac0000000001000000011b436669c06cbf3442e21a2fe3edc20cd3cf13c358c53234bc4d88bfd8c4bd2a000000006a47304402204a63410ee13db52c7609ab08e25b7fe3c608cc21cc1755ad13460685eb55193202204cd1ea80c06a81571119be0b8cccd96ef7cdd90f62c1fe2d538622feb08e22ba0121024baa8b67cc9ed8a97d90895e3716b25469b67cb26d3324d7aff213f507764765ffffffff010000000000000000306a2e516d64523365345261445653324d436a736e536171734a5753324465655446624238354541794a4d5843784c7934000000000100000001be4a95ed36316cada5118b1982e4cb4a07f93e7a4153e227466f1cb0776de995000000006b483045022100a22d5251deea0470806bab817013d675a63cd52218d6e477ab0c9d601d018b7f022042121b46afcdcd0c66f189398212b66085e88c6973ae560f1810c13e55e2bee40121024baa8b67cc9ed8a97d90895e3716b25469b67cb26d3324d7aff213f507764765ffffffff010000000000000000306a2e516d57484d57504e5248515872504c7338554c586b4d483746745356413675366b5a6b4a4e3851796e4e583751340000000001000000016c061a65b49edec21acdbc22f97dc853aa872302aeef13fabf0bf6807de1b8bd010000006b483045022100dd80381f2d158b4dad7f98d2d97317c533fb36e737542473feb05fa74d0b73bb02207097d4331196069167e525b61d132532292fd75cc039a5839c04c2545d427e2b0121035e9a597df8b417bef66811882a2844604fc591c427f642628f0fef46be19a4c9feffffff0280a4bf07000000001976a914573b9106e16ee0b5c143dc40f0724f77dd0e282088ac9533b22c000000001976a9149c4da607efb1d759d33da71778bc6cafa56acb5988acd31b0e0001000000017dae20994b69b28534e5b22f3d7c50f9d7541348cbf6f43fcc654263ebaf8f68000000006b483045022100a85300eb94b24b044877d0b0d61e08e16dbc82ec7d69c723a8a45519f95c35b002203d78376e6bee31b455c097557af7fe4d6b620bc74269e9a75e2aad2b545abddb012103b0d08aba2a5ac6cf2788fda941c386040e35e49d3a57d2aefb16c0438fb98acbfeffffff022222305f000000001976a914cfda30dd836b596db6a9c230c45ae2179107f04888ac80a4bf07000000001976a91442dfcf5823aacb185844e663873c35fb98bfd21b88acd31b0e000100000002ad3e85e4af30678a330f8941ed7a9ca17cd0236368d238cac4e9ff09c466fed1020000006b483045022100d1196c48a0392e09592f1b96b4aec32ab0cecb6fd17b1d0c85ab3250a2fe45d9022059217c82f684fcdecdbe660a2077ea956dfbbb964d2648bc1e8ae0f0fe565449012103b64e32e5f62e03701428fb1e3151e9a57f149c67708f6164a235c8199fe17cc2ffffffff34f0a71c1c2cd610522e9c18c67931cded5e9647d4419c49b99715e2a0795f3d020000006a4730440220316e81d8242abf3c5f885d200feca12c3adb63cf2cd4dc74602f7b8b0cba50340220210d525758df77ccdca6908311c1895275e07bbb29b45963a19252acde55873f012103b64e32e5f62e03701428fb1e3151e9a57f149c67708f6164a235c8199fe17cc2ffffffff0510270000000000001976a914449d2394dde057bc199f23fb8aa2e400f344611788ac10270000000000001976a914449d2394dde057bc199f23fb8aa2e400f344611788aca0860100000000001976a91413d35ad337dd80a055757e5ea0a45b59fee3060c88ac70110100000000001976a91413d35ad337dd80a055757e5ea0a45b59fee3060c88ac0000000000000000026a000000000001000000018e33fecc2ddbd86c5ea919f7bd5a5acf8a09f3e0cdaaaf4f08c5ef095161ef1100000000fdfe0000483045022100d2489b225d39b7d8b6767a6928c8029a2a1297c08fdf00d683ba0c1987e7d7000220176cb66c8a243806bb7421f658325a69a51c82c0c3314e37f2400f33626390210148304502210096cfa57662a545830d0e29610becd41ea031e256339913718ce18dbb1a27bdb00220482911c851d15adcd37097dff99a9ff1f97d953bcebc528835118f447412553e014c695221028d9889862b29430278c084b5c4090b7b807b31e047bcd212ebc2c4e43fc0e3c52103160949a7c8c81f2c25d7763f57eb1cb407d867c5b7c290331bd2dc4b1182c6d32103fbef3b60914bda9173765902013a251ec89450c75d0b5a96a143db1dabf98d9553aeffffffff0220e8891c0100000017a914d996715e081c50f8f6b1b4e7fb6ca214f9924fdf87809698000000000017a9145611d812263f32960228cb5f85329bce4770a218870000000001000000017720507dcbe6c69f652b0c0ce19406f482372d1a8abc05d45fb7acf97fb80eec00000000fdfe00004830450221009821d8e117de44b1202c829c0f5063997acf007cf9b561c6fb8d1212cddb6c40022010ff5067b0d9d4eca2da0ceb876e9a16f1a2142da866d3042a7bae8968813e8001483045022100dea759d14a8a1c5da5f3dcc5509871aaa2c1e3be03752c1b858d80fa4227163702205183d70cc28dcb6df9b037714c8b6442ef84e0ddce07711a30c731e9f0925090014c695221028d70ea66fe7a7def282df7b2b498007e5072933e42c18f63ce85975dcbcf1a8821037e8f842b1e47e21d88002c5aab2559212a4c2c9dbe5ef5347f2a29afd0510ec1210251259cb9fd4f6206488408286e4475c9c9fe887e57a3e32ae4da222778a2aedf53aeffffffff023380cb020000000017a9143b5a7e85b22656a34d43187ac8dd09acd7109d2487809698000000000017a914b9b4b555f594a34deec3ad61d5c5f3738b17ee158700000000&quot;</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">decode</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">segwit_block</span>);
+
+        <span class="kw">let</span> <span class="ident">prevhash</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;2aa2f2ca794ccbd40c16e2f3333f6b8b683f9e7179b2c4d74906000000000000&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">merkle</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;10bc26e70a2f672ad420a6153dd0c28b40a6002c55531bfc99bf8994a8e8f67e&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">work</span> <span class="op">=</span> <span class="ident">Uint256</span>([<span class="number">0x257c3becdacc64u64</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]);
+
+        <span class="macro">assert!</span>(<span class="ident">decode</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let</span> <span class="ident">real_decode</span> <span class="op">=</span> <span class="ident">decode</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">version</span>, <span class="number">0x20000000</span>);  <span class="comment">// VERSIONBITS but no bits set</span>
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">prev_blockhash</span>), <span class="ident">prevhash</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">merkle_root</span>), <span class="ident">merkle</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">merkle_root</span>, <span class="ident">real_decode</span>.<span class="ident">merkle_root</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">time</span>, <span class="number">1472004949</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">bits</span>, <span class="number">0x1a06d450</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">nonce</span>, <span class="number">1879759182</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">work</span>(), <span class="ident">work</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">target</span>()).<span class="ident">unwrap</span>(), <span class="ident">real_decode</span>.<span class="ident">block_hash</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">difficulty</span>(<span class="ident">Network::Testnet</span>), <span class="number">2456598</span>);
+        <span class="comment">// [test] TODO: check the transaction data</span>
+
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">get_size</span>(), <span class="ident">segwit_block</span>.<span class="ident">len</span>());
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">get_weight</span>(), <span class="number">17168</span>);
+
+        <span class="macro">assert!</span>(<span class="ident">real_decode</span>.<span class="ident">check_witness_commitment</span>());
+
+        <span class="macro">assert_eq!</span>(<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="ident">real_decode</span>), <span class="ident">segwit_block</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">block_version_test</span>() {
+        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;ffffff7f0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decode</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">block</span>);
+        <span class="macro">assert!</span>(<span class="ident">decode</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let</span> <span class="ident">real_decode</span> <span class="op">=</span> <span class="ident">decode</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode</span>.<span class="ident">header</span>.<span class="ident">version</span>, <span class="number">2147483647</span>);
+
+        <span class="kw">let</span> <span class="ident">block2</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">decode2</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Block</span>, <span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">block2</span>);
+        <span class="macro">assert!</span>(<span class="ident">decode2</span>.<span class="ident">is_ok</span>());
+        <span class="kw">let</span> <span class="ident">real_decode2</span> <span class="op">=</span> <span class="ident">decode2</span>.<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">real_decode2</span>.<span class="ident">header</span>.<span class="ident">version</span>, <span class="op">-</span><span class="number">2147483648</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">validate_pow_test</span>() {
+        <span class="kw">let</span> <span class="ident">some_header</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;010000004ddccd549d28f385ab457e98d1b11ce80bfea2c5ab93015ade4973e400000000bf4473e53794beae34e64fccc471dace6ae544180816f89591894e0f417a914cd74d6e49ffff001d323b3a7b&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">some_header</span>: <span class="ident">BlockHeader</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">some_header</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t deserialize correct block header&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">some_header</span>.<span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="ident">some_header</span>.<span class="ident">target</span>()).<span class="ident">unwrap</span>(), <span class="ident">some_header</span>.<span class="ident">block_hash</span>());
+
+        <span class="comment">// test with zero target</span>
+        <span class="kw">match</span> <span class="ident">some_header</span>.<span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="ident">Uint256::default</span>()) {
+            <span class="prelude-val">Err</span>(<span class="ident">BlockBadTarget</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>)
+        }
+
+        <span class="comment">// test with modified header</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invalid_header</span>: <span class="ident">BlockHeader</span> <span class="op">=</span> <span class="ident">some_header</span>.<span class="ident">clone</span>();
+        <span class="ident">invalid_header</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">invalid_header</span>.<span class="ident">version</span> <span class="op">+</span> <span class="number">1</span>;
+        <span class="kw">match</span> <span class="ident">invalid_header</span>.<span class="ident">validate_pow</span>(<span class="kw-2">&amp;</span><span class="ident">invalid_header</span>.<span class="ident">target</span>()) {
+            <span class="prelude-val">Err</span>(<span class="ident">BlockBadProofOfWork</span>) <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">assert!</span>(<span class="bool-val">false</span>)
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">compact_roundrtip_test</span>() {
+        <span class="kw">let</span> <span class="ident">some_header</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="string">&quot;010000004ddccd549d28f385ab457e98d1b11ce80bfea2c5ab93015ade4973e400000000bf4473e53794beae34e64fccc471dace6ae544180816f89591894e0f417a914cd74d6e49ffff001d323b3a7b&quot;</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">header</span>: <span class="ident">BlockHeader</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">some_header</span>).<span class="ident">expect</span>(<span class="string">&quot;Can&#39;t deserialize correct block header&quot;</span>);
+
+        <span class="macro">assert_eq!</span>(<span class="ident">header</span>.<span class="ident">bits</span>, <span class="ident">BlockHeader::compact_target_from_u256</span>(<span class="kw-2">&amp;</span><span class="ident">header</span>.<span class="ident">target</span>()));
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">test</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">benches</span> {
+    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::Block</span>;
+    <span class="kw">use</span> <span class="ident">EmptyWrite</span>;
+    <span class="kw">use</span> <span class="ident">consensus</span>::{<span class="ident">deserialize</span>, <span class="ident">Encodable</span>};
+    <span class="kw">use</span> <span class="ident">hashes::hex::FromHex</span>;
+    <span class="kw">use</span> <span class="ident">test</span>::{<span class="ident">black_box</span>, <span class="ident">Bencher</span>};
+
+    <span class="kw">const</span> <span class="ident">SOME_BLOCK</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;000000202aa2f2ca794ccbd40c16e2f3333f6b8b683f9e7179b2c4d7490600000000000010bc26e70a2f672ad420a6153dd0c28b40a6002c55531bfc99bf8994a8e8f67e5503bd5750d4061a4ed90a700f010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff3603da1b0e00045503bd5704c7dd8a0d0ced13bb5785010800000000000a636b706f6f6c122f4e696e6a61506f6f6c2f5345475749542fffffffff02b4e5a212000000001976a914876fbb82ec05caa6af7a3b5e5a983aae6c6cc6d688ac0000000000000000266a24aa21a9edf91c46b49eb8a29089980f02ee6b57e7d63d33b18b4fddac2bcd7db2a3983704012000000000000000000000000000000000000000000000000000000000000000000000000001000000017e4f81175332a733e26d4ba4e29f53f67b7a5d7c2adebb276e447ca71d130b55000000006b483045022100cac809cd1a3d9ad5d5e31a84e2e1d8ec5542841e4d14c6b52e8b38cbe1ff1728022064470b7fb0c2efeccb2e84bfa36ec5f9e434c84b1101c00f7ee32f726371b7410121020e62280798b6b8c37f068df0915b0865b63fabc401c2457cbc3ef96887dd3647ffffffff02ca2f780c000000001976a914c6b5545b3592cb477d709896fa705592c9b6113a88ac663b2a06000000001976a914e7c1345fc8f87c68170b3aa798a956c2fe6a9eff88ac0000000001000000011e99f5a785e677e017d36b50aa4fd10010ffd039f38f42f447ca8895250e121f01000000d90047304402200d3d296ad641a281dd5c0d68b9ab0d1ad5f7052bec148c1fb81fb1ba69181ec502201a372bb16fb8e054ee9bef41e300d292153830f841a4db0ab7f7407f6581b9bc01473044022002584f313ae990236b6bebb82fbbb006a2b02a448dd5c93434428991eae960d60220491d67d2660c4dde19025cf86e5164a559e2c79c3b98b40e146fab974acd24690147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a9140ffdcf96700455074292a821c74922e8652993998788997bc60000000017a9148ce5408cfeaddb7ccb2545ded41ef478109454848700000000010000000113100b09e6a78d63ec4850654ab0f68806de29710b09172eddfef730652b155501000000da00473044022015389408e3446a3f36a05060e0e4a3c8b92ff3901ba2511aa944ec91a537a1cb022045a33b6ec47605b1718ed2e753263e54918edbf6126508ff039621fb928d28a001483045022100bb952fde81f216f7063575c0bb2bedc050ce08c96d9b437ea922f5eb98c882da02201b7cbf3a2f94ea4c5eb7f0df3af2ebcafa8705af7f410ab5d3d4bac13d6bc6120147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a914d3db9a20312c3ab896a316eb108dbd01e47e17d687e0ba7ac60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000016e3cca1599cde54878e2f27f434df69df0afd1f313cb6e38c08d3ffb57f97a6c01000000da0048304502210095623b70ec3194fa4037a1c1106c2580caedc390e25e5b330bbeb3111e8184bc02205ae973c4a4454be2a3a03beb66297143c1044a3c4743742c5cdd1d516a1ad3040147304402202f3d6d89996f5b42773dd6ebaf367f1af1f3a95c7c7b487ec040131c40f4a4a30220524ffbb0b563f37b3eb1341228f792e8f84111b7c4a9f49cdd998e052ee42efa0147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a9141ade6b95896dde8ec4dee9e59af8849d3797348e8728af7ac60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000011d9dc3a5df9b5b2eeb2bd11a2db243be9e8cc23e2f180bf317d32a499904c15501000000db00483045022100ebbd1c9a8ce626edbb1a7881df81e872ef8c6424feda36faa8a5745157400c6a02206eb463bc8acd5ea06a289e86115e1daae0c2cf10d9cbbd199e1311170d5543ef01483045022100809411a917dc8cf4f3a777f0388fdea6de06243ef7691e500c60abd1c7f19ae602205255d2b1191d8adedb77b814ccb66471eb8486cb4ff8727824254ee5589f176b0147522102632178d046673c9729d828cfee388e121f497707f810c131e0d3fc0fe0bd66d62103a0951ec7d3a9da9de171617026442fcd30f34d66100fab539853b43f508787d452aeffffffff0240420f000000000017a914759a49c772347be81c49517f9e1e6def6a88d4dd87800b85c60000000017a9148ce5408cfeaddb7ccb2545ded41ef47810945484870000000001000000018c51902affd8e5247dfcc2e5d0528a3815f53c8b6d2c200ff290b2b2b486d7704f0000006a47304402201be0d485f6a3ce871be80064c593c5327b3fd7e450f05ab7fae38385bc40cfbe02206e2a6c9970b5d1d10207892376733757486634fce4f352e772149c486857612101210350c33bc9a790c9495195761577b34912a949b73d5bc5ae5343f5ba08b33220ccffffffff0110270000000000001976a9142ab1c62710a7bdfdb4bb6394bbedc58b32b4d5a388ac0000000001000000018c51902affd8e5247dfcc2e5d0528a3815f53c8b6d2c200ff290b2b2b486d7704e0000006b483045022100ccc8c0ac90bdb0402842aec91830c765cdead7a728552a6a34de7d13a6dab28e02206c96f8640cf3444054e9632b197be30598a09c3d5defcd95750bdb922a60d64801210350c33bc9a790c9495195761577b34912a949b73d5bc5ae5343f5ba08b33220ccffffffff0110270000000000001976a9142ab1c62710a7bdfdb4bb6394bbedc58b32b4d5a388ac0000000001000000011b436669c06cbf3442e21a2fe3edc20cd3cf13c358c53234bc4d88bfd8c4bd2a000000006a47304402204a63410ee13db52c7609ab08e25b7fe3c608cc21cc1755ad13460685eb55193202204cd1ea80c06a81571119be0b8cccd96ef7cdd90f62c1fe2d538622feb08e22ba0121024baa8b67cc9ed8a97d90895e3716b25469b67cb26d3324d7aff213f507764765ffffffff010000000000000000306a2e516d64523365345261445653324d436a736e536171734a5753324465655446624238354541794a4d5843784c7934000000000100000001be4a95ed36316cada5118b1982e4cb4a07f93e7a4153e227466f1cb0776de995000000006b483045022100a22d5251deea0470806bab817013d675a63cd52218d6e477ab0c9d601d018b7f022042121b46afcdcd0c66f189398212b66085e88c6973ae560f1810c13e55e2bee40121024baa8b67cc9ed8a97d90895e3716b25469b67cb26d3324d7aff213f507764765ffffffff010000000000000000306a2e516d57484d57504e5248515872504c7338554c586b4d483746745356413675366b5a6b4a4e3851796e4e583751340000000001000000016c061a65b49edec21acdbc22f97dc853aa872302aeef13fabf0bf6807de1b8bd010000006b483045022100dd80381f2d158b4dad7f98d2d97317c533fb36e737542473feb05fa74d0b73bb02207097d4331196069167e525b61d132532292fd75cc039a5839c04c2545d427e2b0121035e9a597df8b417bef66811882a2844604fc591c427f642628f0fef46be19a4c9feffffff0280a4bf07000000001976a914573b9106e16ee0b5c143dc40f0724f77dd0e282088ac9533b22c000000001976a9149c4da607efb1d759d33da71778bc6cafa56acb5988acd31b0e0001000000017dae20994b69b28534e5b22f3d7c50f9d7541348cbf6f43fcc654263ebaf8f68000000006b483045022100a85300eb94b24b044877d0b0d61e08e16dbc82ec7d69c723a8a45519f95c35b002203d78376e6bee31b455c097557af7fe4d6b620bc74269e9a75e2aad2b545abddb012103b0d08aba2a5ac6cf2788fda941c386040e35e49d3a57d2aefb16c0438fb98acbfeffffff022222305f000000001976a914cfda30dd836b596db6a9c230c45ae2179107f04888ac80a4bf07000000001976a91442dfcf5823aacb185844e663873c35fb98bfd21b88acd31b0e000100000002ad3e85e4af30678a330f8941ed7a9ca17cd0236368d238cac4e9ff09c466fed1020000006b483045022100d1196c48a0392e09592f1b96b4aec32ab0cecb6fd17b1d0c85ab3250a2fe45d9022059217c82f684fcdecdbe660a2077ea956dfbbb964d2648bc1e8ae0f0fe565449012103b64e32e5f62e03701428fb1e3151e9a57f149c67708f6164a235c8199fe17cc2ffffffff34f0a71c1c2cd610522e9c18c67931cded5e9647d4419c49b99715e2a0795f3d020000006a4730440220316e81d8242abf3c5f885d200feca12c3adb63cf2cd4dc74602f7b8b0cba50340220210d525758df77ccdca6908311c1895275e07bbb29b45963a19252acde55873f012103b64e32e5f62e03701428fb1e3151e9a57f149c67708f6164a235c8199fe17cc2ffffffff0510270000000000001976a914449d2394dde057bc199f23fb8aa2e400f344611788ac10270000000000001976a914449d2394dde057bc199f23fb8aa2e400f344611788aca0860100000000001976a91413d35ad337dd80a055757e5ea0a45b59fee3060c88ac70110100000000001976a91413d35ad337dd80a055757e5ea0a45b59fee3060c88ac0000000000000000026a000000000001000000018e33fecc2ddbd86c5ea919f7bd5a5acf8a09f3e0cdaaaf4f08c5ef095161ef1100000000fdfe0000483045022100d2489b225d39b7d8b6767a6928c8029a2a1297c08fdf00d683ba0c1987e7d7000220176cb66c8a243806bb7421f658325a69a51c82c0c3314e37f2400f33626390210148304502210096cfa57662a545830d0e29610becd41ea031e256339913718ce18dbb1a27bdb00220482911c851d15adcd37097dff99a9ff1f97d953bcebc528835118f447412553e014c695221028d9889862b29430278c084b5c4090b7b807b31e047bcd212ebc2c4e43fc0e3c52103160949a7c8c81f2c25d7763f57eb1cb407d867c5b7c290331bd2dc4b1182c6d32103fbef3b60914bda9173765902013a251ec89450c75d0b5a96a143db1dabf98d9553aeffffffff0220e8891c0100000017a914d996715e081c50f8f6b1b4e7fb6ca214f9924fdf87809698000000000017a9145611d812263f32960228cb5f85329bce4770a218870000000001000000017720507dcbe6c69f652b0c0ce19406f482372d1a8abc05d45fb7acf97fb80eec00000000fdfe00004830450221009821d8e117de44b1202c829c0f5063997acf007cf9b561c6fb8d1212cddb6c40022010ff5067b0d9d4eca2da0ceb876e9a16f1a2142da866d3042a7bae8968813e8001483045022100dea759d14a8a1c5da5f3dcc5509871aaa2c1e3be03752c1b858d80fa4227163702205183d70cc28dcb6df9b037714c8b6442ef84e0ddce07711a30c731e9f0925090014c695221028d70ea66fe7a7def282df7b2b498007e5072933e42c18f63ce85975dcbcf1a8821037e8f842b1e47e21d88002c5aab2559212a4c2c9dbe5ef5347f2a29afd0510ec1210251259cb9fd4f6206488408286e4475c9c9fe887e57a3e32ae4da222778a2aedf53aeffffffff023380cb020000000017a9143b5a7e85b22656a34d43187ac8dd09acd7109d2487809698000000000017a914b9b4b555f594a34deec3ad61d5c5f3738b17ee158700000000&quot;</span>;
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bench_block_serialize</span>(<span class="ident">bh</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="ident">raw_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="ident">SOME_BLOCK</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">raw_block</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">raw_block</span>.<span class="ident">len</span>());
+
+        <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
+            <span class="ident">black_box</span>(<span class="kw-2">&amp;</span><span class="ident">result</span>);
+            <span class="ident">data</span>.<span class="ident">clear</span>();
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bench_block_serialize_logic</span>(<span class="ident">bh</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="ident">raw_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="ident">SOME_BLOCK</span>).<span class="ident">unwrap</span>();
+
+        <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">raw_block</span>).<span class="ident">unwrap</span>();
+
+        <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EmptyWrite</span>);
+            <span class="ident">black_box</span>(<span class="kw-2">&amp;</span><span class="ident">size</span>);
+        });
+    }
+
+    <span class="attribute">#[<span class="ident">bench</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bench_block_deserialize</span>(<span class="ident">bh</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Bencher</span>) {
+        <span class="kw">let</span> <span class="ident">raw_block</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="ident">SOME_BLOCK</span>).<span class="ident">unwrap</span>();
+
+        <span class="ident">bh</span>.<span class="ident">iter</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">raw_block</span>).<span class="ident">unwrap</span>();
+            <span class="ident">black_box</span>(<span class="kw-2">&amp;</span><span class="ident">block</span>);
+        });
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Hmac","A hash computed from a RFC 2104 HMAC. Parameterized by the underlying hash function."],["HmacEngine","Pair of underyling hash engines, used for the inner and outer hash of HMAC"],["HmacMidState","Pair of underlying hash midstates which represent the current state of an `HmacEngine`"]]});

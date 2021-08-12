@@ -1,0 +1,1391 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitcoin-0.27.0/src/util/bip158.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bip158.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+</pre><pre class="rust">
+<span class="comment">// Rust Bitcoin Library</span>
+<span class="comment">// Written in 2019 by</span>
+<span class="comment">//   The rust-bitcoin developers</span>
+<span class="comment">//</span>
+<span class="comment">// To the extent possible under law, the author(s) have dedicated all</span>
+<span class="comment">// copyright and related and neighboring rights to this software to</span>
+<span class="comment">// the public domain worldwide. This software is distributed without</span>
+<span class="comment">// any warranty.</span>
+<span class="comment">//</span>
+<span class="comment">// You should have received a copy of the CC0 Public Domain Dedication</span>
+<span class="comment">// along with this software.</span>
+<span class="comment">// If not, see &lt;http://creativecommons.org/publicdomain/zero/1.0/&gt;.</span>
+<span class="comment">//</span>
+
+<span class="comment">// This module was largely copied from https://github.com/rust-bitcoin/murmel/blob/master/src/blockfilter.rs</span>
+<span class="comment">// on 11. June 2019 which is licensed under Apache, that file specifically</span>
+<span class="comment">// was written entirely by Tamas Blummer, who is re-licensing its contents here as CC0.</span>
+
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # BIP158 Compact Block Filters for Light Clients</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Implements a structure for compact filters on block data, for use in the BIP 157 light client protocol.</span>
+<span class="doccomment">//! The filter construction proposed is an alternative to Bloom filters, as used in BIP 37,</span>
+<span class="doccomment">//! that minimizes filter size by using Golomb-Rice coding for compression.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Example</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```ignore</span>
+<span class="doccomment">//! fn get_script_for_coin(coin: &amp;OutPoint) -&gt; Result&lt;Script, BlockFilterError&gt; {</span>
+<span class="doccomment">//!   // get utxo ...</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!  </span>
+<span class="doccomment">//! // create a block filter for a block (server side)</span>
+<span class="doccomment">//! let filter = BlockFilter::new_script_filter(&amp;block, get_script_for_coin)?;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // or create a filter from known raw data</span>
+<span class="doccomment">//! let filter = BlockFilter::new(content);</span>
+<span class="doccomment">//!  </span>
+<span class="doccomment">//! // read and evaluate a filter</span>
+<span class="doccomment">//!  </span>
+<span class="doccomment">//! let query: Iterator&lt;Item=Script&gt; = // .. some scripts you care about</span>
+<span class="doccomment">//! if filter.match_any(&amp;block_hash, &amp;mut query.map(|s| s.as_bytes())) {</span>
+<span class="doccomment">//!   // get this block</span>
+<span class="doccomment">//! }</span>
+<span class="doccomment">//!  ```</span>
+<span class="doccomment">//!  </span>
+
+<span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">io</span>::{<span class="self">self</span> <span class="kw">as</span> <span class="ident">io</span>, <span class="ident">Cursor</span>};
+<span class="kw">use</span> <span class="ident">core::fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Formatter</span>};
+<span class="kw">use</span> <span class="ident">core::cmp</span>::{<span class="self">self</span>, <span class="ident">Ordering</span>};
+
+<span class="kw">use</span> <span class="ident">hashes</span>::{<span class="ident">Hash</span>, <span class="ident">siphash24</span>};
+<span class="kw">use</span> <span class="ident">hash_types</span>::{<span class="ident">BlockHash</span>, <span class="ident">FilterHash</span>, <span class="ident">FilterHeader</span>};
+
+<span class="kw">use</span> <span class="ident">blockdata::block::Block</span>;
+<span class="kw">use</span> <span class="ident">blockdata::script::Script</span>;
+<span class="kw">use</span> <span class="ident">blockdata::transaction::OutPoint</span>;
+<span class="kw">use</span> <span class="ident">consensus</span>::{<span class="ident">Decodable</span>, <span class="ident">Encodable</span>};
+<span class="kw">use</span> <span class="ident">consensus::encode::VarInt</span>;
+<span class="kw">use</span> <span class="ident">util::endian</span>;
+
+<span class="doccomment">/// Golomb encoding parameter as in BIP-158, see also https://gist.github.com/sipa/576d5f09c3b86c3b1b75598d799fc845</span>
+<span class="kw">const</span> <span class="ident">P</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">19</span>;
+<span class="kw">const</span> <span class="ident">M</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">784931</span>;
+
+<span class="doccomment">/// Errors for blockfilter</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="doccomment">/// missing UTXO, can not calculate script filter</span>
+    <span class="ident">UtxoMissing</span>(<span class="ident">OutPoint</span>),
+    <span class="doccomment">/// some IO error reading or writing binary serialization of the filter</span>
+    <span class="ident">Io</span>(<span class="ident">io::Error</span>),
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {}
+
+<span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">fmt::Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Error::UtxoMissing</span>(<span class="kw-2">ref</span> <span class="ident">coin</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;unresolved UTXO {}&quot;</span>, <span class="ident">coin</span>),
+            <span class="ident">Error::Io</span>(<span class="kw-2">ref</span> <span class="ident">io</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">io</span>)
+        }
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">io::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">io</span>: <span class="ident">io::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Error::Io</span>(<span class="ident">io</span>)
+    }
+}
+
+
+<span class="doccomment">/// a computed or read block filter</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BlockFilter</span> {
+    <span class="doccomment">/// Golomb encoded filter</span>
+    <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>
+}
+
+<span class="kw">impl</span> <span class="ident">FilterHash</span> {
+    <span class="doccomment">/// compute the filter header from a filter hash and previous filter header</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">previous_filter_header</span>: <span class="kw-2">&amp;</span><span class="ident">FilterHeader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterHeader</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">header_data</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">64</span>];
+        <span class="ident">header_data</span>[<span class="number">0</span>..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>[..]);
+        <span class="ident">header_data</span>[<span class="number">32</span>..<span class="number">64</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">previous_filter_header</span>[..]);
+        <span class="ident">FilterHeader::hash</span>(<span class="kw-2">&amp;</span><span class="ident">header_data</span>)
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">BlockFilter</span> {
+    <span class="doccomment">/// compute this filter&#39;s id in a chain of filters</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">filter_header</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">previous_filter_header</span>: <span class="kw-2">&amp;</span><span class="ident">FilterHeader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FilterHeader</span> {
+        <span class="kw">let</span> <span class="ident">filter_hash</span> <span class="op">=</span> <span class="ident">FilterHash::hash</span>(<span class="self">self</span>.<span class="ident">content</span>.<span class="ident">as_slice</span>());
+        <span class="ident">filter_hash</span>.<span class="ident">filter_header</span>(<span class="ident">previous_filter_header</span>)
+    }
+
+    <span class="doccomment">/// create a new filter from pre-computed data</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span> (<span class="ident">content</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockFilter</span> {
+        <span class="ident">BlockFilter</span> { <span class="ident">content</span>: <span class="ident">content</span>.<span class="ident">to_vec</span>() }
+    }
+
+    <span class="doccomment">/// Compute a SCRIPT_FILTER that contains spent and output scripts</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_script_filter</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="ident">Block</span>, <span class="ident">script_for_coin</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">BlockFilter</span>, <span class="ident">Error</span><span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">OutPoint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Script</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">BlockFilterWriter::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>, <span class="ident">block</span>);
+            <span class="ident">writer</span>.<span class="ident">add_output_scripts</span>();
+            <span class="ident">writer</span>.<span class="ident">add_input_scripts</span>(<span class="ident">script_for_coin</span>)<span class="question-mark">?</span>;
+            <span class="ident">writer</span>.<span class="ident">finish</span>()<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">BlockFilter</span> { <span class="ident">content</span>: <span class="ident">out</span> })
+    }
+
+    <span class="doccomment">/// match any query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">block_hash</span>: <span class="kw-2">&amp;</span><span class="ident">BlockHash</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">filter_reader</span> <span class="op">=</span> <span class="ident">BlockFilterReader::new</span>(<span class="ident">block_hash</span>);
+        <span class="ident">filter_reader</span>.<span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cursor::new</span>(<span class="self">self</span>.<span class="ident">content</span>.<span class="ident">as_slice</span>()), <span class="ident">query</span>)
+    }
+
+    <span class="doccomment">/// match all query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">block_hash</span>: <span class="kw-2">&amp;</span><span class="ident">BlockHash</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">filter_reader</span> <span class="op">=</span> <span class="ident">BlockFilterReader::new</span>(<span class="ident">block_hash</span>);
+        <span class="ident">filter_reader</span>.<span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Cursor::new</span>(<span class="self">self</span>.<span class="ident">content</span>.<span class="ident">as_slice</span>()), <span class="ident">query</span>)
+    }
+}
+
+<span class="doccomment">/// Compiles and writes a block filter</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BlockFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Block</span>,
+    <span class="ident">writer</span>: <span class="ident">GCSFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BlockFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a block filter writer</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Write</span>, <span class="ident">block</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Block</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">block_hash_as_int</span> <span class="op">=</span> <span class="ident">block</span>.<span class="ident">block_hash</span>().<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">k0</span> <span class="op">=</span> <span class="ident">endian::slice_to_u64_le</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash_as_int</span>[<span class="number">0</span>..<span class="number">8</span>]);
+        <span class="kw">let</span> <span class="ident">k1</span> <span class="op">=</span> <span class="ident">endian::slice_to_u64_le</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash_as_int</span>[<span class="number">8</span>..<span class="number">16</span>]);
+        <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">GCSFilterWriter::new</span>(<span class="ident">writer</span>, <span class="ident">k0</span>, <span class="ident">k1</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+        <span class="ident">BlockFilterWriter</span> { <span class="ident">block</span>, <span class="ident">writer</span> }
+    }
+
+    <span class="doccomment">/// Add output scripts of the block - excluding OP_RETURN scripts</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_output_scripts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">for</span> <span class="ident">transaction</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">block</span>.<span class="ident">txdata</span> {
+            <span class="kw">for</span> <span class="ident">output</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">transaction</span>.<span class="ident">output</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">output</span>.<span class="ident">script_pubkey</span>.<span class="ident">is_op_return</span>() {
+                    <span class="self">self</span>.<span class="ident">add_element</span>(<span class="ident">output</span>.<span class="ident">script_pubkey</span>.<span class="ident">as_bytes</span>());
+                }
+            }
+        }
+    }
+
+    <span class="doccomment">/// Add consumed output scripts of a block to filter</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_input_scripts</span><span class="op">&lt;</span><span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">script_for_coin</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span>
+        <span class="kw">where</span> <span class="ident">M</span>: <span class="ident">Fn</span>(<span class="kw-2">&amp;</span><span class="ident">OutPoint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Script</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">for</span> <span class="ident">script</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">block</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>()
+            .<span class="ident">skip</span>(<span class="number">1</span>) <span class="comment">// skip coinbase</span>
+            .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">t</span><span class="op">|</span> <span class="ident">t</span>.<span class="ident">input</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">i</span>.<span class="ident">previous_output</span>))
+            .<span class="ident">map</span>(<span class="ident">script_for_coin</span>) {
+            <span class="kw">match</span> <span class="ident">script</span> {
+                <span class="prelude-val">Ok</span>(<span class="ident">script</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">add_element</span>(<span class="ident">script</span>.<span class="ident">as_bytes</span>()),
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+            }
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+
+    <span class="doccomment">/// Add arbitrary element to a filter</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_element</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">add_element</span>(<span class="ident">data</span>);
+    }
+
+    <span class="doccomment">/// Write block filter</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">finish</span>()
+    }
+}
+
+
+<span class="doccomment">/// Reads and interpret a block filter</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BlockFilterReader</span> {
+    <span class="ident">reader</span>: <span class="ident">GCSFilterReader</span>
+}
+
+<span class="kw">impl</span> <span class="ident">BlockFilterReader</span> {
+    <span class="doccomment">/// Create a block filter reader</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">block_hash</span>: <span class="kw-2">&amp;</span><span class="ident">BlockHash</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BlockFilterReader</span> {
+        <span class="kw">let</span> <span class="ident">block_hash_as_int</span> <span class="op">=</span> <span class="ident">block_hash</span>.<span class="ident">into_inner</span>();
+        <span class="kw">let</span> <span class="ident">k0</span> <span class="op">=</span> <span class="ident">endian::slice_to_u64_le</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash_as_int</span>[<span class="number">0</span>..<span class="number">8</span>]);
+        <span class="kw">let</span> <span class="ident">k1</span> <span class="op">=</span> <span class="ident">endian::slice_to_u64_le</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash_as_int</span>[<span class="number">8</span>..<span class="number">16</span>]);
+        <span class="ident">BlockFilterReader</span> { <span class="ident">reader</span>: <span class="ident">GCSFilterReader::new</span>(<span class="ident">k0</span>, <span class="ident">k1</span>, <span class="ident">M</span>, <span class="ident">P</span>) }
+    }
+
+    <span class="doccomment">/// match any query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">reader</span>.<span class="ident">match_any</span>(<span class="ident">reader</span>, <span class="ident">query</span>)
+    }
+
+    <span class="doccomment">/// match all query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">reader</span>.<span class="ident">match_all</span>(<span class="ident">reader</span>, <span class="ident">query</span>)
+    }
+}
+
+
+<span class="doccomment">/// Golomb-Rice encoded filter reader</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GCSFilterReader</span> {
+    <span class="ident">filter</span>: <span class="ident">GCSFilter</span>,
+    <span class="ident">m</span>: <span class="ident">u64</span>
+}
+
+<span class="kw">impl</span> <span class="ident">GCSFilterReader</span> {
+    <span class="doccomment">/// Create a new filter reader with specific seed to siphash</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">k0</span>: <span class="ident">u64</span>, <span class="ident">k1</span>: <span class="ident">u64</span>, <span class="ident">m</span>: <span class="ident">u64</span>, <span class="ident">p</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GCSFilterReader</span> {
+        <span class="ident">GCSFilterReader</span> { <span class="ident">filter</span>: <span class="ident">GCSFilter::new</span>(<span class="ident">k0</span>, <span class="ident">k1</span>, <span class="ident">p</span>), <span class="ident">m</span> }
+    }
+
+    <span class="doccomment">/// match any query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">reader</span>;
+        <span class="kw">let</span> <span class="ident">n_elements</span>: <span class="ident">VarInt</span> <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap_or</span>(<span class="ident">VarInt</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>;
+        <span class="comment">// map hashes to [0, n_elements &lt;&lt; grp]</span>
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">m</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">map_to_range</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">hash</span>(<span class="ident">e</span>), <span class="ident">nm</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="comment">// sort</span>
+        <span class="ident">mapped</span>.<span class="ident">sort</span>();
+        <span class="kw">if</span> <span class="ident">mapped</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+        }
+        <span class="kw">if</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+        }
+
+        <span class="comment">// find first match in two sorted arrays in one read pass</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">BitStreamReader::new</span>(<span class="ident">reader</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">golomb_rice_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span>;
+        <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">mapped</span> {
+            <span class="kw">loop</span> {
+                <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) {
+                    <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>),
+                    <span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                            <span class="ident">data</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">golomb_rice_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                            <span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                        } <span class="kw">else</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                        }
+                    }
+                    <span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                }
+            }
+        }
+        <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>)
+    }
+
+    <span class="doccomment">/// match all query pattern</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>, <span class="ident">query</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">reader</span>;
+        <span class="kw">let</span> <span class="ident">n_elements</span>: <span class="ident">VarInt</span> <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>).<span class="ident">unwrap_or</span>(<span class="ident">VarInt</span>(<span class="number">0</span>));
+        <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>;
+        <span class="comment">// map hashes to [0, n_elements &lt;&lt; grp]</span>
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">m</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span> <span class="op">=</span> <span class="ident">query</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">map_to_range</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">hash</span>(<span class="ident">e</span>), <span class="ident">nm</span>)).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="comment">// sort</span>
+        <span class="ident">mapped</span>.<span class="ident">sort</span>();
+        <span class="ident">mapped</span>.<span class="ident">dedup</span>();
+        <span class="kw">if</span> <span class="ident">mapped</span>.<span class="ident">is_empty</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>);
+        }
+        <span class="kw">if</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+        }
+
+        <span class="comment">// figure if all mapped are there in one read pass</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">BitStreamReader::new</span>(<span class="ident">reader</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">golomb_rice_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">remaining</span> <span class="op">=</span> <span class="ident">n_elements</span>.<span class="number">0</span> <span class="op">-</span> <span class="number">1</span>;
+        <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="ident">mapped</span> {
+            <span class="kw">loop</span> {
+                <span class="kw">match</span> <span class="ident">data</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">p</span>) {
+                    <span class="ident">Ordering::Equal</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
+                    <span class="ident">Ordering::Less</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="kw">if</span> <span class="ident">remaining</span> <span class="op">&gt;</span> <span class="number">0</span> {
+                            <span class="ident">data</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">golomb_rice_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">reader</span>)<span class="question-mark">?</span>;
+                            <span class="ident">remaining</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
+                        } <span class="kw">else</span> {
+                            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>);
+                        }
+                    },
+                    <span class="ident">Ordering::Greater</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="bool-val">false</span>),
+                }
+            }
+        }
+        <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
+    }
+}
+
+<span class="comment">// fast reduction of hash to [0, nm) range</span>
+<span class="kw">fn</span> <span class="ident">map_to_range</span>(<span class="ident">hash</span>: <span class="ident">u64</span>, <span class="ident">nm</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    ((<span class="ident">hash</span> <span class="kw">as</span> <span class="ident">u128</span> <span class="op">*</span> <span class="ident">nm</span> <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">64</span>) <span class="kw">as</span> <span class="ident">u64</span>
+}
+
+<span class="doccomment">/// Colomb-Rice encoded filter writer</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GCSFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">filter</span>: <span class="ident">GCSFilter</span>,
+    <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Write</span>,
+    <span class="ident">elements</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">m</span>: <span class="ident">u64</span>
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">GCSFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new GCS writer wrapping a generic writer, with specific seed to siphash</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Write</span>, <span class="ident">k0</span>: <span class="ident">u64</span>, <span class="ident">k1</span>: <span class="ident">u64</span>, <span class="ident">m</span>: <span class="ident">u64</span>, <span class="ident">p</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GCSFilterWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">GCSFilterWriter</span> {
+            <span class="ident">filter</span>: <span class="ident">GCSFilter::new</span>(<span class="ident">k0</span>, <span class="ident">k1</span>, <span class="ident">p</span>),
+            <span class="ident">writer</span>,
+            <span class="ident">elements</span>: <span class="ident">HashSet::new</span>(),
+            <span class="ident">m</span>
+        }
+    }
+
+    <span class="doccomment">/// Add some data to the filter</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_element</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">element</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">element</span>.<span class="ident">is_empty</span>() {
+            <span class="self">self</span>.<span class="ident">elements</span>.<span class="ident">insert</span>(<span class="ident">element</span>.<span class="ident">to_vec</span>());
+        }
+    }
+
+    <span class="doccomment">/// write the filter to the wrapped writer</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">nm</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">elements</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">m</span>;
+
+        <span class="comment">// map hashes to [0, n_elements * M)</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mapped</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">elements</span>.<span class="ident">iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="ident">map_to_range</span>(<span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">hash</span>(<span class="ident">e</span>.<span class="ident">as_slice</span>()), <span class="ident">nm</span>)).<span class="ident">collect</span>();
+        <span class="ident">mapped</span>.<span class="ident">sort</span>();
+
+        <span class="comment">// write number of elements as varint</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">encoder</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        <span class="ident">VarInt</span>(<span class="ident">mapped</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>).<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">encoder</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrote</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write</span>(<span class="ident">encoder</span>.<span class="ident">as_slice</span>())<span class="question-mark">?</span>;
+
+        <span class="comment">// write out deltas of sorted values into a Golonb-Rice coded bit stream</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">BitStreamWriter::new</span>(<span class="self">self</span>.<span class="ident">writer</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">last</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">for</span> <span class="ident">data</span> <span class="kw">in</span> <span class="ident">mapped</span> {
+            <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">golomb_rice_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>, <span class="ident">data</span> <span class="op">-</span> <span class="ident">last</span>)<span class="question-mark">?</span>;
+            <span class="ident">last</span> <span class="op">=</span> <span class="ident">data</span>;
+        }
+        <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="ident">writer</span>.<span class="ident">flush</span>()<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">wrote</span>)
+    }
+}
+
+<span class="doccomment">/// Golomb Coded Set Filter</span>
+<span class="kw">struct</span> <span class="ident">GCSFilter</span> {
+    <span class="ident">k0</span>: <span class="ident">u64</span>, <span class="comment">// sip hash key</span>
+    <span class="ident">k1</span>: <span class="ident">u64</span>, <span class="comment">// sip hash key</span>
+    <span class="ident">p</span>: <span class="ident">u8</span>
+}
+
+<span class="kw">impl</span> <span class="ident">GCSFilter</span> {
+    <span class="doccomment">/// Create a new filter</span>
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">k0</span>: <span class="ident">u64</span>, <span class="ident">k1</span>: <span class="ident">u64</span>, <span class="ident">p</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GCSFilter</span> {
+        <span class="ident">GCSFilter</span> { <span class="ident">k0</span>, <span class="ident">k1</span>, <span class="ident">p</span> }
+    }
+
+    <span class="doccomment">/// Golomb-Rice encode a number n to a bit stream (Parameter 2^k)</span>
+    <span class="kw">fn</span> <span class="ident">golomb_rice_encode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitStreamWriter</span>, <span class="ident">n</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrote</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="ident">n</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">p</span>;
+        <span class="kw">while</span> <span class="ident">q</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">let</span> <span class="ident">nbits</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="ident">q</span>, <span class="number">64</span>);
+            <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="ident">writer</span>.<span class="ident">write</span>(<span class="op">!</span><span class="number">0u64</span>, <span class="ident">nbits</span> <span class="kw">as</span> <span class="ident">u8</span>)<span class="question-mark">?</span>;
+            <span class="ident">q</span> <span class="op">-</span><span class="op">=</span> <span class="ident">nbits</span>;
+        }
+        <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">0</span>, <span class="number">1</span>)<span class="question-mark">?</span>;
+        <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="ident">writer</span>.<span class="ident">write</span>(<span class="ident">n</span>, <span class="self">self</span>.<span class="ident">p</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">wrote</span>)
+    }
+
+    <span class="doccomment">/// Golomb-Rice decode a number from a bit stream (Parameter 2^k)</span>
+    <span class="kw">fn</span> <span class="ident">golomb_rice_decode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BitStreamReader</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">q</span> <span class="op">=</span> <span class="number">0u64</span>;
+        <span class="kw">while</span> <span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">1</span>)<span class="question-mark">?</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+            <span class="ident">q</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+        }
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">reader</span>.<span class="ident">read</span>(<span class="self">self</span>.<span class="ident">p</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>((<span class="ident">q</span> <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">p</span>) <span class="op">+</span> <span class="ident">r</span>)
+    }
+
+    <span class="doccomment">/// Hash an arbitrary slice with siphash using parameters of this filter</span>
+    <span class="kw">fn</span> <span class="ident">hash</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">element</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+        <span class="ident">siphash24::Hash::hash_to_u64_with_keys</span>(<span class="self">self</span>.<span class="ident">k0</span>, <span class="self">self</span>.<span class="ident">k1</span>, <span class="ident">element</span>)
+    }
+}
+
+<span class="doccomment">/// Bitwise stream reader</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitStreamReader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">buffer</span>: [<span class="ident">u8</span>; <span class="number">1</span>],
+    <span class="ident">offset</span>: <span class="ident">u8</span>,
+    <span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitStreamReader</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new BitStreamReader that reads bitwise from a given reader</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">reader</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Read</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitStreamReader</span> {
+        <span class="ident">BitStreamReader</span> {
+            <span class="ident">buffer</span>: [<span class="number">0u8</span>],
+            <span class="ident">reader</span>: <span class="ident">reader</span>,
+            <span class="ident">offset</span>: <span class="number">8</span>,
+        }
+    }
+
+    <span class="doccomment">/// Read nbit bits</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">nbits</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">u64</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">nbits</span> <span class="op">&gt;</span> <span class="number">64</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;can not read more than 64 bits at once&quot;</span>));
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="number">0u64</span>;
+        <span class="kw">while</span> <span class="ident">nbits</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span><span class="op">=</span> <span class="number">8</span> {
+                <span class="self">self</span>.<span class="ident">reader</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
+            }
+            <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="number">8</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span>, <span class="ident">nbits</span>);
+            <span class="ident">data</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="op">=</span> <span class="ident">bits</span>;
+            <span class="ident">data</span> <span class="op">|</span><span class="op">=</span> ((<span class="self">self</span>.<span class="ident">buffer</span>[<span class="number">0</span>] <span class="op">&lt;</span><span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">offset</span>) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">8</span> <span class="op">-</span> <span class="ident">bits</span>)) <span class="kw">as</span> <span class="ident">u64</span>;
+            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bits</span>;
+            <span class="ident">nbits</span> <span class="op">-</span><span class="op">=</span> <span class="ident">bits</span>;
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">data</span>)
+    }
+}
+
+<span class="doccomment">/// Bitwise stream writer</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BitStreamWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="ident">buffer</span>: [<span class="ident">u8</span>; <span class="number">1</span>],
+    <span class="ident">offset</span>: <span class="ident">u8</span>,
+    <span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Write</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">BitStreamWriter</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Create a new BitStreamWriter that writes bitwise to a given writer</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">writer</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">io::Write</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BitStreamWriter</span> {
+        <span class="ident">BitStreamWriter</span> {
+            <span class="ident">buffer</span>: [<span class="number">0u8</span>],
+            <span class="ident">writer</span>: <span class="ident">writer</span>,
+            <span class="ident">offset</span>: <span class="number">0</span>,
+        }
+    }
+
+    <span class="doccomment">/// Write nbits bits from data</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">data</span>: <span class="ident">u64</span>, <span class="kw-2">mut</span> <span class="ident">nbits</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="ident">nbits</span> <span class="op">&gt;</span> <span class="number">64</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">io::Error::new</span>(<span class="ident">io::ErrorKind::Other</span>, <span class="string">&quot;can not write more than 64 bits at once&quot;</span>));
+        }
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrote</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">while</span> <span class="ident">nbits</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">cmp::min</span>(<span class="number">8</span> <span class="op">-</span> <span class="self">self</span>.<span class="ident">offset</span>, <span class="ident">nbits</span>);
+            <span class="self">self</span>.<span class="ident">buffer</span>[<span class="number">0</span>] <span class="op">|</span><span class="op">=</span> ((<span class="ident">data</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="ident">nbits</span>)) <span class="op">&gt;</span><span class="op">&gt;</span> (<span class="number">64</span> <span class="op">-</span> <span class="number">8</span> <span class="op">+</span> <span class="self">self</span>.<span class="ident">offset</span>)) <span class="kw">as</span> <span class="ident">u8</span>;
+            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">+</span><span class="op">=</span> <span class="ident">bits</span>;
+            <span class="ident">nbits</span> <span class="op">-</span><span class="op">=</span> <span class="ident">bits</span>;
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span><span class="op">=</span> <span class="number">8</span> {
+                <span class="ident">wrote</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">flush</span>()<span class="question-mark">?</span>;
+            }
+        }
+        <span class="prelude-val">Ok</span>(<span class="ident">wrote</span>)
+    }
+
+    <span class="doccomment">/// flush bits not yet written</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flush</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">offset</span> <span class="op">&gt;</span> <span class="number">0</span> {
+            <span class="self">self</span>.<span class="ident">writer</span>.<span class="ident">write_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">buffer</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">buffer</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">0u8</span>;
+            <span class="self">self</span>.<span class="ident">offset</span> <span class="op">=</span> <span class="number">0</span>;
+            <span class="prelude-val">Ok</span>(<span class="number">1</span>)
+        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(<span class="number">0</span>)
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident">io::Cursor</span>;
+
+    <span class="kw">use</span> <span class="ident">hash_types::BlockHash</span>;
+    <span class="kw">use</span> <span class="ident">hashes::hex::FromHex</span>;
+
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+
+    <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde_json</span>;
+    <span class="kw">use</span> <span class="self">self</span><span class="ident">::serde_json</span>::{<span class="ident">Value</span>};
+
+    <span class="kw">use</span> <span class="ident">consensus::encode::deserialize</span>;
+    <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_blockfilters</span>() {
+
+        <span class="comment">// test vectors from: https://github.com/jimpo/bitcoin/blob/c7efb652f3543b001b4dd22186a354605b14f47e/src/test/data/blockfilters.json</span>
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="string">r#&quot;
+        [
+            [&quot;Block Height,Block Hash,Block,[Prev Output Scripts for Block],Previous Basic Header,Basic Filter,Basic Header,Notes&quot;],
+            [0,&quot;000000000933ea01ad0ee984209779baaec3ced90fa3f408719526f8d77f4943&quot;,&quot;0100000000000000000000000000000000000000000000000000000000000000000000003ba3edfd7a7b12b27ac72c3e67768f617fc81bc3888a51323a9fb8aa4b1e5e4adae5494dffff001d1aa4ae180101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff4d04ffff001d0104455468652054696d65732030332f4a616e2f32303039204368616e63656c6c6f72206f6e206272696e6b206f66207365636f6e64206261696c6f757420666f722062616e6b73ffffffff0100f2052a01000000434104678afdb0fe5548271967f1a67130b7105cd6a828e03909a67962e0ea1f61deb649f6bc3f4cef38c4f35504e51ec112de5c384df7ba0b8d578a4c702b6bf11d5fac00000000&quot;,[],&quot;0000000000000000000000000000000000000000000000000000000000000000&quot;,&quot;019dfca8&quot;,&quot;21584579b7eb08997773e5aeff3a7f932700042d0ed2a6129012b7d7ae81b750&quot;,&quot;Genesis block&quot;],
+            [2,&quot;000000006c02c8ea6e4ff69651f7fcde348fb9d557a06e6957b65552002a7820&quot;,&quot;0100000006128e87be8b1b4dea47a7247d5528d2702c96826c7a648497e773b800000000e241352e3bec0a95a6217e10c3abb54adfa05abb12c126695595580fb92e222032e7494dffff001d00d235340101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0e0432e7494d010e062f503253482fffffffff0100f2052a010000002321038a7f6ef1c8ca0c588aa53fa860128077c9e6c11e6830f4d7ee4e763a56b7718fac00000000&quot;,[],&quot;d7bdac13a59d745b1add0d2ce852f1a0442e8945fc1bf3848d3cbffd88c24fe1&quot;,&quot;0174a170&quot;,&quot;186afd11ef2b5e7e3504f2e8cbf8df28a1fd251fe53d60dff8b1467d1b386cf0&quot;,&quot;&quot;],
+            [3,&quot;000000008b896e272758da5297bcd98fdc6d97c9b765ecec401e286dc1fdbe10&quot;,&quot;0100000020782a005255b657696ea057d5b98f34defcf75196f64f6eeac8026c0000000041ba5afc532aae03151b8aa87b65e1594f97504a768e010c98c0add79216247186e7494dffff001d058dc2b60101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0e0486e7494d0151062f503253482fffffffff0100f2052a01000000232103f6d9ff4c12959445ca5549c811683bf9c88e637b222dd2e0311154c4c85cf423ac00000000&quot;,[],&quot;186afd11ef2b5e7e3504f2e8cbf8df28a1fd251fe53d60dff8b1467d1b386cf0&quot;,&quot;016cf7a0&quot;,&quot;8d63aadf5ab7257cb6d2316a57b16f517bff1c6388f124ec4c04af1212729d2a&quot;,&quot;&quot;],
+            [15007,&quot;0000000038c44c703bae0f98cdd6bf30922326340a5996cc692aaae8bacf47ad&quot;,&quot;0100000002394092aa378fe35d7e9ac79c869b975c4de4374cd75eb5484b0e1e00000000eb9b8670abd44ad6c55cee18e3020fb0c6519e7004b01a16e9164867531b67afc33bc94fffff001d123f10050101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0e04c33bc94f0115062f503253482fffffffff0100f2052a01000000232103f268e9ae07e0f8cb2f6e901d87c510d650b97230c0365b021df8f467363cafb1ac00000000&quot;,[],&quot;18b5c2b0146d2d09d24fb00ff5b52bd0742f36c9e65527abdb9de30c027a4748&quot;,&quot;013c3710&quot;,&quot;07384b01311867949e0c046607c66b7a766d338474bb67f66c8ae9dbd454b20e&quot;,&quot;Tx has non-standard OP_RETURN output followed by opcodes&quot;],
+            [49291,&quot;0000000018b07dca1b28b4b5a119f6d6e71698ce1ed96f143f54179ce177a19c&quot;,&quot;02000000abfaf47274223ca2fea22797e44498240e482cb4c2f2baea088962f800000000604b5b52c32305b15d7542071d8b04e750a547500005d4010727694b6e72a776e55d0d51ffff001d211806480201000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0d038bc0000102062f503253482fffffffff01a078072a01000000232102971dd6034ed0cf52450b608d196c07d6345184fcb14deb277a6b82d526a6163dac0000000001000000081cefd96060ecb1c4fbe675ad8a4f8bdc61d634c52b3a1c4116dee23749fe80ff000000009300493046022100866859c21f306538152e83f115bcfbf59ab4bb34887a88c03483a5dff9895f96022100a6dfd83caa609bf0516debc2bf65c3df91813a4842650a1858b3f61cfa8af249014730440220296d4b818bb037d0f83f9f7111665f49532dfdcbec1e6b784526e9ac4046eaa602204acf3a5cb2695e8404d80bf49ab04828bcbe6fc31d25a2844ced7a8d24afbdff01ffffffff1cefd96060ecb1c4fbe675ad8a4f8bdc61d634c52b3a1c4116dee23749fe80ff020000009400483045022100e87899175991aa008176cb553c6f2badbb5b741f328c9845fcab89f8b18cae2302200acce689896dc82933015e7230e5230d5cff8a1ffe82d334d60162ac2c5b0c9601493046022100994ad29d1e7b03e41731a4316e5f4992f0d9b6e2efc40a1ccd2c949b461175c502210099b69fdc2db00fbba214f16e286f6a49e2d8a0d5ffc6409d87796add475478d601ffffffff1e4a6d2d280ea06680d6cf8788ac90344a9c67cca9b06005bbd6d3f6945c8272010000009500493046022100a27400ba52fd842ce07398a1de102f710a10c5599545e6c95798934352c2e4df022100f6383b0b14c9f64b6718139f55b6b9494374755b86bae7d63f5d3e583b57255a01493046022100fdf543292f34e1eeb1703b264965339ec4a450ec47585009c606b3edbc5b617b022100a5fbb1c8de8aaaa582988cdb23622838e38de90bebcaab3928d949aa502a65d401ffffffff1e4a6d2d280ea06680d6cf8788ac90344a9c67cca9b06005bbd6d3f6945c8272020000009400493046022100ac626ac3051f875145b4fe4cfe089ea895aac73f65ab837b1ac30f5d875874fa022100bc03e79fa4b7eb707fb735b95ff6613ca33adeaf3a0607cdcead4cfd3b51729801483045022100b720b04a5c5e2f61b7df0fcf334ab6fea167b7aaede5695d3f7c6973496adbf1022043328c4cc1cdc3e5db7bb895ccc37133e960b2fd3ece98350f774596badb387201ffffffff23a8733e349c97d6cd90f520fdd084ba15ce0a395aad03cd51370602bb9e5db3010000004a00483045022100e8556b72c5e9c0da7371913a45861a61c5df434dfd962de7b23848e1a28c86ca02205d41ceda00136267281be0974be132ac4cda1459fe2090ce455619d8b91045e901ffffffff6856d609b881e875a5ee141c235e2a82f6b039f2b9babe82333677a5570285a6000000006a473044022040a1c631554b8b210fbdf2a73f191b2851afb51d5171fb53502a3a040a38d2c0022040d11cf6e7b41fe1b66c3d08f6ada1aee07a047cb77f242b8ecc63812c832c9a012102bcfad931b502761e452962a5976c79158a0f6d307ad31b739611dac6a297c256ffffffff6856d609b881e875a5ee141c235e2a82f6b039f2b9babe82333677a5570285a601000000930048304502205b109df098f7e932fbf71a45869c3f80323974a826ee2770789eae178a21bfc8022100c0e75615e53ee4b6e32b9bb5faa36ac539e9c05fa2ae6b6de5d09c08455c8b9601483045022009fb7d27375c47bea23b24818634df6a54ecf72d52e0c1268fb2a2c84f1885de022100e0ed4f15d62e7f537da0d0f1863498f9c7c0c0a4e00e4679588c8d1a9eb20bb801ffffffffa563c3722b7b39481836d5edfc1461f97335d5d1e9a23ade13680d0e2c1c371f030000006c493046022100ecc38ae2b1565643dc3c0dad5e961a5f0ea09cab28d024f92fa05c922924157e022100ebc166edf6fbe4004c72bfe8cf40130263f98ddff728c8e67b113dbd621906a601210211a4ed241174708c07206601b44a4c1c29e5ad8b1f731c50ca7e1d4b2a06dc1fffffffff02d0223a00000000001976a91445db0b779c0b9fa207f12a8218c94fc77aff504588ac80f0fa02000000000000000000&quot;,[&quot;5221033423007d8f263819a2e42becaaf5b06f34cb09919e06304349d950668209eaed21021d69e2b68c3960903b702af7829fadcd80bd89b158150c85c4a75b2c8cb9c39452ae&quot;,&quot;52210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179821021d69e2b68c3960903b702af7829fadcd80bd89b158150c85c4a75b2c8cb9c39452ae&quot;,&quot;522102a7ae1e0971fc1689bd66d2a7296da3a1662fd21a53c9e38979e0f090a375c12d21022adb62335f41eb4e27056ac37d462cda5ad783fa8e0e526ed79c752475db285d52ae&quot;,&quot;52210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179821022adb62335f41eb4e27056ac37d462cda5ad783fa8e0e526ed79c752475db285d52ae&quot;,&quot;512103b9d1d0e2b4355ec3cdef7c11a5c0beff9e8b8d8372ab4b4e0aaf30e80173001951ae&quot;,&quot;76a9149144761ebaccd5b4bbdc2a35453585b5637b2f8588ac&quot;,&quot;522103f1848b40621c5d48471d9784c8174ca060555891ace6d2b03c58eece946b1a9121020ee5d32b54d429c152fdc7b1db84f2074b0564d35400d89d11870f9273ec140c52ae&quot;,&quot;76a914f4fa1cc7de742d135ea82c17adf0bb9cf5f4fb8388ac&quot;],&quot;ed47705334f4643892ca46396eb3f4196a5e30880589e4009ef38eae895d4a13&quot;,&quot;0afbc2920af1b027f31f87b592276eb4c32094bb4d3697021b4c6380&quot;,&quot;b6d98692cec5145f67585f3434ec3c2b3030182e1cb3ec58b855c5c164dfaaa3&quot;,&quot;Tx pays to empty output script&quot;],
+            [180480,&quot;00000000fd3ceb2404ff07a785c7fdcc76619edc8ed61bd25134eaa22084366a&quot;,&quot;020000006058aa080a655aa991a444bd7d1f2defd9a3bbe68aabb69030cf3b4e00000000d2e826bfd7ef0beaa891a7eedbc92cd6a544a6cb61c7bdaa436762eb2123ef9790f5f552ffff001d0002c90f0501000000010000000000000000000000000000000000000000000000000000000000000000ffffffff0e0300c102024608062f503253482fffffffff01c0c6072a01000000232102e769e60137a4df6b0df8ebd387cca44c4c57ae74cc0114a8e8317c8f3bfd85e9ac00000000010000000381a0802911a01ffb025c4dea0bc77963e8c1bb46313b71164c53f72f37fe5248010000000151ffffffffc904b267833d215e2128bd9575242232ac2bc311550c7fc1f0ef6f264b40d14c010000000151ffffffffdf0915666649dba81886519c531649b7b02180b4af67d6885e871299e9d5f775000000000151ffffffff0180817dcb00000000232103bb52138972c48a132fc1f637858c5189607dd0f7fe40c4f20f6ad65f2d389ba4ac0000000001000000018da38b434fba82d66052af74fc5e4e94301b114d9bc03f819dc876398404c8b4010000006c493046022100fe738b7580dc5fb5168e51fc61b5aed211125eb71068031009a22d9bbad752c5022100be5086baa384d40bcab0fa586e4f728397388d86e18b66cc417dc4f7fa4f9878012103f233299455134caa2687bdf15cb0becdfb03bd0ff2ff38e65ec6b7834295c34fffffffff022ebc1400000000001976a9147779b7fba1c1e06b717069b80ca170e8b04458a488ac9879c40f000000001976a9142a0307cd925dbb66b534c4db33003dd18c57015788ac0000000001000000026139a62e3422a602de36c873a225c1d3ca5aeee598539ceecb9f0dc8d1ad0f83010000006b483045022100ad9f32b4a0a2ddc19b5a74eba78123e57616f1b3cfd72ce68c03ea35a3dda1f002200dbd22aa6da17213df5e70dfc3b2611d40f70c98ed9626aa5e2cde9d97461f0a012103ddb295d2f1e8319187738fb4b230fdd9aa29d0e01647f69f6d770b9ab24eea90ffffffff983c82c87cf020040d671956525014d5c2b28c6d948c85e1a522362c0059eeae010000006b4830450221009ca544274c786d30a5d5d25e17759201ea16d3aedddf0b9e9721246f7ef6b32e02202cfa5564b6e87dfd9fd98957820e4d4e6238baeb0f65fe305d91506bb13f5f4f012103c99113deac0d5d044e3ac0346abc02501542af8c8d3759f1382c72ff84e704f7ffffffff02c0c62d00000000001976a914ae19d27efe12f5a886dc79af37ad6805db6f922d88ac70ce2000000000001976a9143b8d051d37a07ea1042067e93efe63dbf73920b988ac000000000100000002be566e8cd9933f0c75c4a82c027f7d0c544d5c101d0607ef6ae5d07b98e7f1dc000000006b483045022036a8cdfd5ea7ebc06c2bfb6e4f942bbf9a1caeded41680d11a3a9f5d8284abad022100cacb92a5be3f39e8bc14db1710910ef7b395fa1e18f45d41c28d914fcdde33be012102bf59abf110b5131fae0a3ce1ec379329b4c896a6ae5d443edb68529cc2bc7816ffffffff96cf67645b76ceb23fe922874847456a15feee1655082ff32d25a6bf2c0dfc90000000006a47304402203471ca2001784a5ac0abab583581f2613523da47ec5f53df833c117b5abd81500220618a2847723d57324f2984678db556dbca1a72230fc7e39df04c2239942ba942012102925c9794fd7bb9f8b29e207d5fc491b1150135a21f505041858889fa4edf436fffffffff026c840f00000000001976a914797fb8777d7991d8284d88bfd421ce520f0f843188ac00ca9a3b000000001976a9146d10f3f592699265d10b106eda37c3ce793f7a8588ac00000000&quot;,[&quot;&quot;,&quot;&quot;,&quot;&quot;,&quot;76a9142903b138c24be9e070b3e73ec495d77a204615e788ac&quot;,&quot;76a91433a1941fd9a37b9821d376f5a51bd4b52fa50e2888ac&quot;,&quot;76a914e4374e8155d0865742ca12b8d4d14d41b57d682f88ac&quot;,&quot;76a914001fa7459a6cfc64bdc178ba7e7a21603bb2568f88ac&quot;,&quot;76a914f6039952bc2b307aeec5371bfb96b66078ec17f688ac&quot;],&quot;d34ef98386f413769502808d4bac5f20f8dfd5bffc9eedafaa71de0eb1f01489&quot;,&quot;0db414c859a07e8205876354a210a75042d0463404913d61a8e068e58a3ae2aa080026&quot;,&quot;c582d51c0ca365e3fcf36c51cb646d7f83a67e867cb4743fd2128e3e022b700c&quot;,&quot;Tx spends from empty output script&quot;],
+            [926485,&quot;000000000000015d6077a411a8f5cc95caf775ccf11c54e27df75ce58d187313&quot;,&quot;0000002060bbab0edbf3ef8a49608ee326f8fd75c473b7e3982095e2d100000000000000c30134f8c9b6d2470488d7a67a888f6fa12f8692e0c3411fbfb92f0f68f67eedae03ca57ef13021acc22dc4105010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff2f0315230e0004ae03ca57043e3d1e1d0c8796bf579aef0c0000000000122f4e696e6a61506f6f6c2f5345475749542fffffffff038427a112000000001976a914876fbb82ec05caa6af7a3b5e5a983aae6c6cc6d688ac0000000000000000266a24aa21a9ed5c748e121c0fe146d973a4ac26fa4a68b0549d46ee22d25f50a5e46fe1b377ee00000000000000002952534b424c4f434b3acd16772ad61a3c5f00287480b720f6035d5e54c9efc71be94bb5e3727f10909001200000000000000000000000000000000000000000000000000000000000000000000000000100000000010145310e878941a1b2bc2d33797ee4d89d95eaaf2e13488063a2aa9a74490f510a0100000023220020b6744de4f6ec63cc92f7c220cdefeeb1b1bed2b66c8e5706d80ec247d37e65a1ffffffff01002d3101000000001976a9143ebc40e411ed3c76f86711507ab952300890397288ac0400473044022001dd489a5d4e2fbd8a3ade27177f6b49296ba7695c40dbbe650ea83f106415fd02200b23a0602d8ff1bdf79dee118205fc7e9b40672bf31563e5741feb53fb86388501483045022100f88f040e90cc5dc6c6189d04718376ac19ed996bf9e4a3c29c3718d90ffd27180220761711f16c9e3a44f71aab55cbc0634907a1fa8bb635d971a9a01d368727bea10169522103b3623117e988b76aaabe3d63f56a4fc88b228a71e64c4cc551d1204822fe85cb2103dd823066e096f72ed617a41d3ca56717db335b1ea47a1b4c5c9dbdd0963acba621033d7c89bd9da29fa8d44db7906a9778b53121f72191184a9fee785c39180e4be153ae00000000010000000120925534261de4dcebb1ed5ab1b62bfe7a3ef968fb111dc2c910adfebc6e3bdf010000006b483045022100f50198f5ae66211a4f485190abe4dc7accdabe3bc214ebc9ea7069b97097d46e0220316a70a03014887086e335fc1b48358d46cd6bdc9af3b57c109c94af76fc915101210316cff587a01a2736d5e12e53551b18d73780b83c3bfb4fcf209c869b11b6415effffffff0220a10700000000001976a91450333046115eaa0ac9e0216565f945070e44573988ac2e7cd01a000000001976a914c01a7ca16b47be50cbdbc60724f701d52d75156688ac00000000010000000203a25f58630d7a1ea52550365fd2156683f56daf6ca73a4b4bbd097e66516322010000006a47304402204efc3d70e4ca3049c2a425025edf22d5ca355f9ec899dbfbbeeb2268533a0f2b02204780d3739653035af4814ea52e1396d021953f948c29754edd0ee537364603dc012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffff03a25f58630d7a1ea52550365fd2156683f56daf6ca73a4b4bbd097e66516322000000006a47304402202d96defdc5b4af71d6ba28c9a6042c2d5ee7bc6de565d4db84ef517445626e03022022da80320e9e489c8f41b74833dfb6a54a4eb5087cdb46eb663eef0b25caa526012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffff0200e1f5050000000017a914b7e6f7ff8658b2d1fb107e3d7be7af4742e6b1b3876f88fc00000000001976a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac0000000001000000043ffd60d3818431c495b89be84afac205d5d1ed663009291c560758bbd0a66df5010000006b483045022100f344607de9df42049688dcae8ff1db34c0c7cd25ec05516e30d2bc8f12ac9b2f022060b648f6a21745ea6d9782e17bcc4277b5808326488a1f40d41e125879723d3a012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffffa5379401cce30f84731ef1ba65ce27edf2cc7ce57704507ebe8714aa16a96b92010000006a473044022020c37a63bf4d7f564c2192528709b6a38ab8271bd96898c6c2e335e5208661580220435c6f1ad4d9305d2c0a818b2feb5e45d443f2f162c0f61953a14d097fd07064012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffff70e731e193235ff12c3184510895731a099112ffca4b00246c60003c40f843ce000000006a473044022053760f74c29a879e30a17b5f03a5bb057a5751a39f86fa6ecdedc36a1b7db04c022041d41c9b95f00d2d10a0373322a9025dba66c942196bc9d8adeb0e12d3024728012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffff66b7a71b3e50379c8e85fc18fe3f1a408fc985f257036c34702ba205cef09f6f000000006a4730440220499bf9e2db3db6e930228d0661395f65431acae466634d098612fd80b08459ee022040e069fc9e3c60009f521cef54c38aadbd1251aee37940e6018aadb10f194d6a012103f7a897e4dbecab2264b21917f90664ea8256189ea725d28740cf7ba5d85b5763ffffffff0200e1f5050000000017a9148fc37ad460fdfbd2b44fe446f6e3071a4f64faa6878f447f0b000000001976a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac00000000&quot;,[&quot;a914feb8a29635c56d9cd913122f90678756bf23887687&quot;,&quot;76a914c01a7ca16b47be50cbdbc60724f701d52d75156688ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;,&quot;76a914913bcc2be49cb534c20474c4dee1e9c4c317e7eb88ac&quot;],&quot;8f13b9a9c85611635b47906c3053ac53cfcec7211455d4cb0d63dc9acc13d472&quot;,&quot;09027acea61b6cc3fb33f5d52f7d088a6b2f75d234e89ca800&quot;,&quot;546c574a0472144bcaf9b6aeabf26372ad87c7af7d1ee0dbfae5e099abeae49c&quot;,&quot;Duplicate pushdata 913bcc2be49cb534c20474c4dee1e9c4c317e7eb&quot;],
+            [987876,&quot;0000000000000c00901f2049055e2a437c819d79a3d54fd63e6af796cd7b8a79&quot;,&quot;000000202694f74969fdb542090e95a56bc8aa2d646e27033850e32f1c5f000000000000f7e53676b3f12d5beb524ed617f2d25f5a93b5f4f52c1ba2678260d72712f8dd0a6dfe5740257e1a4b1768960101000000010000000000000000000000000000000000000000000000000000000000000000ffffffff1603e4120ff9c30a1c216900002f424d4920546573742fffffff0001205fa012000000001e76a914c486de584a735ec2f22da7cd9681614681f92173d83d0aa68688ac00000000&quot;,[],&quot;fe4d230dbb0f4fec9bed23a5283e08baf996e3f32b93f52c7de1f641ddfd04ad&quot;,&quot;010c0b40&quot;,&quot;0965a544743bbfa36f254446e75630c09404b3d164a261892372977538928ed5&quot;,&quot;Coinbase tx has unparseable output script&quot;],
+            [1263442,&quot;000000006f27ddfe1dd680044a34548f41bed47eba9e6f0b310da21423bc5f33&quot;,&quot;000000201c8d1a529c39a396db2db234d5ec152fa651a2872966daccbde028b400000000083f14492679151dbfaa1a825ef4c18518e780c1f91044180280a7d33f4a98ff5f45765aaddc001d38333b9a02010000000001010000000000000000000000000000000000000000000000000000000000000000ffffffff230352471300fe5f45765afe94690a000963676d696e6572343208000000000000000000ffffffff024423a804000000001976a914f2c25ac3d59f3d674b1d1d0a25c27339aaac0ba688ac0000000000000000266a24aa21a9edcb26cb3052426b9ebb4d19c819ef87c19677bbf3a7c46ef0855bd1b2abe83491012000000000000000000000000000000000000000000000000000000000000000000000000002000000000101d20978463906ba4ff5e7192494b88dd5eb0de85d900ab253af909106faa22cc5010000000004000000014777ff000000000016001446c29eabe8208a33aa1023c741fa79aa92e881ff0347304402207d7ca96134f2bcfdd6b536536fdd39ad17793632016936f777ebb32c22943fda02206014d2fb8a6aa58279797f861042ba604ebd2f8f61e5bddbd9d3be5a245047b201004b632103eeaeba7ce5dc2470221e9517fb498e8d6bd4e73b85b8be655196972eb9ccd5566754b2752103a40b74d43df244799d041f32ce1ad515a6cd99501701540e38750d883ae21d3a68ac00000000&quot;,[&quot;002027a5000c7917f785d8fc6e5a55adfca8717ecb973ebb7743849ff956d896a7ed&quot;],&quot;31d66d516a9eda7de865df29f6ef6cb8e4bf9309e5dac899968a9a62a5df61e3&quot;,&quot;0385acb4f0fe889ef0&quot;,&quot;4e6d564c2a2452065c205dd7eb2791124e0c4e0dbb064c410c24968572589dec&quot;,&quot;Includes witness data&quot;],
+            [1414221,&quot;0000000000000027b2b3b3381f114f674f481544ff2be37ae3788d7e078383b1&quot;,&quot;000000204ea88307a7959d8207968f152bedca5a93aefab253f1fb2cfb032a400000000070cebb14ec6dbc27a9dfd066d9849a4d3bac5f674665f73a5fe1de01a022a0c851fda85bf05f4c19a779d1450102000000010000000000000000000000000000000000000000000000000000000000000000ffffffff18034d94154d696e6572476174653030310d000000f238f401ffffffff01c817a804000000000000000000&quot;,[],&quot;5e5e12d90693c8e936f01847859404c67482439681928353ca1296982042864e&quot;,&quot;00&quot;,&quot;021e8882ef5a0ed932edeebbecfeda1d7ce528ec7b3daa27641acf1189d7b5dc&quot;,&quot;Empty data&quot;]
+        ]
+        &quot;#</span>;
+
+        <span class="kw">let</span> <span class="ident">testdata</span> <span class="op">=</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>(<span class="ident">data</span>).<span class="ident">unwrap</span>().<span class="ident">as_array</span>().<span class="ident">unwrap</span>().<span class="ident">clone</span>();
+        <span class="kw">for</span> <span class="ident">t</span> <span class="kw">in</span> <span class="ident">testdata</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
+            <span class="kw">let</span> <span class="ident">block_hash</span> <span class="op">=</span> <span class="ident">BlockHash::from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">get</span>(<span class="number">1</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">block</span>: <span class="ident">Block</span> <span class="op">=</span> <span class="ident">deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">Vec::from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">get</span>(<span class="number">2</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">block</span>.<span class="ident">block_hash</span>(), <span class="ident">block_hash</span>);
+            <span class="kw">let</span> <span class="ident">scripts</span> <span class="op">=</span> <span class="ident">t</span>.<span class="ident">get</span>(<span class="number">3</span>).<span class="ident">unwrap</span>().<span class="ident">as_array</span>().<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">previous_filter_header</span> <span class="op">=</span> <span class="ident">FilterHeader::from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">get</span>(<span class="number">4</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">filter_content</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">get</span>(<span class="number">5</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">filter_header</span> <span class="op">=</span> <span class="ident">FilterHeader::from_hex</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">get</span>(<span class="number">6</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>();
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">txmap</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">si</span> <span class="op">=</span> <span class="ident">scripts</span>.<span class="ident">iter</span>();
+            <span class="kw">for</span> <span class="ident">tx</span> <span class="kw">in</span> <span class="ident">block</span>.<span class="ident">txdata</span>.<span class="ident">iter</span>().<span class="ident">skip</span>(<span class="number">1</span>) {
+                <span class="kw">for</span> <span class="ident">input</span> <span class="kw">in</span> <span class="ident">tx</span>.<span class="ident">input</span>.<span class="ident">iter</span>() {
+                    <span class="ident">txmap</span>.<span class="ident">insert</span>(<span class="ident">input</span>.<span class="ident">previous_output</span>.<span class="ident">clone</span>(), <span class="ident">Script::from</span>(<span class="ident">Vec::from_hex</span>(<span class="ident">si</span>.<span class="ident">next</span>().<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">unwrap</span>()).<span class="ident">unwrap</span>()));
+                }
+            }
+
+            <span class="kw">let</span> <span class="ident">filter</span> <span class="op">=</span> <span class="ident">BlockFilter::new_script_filter</span>(<span class="kw-2">&amp;</span><span class="ident">block</span>,
+                                        <span class="op">|</span><span class="ident">o</span><span class="op">|</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span> <span class="ident">txmap</span>.<span class="ident">get</span>(<span class="ident">o</span>) {
+                                            <span class="prelude-val">Ok</span>(<span class="ident">s</span>.<span class="ident">clone</span>())
+                                        } <span class="kw">else</span> {
+                                            <span class="prelude-val">Err</span>(<span class="ident">Error::UtxoMissing</span>(<span class="ident">o</span>.<span class="ident">clone</span>()))
+                                        }).<span class="ident">unwrap</span>();
+
+            <span class="kw">let</span> <span class="ident">test_filter</span> <span class="op">=</span> <span class="ident">BlockFilter::new</span>(<span class="ident">filter_content</span>.<span class="ident">as_slice</span>());
+
+            <span class="macro">assert_eq!</span>(<span class="ident">test_filter</span>.<span class="ident">content</span>, <span class="ident">filter</span>.<span class="ident">content</span>);
+
+            <span class="kw">let</span> <span class="ident">block_hash</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">block</span>.<span class="ident">block_hash</span>();
+            <span class="macro">assert!</span>(<span class="ident">filter</span>.<span class="ident">match_all</span>(<span class="ident">block_hash</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">txmap</span>.<span class="ident">iter</span>()
+                .<span class="ident">filter_map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">s</span>)<span class="op">|</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">s</span>.<span class="ident">is_empty</span>() { <span class="prelude-val">Some</span>(<span class="ident">s</span>.<span class="ident">as_bytes</span>()) } <span class="kw">else</span> { <span class="prelude-val">None</span> })).<span class="ident">unwrap</span>());
+
+            <span class="kw">for</span> (<span class="kw">_</span>, <span class="ident">script</span>) <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">txmap</span> {
+                <span class="kw">let</span> <span class="ident">query</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="ident">script</span>];
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">script</span>.<span class="ident">is_empty</span> () {
+                    <span class="macro">assert!</span>(<span class="ident">filter</span>.<span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="ident">block_hash</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">iter</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">as_bytes</span>())).<span class="ident">unwrap</span>());
+                }
+            }
+
+            <span class="macro">assert_eq!</span>(<span class="ident">filter_header</span>, <span class="ident">filter</span>.<span class="ident">filter_header</span>(<span class="kw-2">&amp;</span><span class="ident">previous_filter_header</span>));
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_filter</span> () {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">patterns</span> <span class="op">=</span> <span class="ident">HashSet::new</span>();
+
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;000000&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;111111&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;222222&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;333333&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;444444&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;555555&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;666666&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;777777&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;888888&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;999999&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;aaaaaa&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;bbbbbb&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;cccccc&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;dddddd&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;eeeeee&quot;</span>).<span class="ident">unwrap</span>());
+        <span class="ident">patterns</span>.<span class="ident">insert</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;ffffff&quot;</span>).<span class="ident">unwrap</span>());
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">GCSFilterWriter::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+            <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">patterns</span> {
+                <span class="ident">writer</span>.<span class="ident">add_element</span>(<span class="ident">p</span>.<span class="ident">as_slice</span>());
+            }
+            <span class="ident">writer</span>.<span class="ident">finish</span>().<span class="ident">unwrap</span>();
+        }
+
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">out</span>;
+
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;abcdef&quot;</span>).<span class="ident">unwrap</span>());
+            <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;eeeeee&quot;</span>).<span class="ident">unwrap</span>());
+
+            <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">GCSFilterReader::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>.<span class="ident">clone</span>());
+            <span class="macro">assert!</span>(<span class="ident">reader</span>.<span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>())).<span class="ident">unwrap</span>());
+        }
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;abcdef&quot;</span>).<span class="ident">unwrap</span>());
+            <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;123456&quot;</span>).<span class="ident">unwrap</span>());
+
+            <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">GCSFilterReader::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>.<span class="ident">clone</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">reader</span>.<span class="ident">match_any</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>())).<span class="ident">unwrap</span>());
+        }
+        {
+            <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">GCSFilterReader::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">patterns</span> {
+                <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
+            }
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>.<span class="ident">clone</span>());
+            <span class="macro">assert!</span>(<span class="ident">reader</span>.<span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>())).<span class="ident">unwrap</span>());
+        }
+        {
+            <span class="kw">let</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">GCSFilterReader::new</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="ident">M</span>, <span class="ident">P</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">query</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">for</span> <span class="ident">p</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">patterns</span> {
+                <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">p</span>.<span class="ident">clone</span>());
+            }
+            <span class="ident">query</span>.<span class="ident">push</span>(<span class="ident">Vec::from_hex</span>(<span class="string">&quot;abcdef&quot;</span>).<span class="ident">unwrap</span>());
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>.<span class="ident">clone</span>());
+            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">reader</span>.<span class="ident">match_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">query</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_slice</span>())).<span class="ident">unwrap</span>());
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_bit_stream</span>() {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">writer</span> <span class="op">=</span> <span class="ident">BitStreamWriter::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>);
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">0</span>, <span class="number">1</span>).<span class="ident">unwrap</span>(); <span class="comment">// 0</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">2</span>, <span class="number">2</span>).<span class="ident">unwrap</span>(); <span class="comment">// 10</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">6</span>, <span class="number">3</span>).<span class="ident">unwrap</span>(); <span class="comment">// 110</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">11</span>, <span class="number">4</span>).<span class="ident">unwrap</span>(); <span class="comment">// 1011</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">1</span>, <span class="number">5</span>).<span class="ident">unwrap</span>(); <span class="comment">// 00001</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">32</span>, <span class="number">6</span>).<span class="ident">unwrap</span>(); <span class="comment">// 100000</span>
+            <span class="ident">writer</span>.<span class="ident">write</span>(<span class="number">7</span>, <span class="number">7</span>).<span class="ident">unwrap</span>(); <span class="comment">// 0000111</span>
+            <span class="ident">writer</span>.<span class="ident">flush</span>().<span class="ident">unwrap</span>();
+        }
+        <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">out</span>;
+        <span class="macro">assert_eq!</span>(<span class="string">&quot;01011010110000110000000001110000&quot;</span>, <span class="macro">format!</span>(<span class="string">&quot;{:08b}{:08b}{:08b}{:08b}&quot;</span>, <span class="ident">bytes</span>[<span class="number">0</span>], <span class="ident">bytes</span>[<span class="number">1</span>], <span class="ident">bytes</span>[<span class="number">2</span>], <span class="ident">bytes</span>[<span class="number">3</span>]));
+        {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">bytes</span>);
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">reader</span> <span class="op">=</span> <span class="ident">BitStreamReader::new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">input</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">1</span>).<span class="ident">unwrap</span>(), <span class="number">0</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">2</span>).<span class="ident">unwrap</span>(), <span class="number">2</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">3</span>).<span class="ident">unwrap</span>(), <span class="number">6</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">4</span>).<span class="ident">unwrap</span>(), <span class="number">11</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">5</span>).<span class="ident">unwrap</span>(), <span class="number">1</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">6</span>).<span class="ident">unwrap</span>(), <span class="number">32</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">7</span>).<span class="ident">unwrap</span>(), <span class="number">7</span>);
+            <span class="comment">// 4 bits remained</span>
+            <span class="macro">assert!</span>(<span class="ident">reader</span>.<span class="ident">read</span>(<span class="number">5</span>).<span class="ident">is_err</span>());
+        }
+    }
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

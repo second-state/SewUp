@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["AddressType","The different types of addresses."],["Error","Address error."],["Payload","The method used to produce an address"]],"struct":[["Address","A Bitcoin address"]]});

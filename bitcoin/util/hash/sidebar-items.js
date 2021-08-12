@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["bitcoin_merkle_root","Calculates the merkle root of an iterator of hashes."],["bitcoin_merkle_root_inline","Calculates the merkle root of a list of hashes inline into the allocated slice."]]});

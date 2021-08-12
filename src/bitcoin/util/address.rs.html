@@ -1,0 +1,1701 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/bitcoin-0.27.0/src/util/address.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>address.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" height="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button">?</button>
+                <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" height="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+<span id="293">293</span>
+<span id="294">294</span>
+<span id="295">295</span>
+<span id="296">296</span>
+<span id="297">297</span>
+<span id="298">298</span>
+<span id="299">299</span>
+<span id="300">300</span>
+<span id="301">301</span>
+<span id="302">302</span>
+<span id="303">303</span>
+<span id="304">304</span>
+<span id="305">305</span>
+<span id="306">306</span>
+<span id="307">307</span>
+<span id="308">308</span>
+<span id="309">309</span>
+<span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
+<span id="316">316</span>
+<span id="317">317</span>
+<span id="318">318</span>
+<span id="319">319</span>
+<span id="320">320</span>
+<span id="321">321</span>
+<span id="322">322</span>
+<span id="323">323</span>
+<span id="324">324</span>
+<span id="325">325</span>
+<span id="326">326</span>
+<span id="327">327</span>
+<span id="328">328</span>
+<span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
+<span id="670">670</span>
+<span id="671">671</span>
+<span id="672">672</span>
+<span id="673">673</span>
+<span id="674">674</span>
+<span id="675">675</span>
+<span id="676">676</span>
+<span id="677">677</span>
+<span id="678">678</span>
+<span id="679">679</span>
+<span id="680">680</span>
+<span id="681">681</span>
+<span id="682">682</span>
+<span id="683">683</span>
+<span id="684">684</span>
+<span id="685">685</span>
+<span id="686">686</span>
+<span id="687">687</span>
+<span id="688">688</span>
+<span id="689">689</span>
+<span id="690">690</span>
+<span id="691">691</span>
+<span id="692">692</span>
+<span id="693">693</span>
+<span id="694">694</span>
+<span id="695">695</span>
+<span id="696">696</span>
+<span id="697">697</span>
+<span id="698">698</span>
+<span id="699">699</span>
+<span id="700">700</span>
+<span id="701">701</span>
+<span id="702">702</span>
+<span id="703">703</span>
+<span id="704">704</span>
+<span id="705">705</span>
+<span id="706">706</span>
+<span id="707">707</span>
+<span id="708">708</span>
+<span id="709">709</span>
+<span id="710">710</span>
+<span id="711">711</span>
+<span id="712">712</span>
+<span id="713">713</span>
+<span id="714">714</span>
+<span id="715">715</span>
+<span id="716">716</span>
+<span id="717">717</span>
+<span id="718">718</span>
+<span id="719">719</span>
+<span id="720">720</span>
+<span id="721">721</span>
+<span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
+<span id="726">726</span>
+<span id="727">727</span>
+<span id="728">728</span>
+<span id="729">729</span>
+<span id="730">730</span>
+<span id="731">731</span>
+<span id="732">732</span>
+<span id="733">733</span>
+<span id="734">734</span>
+<span id="735">735</span>
+<span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
+<span id="745">745</span>
+<span id="746">746</span>
+<span id="747">747</span>
+<span id="748">748</span>
+<span id="749">749</span>
+<span id="750">750</span>
+<span id="751">751</span>
+<span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
+<span id="760">760</span>
+<span id="761">761</span>
+<span id="762">762</span>
+<span id="763">763</span>
+<span id="764">764</span>
+<span id="765">765</span>
+<span id="766">766</span>
+<span id="767">767</span>
+<span id="768">768</span>
+<span id="769">769</span>
+<span id="770">770</span>
+<span id="771">771</span>
+<span id="772">772</span>
+<span id="773">773</span>
+<span id="774">774</span>
+<span id="775">775</span>
+<span id="776">776</span>
+<span id="777">777</span>
+<span id="778">778</span>
+<span id="779">779</span>
+<span id="780">780</span>
+<span id="781">781</span>
+<span id="782">782</span>
+<span id="783">783</span>
+<span id="784">784</span>
+<span id="785">785</span>
+<span id="786">786</span>
+<span id="787">787</span>
+<span id="788">788</span>
+<span id="789">789</span>
+<span id="790">790</span>
+<span id="791">791</span>
+<span id="792">792</span>
+<span id="793">793</span>
+<span id="794">794</span>
+<span id="795">795</span>
+<span id="796">796</span>
+<span id="797">797</span>
+<span id="798">798</span>
+<span id="799">799</span>
+<span id="800">800</span>
+<span id="801">801</span>
+<span id="802">802</span>
+<span id="803">803</span>
+<span id="804">804</span>
+<span id="805">805</span>
+<span id="806">806</span>
+<span id="807">807</span>
+<span id="808">808</span>
+<span id="809">809</span>
+<span id="810">810</span>
+<span id="811">811</span>
+<span id="812">812</span>
+<span id="813">813</span>
+<span id="814">814</span>
+<span id="815">815</span>
+<span id="816">816</span>
+<span id="817">817</span>
+<span id="818">818</span>
+<span id="819">819</span>
+<span id="820">820</span>
+<span id="821">821</span>
+<span id="822">822</span>
+<span id="823">823</span>
+<span id="824">824</span>
+<span id="825">825</span>
+<span id="826">826</span>
+<span id="827">827</span>
+<span id="828">828</span>
+<span id="829">829</span>
+<span id="830">830</span>
+<span id="831">831</span>
+<span id="832">832</span>
+<span id="833">833</span>
+<span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+</pre><pre class="rust">
+<span class="comment">// Rust Bitcoin Library</span>
+<span class="comment">// Written in 2014 by</span>
+<span class="comment">//     Andrew Poelstra &lt;apoelstra@wpsoftware.net&gt;</span>
+<span class="comment">// To the extent possible under law, the author(s) have dedicated all</span>
+<span class="comment">// copyright and related and neighboring rights to this software to</span>
+<span class="comment">// the public domain worldwide. This software is distributed without</span>
+<span class="comment">// any warranty.</span>
+<span class="comment">//</span>
+<span class="comment">// You should have received a copy of the CC0 Public Domain Dedication</span>
+<span class="comment">// along with this software.</span>
+<span class="comment">// If not, see &lt;http://creativecommons.org/publicdomain/zero/1.0/&gt;.</span>
+<span class="comment">//</span>
+
+<span class="doccomment">//! Addresses</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Support for ordinary base58 Bitcoin addresses and private keys</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Example: creating a new address from a randomly-generated key pair</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! use bitcoin::network::constants::Network;</span>
+<span class="doccomment">//! use bitcoin::util::address::Address;</span>
+<span class="doccomment">//! use bitcoin::util::ecdsa;</span>
+<span class="doccomment">//! use bitcoin::secp256k1::Secp256k1;</span>
+<span class="doccomment">//! use bitcoin::secp256k1::rand::thread_rng;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Generate random key pair</span>
+<span class="doccomment">//! let s = Secp256k1::new();</span>
+<span class="doccomment">//! let public_key = ecdsa::PublicKey::new(s.generate_keypair(&amp;mut thread_rng()).1);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // Generate pay-to-pubkey-hash address</span>
+<span class="doccomment">//! let address = Address::p2pkh(&amp;public_key, Network::Bitcoin);</span>
+<span class="doccomment">//! ```</span>
+
+<span class="kw">use</span> <span class="ident">prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">core::fmt</span>;
+<span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span> <span class="kw">use</span> <span class="ident">std::error</span>;
+
+<span class="kw">use</span> <span class="ident">bech32</span>;
+<span class="kw">use</span> <span class="ident">hashes::Hash</span>;
+<span class="kw">use</span> <span class="ident">hash_types</span>::{<span class="ident">PubkeyHash</span>, <span class="ident">WPubkeyHash</span>, <span class="ident">ScriptHash</span>, <span class="ident">WScriptHash</span>};
+<span class="kw">use</span> <span class="ident">blockdata::script</span>;
+<span class="kw">use</span> <span class="ident">network::constants::Network</span>;
+<span class="kw">use</span> <span class="ident">util::base58</span>;
+<span class="kw">use</span> <span class="ident">util::ecdsa</span>;
+
+<span class="doccomment">/// Address error.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
+    <span class="doccomment">/// Base58 encoding error</span>
+    <span class="ident">Base58</span>(<span class="ident">base58::Error</span>),
+    <span class="doccomment">/// Bech32 encoding error</span>
+    <span class="ident">Bech32</span>(<span class="ident">bech32::Error</span>),
+    <span class="doccomment">/// The bech32 payload was empty</span>
+    <span class="ident">EmptyBech32Payload</span>,
+    <span class="doccomment">/// Script version must be 0 to 16 inclusive</span>
+    <span class="ident">InvalidWitnessVersion</span>(<span class="ident">u8</span>),
+    <span class="doccomment">/// The witness program must be between 2 and 40 bytes in length.</span>
+    <span class="ident">InvalidWitnessProgramLength</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// A v0 witness program must be either of length 20 or 32.</span>
+    <span class="ident">InvalidSegwitV0ProgramLength</span>(<span class="ident">usize</span>),
+    <span class="doccomment">/// An uncompressed pubkey was used where it is not allowed.</span>
+    <span class="ident">UncompressedPubkey</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Error::Base58</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;base58: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">Error::Bech32</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;bech32: {}&quot;</span>, <span class="ident">e</span>),
+            <span class="ident">Error::EmptyBech32Payload</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;the bech32 payload was empty&quot;</span>),
+            <span class="ident">Error::InvalidWitnessVersion</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid witness script version: {}&quot;</span>, <span class="ident">v</span>),
+            <span class="ident">Error::InvalidWitnessProgramLength</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>,
+                <span class="string">&quot;the witness program must be between 2 and 40 bytes in length: length={}&quot;</span>, <span class="ident">l</span>,
+            ),
+            <span class="ident">Error::InvalidSegwitV0ProgramLength</span>(<span class="ident">l</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>,
+                <span class="string">&quot;a v0 witness program must be either of length 20 or 32 bytes: length={}&quot;</span>, <span class="ident">l</span>,
+            ),
+            <span class="ident">Error::UncompressedPubkey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>,
+                <span class="string">&quot;an uncompressed pubkey was used where it is not allowed&quot;</span>,
+            ),
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
+<span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dyn</span>  <span class="ident">error::Error</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Error::Base58</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident">Error::Bech32</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">base58::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">base58::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error::Base58</span>(<span class="ident">e</span>)
+    }
+}
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">bech32::Error</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">bech32::Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error::Bech32</span>(<span class="ident">e</span>)
+    }
+}
+
+<span class="doccomment">/// The different types of addresses.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AddressType</span> {
+    <span class="doccomment">/// pay-to-pubkey-hash</span>
+    <span class="ident">P2pkh</span>,
+    <span class="doccomment">/// pay-to-script-hash</span>
+    <span class="ident">P2sh</span>,
+    <span class="doccomment">/// pay-to-witness-pubkey-hash</span>
+    <span class="ident">P2wpkh</span>,
+    <span class="doccomment">/// pay-to-witness-script-hash</span>
+    <span class="ident">P2wsh</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">AddressType</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">AddressType::P2pkh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;p2pkh&quot;</span>,
+            <span class="ident">AddressType::P2sh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;p2sh&quot;</span>,
+            <span class="ident">AddressType::P2wpkh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;p2wpkh&quot;</span>,
+            <span class="ident">AddressType::P2wsh</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;p2wsh&quot;</span>,
+        })
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">AddressType</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> ();
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="self">Self</span><span class="ident">::Err</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="ident">s</span> {
+            <span class="string">&quot;p2pkh&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AddressType::P2pkh</span>),
+            <span class="string">&quot;p2sh&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AddressType::P2sh</span>),
+            <span class="string">&quot;p2wpkh&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AddressType::P2wpkh</span>),
+            <span class="string">&quot;p2wsh&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="ident">AddressType::P2wsh</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
+        }
+    }
+}
+
+<span class="doccomment">/// The method used to produce an address</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Payload</span> {
+    <span class="doccomment">/// P2PKH address</span>
+    <span class="ident">PubkeyHash</span>(<span class="ident">PubkeyHash</span>),
+    <span class="doccomment">/// P2SH address</span>
+    <span class="ident">ScriptHash</span>(<span class="ident">ScriptHash</span>),
+    <span class="doccomment">/// Segwit addresses</span>
+    <span class="ident">WitnessProgram</span> {
+        <span class="doccomment">/// The witness program version</span>
+        <span class="ident">version</span>: <span class="ident">bech32::u5</span>,
+        <span class="doccomment">/// The witness program</span>
+        <span class="ident">program</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+    },
+}
+
+<span class="kw">impl</span> <span class="ident">Payload</span> {
+    <span class="doccomment">/// Get a [Payload] from an output script (scriptPubkey).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_script</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Payload</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">script</span>.<span class="ident">is_p2pkh</span>() {
+            <span class="ident">Payload::PubkeyHash</span>(<span class="ident">PubkeyHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>.<span class="ident">as_bytes</span>()[<span class="number">3</span>..<span class="number">23</span>]).<span class="ident">unwrap</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">script</span>.<span class="ident">is_p2sh</span>() {
+            <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>.<span class="ident">as_bytes</span>()[<span class="number">2</span>..<span class="number">22</span>]).<span class="ident">unwrap</span>())
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">script</span>.<span class="ident">is_witness_program</span>() {
+            <span class="comment">// We can unwrap the u5 check and assume script length</span>
+            <span class="comment">// because [Script::is_witness_program] makes sure of this.</span>
+            <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: {
+                    <span class="comment">// Since we passed the [is_witness_program] check,</span>
+                    <span class="comment">// the first byte is either 0x00 or 0x50 + version.</span>
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">verop</span> <span class="op">=</span> <span class="ident">script</span>.<span class="ident">as_bytes</span>()[<span class="number">0</span>];
+                    <span class="kw">if</span> <span class="ident">verop</span> <span class="op">&gt;</span> <span class="number">0x50</span> {
+                        <span class="ident">verop</span> <span class="op">-</span><span class="op">=</span> <span class="number">0x50</span>;
+                    }
+                    <span class="ident">bech32::u5::try_from_u8</span>(<span class="ident">verop</span>).<span class="ident">expect</span>(<span class="string">&quot;checked before&quot;</span>)
+                },
+                <span class="ident">program</span>: <span class="ident">script</span>.<span class="ident">as_bytes</span>()[<span class="number">2</span>..].<span class="ident">to_vec</span>(),
+            }
+        } <span class="kw">else</span> {
+            <span class="kw">return</span> <span class="prelude-val">None</span>;
+        })
+    }
+
+    <span class="doccomment">/// Generates a script pubkey spending to this [Payload].</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_pubkey</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">script::Script</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">Payload::PubkeyHash</span>(<span class="kw-2">ref</span> <span class="ident">hash</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">script::Script::new_p2pkh</span>(<span class="ident">hash</span>),
+            <span class="ident">Payload::ScriptHash</span>(<span class="kw-2">ref</span> <span class="ident">hash</span>) <span class="op">=</span><span class="op">&gt;</span>
+                <span class="ident">script::Script::new_p2sh</span>(<span class="ident">hash</span>),
+            <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">ver</span>,
+                <span class="ident">program</span>: <span class="kw-2">ref</span> <span class="ident">prog</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> <span class="ident">script::Script::new_witness_program</span>(<span class="ident">ver</span>, <span class="ident">prog</span>)
+        }
+    }
+}
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Hash</span>)]</span>
+<span class="doccomment">/// A Bitcoin address</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Address</span> {
+    <span class="doccomment">/// The type of the address</span>
+    <span class="kw">pub</span> <span class="ident">payload</span>: <span class="ident">Payload</span>,
+    <span class="doccomment">/// The network on which this address is usable</span>
+    <span class="kw">pub</span> <span class="ident">network</span>: <span class="ident">Network</span>,
+}
+<span class="macro">serde_string_impl!</span>(<span class="ident">Address</span>, <span class="string">&quot;a Bitcoin address&quot;</span>);
+
+<span class="kw">impl</span> <span class="ident">Address</span> {
+    <span class="doccomment">/// Creates a pay to (compressed) public key hash address from a public key</span>
+    <span class="doccomment">/// This is the preferred non-witness type address</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2pkh</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">ecdsa::PublicKey</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_engine</span> <span class="op">=</span> <span class="ident">PubkeyHash::engine</span>();
+        <span class="ident">pk</span>.<span class="ident">write_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">hash_engine</span>).<span class="ident">expect</span>(<span class="string">&quot;engines don&#39;t error&quot;</span>);
+
+        <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::PubkeyHash</span>(<span class="ident">PubkeyHash::from_engine</span>(<span class="ident">hash_engine</span>)),
+        }
+    }
+
+    <span class="doccomment">/// Creates a pay to script hash P2SH address from a script</span>
+    <span class="doccomment">/// This address type was introduced with BIP16 and is the popular type to implement multi-sig these days.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2sh</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span> {
+        <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::hash</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>[..])),
+        }
+    }
+
+    <span class="doccomment">/// Create a witness pay to public key address from a public key</span>
+    <span class="doccomment">/// This is the native segwit address type for an output redeemable with a single signature</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will only return an Error when an uncompressed public key is provided.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2wpkh</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">ecdsa::PublicKey</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Address</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">pk</span>.<span class="ident">compressed</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedPubkey</span>);
+        }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_engine</span> <span class="op">=</span> <span class="ident">WPubkeyHash::engine</span>();
+        <span class="ident">pk</span>.<span class="ident">write_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">hash_engine</span>).<span class="ident">expect</span>(<span class="string">&quot;engines don&#39;t error&quot;</span>);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">bech32::u5::try_from_u8</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;0&lt;32&quot;</span>),
+                <span class="ident">program</span>: <span class="ident">WPubkeyHash::from_engine</span>(<span class="ident">hash_engine</span>)[..].<span class="ident">to_vec</span>(),
+            },
+        })
+    }
+
+    <span class="doccomment">/// Create a pay to script address that embeds a witness pay to public key</span>
+    <span class="doccomment">/// This is a segwit address type that looks familiar (as p2sh) to legacy clients</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will only return an Error when an uncompressed public key is provided.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2shwpkh</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">ecdsa::PublicKey</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Address</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">pk</span>.<span class="ident">compressed</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedPubkey</span>);
+        }
+
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hash_engine</span> <span class="op">=</span> <span class="ident">WPubkeyHash::engine</span>();
+        <span class="ident">pk</span>.<span class="ident">write_into</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">hash_engine</span>).<span class="ident">expect</span>(<span class="string">&quot;engines don&#39;t error&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">script::Builder::new</span>()
+            .<span class="ident">push_int</span>(<span class="number">0</span>)
+            .<span class="ident">push_slice</span>(<span class="kw-2">&amp;</span><span class="ident">WPubkeyHash::from_engine</span>(<span class="ident">hash_engine</span>)[..]);
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::hash</span>(<span class="ident">builder</span>.<span class="ident">into_script</span>().<span class="ident">as_bytes</span>())),
+        })
+    }
+
+    <span class="doccomment">/// Create a witness pay to script hash address</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2wsh</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span> {
+        <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">bech32::u5::try_from_u8</span>(<span class="number">0</span>).<span class="ident">expect</span>(<span class="string">&quot;0&lt;32&quot;</span>),
+                <span class="ident">program</span>: <span class="ident">WScriptHash::hash</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>[..])[..].<span class="ident">to_vec</span>(),
+            },
+        }
+    }
+
+    <span class="doccomment">/// Create a pay to script address that embeds a witness pay to script hash address</span>
+    <span class="doccomment">/// This is a segwit address type that looks familiar (as p2sh) to legacy clients</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">p2shwsh</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span> {
+        <span class="kw">let</span> <span class="ident">ws</span> <span class="op">=</span> <span class="ident">script::Builder::new</span>()
+            .<span class="ident">push_int</span>(<span class="number">0</span>)
+            .<span class="ident">push_slice</span>(<span class="kw-2">&amp;</span><span class="ident">WScriptHash::hash</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>[..])[..])
+            .<span class="ident">into_script</span>();
+
+        <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::hash</span>(<span class="kw-2">&amp;</span><span class="ident">ws</span>[..])),
+        }
+    }
+
+    <span class="doccomment">/// Get the address type of the address.</span>
+    <span class="doccomment">/// None if unknown or non-standard.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">address_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">AddressType</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">payload</span> {
+            <span class="ident">Payload::PubkeyHash</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2pkh</span>),
+            <span class="ident">Payload::ScriptHash</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2sh</span>),
+            <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">ver</span>,
+                <span class="ident">program</span>: <span class="kw-2">ref</span> <span class="ident">prog</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="comment">// BIP-141 p2wpkh or p2wsh addresses.</span>
+                <span class="kw">match</span> <span class="ident">ver</span>.<span class="ident">to_u8</span>() {
+                    <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">prog</span>.<span class="ident">len</span>() {
+                        <span class="number">20</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2wpkh</span>),
+                        <span class="number">32</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2wsh</span>),
+                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                    },
+                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                }
+            }
+        }
+    }
+
+    <span class="doccomment">/// Check whether or not the address is following Bitcoin</span>
+    <span class="doccomment">/// standardness rules.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Segwit addresses with unassigned witness versions or non-standard</span>
+    <span class="doccomment">/// program sizes are considered non-standard.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_standard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">address_type</span>().<span class="ident">is_some</span>()
+    }
+
+    <span class="doccomment">/// Get an [Address] from an output script (scriptPubkey).</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_script</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>, <span class="ident">network</span>: <span class="ident">Network</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">Address</span> {
+            <span class="ident">payload</span>: <span class="ident">Payload::from_script</span>(<span class="ident">script</span>)<span class="question-mark">?</span>,
+            <span class="ident">network</span>: <span class="ident">network</span>,
+        })
+    }
+
+    <span class="doccomment">/// Generates a script pubkey spending to this address</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">script_pubkey</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">script::Script</span> {
+        <span class="self">self</span>.<span class="ident">payload</span>.<span class="ident">script_pubkey</span>()
+    }
+
+    <span class="doccomment">/// Creates a URI string *bitcoin:address* optimized to be encoded in QR codes.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the address is bech32, both the schema and the address become uppercase.</span>
+    <span class="doccomment">/// If the address is base58, the schema is lowercase and the address is left mixed case.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Quoting BIP 173 &quot;inside QR codes uppercase SHOULD be used, as those permit the use of</span>
+    <span class="doccomment">/// alphanumeric mode, which is 45% more compact than the normal byte mode.&quot;</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_qr_uri</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
+        <span class="kw">let</span> <span class="ident">schema</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">payload</span> {
+            <span class="ident">Payload::WitnessProgram</span> { .. } <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;BITCOIN&quot;</span>,
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;bitcoin&quot;</span>,
+        };
+        <span class="macro">format!</span>(<span class="string">&quot;{}:{:#}&quot;</span>, <span class="ident">schema</span>, <span class="self">self</span>)
+    }
+}
+
+<span class="comment">// Alternate formatting `{:#}` is used to return uppercase version of bech32 addresses which should</span>
+<span class="comment">// be used in QR codes, see [Address::to_qr_uri]</span>
+<span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Address</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fmt</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">payload</span> {
+            <span class="ident">Payload::PubkeyHash</span>(<span class="kw-2">ref</span> <span class="ident">hash</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefixed</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">21</span>];
+                <span class="ident">prefixed</span>[<span class="number">0</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">network</span> {
+                    <span class="ident">Network::Bitcoin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>,
+                    <span class="ident">Network::Testnet</span> <span class="op">|</span> <span class="ident">Network::Signet</span> <span class="op">|</span> <span class="ident">Network::Regtest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">111</span>,
+                };
+                <span class="ident">prefixed</span>[<span class="number">1</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>[..]);
+                <span class="ident">base58::check_encode_slice_to_fmt</span>(<span class="ident">fmt</span>, <span class="kw-2">&amp;</span><span class="ident">prefixed</span>[..])
+            }
+            <span class="ident">Payload::ScriptHash</span>(<span class="kw-2">ref</span> <span class="ident">hash</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">prefixed</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">21</span>];
+                <span class="ident">prefixed</span>[<span class="number">0</span>] <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">network</span> {
+                    <span class="ident">Network::Bitcoin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">5</span>,
+                    <span class="ident">Network::Testnet</span> <span class="op">|</span> <span class="ident">Network::Signet</span> <span class="op">|</span> <span class="ident">Network::Regtest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">196</span>,
+                };
+                <span class="ident">prefixed</span>[<span class="number">1</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">hash</span>[..]);
+                <span class="ident">base58::check_encode_slice_to_fmt</span>(<span class="ident">fmt</span>, <span class="kw-2">&amp;</span><span class="ident">prefixed</span>[..])
+            }
+            <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">ver</span>,
+                <span class="ident">program</span>: <span class="kw-2">ref</span> <span class="ident">prog</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">hrp</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">network</span> {
+                    <span class="ident">Network::Bitcoin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;bc&quot;</span>,
+                    <span class="ident">Network::Testnet</span> <span class="op">|</span> <span class="ident">Network::Signet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;tb&quot;</span>,
+                    <span class="ident">Network::Regtest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;bcrt&quot;</span>,
+                };
+                <span class="kw">let</span> <span class="ident">bech_ver</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">ver</span>.<span class="ident">to_u8</span>() <span class="op">&gt;</span> <span class="number">0</span> {  <span class="ident">bech32::Variant::Bech32m</span> } <span class="kw">else</span> { <span class="ident">bech32::Variant::Bech32</span> };
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">upper_writer</span>;
+                <span class="kw">let</span> <span class="ident">writer</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">fmt</span>.<span class="ident">alternate</span>() {
+                    <span class="ident">upper_writer</span> <span class="op">=</span> <span class="ident">UpperWriter</span>(<span class="ident">fmt</span>);
+                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">upper_writer</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">fmt::Write</span>
+                } <span class="kw">else</span> {
+                    <span class="ident">fmt</span> <span class="kw">as</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">dyn</span> <span class="ident">fmt::Write</span>
+                };
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bech32_writer</span> <span class="op">=</span> <span class="ident">bech32::Bech32Writer::new</span>(<span class="ident">hrp</span>, <span class="ident">bech_ver</span>, <span class="ident">writer</span>)<span class="question-mark">?</span>;
+                <span class="ident">bech32::WriteBase32::write_u5</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bech32_writer</span>, <span class="ident">ver</span>)<span class="question-mark">?</span>;
+                <span class="ident">bech32::ToBase32::write_base32</span>(<span class="kw-2">&amp;</span><span class="ident">prog</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bech32_writer</span>)
+            }
+        }
+    }
+}
+
+<span class="kw">struct</span> <span class="ident">UpperWriter</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">fmt::Write</span><span class="op">&gt;</span>(<span class="ident">W</span>);
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">W</span>: <span class="ident">fmt::Write</span><span class="op">&gt;</span> <span class="ident">fmt::Write</span> <span class="kw">for</span> <span class="ident">UpperWriter</span><span class="op">&lt;</span><span class="ident">W</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">write_str</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">for</span> <span class="ident">c</span> <span class="kw">in</span> <span class="ident">s</span>.<span class="ident">chars</span>() {
+            <span class="self">self</span>.<span class="number">0</span>.<span class="ident">write_char</span>(<span class="ident">c</span>.<span class="ident">to_ascii_uppercase</span>())<span class="question-mark">?</span>;
+        }
+        <span class="prelude-val">Ok</span>(())
+    }
+}
+
+<span class="doccomment">/// Extract the bech32 prefix.</span>
+<span class="doccomment">/// Returns the same slice when no prefix is found.</span>
+<span class="kw">fn</span> <span class="ident">find_bech32_prefix</span>(<span class="ident">bech32</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">str</span> {
+    <span class="comment">// Split at the last occurrence of the separator character &#39;1&#39;.</span>
+    <span class="kw">match</span> <span class="ident">bech32</span>.<span class="ident">rfind</span>(<span class="string">&#39;1&#39;</span>) {
+        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bech32</span>,
+        <span class="prelude-val">Some</span>(<span class="ident">sep</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">bech32</span>.<span class="ident">split_at</span>(<span class="ident">sep</span>).<span class="number">0</span>,
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">Address</span> {
+    <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">Error</span>;
+
+    <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Address</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+        <span class="comment">// try bech32</span>
+        <span class="kw">let</span> <span class="ident">bech32_network</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">find_bech32_prefix</span>(<span class="ident">s</span>) {
+            <span class="comment">// note that upper or lowercase is allowed but NOT mixed case</span>
+            <span class="string">&quot;bc&quot;</span> <span class="op">|</span> <span class="string">&quot;BC&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Bitcoin</span>),
+            <span class="string">&quot;tb&quot;</span> <span class="op">|</span> <span class="string">&quot;TB&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Testnet</span>), <span class="comment">// this may also be signet</span>
+            <span class="string">&quot;bcrt&quot;</span> <span class="op">|</span> <span class="string">&quot;BCRT&quot;</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Regtest</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        };
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">network</span>) <span class="op">=</span> <span class="ident">bech32_network</span> {
+            <span class="comment">// decode as bech32</span>
+            <span class="kw">let</span> (<span class="kw">_</span>, <span class="ident">payload</span>, <span class="ident">variant</span>) <span class="op">=</span> <span class="ident">bech32::decode</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+            <span class="kw">if</span> <span class="ident">payload</span>.<span class="ident">is_empty</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::EmptyBech32Payload</span>);
+            }
+
+            <span class="comment">// Get the script version and program (converted from 5-bit to 8-bit)</span>
+            <span class="kw">let</span> (<span class="ident">version</span>, <span class="ident">program</span>): (<span class="ident">bech32::u5</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>) <span class="op">=</span> {
+                <span class="kw">let</span> (<span class="ident">v</span>, <span class="ident">p5</span>) <span class="op">=</span> <span class="ident">payload</span>.<span class="ident">split_at</span>(<span class="number">1</span>);
+                (<span class="ident">v</span>[<span class="number">0</span>], <span class="ident">bech32::FromBase32::from_base32</span>(<span class="ident">p5</span>)<span class="question-mark">?</span>)
+            };
+
+            <span class="comment">// Generic segwit checks.</span>
+            <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">to_u8</span>() <span class="op">&gt;</span> <span class="number">16</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidWitnessVersion</span>(<span class="ident">version</span>.<span class="ident">to_u8</span>()));
+            }
+            <span class="kw">if</span> <span class="ident">program</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> <span class="op">|</span><span class="op">|</span> <span class="ident">program</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">40</span> {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidWitnessProgramLength</span>(<span class="ident">program</span>.<span class="ident">len</span>()));
+            }
+
+            <span class="comment">// Specific segwit v0 check.</span>
+            <span class="kw">if</span> <span class="ident">version</span>.<span class="ident">to_u8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> (<span class="ident">program</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">20</span> <span class="op">&amp;&amp;</span> <span class="ident">program</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">32</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSegwitV0ProgramLength</span>(<span class="ident">program</span>.<span class="ident">len</span>()));
+            }
+
+            <span class="comment">// Bech32 encoding check</span>
+            <span class="kw">if</span> (<span class="ident">version</span>.<span class="ident">to_u8</span>() <span class="op">&gt;</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">variant</span> <span class="op">!</span><span class="op">=</span> <span class="ident">bech32::Variant::Bech32m</span>) <span class="op">|</span><span class="op">|</span>
+               (<span class="ident">version</span>.<span class="ident">to_u8</span>() <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> <span class="ident">variant</span> <span class="op">!</span><span class="op">=</span> <span class="ident">bech32::Variant::Bech32</span>) {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidWitnessVersion</span>(<span class="ident">version</span>.<span class="ident">to_u8</span>()))
+            }
+
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Address</span> {
+                <span class="ident">payload</span>: <span class="ident">Payload::WitnessProgram</span> {
+                    <span class="ident">version</span>: <span class="ident">version</span>,
+                    <span class="ident">program</span>: <span class="ident">program</span>,
+                },
+                <span class="ident">network</span>: <span class="ident">network</span>,
+            });
+        }
+
+        <span class="comment">// Base58</span>
+        <span class="kw">if</span> <span class="ident">s</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">50</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Base58</span>(<span class="ident">base58::Error::InvalidLength</span>(<span class="ident">s</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">11</span> <span class="op">/</span> <span class="number">15</span>)));
+        }
+        <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">base58::from_check</span>(<span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="kw">if</span> <span class="ident">data</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="number">21</span> {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Base58</span>(<span class="ident">base58::Error::InvalidLength</span>(<span class="ident">data</span>.<span class="ident">len</span>())));
+        }
+
+        <span class="kw">let</span> (<span class="ident">network</span>, <span class="ident">payload</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">data</span>[<span class="number">0</span>] {
+            <span class="number">0</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">Network::Bitcoin</span>,
+                <span class="ident">Payload::PubkeyHash</span>(<span class="ident">PubkeyHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="number">1</span>..]).<span class="ident">unwrap</span>()),
+            ),
+            <span class="number">5</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">Network::Bitcoin</span>,
+                <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="number">1</span>..]).<span class="ident">unwrap</span>()),
+            ),
+            <span class="number">111</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">Network::Testnet</span>,
+                <span class="ident">Payload::PubkeyHash</span>(<span class="ident">PubkeyHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="number">1</span>..]).<span class="ident">unwrap</span>()),
+            ),
+            <span class="number">196</span> <span class="op">=</span><span class="op">&gt;</span> (
+                <span class="ident">Network::Testnet</span>,
+                <span class="ident">Payload::ScriptHash</span>(<span class="ident">ScriptHash::from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>[<span class="number">1</span>..]).<span class="ident">unwrap</span>()),
+            ),
+            <span class="ident">x</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Base58</span>(<span class="ident">base58::Error::InvalidAddressVersion</span>(<span class="ident">x</span>))),
+        };
+
+        <span class="prelude-val">Ok</span>(<span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">network</span>,
+            <span class="ident">payload</span>: <span class="ident">payload</span>,
+        })
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">fmt::Debug</span> <span class="kw">for</span> <span class="ident">Address</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.<span class="ident">to_string</span>())
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">tests</span> {
+    <span class="kw">use</span> <span class="ident">core::str::FromStr</span>;
+
+    <span class="kw">use</span> <span class="ident">hashes::hex</span>::{<span class="ident">FromHex</span>, <span class="ident">ToHex</span>};
+
+    <span class="kw">use</span> <span class="ident">blockdata::script::Script</span>;
+    <span class="kw">use</span> <span class="ident">network::constants::Network</span>::{<span class="ident">Bitcoin</span>, <span class="ident">Testnet</span>};
+    <span class="kw">use</span> <span class="ident">util::ecdsa::PublicKey</span>;
+
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
+
+    <span class="macro">macro_rules!</span> <span class="ident">hex</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Vec::from_hex</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>).<span class="ident">unwrap</span>()));
+    <span class="macro">macro_rules!</span> <span class="ident">hex_key</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="macro">hex!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>)).<span class="ident">unwrap</span>()));
+    <span class="macro">macro_rules!</span> <span class="ident">hex_script</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Script::from</span>(<span class="macro">hex!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>))));
+    <span class="macro">macro_rules!</span> <span class="ident">hex_pubkeyhash</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">PubkeyHash::from_hex</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>).<span class="ident">unwrap</span>()));
+    <span class="macro">macro_rules!</span> <span class="ident">hex_scripthash</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">ScriptHash::from_hex</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>).<span class="ident">unwrap</span>()));
+
+    <span class="kw">fn</span> <span class="ident">roundtrips</span>(<span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="ident">Address</span>) {
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Address::from_str</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>()).<span class="ident">unwrap</span>(),
+            <span class="kw-2">*</span><span class="ident">addr</span>,
+            <span class="string">&quot;string round-trip failed for {}&quot;</span>,
+            <span class="ident">addr</span>,
+        );
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">Address::from_script</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">script_pubkey</span>(), <span class="ident">addr</span>.<span class="ident">network</span>).<span class="ident">as_ref</span>(),
+            <span class="prelude-val">Some</span>(<span class="ident">addr</span>),
+            <span class="string">&quot;script round-trip failed for {}&quot;</span>,
+            <span class="ident">addr</span>,
+        );
+        <span class="comment">//TODO: add serde roundtrip after no-strason PR</span>
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2pkh_address_58</span>() {
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">Bitcoin</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::PubkeyHash</span>(<span class="macro">hex_pubkeyhash!</span>(<span class="string">&quot;162c5ea71c0b23f5b9022ef047c4a86470a5b070&quot;</span>)),
+        };
+
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">addr</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;76a914162c5ea71c0b23f5b9022ef047c4a86470a5b07088ac&quot;</span>)
+        );
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;132F25rTsvBdp9JzLLBHP5mvGY66i1xdiM&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2pkh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2pkh_from_key</span>() {
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">hex_key!</span>(<span class="string">&quot;048d5141948c1702e8c95f438815794b87f706a8d4cd2bffad1dc1570971032c9b6042a0431ded2478b5c9cf2d81c124a5e57347a3c63ef0e7716cf54d613ba183&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2pkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Bitcoin</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;1QJVDzdqb1VpbDK7uDeyVXy9mR27CJiyhY&quot;</span>);
+
+        <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">hex_key!</span>(<span class="kw-2">&amp;</span><span class="string">&quot;03df154ebfcf29d29cc10d5c2565018bce2d9edbab267c31d2caf44a63056cf99f&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2pkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Testnet</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;mqkhEMH6NCeYjFybv7pvFC22MFeaNT9AQC&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2pkh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2sh_address_58</span>() {
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address</span> {
+            <span class="ident">network</span>: <span class="ident">Bitcoin</span>,
+            <span class="ident">payload</span>: <span class="ident">Payload::ScriptHash</span>(<span class="macro">hex_scripthash!</span>(<span class="string">&quot;162c5ea71c0b23f5b9022ef047c4a86470a5b070&quot;</span>)),
+        };
+
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">addr</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;a914162c5ea71c0b23f5b9022ef047c4a86470a5b07087&quot;</span>)
+        );
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;33iFwdLuRpW1uK1RTRqsoi8rR4NpDzk66k&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2sh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2sh_parse</span>() {
+        <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="macro">hex_script!</span>(<span class="string">&quot;552103a765fc35b3f210b95223846b36ef62a4e53e34e2925270c2c7906b92c9f718eb2103c327511374246759ec8d0b89fa6c6b23b33e11f92c5bc155409d86de0c79180121038cae7406af1f12f4786d820a1466eec7bc5785a1b5e4a387eca6d797753ef6db2103252bfb9dcaab0cd00353f2ac328954d791270203d66c2be8b430f115f451b8a12103e79412d42372c55dd336f2eb6eb639ef9d74a22041ba79382c74da2338fe58ad21035049459a4ebc00e876a9eef02e72a3e70202d3d1f591fc0dd542f93f642021f82102016f682920d9723c61b27f562eb530c926c00106004798b6471e8c52c60ee02057ae&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2sh</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>, <span class="ident">Testnet</span>);
+
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;2N3zXjbwdTcPsJiy8sUK9FhWJhqQCxA8Jjr&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2sh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2wpkh</span>() {
+        <span class="comment">// stolen from Bitcoin transaction: b3c8c2b6cfc335abbcb2c7823a8453f55d64b2b5125a9a61e8737230cdb8ce20</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">hex_key!</span>(<span class="string">&quot;033bc8c83c52df5712229a2f72206d90192366c36428cb0c12b6af98324d97bfbc&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2wpkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Bitcoin</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;bc1qvzvkjn4q3nszqxrv3nraga2r822xjty3ykvkuw&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2wpkh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+
+        <span class="comment">// Test uncompressed pubkey</span>
+        <span class="ident">key</span>.<span class="ident">compressed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">Address::p2wpkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Bitcoin</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedPubkey</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2wsh</span>() {
+        <span class="comment">// stolen from Bitcoin transaction 5df912fda4becb1c29e928bec8d64d93e9ba8efa9b5b405bd683c86fd2c65667</span>
+        <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="macro">hex_script!</span>(<span class="string">&quot;52210375e00eb72e29da82b89367947f29ef34afb75e8654f6ea368e0acdfd92976b7c2103a1b26313f430c4b15bb1fdce663207659d8cac749a0e53d70eff01874496feff2103c96d495bfdd5ba4145e3e046fee45e84a8a48ad05bd8dbb395c011a32cf9f88053ae&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2wsh</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>, <span class="ident">Bitcoin</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(),
+            <span class="string">&quot;bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej&quot;</span>
+        );
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2wsh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2shwpkh</span>() {
+        <span class="comment">// stolen from Bitcoin transaction: ad3fd9c6b52e752ba21425435ff3dd361d6ac271531fc1d2144843a9f550ad01</span>
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key</span> <span class="op">=</span> <span class="macro">hex_key!</span>(<span class="string">&quot;026c468be64d22761c30cd2f12cbc7de255d592d7904b1bab07236897cc4c2e766&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2shwpkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Bitcoin</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;3QBRmWNqqBGme9er7fMkGqtZtp4gjMFxhE&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2sh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+
+        <span class="comment">// Test uncompressed pubkey</span>
+        <span class="ident">key</span>.<span class="ident">compressed</span> <span class="op">=</span> <span class="bool-val">false</span>;
+        <span class="macro">assert_eq!</span>(<span class="ident">Address::p2wpkh</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">Bitcoin</span>), <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedPubkey</span>));
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_p2shwsh</span>() {
+        <span class="comment">// stolen from Bitcoin transaction f9ee2be4df05041d0e0a35d7caa3157495ca4f93b233234c9967b6901dacf7a9</span>
+        <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="macro">hex_script!</span>(<span class="string">&quot;522103e5529d8eaa3d559903adb2e881eb06c86ac2574ffa503c45f4e942e2a693b33e2102e5f10fcdcdbab211e0af6a481f5532536ec61a5fdbf7183770cf8680fe729d8152ae&quot;</span>);
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::p2shwsh</span>(<span class="kw-2">&amp;</span><span class="ident">script</span>, <span class="ident">Bitcoin</span>);
+        <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="string">&quot;36EqgNnsWW94SreZgBWc1ANC6wpFZwirHr&quot;</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">address_type</span>(), <span class="prelude-val">Some</span>(<span class="ident">AddressType::P2sh</span>));
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_non_existent_segwit_version</span>() {
+        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="number">13</span>;
+        <span class="comment">// 40-byte program</span>
+        <span class="kw">let</span> <span class="ident">program</span> <span class="op">=</span> <span class="macro">hex!</span>(
+            <span class="string">&quot;654f6ea368e0acdfd92976b7c2103a1b26313f430654f6ea368e0acdfd92976b7c2103a1b26313f4&quot;</span>
+        );
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address</span> {
+            <span class="ident">payload</span>: <span class="ident">Payload::WitnessProgram</span> {
+                <span class="ident">version</span>: <span class="ident">bech32::u5::try_from_u8</span>(<span class="ident">version</span>).<span class="ident">expect</span>(<span class="string">&quot;0&lt;32&quot;</span>),
+                <span class="ident">program</span>: <span class="ident">program</span>,
+            },
+            <span class="ident">network</span>: <span class="ident">Network::Bitcoin</span>,
+        };
+        <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_bip173_350_vectors</span>() {
+        <span class="comment">// Test vectors valid under both BIP-173 and BIP-350</span>
+        <span class="kw">let</span> <span class="ident">valid_vectors</span> <span class="op">=</span> [
+            (<span class="string">&quot;BC1QW508D6QEJXTDG4Y5R3ZARVARY0C5XW7KV8F3T4&quot;</span>, <span class="string">&quot;0014751e76e8199196d454941c45d1b3a323f1433bd6&quot;</span>),
+            (<span class="string">&quot;tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7&quot;</span>, <span class="string">&quot;00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262&quot;</span>),
+            (<span class="string">&quot;bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7kt5nd6y&quot;</span>, <span class="string">&quot;5128751e76e8199196d454941c45d1b3a323f1433bd6751e76e8199196d454941c45d1b3a323f1433bd6&quot;</span>),
+            (<span class="string">&quot;BC1SW50QGDZ25J&quot;</span>, <span class="string">&quot;6002751e&quot;</span>),
+            (<span class="string">&quot;bc1zw508d6qejxtdg4y5r3zarvaryvaxxpcs&quot;</span>, <span class="string">&quot;5210751e76e8199196d454941c45d1b3a323&quot;</span>),
+            (<span class="string">&quot;tb1qqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesrxh6hy&quot;</span>, <span class="string">&quot;0020000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433&quot;</span>),
+            (<span class="string">&quot;tb1pqqqqp399et2xygdj5xreqhjjvcmzhxw4aywxecjdzew6hylgvsesf3hn0c&quot;</span>, <span class="string">&quot;5120000000c4a5cad46221b2a187905e5266362b99d5e91c6ce24d165dab93e86433&quot;</span>),
+            (<span class="string">&quot;bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqzk5jj0&quot;</span>, <span class="string">&quot;512079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798&quot;</span>)
+        ];
+        <span class="kw">for</span> <span class="ident">vector</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">valid_vectors</span> {
+            <span class="kw">let</span> <span class="ident">addr</span>: <span class="ident">Address</span> <span class="op">=</span> <span class="ident">vector</span>.<span class="number">0</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>.<span class="ident">script_pubkey</span>().<span class="ident">as_bytes</span>().<span class="ident">to_hex</span>(), <span class="ident">vector</span>.<span class="number">1</span>);
+            <span class="ident">roundtrips</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>);
+        }
+
+        <span class="kw">let</span> <span class="ident">invalid_vectors</span> <span class="op">=</span> [
+            <span class="comment">// 1. BIP-350 test vectors</span>
+            <span class="comment">// Invalid human-readable part</span>
+            <span class="string">&quot;tc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq5zuyut&quot;</span>,
+            <span class="comment">// Invalid checksums (Bech32 instead of Bech32m):</span>
+            <span class="string">&quot;bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqh2y7hd&quot;</span>,
+            <span class="string">&quot;tb1z0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vqglt7rf&quot;</span>,
+            <span class="string">&quot;BC1S0XLXVLHEMJA6C4DQV22UAPCTQUPFHLXM9H8Z3K2E72Q4K9HCZ7VQ54WELL&quot;</span>,
+            <span class="string">&quot;bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kemeawh&quot;</span>,
+            <span class="string">&quot;tb1q0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq24jc47&quot;</span>,
+            <span class="comment">// Invalid character in checksum</span>
+            <span class="string">&quot;bc1p38j9r5y49hruaue7wxjce0updqjuyyx0kh56v8s25huc6995vvpql3jow4&quot;</span>,
+            <span class="comment">// Invalid witness version</span>
+            <span class="string">&quot;BC130XLXVLHEMJA6C4DQV22UAPCTQUPFHLXM9H8Z3K2E72Q4K9HCZ7VQ7ZWS8R&quot;</span>,
+            <span class="comment">// Invalid program length (1 byte)</span>
+            <span class="string">&quot;bc1pw5dgrnzv&quot;</span>,
+            <span class="comment">// Invalid program length (41 bytes)</span>
+            <span class="string">&quot;bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7v8n0nx0muaewav253zgeav&quot;</span>,
+            <span class="comment">// Invalid program length for witness version 0 (per BIP141)</span>
+            <span class="string">&quot;BC1QR508D6QEJXTDG4Y5R3ZARVARYV98GJ9P&quot;</span>,
+            <span class="comment">// Mixed case</span>
+            <span class="string">&quot;tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vq47Zagq&quot;</span>,
+            <span class="comment">// zero padding of more than 4 bits</span>
+            <span class="string">&quot;bc1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7v07qwwzcrf&quot;</span>,
+            <span class="comment">// Non-zero padding in 8-to-5 conversion</span>
+            <span class="string">&quot;tb1p0xlxvlhemja6c4dqv22uapctqupfhlxm9h8z3k2e72q4k9hcz7vpggkg4j&quot;</span>,
+            <span class="comment">// Empty data section</span>
+            <span class="string">&quot;bc1gmk9yu&quot;</span>,
+
+            <span class="comment">// 2. BIP-173 test vectors</span>
+            <span class="comment">// Invalid human-readable part</span>
+            <span class="string">&quot;tc1qw508d6qejxtdg4y5r3zarvary0c5xw7kg3g4ty&quot;</span>,
+            <span class="comment">// Invalid checksum</span>
+            <span class="string">&quot;bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t5&quot;</span>,
+            <span class="comment">// Invalid witness version</span>
+            <span class="string">&quot;BC13W508D6QEJXTDG4Y5R3ZARVARY0C5XW7KN40WF2&quot;</span>,
+            <span class="comment">// Invalid program length</span>
+            <span class="string">&quot;bc1rw5uspcuh&quot;</span>,
+            <span class="comment">// Invalid program length</span>
+            <span class="string">&quot;bc10w508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7kw5rljs90&quot;</span>,
+            <span class="comment">// Invalid program length for witness version 0 (per BIP141)</span>
+            <span class="string">&quot;BC1QR508D6QEJXTDG4Y5R3ZARVARYV98GJ9P&quot;</span>,
+            <span class="comment">// Mixed case</span>
+            <span class="string">&quot;tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sL5k7&quot;</span>,
+            <span class="comment">// zero padding of more than 4 bits</span>
+            <span class="string">&quot;bc1zw508d6qejxtdg4y5r3zarvaryvqyzf3du&quot;</span>,
+            <span class="comment">// Non-zero padding in 8-to-5 conversion</span>
+            <span class="string">&quot;tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3pjxtptv&quot;</span>,
+            <span class="comment">// Final test for empty data section is the same as above in BIP-350</span>
+
+            <span class="comment">// 3. BIP-173 valid test vectors obsolete by BIP-350</span>
+            <span class="string">&quot;bc1pw508d6qejxtdg4y5r3zarvary0c5xw7kw508d6qejxtdg4y5r3zarvary0c5xw7k7grplx&quot;</span>,
+            <span class="string">&quot;BC1SW50QA3JX3S&quot;</span>,
+            <span class="string">&quot;bc1zw508d6qejxtdg4y5r3zarvaryvg6kdaj&quot;</span>,
+        ];
+        <span class="kw">for</span> <span class="ident">vector</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">invalid_vectors</span> {
+            <span class="macro">assert!</span>(<span class="ident">vector</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>().<span class="ident">is_err</span>());
+        }
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
+    <span class="kw">fn</span> <span class="ident">test_json_serialize</span>() {
+        <span class="kw">use</span> <span class="ident">serde_json</span>;
+
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::from_str</span>(<span class="string">&quot;132F25rTsvBdp9JzLLBHP5mvGY66i1xdiM&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">json</span>,
+            <span class="ident">serde_json::Value::String</span>(<span class="string">&quot;132F25rTsvBdp9JzLLBHP5mvGY66i1xdiM&quot;</span>.<span class="ident">to_owned</span>())
+        );
+        <span class="kw">let</span> <span class="ident">into</span>: <span class="ident">Address</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="ident">into</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">into</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;76a914162c5ea71c0b23f5b9022ef047c4a86470a5b07088ac&quot;</span>)
+        );
+
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::from_str</span>(<span class="string">&quot;33iFwdLuRpW1uK1RTRqsoi8rR4NpDzk66k&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">json</span>,
+            <span class="ident">serde_json::Value::String</span>(<span class="string">&quot;33iFwdLuRpW1uK1RTRqsoi8rR4NpDzk66k&quot;</span>.<span class="ident">to_owned</span>())
+        );
+        <span class="kw">let</span> <span class="ident">into</span>: <span class="ident">Address</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="ident">into</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">into</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;a914162c5ea71c0b23f5b9022ef047c4a86470a5b07087&quot;</span>)
+        );
+
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span>
+            <span class="ident">Address::from_str</span>(<span class="string">&quot;tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7&quot;</span>)
+                .<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">json</span>,
+            <span class="ident">serde_json::Value::String</span>(
+                <span class="string">&quot;tb1qrp33g0q5c5txsp9arysrx4k6zdkfs4nce4xj0gdcccefvpysxf3q0sl5k7&quot;</span>.<span class="ident">to_owned</span>()
+            )
+        );
+        <span class="kw">let</span> <span class="ident">into</span>: <span class="ident">Address</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="ident">into</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">into</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;00201863143c14c5166804bd19203356da136c985678cd4d27a1b8c6329604903262&quot;</span>)
+        );
+
+        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::from_str</span>(<span class="string">&quot;bcrt1q2nfxmhd4n3c8834pj72xagvyr9gl57n5r94fsl&quot;</span>).<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">json</span> <span class="op">=</span> <span class="ident">serde_json::to_value</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">json</span>,
+            <span class="ident">serde_json::Value::String</span>(<span class="string">&quot;bcrt1q2nfxmhd4n3c8834pj72xagvyr9gl57n5r94fsl&quot;</span>.<span class="ident">to_owned</span>())
+        );
+        <span class="kw">let</span> <span class="ident">into</span>: <span class="ident">Address</span> <span class="op">=</span> <span class="ident">serde_json::from_value</span>(<span class="ident">json</span>).<span class="ident">unwrap</span>();
+        <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_string</span>(), <span class="ident">into</span>.<span class="ident">to_string</span>());
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">into</span>.<span class="ident">script_pubkey</span>(),
+            <span class="macro">hex_script!</span>(<span class="string">&quot;001454d26dddb59c7073c6a197946ea1841951fa7a74&quot;</span>)
+        );
+    }
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test_qr_string</span>() {
+        <span class="kw">for</span> <span class="ident">el</span> <span class="kw">in</span>  [<span class="string">&quot;132F25rTsvBdp9JzLLBHP5mvGY66i1xdiM&quot;</span>, <span class="string">&quot;33iFwdLuRpW1uK1RTRqsoi8rR4NpDzk66k&quot;</span>].<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::from_str</span>(<span class="ident">el</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_qr_uri</span>(), <span class="macro">format!</span>(<span class="string">&quot;bitcoin:{}&quot;</span>, <span class="ident">el</span>));
+        }
+
+        <span class="kw">for</span> <span class="ident">el</span> <span class="kw">in</span> [<span class="string">&quot;bcrt1q2nfxmhd4n3c8834pj72xagvyr9gl57n5r94fsl&quot;</span>, <span class="string">&quot;bc1qwqdg6squsna38e46795at95yu9atm8azzmyvckulcc7kytlcckxswvvzej&quot;</span>].<span class="ident">iter</span>() {
+            <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">Address::from_str</span>(<span class="ident">el</span>).<span class="ident">unwrap</span>();
+            <span class="macro">assert_eq!</span>(<span class="ident">addr</span>.<span class="ident">to_qr_uri</span>(), <span class="macro">format!</span>(<span class="string">&quot;BITCOIN:{}&quot;</span>, <span class="ident">el</span>.<span class="ident">to_ascii_uppercase</span>()) );
+        }
+    }
+
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
+    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script></body></html>

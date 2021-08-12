@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Denomination","A set of denominations in which amounts can be expressed."],["ParseAmountError","An error during amount parsing."]],"struct":[["Amount","Amount"],["SignedAmount","SignedAmount"]]});

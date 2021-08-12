@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Key","A PSBT key in its raw byte form."],["Pair","A PSBT key-value pair in its raw byte form."],["ProprietaryKey","Proprietary keys (i.e. keys starting with 0xFC byte) with their internal structure according to BIP 174."]],"type":[["ProprietaryType","Default implementation for proprietary key subtyping"]]});

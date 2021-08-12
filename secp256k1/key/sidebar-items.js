@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["ONE_KEY","The number 1 encoded as a secret key"]],"struct":[["PublicKey","A Secp256k1 public key, used for verification of signatures"],["SecretKey","Secret 256-bit key used as `x` in an ECDSA signature"]]});

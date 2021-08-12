@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Class","Broad categories of opcodes with similar behavior"]],"mod":[["all","Constants associated with All type"]],"static":[["OP_FALSE","Empty stack is also FALSE"],["OP_NOP2","previously called OP_NOP2"],["OP_NOP3","previously called OP_NOP3"],["OP_TRUE","Number 1 is also TRUE"]],"struct":[["All","A script Opcode"]]});

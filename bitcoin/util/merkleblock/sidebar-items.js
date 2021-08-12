@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MerkleBlockError","An error when verifying the merkle block"]],"struct":[["MerkleBlock","Data structure that represents a block header paired to a partial merkle tree."],["PartialMerkleTree","Data structure that represents a partial merkle tree."]]});

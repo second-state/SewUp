@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Hash","Output of the SHA1 hash function"],["HashEngine","Engine to compute SHA1 hash function"]]});

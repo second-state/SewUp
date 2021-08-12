@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SigHashCache","A replacement for SigHashComponents which supports all sighash modes"],["SighashComponents","Parts of a sighash which are common across inputs or signatures, and which are sufficient (in conjunction with a private key) to sign the transaction"]]});

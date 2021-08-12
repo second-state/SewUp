@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["PrivateKey","A Bitcoin ECDSA private key"],["PublicKey","A Bitcoin ECDSA public key"]]});

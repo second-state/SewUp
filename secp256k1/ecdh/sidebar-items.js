@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SharedSecret","A tag used for recovering the public key from a compact signature"]]});
