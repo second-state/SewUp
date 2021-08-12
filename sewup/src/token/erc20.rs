@@ -150,93 +150,120 @@ pub fn total_supply(i: usize) {
 }
 
 /// Implement ERC-20 approve(address,uint256)
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [
+///         { "internalType": "address", "name": "spender", "type": "address" },
+///         { "internalType": "uint256", "name": "value", "type": "uint256" }
+///     ],
+///     "name": "approve",
+///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+///     "payable": false,
+///     "stateMutability": "nonpayable",
+///     "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn("095ea7b3")]
 pub fn approve(contract: &Contract) {
-    let spender_data = contract.input_data[4..24].to_vec();
-    let spender = copy_into_address(&spender_data[0..20]);
-
-    let value = contract.input_data[24..56].to_vec();
-    let storage_value = copy_into_storage_value(&value[0..8]);
-
     let sender = ewasm_api::caller();
-    let byte32: [u8; 32] = value.try_into().expect("value should be byte32");
-
-    set_allowance(&sender, &spender, &byte32.into());
+    let spender = copy_into_address(&contract.input_data[16..36]);
+    let value = {
+        let buffer: [u8; 32] = copy_into_array(&contract.input_data[36..68]);
+        copy_into_storage_value(&buffer)
+    };
+    set_allowance(&sender, &spender, &value);
 }
 
 /// Implement ERC-20 allowance(address,address)
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [
+///         { "internalType": "address", "name": "owner", "type": "address" },
+///         { "internalType": "address", "name": "spender", "type": "address" }
+///     ],
+///     "name": "allowance",
+///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+///     "payable": false,
+///     "stateMutability": "view",
+///     "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(dd62ed3e)]
 pub fn allowance(contract: &Contract) {
-    if contract.data_size != 44 {
-        ewasm_api::revert();
-    }
-
-    let from_data = contract.input_data[4..24].to_vec();
-    let owner = copy_into_address(&from_data[0..20]);
-
-    let spender_data = contract.input_data[24..44].to_vec();
-    let spender = copy_into_address(&spender_data[0..20]);
-
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let spender = copy_into_address(&contract.input_data[48..68]);
     let allowance_value = get_allowance(&owner, &spender);
-
     ewasm_api::finish_data(&allowance_value.bytes);
 }
 
 /// Implement ERC-20 transferFrom(address,address,uint256)
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [
+///         { "internalType": "address", "name": "sender", "type": "address" },
+///         { "internalType": "address", "name": "recipient", "type": "address" },
+///         { "internalType": "uint256", "name": "amount", "type": "uint256" }
+///     ],
+///     "name": "transferFrom",
+///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+///     "payable": false, "stateMutability": "nonpayable", "type": "function"
+/// }
+/// ```
 #[ewasm_lib_fn(23b872dd)]
 pub fn transfer_from(contract: &Contract) {
-    if contract.data_size != 52 {
-        ewasm_api::revert();
-    }
-
-    let owner = copy_into_address(&contract.input_data[4..24]);
-
-    let recipient = copy_into_address(&contract.input_data[24..44]);
-
-    let value_data: [u8; 8] = copy_into_array(&contract.input_data[44..52]);
-
-    let value = u64::from_be_bytes(value_data);
-
     let sender = ewasm_api::caller();
-    let owner_balance = get_balance(&owner);
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let recipient = copy_into_address(&contract.input_data[48..68]);
 
-    let ob_bytes: [u8; 8] = copy_into_array(&owner_balance.bytes[24..32]);
-    let mut owner_balance = u64::from_be_bytes(ob_bytes);
+    let amount = {
+        let buffer: [u8; 32] = copy_into_array(&contract.input_data[68..100]);
+        Uint256::from_be_bytes(buffer)
+    };
 
-    if owner_balance < value {
+    let mut allowed = {
+        let allowed_value = get_allowance(&owner, &sender);
+        Uint256::from_be_bytes(allowed_value.bytes)
+    };
+
+    let mut owner_balance = {
+        let owner_balance = get_balance(&owner);
+        Uint256::from_be_bytes(owner_balance.bytes)
+    };
+
+    let mut recipient_balance = {
+        let recipient_balance = get_balance(&recipient);
+        Uint256::from_be_bytes(recipient_balance.bytes)
+    };
+
+    if owner_balance < amount || amount > allowed {
         ewasm_api::revert();
     }
 
-    let allowed_value = get_allowance(&owner, &sender);
+    owner_balance = owner_balance - amount;
+    recipient_balance = recipient_balance + amount;
+    allowed = allowed - amount;
 
-    let a_bytes: [u8; 8] = copy_into_array(&allowed_value.bytes[24..32]);
-    let mut allowed = u64::from_be_bytes(a_bytes);
+    let owner_storage_value = {
+        let buffer = owner_balance.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
 
-    if value > allowed {
-        ewasm_api::revert();
-    }
+    let recipient_storage_value = {
+        let buffer = recipient_balance.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
 
-    let recipient_balance = get_balance(&recipient);
+    let allowed_storage_value = {
+        let buffer = allowed.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
 
-    let rb_bytes: [u8; 8] = copy_into_array(&recipient_balance.bytes[24..32]);
-    let mut recipient_balance = u64::from_be_bytes(rb_bytes);
-
-    owner_balance -= value;
-    recipient_balance += value;
-    allowed -= value;
-
-    let owner_balance_bytes: [u8; 8] = owner_balance.to_be_bytes();
-    let stv_owner_balance = copy_into_storage_value(&owner_balance_bytes[0..8]);
-
-    let recipient_balance_bytes: [u8; 8] = recipient_balance.to_be_bytes();
-    let stv_recipient_balance = copy_into_storage_value(&recipient_balance_bytes[0..8]);
-
-    let allowed_bytes: [u8; 8] = allowed.to_be_bytes();
-    let stv_allowed = copy_into_storage_value(&allowed_bytes[0..8]);
-
-    set_balance(&owner, &stv_owner_balance);
-    set_balance(&recipient, &stv_recipient_balance);
-    set_allowance(&owner, &sender, &stv_allowed);
+    set_balance(&owner, &owner_storage_value);
+    set_balance(&recipient, &recipient_storage_value);
+    set_allowance(&owner, &sender, &allowed_storage_value);
 }
 
 #[cfg(target_arch = "wasm32")]
