@@ -1,10 +1,13 @@
 use std::convert::TryInto;
 
+use crate::primitives::Contract;
 use crate::types::Raw;
+use sewup_derive::ewasm_lib_fn;
 
-pub use super::erc20::{balance_of, BALANCE_OF_SIG};
+pub use super::erc20::{balance_of, name, symbol, BALANCE_OF_SIG, NAME_SIG, SYMBOL_SIG};
+
 #[cfg(target_arch = "wasm32")]
-use super::helpers::{set_balance, set_token_owner};
+use super::helpers::{get_token_owner, set_balance, set_token_owner};
 
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::Address;
@@ -15,9 +18,30 @@ use hex::decode;
 #[cfg(not(target_arch = "wasm32"))]
 use super::helpers::Address;
 
-// ownerOf(uint256): 6352211e
+/// Implement ERC-721 owner_of()
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [{ "name": "_tokenId", "type": "uint256" }],
+///     "name": "ownerOf",
+///     "outputs": [{ "name": "_owner", "type": "address" }],
+///     "payable": false,
+///     "stateMutability": "view",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn("6352211e")]
+pub fn owner_of(contract: &Contract) {
+    let token_id: [u8; 32] = contract.input_data[4..36]
+        .try_into()
+        .expect("token id should be byte32");
+    let owner = get_token_owner(&token_id);
+    ewasm_api::finish_data(&Raw::from(owner).as_bytes().to_vec());
+}
+
 // safeTransferFrom(address,address,uint256,bytes): b88d4fde
 // safeTransferFrom(address,address,uint256): 42842e0e
+
 // transferFrom(address,address,uint256): 23b872dd
 // approve(address,uint256): 095ea7b3
 // setApprovalForAll(address,bool): a22cb465
