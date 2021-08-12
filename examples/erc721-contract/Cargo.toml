@@ -1,9 +1,9 @@
 [package]
-name = "erc20-contract"
+name = "erc721-contract"
 version = "0.1.0"
 authors = []
 edition = "2018"
-description = "This is an ERC-20 example for SewUp"
+description = "This is an ERC-721 example for SewUp"
 
 [lib]
 path = "src/token.rs"
@@ -23,7 +23,7 @@ panic = "abort"
 lto = true
 opt-level = "z"
 
-[profile.release.package.erc20-contract]
+[profile.release.package.erc721-contract]
 incremental = false
 opt-level = "z"
 

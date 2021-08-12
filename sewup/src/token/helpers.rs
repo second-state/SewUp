@@ -1,3 +1,6 @@
+use std::convert::TryInto;
+
+use crate::types::Raw;
 pub use crate::utils::{copy_into_array, sha3_256};
 
 #[cfg(target_arch = "wasm32")]
@@ -19,6 +22,12 @@ pub fn calculate_balance_hash(address: &[u8; 20]) -> Vec<u8> {
     let mut balance_of: Vec<u8> = "balanceOf".as_bytes().into();
     balance_of.extend_from_slice(address);
     sha3_256(&balance_of).to_vec()
+}
+
+pub fn calculate_token_hash(token_id: &[u8; 32]) -> Vec<u8> {
+    let mut token: Vec<u8> = "token_id".as_bytes().into();
+    token.extend_from_slice(token_id);
+    sha3_256(&token).to_vec()
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -90,4 +99,27 @@ pub fn copy_into_address(slice: &[u8]) -> Address {
     let mut a = Address::default();
     a.bytes.copy_from_slice(slice);
     a
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn set_token_owner(_token_id: &[u8; 32], _owner: &Address) {}
+#[cfg(target_arch = "wasm32")]
+pub fn set_token_owner(token_id: &[u8; 32], owner: &Address) {
+    let storage_key = copy_into_storage_value(&calculate_token_hash(token_id));
+    let value: StorageValue = Raw::from(owner).to_bytes32().into();
+    ewasm_api::storage_store(&storage_key, &value);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_token_owner(_token_id: &[u8; 32]) -> Address {
+    Address {}
+}
+#[cfg(target_arch = "wasm32")]
+pub fn get_token_owner(token_id: &[u8; 32]) -> Address {
+    let storage_key = copy_into_storage_value(&calculate_token_hash(token_id));
+    let storage_value = ewasm_api::storage_load(&storage_key);
+    let bytes20: [u8; 20] = storage_value.bytes[12..32]
+        .try_into()
+        .expect("address should be bytes20");
+    bytes20.into()
 }

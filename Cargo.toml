@@ -9,6 +9,7 @@ exclude = [
     "examples/hello-contract",
     "examples/default-contract",
     "examples/erc20-contract",
+    "examples/erc721-contract",
     "examples/kv-contract",
     "examples/rdb-contract",
     "examples/rusty-contract",
