@@ -14,12 +14,12 @@ use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::types::{Address, StorageValue};
+use ewasm_api::{log3, types::Address};
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
 
 #[cfg(not(target_arch = "wasm32"))]
-use super::helpers::{Address, StorageValue};
+use super::helpers::Address;
 
 use sewup_derive::ewasm_lib_fn;
 
@@ -66,6 +66,18 @@ pub fn transfer(contract: &Contract) {
 
     set_balance(&sender, &sender_storage_value);
     set_balance(&recipient, &recipient_storage_value);
+
+    let topic: [u8; 32] =
+        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log3(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(sender).to_bytes32().into(),
+        &Raw::from(recipient).to_bytes32().into(),
+    );
 }
 
 /// Implement ERC-20 balanceOf(address)
@@ -173,6 +185,17 @@ pub fn approve(contract: &Contract) {
         copy_into_storage_value(&buffer)
     };
     set_allowance(&sender, &spender, &value);
+    let topic: [u8; 32] =
+        decode("8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log3(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(sender).to_bytes32().into(),
+        &Raw::from(spender).to_bytes32().into(),
+    );
 }
 
 /// Implement ERC-20 allowance(address,address)

@@ -5,6 +5,9 @@ use serde_derive::Deserialize as DeserializeDerive;
 
 use crate::types::*;
 
+#[cfg(target_arch = "wasm32")]
+use ewasm_api::types::Address;
+
 /// The small storage unit in the contract, which contains 32 bytes.
 #[derive(Clone)]
 pub struct Raw {
@@ -223,6 +226,19 @@ impl From<usize> for Raw {
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2],
             bytes[3],
         ]);
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<Address> for Raw {
+    fn from(addr: Address) -> Self {
+        let bytes = addr.bytes;
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1],
+            bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7], bytes[8], bytes[9],
+            bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15], bytes[16], bytes[17],
+            bytes[18], bytes[19],
+        ])
     }
 }
 
