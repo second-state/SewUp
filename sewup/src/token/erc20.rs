@@ -51,6 +51,11 @@ pub fn transfer(contract: &Contract) {
     let sender_storage_value = {
         let balance = get_balance(&sender);
         let origin_value = Uint256::from_be_bytes(balance.bytes);
+
+        if origin_value < value {
+            ewasm_api::revert();
+        }
+
         let new_value = origin_value - value;
         let buffer = new_value.to_be_bytes();
         copy_into_storage_value(&buffer)
@@ -287,6 +292,18 @@ pub fn transfer_from(contract: &Contract) {
     set_balance(&owner, &owner_storage_value);
     set_balance(&recipient, &recipient_storage_value);
     set_allowance(&owner, &sender, &allowed_storage_value);
+
+    let topic: [u8; 32] =
+        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log3(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(owner).to_bytes32().into(),
+        &Raw::from(recipient).to_bytes32().into(),
+    );
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -295,8 +312,18 @@ pub fn mint(addr: &str, value: usize) {
         .expect("address should be hex format")
         .try_into()
         .expect("address should be byte20");
-    set_balance(
-        &Address::from(byte20),
-        &Raw::from(value).to_bytes32().into(),
+    let address = Address::from(byte20);
+    set_balance(&address, &Raw::from(value).to_bytes32().into());
+
+    let topic: [u8; 32] =
+        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log3(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(0u32).to_bytes32().into(),
+        &Raw::from(address).to_bytes32().into(),
     );
 }
