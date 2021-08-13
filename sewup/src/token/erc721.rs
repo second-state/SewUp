@@ -8,8 +8,8 @@ pub use super::erc20::{balance_of, name, symbol, BALANCE_OF_SIG, NAME_SIG, SYMBO
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_storage_value, get_balance, get_token_owner, set_balance,
-    set_token_owner,
+    copy_into_address, copy_into_storage_value, get_balance, get_token_approval, get_token_owner,
+    set_balance, set_token_approval, set_token_owner,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -18,7 +18,7 @@ use bitcoin::util::uint::Uint256;
 use hex::decode;
 
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, types::Address};
+use ewasm_api::{log4, types::Address};
 
 /// Implement ERC-721 owner_of()
 /// ```json
@@ -81,17 +81,19 @@ pub fn transfer(contract: &Contract) {
     set_balance(&to, &copy_into_storage_value(&buffer));
 
     set_token_owner(&token_id, &to);
+    set_token_approval(&token_id, &to);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
             .unwrap()
             .try_into()
             .unwrap();
-    log3(
+    log4(
         &Vec::<u8>::with_capacity(0),
         &topic.into(),
         &Raw::from(sender).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
+        &token_id.into(),
     );
 }
 
@@ -130,7 +132,26 @@ pub fn transfer_from(contract: &Contract) {}
 /// }
 /// ```
 #[ewasm_lib_fn("095ea7b3")]
-pub fn approve(contract: &Contract) {}
+pub fn approve(contract: &Contract) {
+    let sender = ewasm_api::caller();
+    let spender = copy_into_address(&contract.input_data[16..36]);
+    let token_id: [u8; 32] = contract.input_data[36..68]
+        .try_into()
+        .expect("token id should be byte32");
+    set_token_approval(&token_id, &spender);
+    let topic: [u8; 32] =
+        decode("8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log4(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(sender).to_bytes32().into(),
+        &Raw::from(spender).to_bytes32().into(),
+        &token_id.into(),
+    );
+}
 
 /// Implement ERC-721 tokenMetadata(uint256)
 /// ```json

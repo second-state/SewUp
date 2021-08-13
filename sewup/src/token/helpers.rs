@@ -11,6 +11,12 @@ pub struct Address {}
 #[cfg(not(target_arch = "wasm32"))]
 pub struct StorageValue {}
 
+pub fn calculate_token_approval_hash(token_id: &[u8; 32]) -> Vec<u8> {
+    let mut token_approval: Vec<u8> = "token approval".as_bytes().into();
+    token_approval.extend_from_slice(token_id);
+    sha3_256(&token_approval).to_vec()
+}
+
 pub fn calculate_allowance_hash(sender: &[u8; 20], spender: &[u8; 20]) -> Vec<u8> {
     let mut allowance: Vec<u8> = "allowance".as_bytes().into();
     allowance.extend_from_slice(sender);
@@ -77,6 +83,31 @@ pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) 
     storage_key.bytes.copy_from_slice(&hash[0..32]);
 
     ewasm_api::storage_store(&storage_key, &value);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_token_approval(_token_id: &[u8; 32]) -> Address {
+    Address {}
+}
+#[cfg(target_arch = "wasm32")]
+pub fn get_token_approval(token_id: &[u8; 32]) -> Address {
+    let hash = calculate_token_approval_hash(token_id);
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+    let buf: [u8; 20] = ewasm_api::storage_load(&storage_key).bytes[12..32]
+        .try_into()
+        .expect("");
+    buf.into()
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn set_token_approval(_token_id: &[u8; 32], _spender: &Address) {}
+#[cfg(target_arch = "wasm32")]
+pub fn set_token_approval(token_id: &[u8; 32], spender: &Address) {
+    let hash = calculate_token_approval_hash(token_id);
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+    ewasm_api::storage_store(&storage_key, &Raw::from(spender).to_bytes32().into());
 }
 
 #[cfg(not(target_arch = "wasm32"))]
