@@ -19,7 +19,7 @@ use bitcoin::util::uint::Uint256;
 use hex::decode;
 
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log4, types::Address};
+use ewasm_api::{log3, log4, types::Address};
 
 /// Implement ERC-721 owner_of()
 /// ```json
@@ -127,7 +127,7 @@ pub fn transfer_from(contract: &Contract) {
     let to = copy_into_address(&contract.input_data[48..68]);
     let token_id = copy_into_array(&contract.input_data[68..100]);
 
-    if sender != get_token_approval(&token_id) {
+    if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
         ewasm_api::revert();
     }
 
@@ -176,7 +176,7 @@ pub fn approve(contract: &Contract) {
 /// {
 ///     "constant": false,
 ///     "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
-///     "name": "approve",
+///     "name": "getApproved",
 ///     "outputs": [{ "name": "_owner", "type": "address" }],
 ///     "payable": false,
 ///     "stateMutability": "nonpayable",
@@ -191,9 +191,42 @@ pub fn get_approved(contract: &Contract) {
     let spender = get_token_approval(&token_id);
     ewasm_api::finish_data(&Raw::from(spender).as_bytes().to_vec());
 }
-// setApprovalForAll(address,bool): a22cb465
+
+/// Implement ERC-721 setApprovalForAll(address,bool)
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [
+///         { "name": "_operator", "type": "address" },
+///         { "name": "_approved", "type": "bool" }
+///     ],
+///     "name": "setApprovalForAll",
+///     "outputs": [],
+///     "payable": false,
+///     "stateMutability": "nonpayable",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn("a22cb465")]
+pub fn set_approval_for_all(contract: &Contract) {
+    let sender = ewasm_api::caller();
+    let operator = copy_into_address(&contract.input_data[16..36]);
+    let is_approved = contract.input_data[67] == 1;
+    set_approval(&sender, &operator, is_approved);
+
+    let topic: [u8; 32] =
+        decode("17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log3(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(sender).to_bytes32().into(),
+        &Raw::from(operator).to_bytes32().into(),
+    );
+}
 // isApprovedForAll(address,address): e985e9c5
-// ApprovalForAll(address,address,bool): 17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
 
 /// Implement ERC-721 tokenMetadata(uint256)
 /// ```json

@@ -130,14 +130,14 @@ pub fn get_approval(sender: &Address, spender: &Address) -> bool {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_approval(_sender: &Address, _spender: &Address, _is_trust: bool) {}
+pub fn set_approval(_sender: &Address, _spender: &Address, _is_approved: bool) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_approval(sender: &Address, spender: &Address, is_trust: bool) {
+pub fn set_approval(sender: &Address, spender: &Address, is_approved: bool) {
     let hash = calculate_approval_hash(&sender.bytes, &spender.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
     let mut storage_value = StorageKey::default();
-    storage_value.bytes[31] = if is_trust { 1 } else { 0 };
+    storage_value.bytes[31] = if is_approved { 1 } else { 0 };
     ewasm_api::storage_store(&storage_key, &storage_value);
 }
 
