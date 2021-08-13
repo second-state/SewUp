@@ -17,6 +17,7 @@ fn main() -> anyhow::Result<()> {
     match contract.get_function_selector()? {
         sewup::token::erc721::BALANCE_OF_SIG => sewup::token::erc721::balance_of(&contract),
         sewup::token::erc721::OWNER_OF_SIG => sewup::token::erc721::owner_of(&contract),
+        sewup::token::erc721::TRANSFER_SIG => sewup::token::erc721::transfer(&contract),
         _ => (),
     };
     Ok(())
@@ -33,7 +34,7 @@ mod tests {
     fn test_execute_basic_operations() {
         let address_input = hex!("8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
         let mut input_data = vec![0u8, 0u8, 0u8, 0u8];
-        input_data.append(&mut address_input.to_vec());
+        input_data.extend_from_slice(&address_input);
         ewasm_assert_eq!(
             balance_of(input_data),
             vec![
