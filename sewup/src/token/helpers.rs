@@ -11,6 +11,13 @@ pub struct Address {}
 #[cfg(not(target_arch = "wasm32"))]
 pub struct StorageValue {}
 
+pub fn calculate_approval_hash(sender: &[u8; 20], spender: &[u8; 20]) -> Vec<u8> {
+    let mut allowance: Vec<u8> = "approval".as_bytes().into();
+    allowance.extend_from_slice(sender);
+    allowance.extend_from_slice(spender);
+    sha3_256(&allowance).to_vec()
+}
+
 pub fn calculate_token_approval_hash(token_id: &[u8; 32]) -> Vec<u8> {
     let mut token_approval: Vec<u8> = "token approval".as_bytes().into();
     token_approval.extend_from_slice(token_id);
@@ -108,6 +115,30 @@ pub fn set_token_approval(token_id: &[u8; 32], spender: &Address) {
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
     ewasm_api::storage_store(&storage_key, &Raw::from(spender).to_bytes32().into());
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_approval(_sender: &Address, _spender: &Address) -> bool {
+    true
+}
+#[cfg(target_arch = "wasm32")]
+pub fn get_approval(sender: &Address, spender: &Address) -> bool {
+    let hash = calculate_approval_hash(&sender.bytes, &spender.bytes);
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+    ewasm_api::storage_load(&storage_key).bytes[31] == 1
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn set_approval(_sender: &Address, _spender: &Address, _is_trust: bool) {}
+#[cfg(target_arch = "wasm32")]
+pub fn set_approval(sender: &Address, spender: &Address, is_trust: bool) {
+    let hash = calculate_approval_hash(&sender.bytes, &spender.bytes);
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+    let mut storage_value = StorageKey::default();
+    storage_value.bytes[31] = if is_trust { 1 } else { 0 };
+    ewasm_api::storage_store(&storage_key, &storage_value);
 }
 
 #[cfg(not(target_arch = "wasm32"))]

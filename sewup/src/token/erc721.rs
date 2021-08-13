@@ -8,8 +8,9 @@ pub use super::erc20::{balance_of, name, symbol, BALANCE_OF_SIG, NAME_SIG, SYMBO
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_array, copy_into_storage_value, get_balance, get_token_approval,
-    get_token_owner, set_balance, set_token_approval, set_token_owner,
+    copy_into_address, copy_into_array, copy_into_storage_value, get_approval, get_balance,
+    get_token_approval, get_token_owner, set_approval, set_balance, set_token_approval,
+    set_token_owner,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -169,6 +170,30 @@ pub fn approve(contract: &Contract) {
         &token_id.into(),
     );
 }
+
+/// Implement ERC-721 getApproved(uint256)
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
+///     "name": "approve",
+///     "outputs": [{ "name": "_owner", "type": "address" }],
+///     "payable": false,
+///     "stateMutability": "nonpayable",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn("081812fc")]
+pub fn get_approved(contract: &Contract) {
+    let token_id: [u8; 32] = contract.input_data[4..36]
+        .try_into()
+        .expect("token id should be byte32");
+    let spender = get_token_approval(&token_id);
+    ewasm_api::finish_data(&Raw::from(spender).as_bytes().to_vec());
+}
+// setApprovalForAll(address,bool): a22cb465
+// isApprovedForAll(address,address): e985e9c5
+// ApprovalForAll(address,address,bool): 17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
 
 /// Implement ERC-721 tokenMetadata(uint256)
 /// ```json
