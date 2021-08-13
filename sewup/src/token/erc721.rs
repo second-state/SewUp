@@ -14,6 +14,9 @@ use super::helpers::{
 };
 
 #[cfg(target_arch = "wasm32")]
+use crate::utils::ewasm_return_bool;
+
+#[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
@@ -226,7 +229,28 @@ pub fn set_approval_for_all(contract: &Contract) {
         &Raw::from(operator).to_bytes32().into(),
     );
 }
-// isApprovedForAll(address,address): e985e9c5
+
+/// Implement ERC-721 isApprovedForAll(address,address)
+/// ```json
+/// {
+///     "constant": false,
+///     "inputs": [
+///         { "name": "owner", "type": "address" },
+///         { "name": "operator", "type": "address" }
+///     ],
+///     "name": "isApprovedForAll",
+///     "outputs": [{ "name": "_approved", "type": "bool" }],
+///     "payable": false,
+///     "stateMutability": "nonpayable",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn("e985e9c5")]
+pub fn is_approval_for_all(contract: &Contract) {
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let operator = copy_into_address(&contract.input_data[48..68]);
+    ewasm_return_bool(get_approval(&owner, &operator));
+}
 
 /// Implement ERC-721 tokenMetadata(uint256)
 /// ```json
