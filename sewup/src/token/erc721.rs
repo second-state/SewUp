@@ -8,8 +8,8 @@ pub use super::erc20::{balance_of, name, symbol, BALANCE_OF_SIG, NAME_SIG, SYMBO
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_storage_value, get_balance, get_token_approval, get_token_owner,
-    set_balance, set_token_approval, set_token_owner,
+    copy_into_address, copy_into_array, copy_into_storage_value, get_balance, get_token_approval,
+    get_token_owner, set_balance, set_token_approval, set_token_owner,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -41,6 +41,37 @@ pub fn owner_of(contract: &Contract) {
     ewasm_api::finish_data(&Raw::from(owner).as_bytes().to_vec());
 }
 
+#[cfg(target_arch = "wasm32")]
+fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
+    let mut balance = get_balance(&owner);
+    let mut value = Uint256::from_be_bytes(balance.bytes)
+        - Uint256::from_u64(1u64).expect("uint256 one should valid");
+    let mut buffer = value.to_be_bytes();
+    set_balance(&owner, &copy_into_storage_value(&buffer));
+
+    balance = get_balance(&to);
+    value = Uint256::from_be_bytes(balance.bytes)
+        + Uint256::from_u64(1u64).expect("uint256 one should valid");
+    buffer = value.to_be_bytes();
+    set_balance(&to, &copy_into_storage_value(&buffer));
+
+    set_token_owner(&token_id, &to);
+    set_token_approval(&token_id, &to);
+
+    let topic: [u8; 32] =
+        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log4(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(owner).to_bytes32().into(),
+        &Raw::from(to).to_bytes32().into(),
+        &token_id.into(),
+    );
+}
+
 /// Implement ERC-721 transfer()
 /// ```json
 /// {
@@ -64,37 +95,12 @@ pub fn transfer(contract: &Contract) {
         .expect("token id should be byte32");
     let sender = ewasm_api::caller();
     let owner = get_token_owner(&token_id);
+
     if owner != sender {
         ewasm_api::revert();
     }
 
-    let mut balance = get_balance(&sender);
-    let mut value = Uint256::from_be_bytes(balance.bytes)
-        - Uint256::from_u64(1u64).expect("uint256 one should valid");
-    let mut buffer = value.to_be_bytes();
-    set_balance(&sender, &copy_into_storage_value(&buffer));
-
-    balance = get_balance(&to);
-    value = Uint256::from_be_bytes(balance.bytes)
-        + Uint256::from_u64(1u64).expect("uint256 one should valid");
-    buffer = value.to_be_bytes();
-    set_balance(&to, &copy_into_storage_value(&buffer));
-
-    set_token_owner(&token_id, &to);
-    set_token_approval(&token_id, &to);
-
-    let topic: [u8; 32] =
-        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
-            .unwrap()
-            .try_into()
-            .unwrap();
-    log4(
-        &Vec::<u8>::with_capacity(0),
-        &topic.into(),
-        &Raw::from(sender).to_bytes32().into(),
-        &Raw::from(to).to_bytes32().into(),
-        &token_id.into(),
-    );
+    do_transfer(owner, to, token_id);
 }
 
 /// Implement ERC-721 transferFrom(address,address,uint256)
@@ -114,7 +120,18 @@ pub fn transfer(contract: &Contract) {
 /// }
 /// ```
 #[ewasm_lib_fn("23b872dd")]
-pub fn transfer_from(contract: &Contract) {}
+pub fn transfer_from(contract: &Contract) {
+    let sender = ewasm_api::caller();
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
+    let token_id = copy_into_array(&contract.input_data[68..100]);
+
+    if sender != get_token_approval(&token_id) {
+        ewasm_api::revert();
+    }
+
+    do_transfer(owner, to, token_id);
+}
 
 /// Implement ERC-721 approve(address,uint256)
 /// ```json
@@ -213,12 +230,24 @@ pub fn mint(addr: &str, tokens: Vec<&str>) {
         .expect("address should be byte20");
     let address = Address::from(byte20);
 
+    let topic: [u8; 32] =
+        decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
+            .unwrap()
+            .try_into()
+            .unwrap();
     for token in tokens.iter() {
         let token_id: [u8; 32] = decode(token)
             .expect("token id should be hex format")
             .try_into()
             .expect("token id should be byte32");
         set_token_owner(&token_id, &address);
+        log4(
+            &Vec::<u8>::with_capacity(0),
+            &topic.into(),
+            &Raw::from(0u32).to_bytes32().into(),
+            &Raw::from(address).to_bytes32().into(),
+            &token_id.into(),
+        );
     }
 
     set_balance(&address, &Raw::from(tokens.len()).to_bytes32().into());
