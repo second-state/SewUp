@@ -246,7 +246,7 @@ pub fn set_approval_for_all(contract: &Contract) {
 /// }
 /// ```
 #[ewasm_lib_fn("e985e9c5")]
-pub fn is_approval_for_all(contract: &Contract) {
+pub fn is_approved_for_all(contract: &Contract) {
     let owner = copy_into_address(&contract.input_data[16..36]);
     let operator = copy_into_address(&contract.input_data[48..68]);
     ewasm_return_bool(get_approval(&owner, &operator));

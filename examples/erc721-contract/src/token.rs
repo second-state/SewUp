@@ -7,6 +7,7 @@ fn constructor() {
         vec![
             "0000000000000000000000000000000000000000000000000000000000000001",
             "0000000000000000000000000000000000000000000000000000000000000002",
+            "0000000000000000000000000000000000000000000000000000000000000003",
         ],
     );
 }
@@ -18,6 +19,15 @@ fn main() -> anyhow::Result<()> {
         sewup::token::erc721::BALANCE_OF_SIG => sewup::token::erc721::balance_of(&contract),
         sewup::token::erc721::OWNER_OF_SIG => sewup::token::erc721::owner_of(&contract),
         sewup::token::erc721::TRANSFER_SIG => sewup::token::erc721::transfer(&contract),
+        sewup::token::erc721::TRANSFER_FROM_SIG => sewup::token::erc721::transfer_from(&contract),
+        sewup::token::erc721::APPROVE_SIG => sewup::token::erc721::approve(&contract),
+        sewup::token::erc721::GET_APPROVED_SIG => sewup::token::erc721::get_approved(&contract),
+        sewup::token::erc721::SET_APPROVAL_FOR_ALL_SIG => {
+            sewup::token::erc721::set_approval_for_all(&contract)
+        }
+        sewup::token::erc721::IS_APPROVED_FOR_ALL_SIG => {
+            sewup::token::erc721::is_approved_for_all(&contract)
+        }
         _ => (),
     };
     Ok(())
@@ -39,13 +49,13 @@ mod tests {
             balance_of(input_data),
             vec![
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 2
+                0, 0, 0, 3
             ]
         );
 
         let token1 = hex!("0000000000000000000000000000000000000000000000000000000000000001");
         let token2 = hex!("0000000000000000000000000000000000000000000000000000000000000002");
-        let token3 = hex!("0000000000000000000000000000000000000000000000000000000000000003");
+        let token4 = hex!("0000000000000000000000000000000000000000000000000000000000000004");
 
         ewasm_assert_eq!(
             owner_of(token1),
@@ -63,7 +73,7 @@ mod tests {
         );
 
         ewasm_assert_eq!(
-            owner_of(token3),
+            owner_of(token4),
             vec![
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0

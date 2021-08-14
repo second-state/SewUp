@@ -59,12 +59,17 @@ pub fn ewasm_return_str(s: &str) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn ewasm_return_bool(is_true: bool) {
-    let mut output = Raw::from(32u32).as_bytes().to_vec();
-    if is_true {
-        output.append(&mut Raw::from(1u8).as_bytes().to_vec());
+    let output = if is_true {
+        vec![
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+        ]
     } else {
-        output.append(&mut Raw::from(0u8).as_bytes().to_vec());
-    }
+        vec![
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        ]
+    };
     finish_data(&output);
 }
 
