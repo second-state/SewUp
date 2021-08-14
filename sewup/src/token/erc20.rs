@@ -65,6 +65,11 @@ pub fn transfer(contract: &Contract) {
         let balance = get_balance(&recipient);
         let origin_value = Uint256::from_be_bytes(balance.bytes);
         let new_value = origin_value + value;
+
+        if origin_value > new_value {
+            ewasm_api::revert();
+        }
+
         let buffer = new_value.to_be_bytes();
         copy_into_storage_value(&buffer)
     };
