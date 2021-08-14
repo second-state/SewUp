@@ -1,11 +1,11 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.0.8-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.0.9-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.8-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.0.9-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
-[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.0.8-green.svg)](https://crates.io/crates/cargo-sewup)
+[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.0.9-green.svg)](https://crates.io/crates/cargo-sewup)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
@@ -23,6 +23,7 @@ as following, then you are ready to build contract with sewup.
 Features list (should select none or one of following)
 - kv - for writing contract as key value database
 - rdb - for writing contract as relational database
+- token - for writing ERC-20, ERC-721 tokens
 
 Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
 if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
