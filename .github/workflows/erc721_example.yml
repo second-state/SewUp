@@ -1,0 +1,27 @@
+name: Example
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  erc721-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v13
+        with:
+          nix_path: nixpkgs=channel:nixos-21.05-small
+
+      - name: Run test
+        run: nix-shell --run 'run-example-test erc721'
+
+      - name: Deploy test
+        run: nix-shell --run 'cli-test erc721'

@@ -57,6 +57,22 @@ pub fn ewasm_return_str(s: &str) {
     finish_data(&output);
 }
 
+#[cfg(target_arch = "wasm32")]
+pub fn ewasm_return_bool(is_true: bool) {
+    let output = if is_true {
+        vec![
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 1u8,
+        ]
+    } else {
+        vec![
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
+        ]
+    };
+    finish_data(&output);
+}
+
 pub fn copy_into_array<A, T>(slice: &[T]) -> A
 where
     A: Default + AsMut<[T]>,
