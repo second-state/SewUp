@@ -43,6 +43,13 @@ pub fn calculate_token_hash(token_id: &[u8; 32]) -> Vec<u8> {
     sha3_256(&token).to_vec()
 }
 
+pub fn calculate_token_balance_hash(address: &[u8; 20], token_id: &[u8; 32]) -> Vec<u8> {
+    let mut balance_of: Vec<u8> = "balanceOf".as_bytes().into();
+    balance_of.extend_from_slice(address);
+    balance_of.extend_from_slice(token_id);
+    sha3_256(&balance_of).to_vec()
+}
+
 #[cfg(not(target_arch = "wasm32"))]
 pub fn get_balance(_address: &Address) -> StorageValue {
     StorageValue {}
@@ -62,6 +69,31 @@ pub fn set_balance(_address: &Address, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
 pub fn set_balance(address: &Address, value: &StorageValue) {
     let hash = calculate_balance_hash(&address.bytes);
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+
+    ewasm_api::storage_store(&storage_key, &value);
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_token_balance(_address: &Address, token_id: &[u8; 32]) -> StorageValue {
+    StorageValue {}
+}
+#[cfg(target_arch = "wasm32")]
+pub fn get_token_balance(address: &Address, token_id: &[u8; 32]) -> StorageValue {
+    let hash = calculate_token_balance_hash(&address.bytes, token_id);
+
+    let mut storage_key = StorageKey::default();
+    storage_key.bytes.copy_from_slice(&hash[0..32]);
+
+    ewasm_api::storage_load(&storage_key)
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn set_token_balance(_address: &Address, token_id: &[u8; 32], _value: &StorageValue) {}
+#[cfg(target_arch = "wasm32")]
+pub fn set_token_balance(address: &Address, token_id: &[u8; 32], value: &StorageValue) {
+    let hash = calculate_token_balance_hash(&address.bytes, token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
 
