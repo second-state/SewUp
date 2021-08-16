@@ -16,7 +16,7 @@ jobs:
           nix_path: nixpkgs=channel:nixos-21.05-small
 
       - name: Build Documentation
-        run: nix-shell --run "cargo doc -p sewup -p sewup-derive --features=kv,rdb"
+        run: nix-shell --run "cargo doc -p sewup -p sewup-derive --features=kv,rdb,token"
 
       - name: Deploy Documentation
         env:
