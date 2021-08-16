@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["ALLOWANCE_SIG",""],["APPROVE_SIG",""],["BALANCE_OF_SIG",""],["DECIMALS_SIG",""],["NAME_SIG",""],["SYMBOL_SIG",""],["TOTAL_SUPPLY_SIG",""],["TRANSFER_FROM_SIG",""],["TRANSFER_SIG",""]],"fn":[["allowance",""],["approve",""],["balance_of",""],["decimals",""],["name",""],["symbol",""],["total_supply",""],["transfer",""],["transfer_from",""]]});
