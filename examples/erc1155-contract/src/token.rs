@@ -11,6 +11,12 @@ fn main() -> anyhow::Result<()> {
         sewup::token::erc1155::BALANCE_OF_BATCH_SIG => {
             sewup::token::erc1155::balance_of_batch(&contract)
         }
+        sewup::token::erc1155::SET_APPROVAL_FOR_ALL_SIG => {
+            sewup::token::erc721::set_approval_for_all(&contract)
+        }
+        sewup::token::erc1155::IS_APPROVED_FOR_ALL_SIG => {
+            sewup::token::erc721::is_approved_for_all(&contract)
+        }
         _ => (),
     };
     Ok(())
