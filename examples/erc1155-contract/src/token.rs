@@ -8,6 +8,9 @@ fn main() -> anyhow::Result<()> {
     let contract = sewup::primitives::Contract::new()?;
     match contract.get_function_selector()? {
         sewup::token::erc1155::BALANCE_OF_SIG => sewup::token::erc1155::balance_of(&contract),
+        sewup::token::erc1155::BALANCE_OF_BATCH_SIG => {
+            sewup::token::erc1155::balance_of_batch(&contract)
+        }
         _ => (),
     };
     Ok(())
