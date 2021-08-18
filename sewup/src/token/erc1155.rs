@@ -5,10 +5,16 @@ use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
 
 #[cfg(target_arch = "wasm32")]
-use super::helpers::{copy_into_address, get_token_balance, set_token_balance};
+use super::helpers::{
+    copy_into_address, copy_into_array, copy_into_storage_value, get_token_balance,
+    set_token_balance,
+};
 
 #[cfg(target_arch = "wasm32")]
 use crate::utils::ewasm_return_vec;
+
+#[cfg(target_arch = "wasm32")]
+use bitcoin::util::uint::Uint256;
 
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::{log3, log4, types::Address};
@@ -106,10 +112,11 @@ pub fn balance_of_batch(contract: &Contract) {
 /// {
 ///     "constant": true,
 ///     "inputs": [
-///         { "internalType": "address", "name": "account", "type": "address" },
-///         { "internalType": "address", "name": "account", "type": "address" },
+///         { "internalType": "address", "name": "from", "type": "address" },
+///         { "internalType": "address", "name": "to", "type": "address" },
 ///         { "internalType": "uinit256", "name": "token_id", "type": "uinit256" },
 ///         { "internalType": "uinit256", "name": "value", "type": "uinit256" }
+///         { "internalType": "bytes", "name": "data", "type": "bytes" }
 ///     ],
 ///     "name": "balanceOfBatch",
 ///     "outputs": [],
@@ -119,7 +126,61 @@ pub fn balance_of_batch(contract: &Contract) {
 /// }
 /// ```
 #[ewasm_lib_fn(f242432a)]
-pub fn safe_transfer_from(contract: &Contract) {}
+pub fn safe_transfer_from(contract: &Contract) {
+    let from = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
+    let token_id: [u8; 32] = contract.input_data[68..100]
+        .try_into()
+        .expect("token id should be byte32");
+    let value = {
+        let value_data: [u8; 32] = copy_into_array(&contract.input_data[100..132]);
+        Uint256::from_be_bytes(value_data)
+    };
+
+    let sender_storage_value = {
+        let balance = get_token_balance(&from, &token_id);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+
+        if origin_value < value {
+            ewasm_api::revert();
+        }
+
+        let new_value = origin_value - value;
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
+
+    let recipient_storage_value = {
+        let balance = get_token_balance(&to, &token_id);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+        let new_value = origin_value + value;
+
+        if origin_value > new_value {
+            ewasm_api::revert();
+        }
+
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
+
+    set_token_balance(&from, &token_id, &sender_storage_value);
+    set_token_balance(&to, &token_id, &recipient_storage_value);
+
+    //TODO handler the byte
+
+    let topic: [u8; 32] =
+        decode("c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log4(
+        &Vec::<u8>::with_capacity(0),
+        &topic.into(),
+        &Raw::from(from).to_bytes32().into(),
+        &Raw::from(to).to_bytes32().into(),
+        &token_id.into(),
+    );
+}
 
 // safeBatchTransferFrom(address,address,uint256[],uint256[],bytes): 2eb2c2d6
 // TransferSingle(address,address,address,uint256,uint256): c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62
