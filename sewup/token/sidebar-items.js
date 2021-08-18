@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["erc20",""],["erc721",""],["helpers",""]]});
+initSidebarItems({"mod":[["erc1155",""],["erc20",""],["erc721",""],["helpers",""]]});
