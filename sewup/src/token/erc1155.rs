@@ -17,7 +17,7 @@ use crate::utils::ewasm_return_vec;
 use bitcoin::util::uint::Uint256;
 
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, log4, types::Address};
+use ewasm_api::{log4, types::Address};
 
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
@@ -107,6 +107,7 @@ pub fn balance_of_batch(contract: &Contract) {
     ewasm_return_vec(&token_balance_list);
 }
 
+#[cfg(target_arch = "wasm32")]
 fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Uint256) {
     let sender_storage_value = {
         let balance = get_token_balance(from, token_id);
@@ -149,7 +150,7 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
 ///         { "internalType": "uinit256", "name": "value", "type": "uinit256" }
 ///         { "internalType": "bytes", "name": "data", "type": "bytes" }
 ///     ],
-///     "name": "balanceOfBatch",
+///     "name": "safeTransferFrom",
 ///     "outputs": [],
 ///     "payable": false,
 ///     "stateMutability": "view",
@@ -178,9 +179,9 @@ pub fn safe_transfer_from(contract: &Contract) {
     log4(
         &Vec::<u8>::with_capacity(0), //TODO handler the byte
         &topic.into(),
+        &Raw::from(ewasm_api::caller()).to_bytes32().into(),
         &Raw::from(from).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
-        &token_id.into(),
     );
 }
 
@@ -195,7 +196,7 @@ pub fn safe_transfer_from(contract: &Contract) {
 ///         { "internalType": "uinit256[]", "name": "value", "type": "uinit256[]" }
 ///         { "internalType": "bytes", "name": "data", "type": "bytes" }
 ///     ],
-///     "name": "balanceOfBatch",
+///     "name": "safeBatchTransferFrom",
 ///     "outputs": [],
 ///     "payable": false,
 ///     "stateMutability": "view",
@@ -246,9 +247,9 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
     log4(
         &Vec::<u8>::with_capacity(0), //TODO handler the byte
         &topic.into(),
+        &Raw::from(ewasm_api::caller()).to_bytes32().into(),
         &Raw::from(from).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
-        &token_id.into(),
     );
 }
 // URI(string,uint256): 6bb7ff708619ba0610cba295a58592e0451dee2622938c8755667688daf3529b
@@ -275,11 +276,11 @@ pub fn mint(addr: &str, tokens: Vec<(&str, usize)>) {
             .expect("token id should be byte32");
         set_token_balance(&address, &token_id, &Raw::from(*value).to_bytes32().into());
         log4(
-            &Vec::<u8>::with_capacity(0),
+            &Vec::<u8>::with_capacity(0), //TODO handler the byte
             &topic.into(),
             &Raw::from(0u32).to_bytes32().into(),
+            &Raw::from(0u32).to_bytes32().into(),
             &Raw::from(address).to_bytes32().into(),
-            &token_id.into(),
         );
     }
 }
