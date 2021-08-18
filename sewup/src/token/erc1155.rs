@@ -6,7 +6,7 @@ use sewup_derive::ewasm_lib_fn;
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_array, copy_into_storage_value, get_token_balance,
+    copy_into_address, copy_into_array, copy_into_storage_value, get_approval, get_token_balance,
     set_token_balance,
 };
 
@@ -159,11 +159,15 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
 /// ```
 #[ewasm_lib_fn(f242432a)]
 pub fn safe_transfer_from(contract: &Contract) {
+    let sender = ewasm_api::caller();
     let from = copy_into_address(&contract.input_data[16..36]);
     let to = copy_into_address(&contract.input_data[48..68]);
     let token_id: [u8; 32] = contract.input_data[68..100]
         .try_into()
         .expect("token id should be byte32");
+    if !get_approval(&from, &sender) {
+        ewasm_api::revert();
+    }
     let value = {
         let value_data: [u8; 32] = copy_into_array(&contract.input_data[100..132]);
         Uint256::from_be_bytes(value_data)
@@ -179,7 +183,7 @@ pub fn safe_transfer_from(contract: &Contract) {
     log4(
         &Vec::<u8>::with_capacity(0), //TODO handler the byte
         &topic.into(),
-        &Raw::from(ewasm_api::caller()).to_bytes32().into(),
+        &Raw::from(sender).to_bytes32().into(),
         &Raw::from(from).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
     );
@@ -205,18 +209,32 @@ pub fn safe_transfer_from(contract: &Contract) {
 /// ```
 #[ewasm_lib_fn("2eb2c2d6")]
 pub fn safe_batch_transfer_from(contract: &Contract) {
+    let sender = ewasm_api::caller();
     let from = copy_into_address(&contract.input_data[16..36]);
     let to = copy_into_address(&contract.input_data[48..68]);
 
+    if !get_approval(&from, &sender) {
+        ewasm_api::revert();
+    }
+
     // TODO: handle the offset bigger than usize
-
     let mut buf: [u8; 4] = contract.input_data[96..100].try_into().unwrap();
+    let token_offset = usize::from_be_bytes(buf) + 4;
 
+    buf = contract.input_data[128..132].try_into().unwrap();
+    let value_offset = usize::from_be_bytes(buf) + 4;
+
+    buf = contract.input_data[token_offset + 28..token_offset + 32]
+        .try_into()
+        .unwrap();
     let token_length = usize::from_be_bytes(buf);
     let mut token_list = Vec::<[u8; 32]>::new();
     let mut i = 0;
+
+    let mut output = Vec::<[u8; 32]>::new();
     while i < token_length {
-        let bytes32: [u8; 32] = contract.input_data[100 + i * 32..132 + i * 32]
+        let bytes32: [u8; 32] = contract.input_data
+            [token_offset + 32 + i * 32..token_offset + 64 + i * 32]
             .try_into()
             .unwrap();
         token_list.push(bytes32);
@@ -224,14 +242,13 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
     }
 
     i = 0;
-    buf = contract.input_data[100 + 32 * token_length..132 + 32 * token_length]
+    buf = contract.input_data[value_offset + 28..value_offset + 32]
         .try_into()
         .unwrap();
     while i < usize::from_be_bytes(buf) {
         let value = {
             let value_data: [u8; 32] = copy_into_array(
-                &contract.input_data
-                    [132 + 32 * token_length + 32 * i..164 + 32 * token_length + 32 * i],
+                &contract.input_data[value_offset + 32 + i * 32..value_offset + 64 + i * 32],
             );
             Uint256::from_be_bytes(value_data)
         };
