@@ -1,0 +1,37 @@
+[package]
+name = "erc1155-contract"
+version = "0.1.0"
+authors = []
+edition = "2018"
+description = "This is an ERC-1155 example for SewUp"
+
+[lib]
+path = "src/token.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+sewup ={ version = "*", path = "../../sewup", features = [ "token" ] }
+sewup-derive = { version = "*", path = "../../sewup-derive" }
+anyhow = "1.0.40"
+
+[dev-dependencies]
+hex-literal = "0.3.1"
+
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z"
+
+[profile.release.package.erc1155-contract]
+incremental = false
+opt-level = "z"
+
+[deploy]
+url = "http://localhost:8545"
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+[features]
+constructor = []
+constructor-test = []

@@ -306,11 +306,13 @@ pub fn safe_transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, tokens: Vec<&str>) {
-    let byte20: [u8; 20] = decode(addr)
-        .expect("address should be hex format")
-        .try_into()
-        .expect("address should be byte20");
-    let address = Address::from(byte20);
+    let address = {
+        let byte20: [u8; 20] = decode(addr)
+            .expect("address should be hex format")
+            .try_into()
+            .expect("address should be byte20");
+        Address::from(byte20)
+    };
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")

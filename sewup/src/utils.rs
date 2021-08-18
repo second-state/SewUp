@@ -58,6 +58,16 @@ pub fn ewasm_return_str(s: &str) {
 }
 
 #[cfg(target_arch = "wasm32")]
+pub fn ewasm_return_vec(v: &Vec<[u8; 32]>) {
+    let mut output = Raw::from(32u32).as_bytes().to_vec();
+    output.append(&mut Raw::from(v.len()).as_bytes().to_vec());
+    for e in v.iter() {
+        output.extend_from_slice(e);
+    }
+    finish_data(&output);
+}
+
+#[cfg(target_arch = "wasm32")]
 pub fn ewasm_return_bool(is_true: bool) {
     let output = if is_true {
         vec![
