@@ -1,7 +1,25 @@
 use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[ewasm_constructor]
-fn constructor() {}
+fn constructor() {
+    sewup::token::erc1155::mint(
+        "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+        vec![
+            (
+                "0000000000000000000000000000000000000000000000000000000000000001",
+                1,
+            ),
+            (
+                "0000000000000000000000000000000000000000000000000000000000000002",
+                2,
+            ),
+            (
+                "0000000000000000000000000000000000000000000000000000000000000003",
+                3,
+            ),
+        ],
+    );
+}
 
 #[ewasm_main]
 fn main() -> anyhow::Result<()> {

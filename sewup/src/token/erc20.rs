@@ -313,11 +313,13 @@ pub fn transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, value: usize) {
-    let byte20: [u8; 20] = decode(addr)
-        .expect("address should be hex format")
-        .try_into()
-        .expect("address should be byte20");
-    let address = Address::from(byte20);
+    let address = {
+        let byte20: [u8; 20] = decode(addr)
+            .expect("address should be hex format")
+            .try_into()
+            .expect("address should be byte20");
+        Address::from(byte20)
+    };
     set_balance(&address, &Raw::from(value).to_bytes32().into());
 
     let topic: [u8; 32] =
