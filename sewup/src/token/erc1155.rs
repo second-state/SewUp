@@ -107,6 +107,37 @@ pub fn balance_of_batch(contract: &Contract) {
     ewasm_return_vec(&token_balance_list);
 }
 
+fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Uint256) {
+    let sender_storage_value = {
+        let balance = get_token_balance(from, token_id);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+
+        if origin_value < value {
+            ewasm_api::revert();
+        }
+
+        let new_value = origin_value - value;
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
+
+    let recipient_storage_value = {
+        let balance = get_token_balance(to, token_id);
+        let origin_value = Uint256::from_be_bytes(balance.bytes);
+        let new_value = origin_value + value;
+
+        if origin_value > new_value {
+            ewasm_api::revert();
+        }
+
+        let buffer = new_value.to_be_bytes();
+        copy_into_storage_value(&buffer)
+    };
+
+    set_token_balance(from, token_id, &sender_storage_value);
+    set_token_balance(to, token_id, &recipient_storage_value);
+}
+
 /// Implement ERC-1155 safeTransferFrom(address,address,uint256,uint256,bytes)
 /// ```json
 /// {
@@ -137,36 +168,7 @@ pub fn safe_transfer_from(contract: &Contract) {
         Uint256::from_be_bytes(value_data)
     };
 
-    let sender_storage_value = {
-        let balance = get_token_balance(&from, &token_id);
-        let origin_value = Uint256::from_be_bytes(balance.bytes);
-
-        if origin_value < value {
-            ewasm_api::revert();
-        }
-
-        let new_value = origin_value - value;
-        let buffer = new_value.to_be_bytes();
-        copy_into_storage_value(&buffer)
-    };
-
-    let recipient_storage_value = {
-        let balance = get_token_balance(&to, &token_id);
-        let origin_value = Uint256::from_be_bytes(balance.bytes);
-        let new_value = origin_value + value;
-
-        if origin_value > new_value {
-            ewasm_api::revert();
-        }
-
-        let buffer = new_value.to_be_bytes();
-        copy_into_storage_value(&buffer)
-    };
-
-    set_token_balance(&from, &token_id, &sender_storage_value);
-    set_token_balance(&to, &token_id, &recipient_storage_value);
-
-    //TODO handler the byte
+    do_transfer_from(&from, &to, &token_id, value);
 
     let topic: [u8; 32] =
         decode("c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62")
@@ -174,7 +176,7 @@ pub fn safe_transfer_from(contract: &Contract) {
             .try_into()
             .unwrap();
     log4(
-        &Vec::<u8>::with_capacity(0),
+        &Vec::<u8>::with_capacity(0), //TODO handler the byte
         &topic.into(),
         &Raw::from(from).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
@@ -182,9 +184,73 @@ pub fn safe_transfer_from(contract: &Contract) {
     );
 }
 
-// safeBatchTransferFrom(address,address,uint256[],uint256[],bytes): 2eb2c2d6
-// TransferSingle(address,address,address,uint256,uint256): c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62
-// TransferBatch(address,address,address,uint256[],uint256[]): 4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb
+/// Implement ERC-1155 safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
+/// ```json
+/// {
+///     "constant": true,
+///     "inputs": [
+///         { "internalType": "address", "name": "from", "type": "address" },
+///         { "internalType": "address", "name": "to", "type": "address" },
+///         { "internalType": "uinit256[]", "name": "token_id", "type": "uinit256[]" },
+///         { "internalType": "uinit256[]", "name": "value", "type": "uinit256[]" }
+///         { "internalType": "bytes", "name": "data", "type": "bytes" }
+///     ],
+///     "name": "balanceOfBatch",
+///     "outputs": [],
+///     "payable": false,
+///     "stateMutability": "view",
+///     "type": "function"
+/// }
+/// ```
+#[ewasm_lib_fn("2eb2c2d6")]
+pub fn safe_batch_transfer_from(contract: &Contract) {
+    let from = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
+
+    // TODO: handle the offset bigger than usize
+
+    let mut buf: [u8; 4] = contract.input_data[96..100].try_into().unwrap();
+
+    let token_length = usize::from_be_bytes(buf);
+    let mut token_list = Vec::<[u8; 32]>::new();
+    let mut i = 0;
+    while i < token_length {
+        let bytes32: [u8; 32] = contract.input_data[100 + i * 32..132 + i * 32]
+            .try_into()
+            .unwrap();
+        token_list.push(bytes32);
+        i = i + 1;
+    }
+
+    i = 0;
+    buf = contract.input_data[100 + 32 * token_length..132 + 32 * token_length]
+        .try_into()
+        .unwrap();
+    while i < usize::from_be_bytes(buf) {
+        let value = {
+            let value_data: [u8; 32] = copy_into_array(
+                &contract.input_data
+                    [132 + 32 * token_length + 32 * i..164 + 32 * token_length + 32 * i],
+            );
+            Uint256::from_be_bytes(value_data)
+        };
+        do_transfer_from(&from, &to, &token_list[i], value);
+        i = i + 1;
+    }
+
+    let topic: [u8; 32] =
+        decode("4a39dc06d4c0dbc64b70af90fd698a233a518aa5d07e595d983b8c0526c8f7fb")
+            .unwrap()
+            .try_into()
+            .unwrap();
+    log4(
+        &Vec::<u8>::with_capacity(0), //TODO handler the byte
+        &topic.into(),
+        &Raw::from(from).to_bytes32().into(),
+        &Raw::from(to).to_bytes32().into(),
+        &token_id.into(),
+    );
+}
 // URI(string,uint256): 6bb7ff708619ba0610cba295a58592e0451dee2622938c8755667688daf3529b
 
 #[cfg(target_arch = "wasm32")]
