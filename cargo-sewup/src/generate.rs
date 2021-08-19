@@ -1,3 +1,6 @@
+use std::collections::HashSet;
+use std::iter::FromIterator;
+
 use anyhow::{Context, Result};
 use regex::Regex;
 use tokio::{
@@ -27,24 +30,30 @@ pub async fn run() -> Result<()> {
         .await
         .context("fail to expand macro")?;
     let expanded = read_to_string(outfile_path).await?;
-    println!("{}", expanded);
 
     let sig_re = Regex::new(r"[A-Za-z0-9:_]*_SIG").unwrap();
-    let abi_re = Regex::new(r#"(?P<abi_name>[A-Za-z0-9_]*_ABI): &'static str =[^;]*"#).unwrap();
+    let abi_re =
+        Regex::new(r#"const (?P<abi_name>[A-Za-z0-9_]*_ABI): &'static str =[^;]*;"#).unwrap();
     let total_abis: Vec<String> = sig_re
         .find_iter(&expanded)
         .map(|m| m.as_str().replace("_SIG", "_ABI"))
         .collect();
-    let contract_abis: Vec<String> = abi_re
-        .find_iter(&expanded)
-        .map(|m| m.as_str().to_string())
+    let contract_abis: Vec<(String, String)> = abi_re
+        .captures_iter(&expanded)
+        .map(|c| {
+            (
+                c.name("abi_name").unwrap().as_str().to_string(),
+                c.get(0).unwrap().as_str().to_string(),
+            )
+        })
         .collect();
-    println!("{:?}", total_abis);
-    println!("{:?}", contract_abis);
-    macro_rules! m {
-        ( $body:block ) => {
-            concat!("fn main () {", stringify!($body), "}")
-        };
+
+    let all_abis = HashSet::<String>::from_iter(total_abis.iter().cloned());
+    let mut lib_abis = all_abis.clone();
+    let mut contract_abi_context = String::new();
+    for (abi, def) in contract_abis.into_iter() {
+        lib_abis.remove(&abi);
+        contract_abi_context = contract_abi_context + &def;
     }
 
     write(
@@ -60,13 +69,21 @@ pub async fn run() -> Result<()> {
     )
     .await?;
 
-    write(
-        abi_generator_path.to_str().unwrap(),
-        m!({
-            println!("Hello, world!");
-        }),
-    )
-    .await?;
+    let generator = format!(
+        r#"
+            {}
+            fn main () {{
+                println!(
+                        "[{{}}]"
+                        , {}
+                );
+            }}
+        "#,
+        contract_abi_context,
+        all_abis.into_iter().collect::<Vec<String>>().join(",")
+    );
+
+    write(abi_generator_path.to_str().unwrap(), generator).await?;
 
     let output = Command::new("cargo")
         .args(&[
