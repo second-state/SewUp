@@ -254,12 +254,18 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         let fn_sig = hex::decode(attr_str).expect("function signature is not correct");
         (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
     };
+    let abi_info = Ident::new(
+        &format!("{}_ABI", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
     let sig_name = Ident::new(
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
     let result = quote! {
         pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub(crate) const #abi_info: &'static str = r#"{}"#;
+
         #[cfg(target_arch = "wasm32")]
         #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
         #input
@@ -369,8 +375,13 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
+    let abi_info = Ident::new(
+        &format!("{}_ABI", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
     let result = quote! {
-        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #sig_name: [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #abi_info: &'static str = "{}";
 
         #[cfg(not(target_arch = "wasm32"))]
         #[allow(unused)]
