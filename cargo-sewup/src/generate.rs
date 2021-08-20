@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::iter::FromIterator;
 
 use anyhow::{Context, Result};
@@ -48,7 +47,7 @@ pub async fn run() -> Result<()> {
         })
         .collect();
 
-    let all_abis = HashSet::<String>::from_iter(total_abis.iter().cloned());
+    let all_abis = linked_hash_set::LinkedHashSet::<String>::from_iter(total_abis.iter().cloned());
     let mut lib_abis = all_abis.clone();
     let mut contract_abi_context = String::new();
     for (abi, def) in contract_abis.into_iter() {
