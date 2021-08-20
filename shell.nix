@@ -25,7 +25,9 @@ let
   '';
   abiTestScript = nixpkgs.writeShellScriptBin "abi-test" ''
     cd cargo-sewup
-    cargo run -- -g -p ../examples/$1-contract | jq
+    cargo run -- -g -p ../examples/$1-contract | jq --sort-keys > /tmp/$1_abi.json
+    cd ../
+    diff /tmp/$1_abi.json asset/$1_abi.json
     rc=$?
     exit $rc
   '';
