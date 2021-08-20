@@ -4,7 +4,10 @@ use crate::primitives::Contract;
 use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
 
-pub use super::erc20::{balance_of, name, symbol, BALANCE_OF_SIG, NAME_SIG, SYMBOL_SIG};
+pub use super::erc20::{
+    balance_of, name, symbol, BALANCE_OF_ABI, BALANCE_OF_SIG, NAME_ABI, NAME_SIG, SYMBOL_ABI,
+    SYMBOL_SIG,
+};
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
@@ -25,18 +28,15 @@ use hex::decode;
 use ewasm_api::{log3, log4, types::Address};
 
 /// Implement ERC-721 owner_of()
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [{ "name": "_tokenId", "type": "uint256" }],
-///     "name": "ownerOf",
-///     "outputs": [{ "name": "_owner", "type": "address" }],
-///     "payable": false,
-///     "stateMutability": "view",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("6352211e")]
+#[ewasm_lib_fn("6352211e", {
+    "constant": true,
+    "inputs": [{ "name": "_tokenId", "type": "uint256" }],
+    "name": "ownerOf",
+    "outputs": [{ "name": "_owner", "type": "address" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+})]
 pub fn owner_of(contract: &Contract) {
     let token_id: [u8; 32] = contract.input_data[4..36]
         .try_into()
@@ -77,21 +77,18 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
 }
 
 /// Implement ERC-721 transfer()
-/// ```json
-/// {
-///   "constant": false,
-///   "inputs": [
-///     { "name": "_to", "type": "address" },
-///     { "name": "_tokenId", "type": "uint256" }
-///   ],
-///   "name": "transfer",
-///   "outputs": [],
-///   "payable": false,
-///   "stateMutability": "nonpayable",
-///   "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("a9059cbb")]
+#[ewasm_lib_fn("a9059cbb", {
+  "constant": false,
+  "inputs": [
+    { "name": "_to", "type": "address" },
+    { "name": "_tokenId", "type": "uint256" }
+  ],
+  "name": "transfer",
+  "outputs": [],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+})]
 pub fn transfer(contract: &Contract) {
     let to = copy_into_address(&contract.input_data[16..36]);
     let token_id: [u8; 32] = contract.input_data[36..68]
@@ -108,22 +105,19 @@ pub fn transfer(contract: &Contract) {
 }
 
 /// Implement ERC-721 transferFrom(address,address,uint256)
-/// ```json
-/// {
-///   "constant": false,
-///   "inputs": [
-///     { "name": "_from", "type": "address" },
-///     { "name": "_to", "type": "address" },
-///     { "name": "_tokenId", "type": "uint256" }
-///   ],
-///   "name": "transferFrom",
-///   "outputs": [],
-///   "payable": false,
-///   "stateMutability": "nonpayable",
-///   "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("23b872dd")]
+#[ewasm_lib_fn("23b872dd", {
+  "constant": false,
+  "inputs": [
+    { "name": "_from", "type": "address" },
+    { "name": "_to", "type": "address" },
+    { "name": "_tokenId", "type": "uint256" }
+  ],
+  "name": "transferFrom",
+  "outputs": [],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+})]
 pub fn transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let owner = copy_into_address(&contract.input_data[16..36]);
@@ -138,21 +132,18 @@ pub fn transfer_from(contract: &Contract) {
 }
 
 /// Implement ERC-721 approve(address,uint256)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "name": "_to", "type": "address" },
-///         { "name": "_tokenId", "type": "uint256" }
-///     ],
-///     "name": "approve",
-///     "outputs": [],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("095ea7b3")]
+#[ewasm_lib_fn("095ea7b3", {
+    "constant": false,
+    "inputs": [
+        { "name": "_to", "type": "address" },
+        { "name": "_tokenId", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn approve(contract: &Contract) {
     let sender = ewasm_api::caller();
     let spender = copy_into_address(&contract.input_data[16..36]);
@@ -175,18 +166,15 @@ pub fn approve(contract: &Contract) {
 }
 
 /// Implement ERC-721 getApproved(uint256)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
-///     "name": "getApproved",
-///     "outputs": [{ "name": "_owner", "type": "address" }],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("081812fc")]
+#[ewasm_lib_fn("081812fc", {
+    "constant": false,
+    "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
+    "name": "getApproved",
+    "outputs": [{ "name": "_owner", "type": "address" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn get_approved(contract: &Contract) {
     let token_id: [u8; 32] = contract.input_data[4..36]
         .try_into()
@@ -196,21 +184,18 @@ pub fn get_approved(contract: &Contract) {
 }
 
 /// Implement ERC-721 setApprovalForAll(address,bool)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "name": "_operator", "type": "address" },
-///         { "name": "_approved", "type": "bool" }
-///     ],
-///     "name": "setApprovalForAll",
-///     "outputs": [],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("a22cb465")]
+#[ewasm_lib_fn("a22cb465", {
+    "constant": false,
+    "inputs": [
+        { "name": "_operator", "type": "address" },
+        { "name": "_approved", "type": "bool" }
+    ],
+    "name": "setApprovalForAll",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn set_approval_for_all(contract: &Contract) {
     let sender = ewasm_api::caller();
     let operator = copy_into_address(&contract.input_data[16..36]);
@@ -231,21 +216,18 @@ pub fn set_approval_for_all(contract: &Contract) {
 }
 
 /// Implement ERC-721 isApprovedForAll(address,address)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "name": "owner", "type": "address" },
-///         { "name": "operator", "type": "address" }
-///     ],
-///     "name": "isApprovedForAll",
-///     "outputs": [{ "name": "_approved", "type": "bool" }],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("e985e9c5")]
+#[ewasm_lib_fn("e985e9c5", {
+    "constant": false,
+    "inputs": [
+        { "name": "owner", "type": "address" },
+        { "name": "operator", "type": "address" }
+    ],
+    "name": "isApprovedForAll",
+    "outputs": [{ "name": "_approved", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn is_approved_for_all(contract: &Contract) {
     let owner = copy_into_address(&contract.input_data[16..36]);
     let operator = copy_into_address(&contract.input_data[48..68]);
@@ -253,18 +235,15 @@ pub fn is_approved_for_all(contract: &Contract) {
 }
 
 /// Implement ERC-721 tokenMetadata(uint256)
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
-///     "name": "tokenMetadata",
-///     "outputs": [ { "name": "_infoUrl", "type": "string" } ],
-///     "payable": false,
-///     "stateMutability": "view",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("6914db60")]
+#[ewasm_lib_fn("6914db60", {
+    "constant": true,
+    "inputs": [ { "name": "_tokenId", "type": "uint256" } ],
+    "name": "tokenMetadata",
+    "outputs": [ { "name": "_infoUrl", "type": "string" } ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+})]
 pub fn tokenMetadata(contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/161
@@ -285,20 +264,19 @@ pub fn safe_transfer_from_with_data(contract: &Contract) {
 }
 
 /// Implement ERC-721 safeTransferFrom(address,address,uint256)
-/// {
-///   "constant": false,
-///   "inputs": [
-///     { "name": "_from", "type": "address" },
-///     { "name": "_to", "type": "address" },
-///     { "name": "_tokenId", "type": "uint256" }
-///   ],
-///   "name": "safeTransferFrom",
-///   "outputs": [],
-///   "payable": false,
-///   "stateMutability": "nonpayable",
-///   "type": "function"
-/// }
-#[ewasm_lib_fn("42842e0e")]
+#[ewasm_lib_fn("42842e0e", {
+  "constant": false,
+  "inputs": [
+    { "name": "_from", "type": "address" },
+    { "name": "_to", "type": "address" },
+    { "name": "_tokenId", "type": "uint256" }
+  ],
+  "name": "safeTransferFrom",
+  "outputs": [],
+  "payable": false,
+  "stateMutability": "nonpayable",
+  "type": "function"
+})]
 pub fn safe_transfer_from(contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/160

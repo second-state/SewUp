@@ -10,6 +10,7 @@ mod config;
 mod constants;
 mod deploy;
 mod errors;
+mod generate;
 mod inspect;
 
 #[derive(StructOpt)]
@@ -34,32 +35,37 @@ struct Opt {
     /// Inspect the .deploy file to wat
     #[structopt(short, long)]
     inspect_file: Option<String>,
+
+    /// Generate ABI JSON if the handler is compaitabled with web3.js
+    #[structopt(short, long)]
+    generate_abi: bool,
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
     let opt = Opt::from_args();
 
-    if let Some(inspect_file) = opt.inspect_file {
-        return inspect::run(inspect_file).await;
-    }
-
     if let Some(path) = opt.project_path {
         env::set_current_dir(&Path::new(&path))?
     }
 
-    if opt.verbose {
-        println!("project   : {}", env::current_dir()?.display());
-    }
-
-    let contract_name = build::run(opt.debug).await?;
-
-    if !opt.build_only {
+    return if let Some(inspect_file) = opt.inspect_file {
+        inspect::run(inspect_file).await
+    } else if opt.generate_abi {
+        generate::run().await
+    } else {
         if opt.verbose {
-            println!("contract  : {}", contract_name);
+            println!("project   : {}", env::current_dir()?.display());
         }
-        deploy::run(contract_name, opt.verbose, opt.debug).await?;
-    }
 
-    Ok(())
+        let contract_name = build::run(opt.debug).await?;
+
+        if !opt.build_only {
+            if opt.verbose {
+                println!("contract  : {}", contract_name);
+            }
+            deploy::run(contract_name, opt.verbose, opt.debug).await?;
+        }
+        Ok(())
+    };
 }

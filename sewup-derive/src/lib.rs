@@ -217,6 +217,21 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     let attr_str = attr.to_string().replace(" ", "");
+    let (hex_str, abi_str) = if attr_str.is_empty() {
+        (None, "{}".to_string())
+    } else if attr_str.starts_with('{') {
+        (None, attr_str.split_whitespace().collect())
+    } else {
+        if let Some((head, tail)) = attr_str.split_once(',') {
+            (
+                Some(head.replace("\"", "")),
+                tail.split_whitespace().collect(),
+            )
+        } else {
+            (Some(attr_str.replace("\"", "")), "{}".to_string())
+        }
+    };
+
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
     let args = &input
@@ -247,19 +262,25 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         .collect::<Vec<_>>()
         .join(",");
     let canonical_fn = format!("{}({})", name, args);
-    let (sig_0, sig_1, sig_2, sig_3) = if attr_str.is_empty() {
-        let fn_sig = get_function_signature(&canonical_fn);
+    let (sig_0, sig_1, sig_2, sig_3) = if let Some(hex_str) = hex_str {
+        let fn_sig = hex::decode(hex_str).expect("function signature is not correct");
         (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
     } else {
-        let fn_sig = hex::decode(attr_str).expect("function signature is not correct");
+        let fn_sig = get_function_signature(&canonical_fn);
         (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
     };
+    let abi_info = Ident::new(
+        &format!("{}_ABI", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
     let sig_name = Ident::new(
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
     let result = quote! {
         pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub(crate) const #abi_info: &'static str = #abi_str;
+
         #[cfg(target_arch = "wasm32")]
         #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
         #input
@@ -326,11 +347,27 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_str = attr.to_string().replace(" ", "").replace("\"", "");
+    let attr_str = attr.to_string().replace(" ", "");
+    let (hex_str, abi_str) = if attr_str.is_empty() {
+        (None, "{}".to_string())
+    } else if attr_str.starts_with('{') {
+        (None, attr_str.to_string())
+    } else {
+        if let Some((head, tail)) = attr_str.split_once(',') {
+            (Some(head.replace("\"", "")), tail.to_string())
+        } else {
+            (Some(attr_str.replace("\"", "")), "{}".to_string())
+        }
+    };
+
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
     let inputs = &input.sig.inputs;
-    let (sig_0, sig_1, sig_2, sig_3) = if attr_str.is_empty() {
+
+    let (sig_0, sig_1, sig_2, sig_3) = if let Some(hex_str) = hex_str {
+        let fn_sig = hex::decode(hex_str).expect("function signature is not correct");
+        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
+    } else {
         let args = &inputs
             .iter()
             .map(|fn_arg| match fn_arg {
@@ -361,16 +398,18 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         let canonical_fn = format!("{}({})", name, args);
         let fn_sig = get_function_signature(&canonical_fn);
         (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
-    } else {
-        let fn_sig = hex::decode(attr_str).expect("function signature is not correct");
-        (fn_sig[0], fn_sig[1], fn_sig[2], fn_sig[3])
     };
     let sig_name = Ident::new(
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
+    let abi_info = Ident::new(
+        &format!("{}_ABI", name.to_string().to_ascii_uppercase()),
+        Span::call_site(),
+    );
     let result = quote! {
-        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #sig_name: [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #abi_info: &'static str = #abi_str;
 
         #[cfg(not(target_arch = "wasm32"))]
         #[allow(unused)]
