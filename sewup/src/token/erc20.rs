@@ -24,21 +24,18 @@ use super::helpers::Address;
 use sewup_derive::ewasm_lib_fn;
 
 /// Implement ERC-20 transfer(address,uint256)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "internalType": "address", "name": "recipient", "type": "address" },
-///         { "internalType": "uint256", "name": "amount", "type": "uint256" }
-///     ],
-///     "name": "transfer",
-///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(a9059cbb)]
+#[ewasm_lib_fn(a9059cbb, {
+    "constant": false,
+    "inputs": [
+        { "internalType": "address", "name": "recipient", "type": "address" },
+        { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "transfer",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn transfer(contract: &Contract) {
     let sender = ewasm_api::caller();
     let recipient = copy_into_address(&contract.input_data[16..36]);
@@ -91,18 +88,15 @@ pub fn transfer(contract: &Contract) {
 }
 
 /// Implement ERC-20 balanceOf(address)
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
-///     "name": "balanceOf",
-///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-///     "payable": false,
-///     "stateMutability": "view",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(70a08231)]
+#[ewasm_lib_fn(70a08231, {
+    "constant": true,
+    "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
+    "name": "balanceOf",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+})]
 pub fn balance_of(contract: &Contract) {
     let address = copy_into_address(&contract.input_data[16..36]);
     let balance = get_balance(&address);
@@ -111,82 +105,71 @@ pub fn balance_of(contract: &Contract) {
 
 /// Implement ERC-20 name() and easy to change the name
 /// ```json
-/// {
-///     "constant": true,
-///     "inputs": [],
-///     "name": "symbol",
-///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-///     "payable": false, "stateMutability": "view",
-///     "type": "function"
-/// }
 /// ```
-#[ewasm_lib_fn(06fdde03)]
+#[ewasm_lib_fn(06fdde03, {
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "payable": false, "stateMutability": "view",
+    "type": "function"
+})]
 pub fn name(s: &str) {
     ewasm_return_str(s);
 }
 
 /// Implement ERC-20 symbol() and easy to change the symbol
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [],
-///     "name": "symbol",
-///     "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
-///     "payable": false, "stateMutability": "view",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(95d89b41)]
+#[ewasm_lib_fn(95d89b41, {
+    "constant": true,
+    "inputs": [],
+    "name": "symbol",
+    "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
+    "payable": false, "stateMutability": "view",
+    "type": "function"
+})]
 pub fn symbol(s: &str) {
     ewasm_return_str(s);
 }
 
 /// Implement ERC-20 decimals()
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [],
-///     "name": "decimals",
-///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint8" }],
-///     "payable": false, "stateMutability": "view", "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(313ce567)]
+#[ewasm_lib_fn(313ce567, {
+    "constant": true,
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint8" }],
+    "payable": false, "stateMutability": "view", "type": "function"
+})]
 pub fn decimals(i: u8) {
     ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
 }
 
 /// Implement ERC-20 totalSupply()
 /// ```json
-/// {
-///     "constant": true,
-///     "inputs": [],
-///     "name": "totalSupply",
-///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-///     "payable": false, "stateMutability": "view", "type": "function"
-/// }
 /// ```
-#[ewasm_lib_fn(18160ddd)]
+#[ewasm_lib_fn(18160ddd, {
+    "constant": true,
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false, "stateMutability": "view", "type": "function"
+})]
 pub fn total_supply(i: usize) {
     ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
 }
 
 /// Implement ERC-20 approve(address,uint256)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "internalType": "address", "name": "spender", "type": "address" },
-///         { "internalType": "uint256", "name": "value", "type": "uint256" }
-///     ],
-///     "name": "approve",
-///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-///     "payable": false,
-///     "stateMutability": "nonpayable",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn("095ea7b3")]
+#[ewasm_lib_fn("095ea7b3", {
+    "constant": false,
+    "inputs": [
+        { "internalType": "address", "name": "spender", "type": "address" },
+        { "internalType": "uint256", "name": "value", "type": "uint256" }
+    ],
+    "name": "approve",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+})]
 pub fn approve(contract: &Contract) {
     let sender = ewasm_api::caller();
     let spender = copy_into_address(&contract.input_data[16..36]);
@@ -209,21 +192,18 @@ pub fn approve(contract: &Contract) {
 }
 
 /// Implement ERC-20 allowance(address,address)
-/// ```json
-/// {
-///     "constant": true,
-///     "inputs": [
-///         { "internalType": "address", "name": "owner", "type": "address" },
-///         { "internalType": "address", "name": "spender", "type": "address" }
-///     ],
-///     "name": "allowance",
-///     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-///     "payable": false,
-///     "stateMutability": "view",
-///     "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(dd62ed3e)]
+#[ewasm_lib_fn(dd62ed3e, {
+    "constant": true,
+    "inputs": [
+        { "internalType": "address", "name": "owner", "type": "address" },
+        { "internalType": "address", "name": "spender", "type": "address" }
+    ],
+    "name": "allowance",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+})]
 pub fn allowance(contract: &Contract) {
     let owner = copy_into_address(&contract.input_data[16..36]);
     let spender = copy_into_address(&contract.input_data[48..68]);
@@ -232,20 +212,17 @@ pub fn allowance(contract: &Contract) {
 }
 
 /// Implement ERC-20 transferFrom(address,address,uint256)
-/// ```json
-/// {
-///     "constant": false,
-///     "inputs": [
-///         { "internalType": "address", "name": "sender", "type": "address" },
-///         { "internalType": "address", "name": "recipient", "type": "address" },
-///         { "internalType": "uint256", "name": "amount", "type": "uint256" }
-///     ],
-///     "name": "transferFrom",
-///     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
-///     "payable": false, "stateMutability": "nonpayable", "type": "function"
-/// }
-/// ```
-#[ewasm_lib_fn(23b872dd)]
+#[ewasm_lib_fn(23b872dd, {
+    "constant": false,
+    "inputs": [
+        { "internalType": "address", "name": "sender", "type": "address" },
+        { "internalType": "address", "name": "recipient", "type": "address" },
+        { "internalType": "uint256", "name": "amount", "type": "uint256" }
+    ],
+    "name": "transferFrom",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "payable": false, "stateMutability": "nonpayable", "type": "function"
+})]
 pub fn transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let owner = copy_into_address(&contract.input_data[16..36]);

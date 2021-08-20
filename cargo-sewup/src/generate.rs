@@ -64,9 +64,9 @@ pub async fn run() -> Result<()> {
         version = "0.1.0"
         edition = "2018"
         [dependencies]
-        sewup = { version = "*", features=["kv", "rdb", "token"], path = "/home/yanganto/data/2nd-state/SewUp/sewup" }
+        sewup = { version = "*", features=["kv", "rdb", "token"] }
     "#,
-    ) //TODO: FIX path before deploy
+    )
     .await?;
 
     let generator = format!(
