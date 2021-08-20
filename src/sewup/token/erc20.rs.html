@@ -314,29 +314,6 @@
 <span id="311">311</span>
 <span id="312">312</span>
 <span id="313">313</span>
-<span id="314">314</span>
-<span id="315">315</span>
-<span id="316">316</span>
-<span id="317">317</span>
-<span id="318">318</span>
-<span id="319">319</span>
-<span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
 
@@ -364,21 +341,18 @@
 <span class="kw">use</span> <span class="ident">sewup_derive::ewasm_lib_fn</span>;
 
 <span class="doccomment">/// Implement ERC-20 transfer(address,uint256)</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: false,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;recipient&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;amount&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
-<span class="doccomment">///     ],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;transfer&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;bool&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;bool&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false,</span>
-<span class="doccomment">///     &quot;stateMutability&quot;: &quot;nonpayable&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="ident">a9059cbb</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="ident">a9059cbb</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;inputs&quot;</span>: [
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;recipient&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> },
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;amount&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }
+    ]</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;transfer&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;bool&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;bool&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;nonpayable&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transfer</span>(<span class="ident">contract</span>: <span class="kw-2">&amp;</span><span class="ident">Contract</span>) {
     <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ewasm_api::caller</span>();
     <span class="kw">let</span> <span class="ident">recipient</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">16</span>..<span class="number">36</span>]);
@@ -431,18 +405,15 @@
 }
 
 <span class="doccomment">/// Implement ERC-20 balanceOf(address)</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [{ &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;account&quot;, &quot;type&quot;: &quot;address&quot; }],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;balanceOf&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint256&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false,</span>
-<span class="doccomment">///     &quot;stateMutability&quot;: &quot;view&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">70a08231</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">70a08231</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;account&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> }]</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;balanceOf&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">balance_of</span>(<span class="ident">contract</span>: <span class="kw-2">&amp;</span><span class="ident">Contract</span>) {
     <span class="kw">let</span> <span class="ident">address</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">16</span>..<span class="number">36</span>]);
     <span class="kw">let</span> <span class="ident">balance</span> <span class="op">=</span> <span class="ident">get_balance</span>(<span class="kw-2">&amp;</span><span class="ident">address</span>);
@@ -451,82 +422,71 @@
 
 <span class="doccomment">/// Implement ERC-20 name() and easy to change the name</span>
 <span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;symbol&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;string&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;string&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false, &quot;stateMutability&quot;: &quot;view&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">06fdde03</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">06fdde03</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: []</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;symbol&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>, <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">name</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="ident">ewasm_return_str</span>(<span class="ident">s</span>);
 }
 
 <span class="doccomment">/// Implement ERC-20 symbol() and easy to change the symbol</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;symbol&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;string&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;string&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false, &quot;stateMutability&quot;: &quot;view&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">95d89b41</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">95d89b41</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: []</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;symbol&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;string&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;string&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>, <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">symbol</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="ident">ewasm_return_str</span>(<span class="ident">s</span>);
 }
 
 <span class="doccomment">/// Implement ERC-20 decimals()</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;decimals&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint8&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false, &quot;stateMutability&quot;: &quot;view&quot;, &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">313ce567</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">313ce567</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: []</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;decimals&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint8&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>, <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">decimals</span>(<span class="ident">i</span>: <span class="ident">u8</span>) {
     <span class="ident">ewasm_api::finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">Raw::from</span>(<span class="ident">i</span>).<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
 }
 
 <span class="doccomment">/// Implement ERC-20 totalSupply()</span>
 <span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;totalSupply&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint256&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false, &quot;stateMutability&quot;: &quot;view&quot;, &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">18160ddd</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">18160ddd</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: []</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;totalSupply&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>, <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">total_supply</span>(<span class="ident">i</span>: <span class="ident">usize</span>) {
     <span class="ident">ewasm_api::finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">Raw::from</span>(<span class="ident">i</span>).<span class="ident">as_bytes</span>().<span class="ident">to_vec</span>());
 }
 
 <span class="doccomment">/// Implement ERC-20 approve(address,uint256)</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: false,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;spender&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;value&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
-<span class="doccomment">///     ],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;approve&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;bool&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;bool&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false,</span>
-<span class="doccomment">///     &quot;stateMutability&quot;: &quot;nonpayable&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="string">&quot;095ea7b3&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="string">&quot;095ea7b3&quot;</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;inputs&quot;</span>: [
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;spender&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> },
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;value&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }
+    ]</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;approve&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;bool&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;bool&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;nonpayable&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">approve</span>(<span class="ident">contract</span>: <span class="kw-2">&amp;</span><span class="ident">Contract</span>) {
     <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ewasm_api::caller</span>();
     <span class="kw">let</span> <span class="ident">spender</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">16</span>..<span class="number">36</span>]);
@@ -549,21 +509,18 @@
 }
 
 <span class="doccomment">/// Implement ERC-20 allowance(address,address)</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: true,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;owner&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;spender&quot;, &quot;type&quot;: &quot;address&quot; }</span>
-<span class="doccomment">///     ],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;allowance&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint256&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false,</span>
-<span class="doccomment">///     &quot;stateMutability&quot;: &quot;view&quot;,</span>
-<span class="doccomment">///     &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="ident">dd62ed3e</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="ident">dd62ed3e</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">true</span>,
+    <span class="string">&quot;inputs&quot;</span>: [
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;owner&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> },
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;spender&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> }
+    ]</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;allowance&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;view&quot;</span>,
+    <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">allowance</span>(<span class="ident">contract</span>: <span class="kw-2">&amp;</span><span class="ident">Contract</span>) {
     <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">16</span>..<span class="number">36</span>]);
     <span class="kw">let</span> <span class="ident">spender</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">48</span>..<span class="number">68</span>]);
@@ -572,20 +529,17 @@
 }
 
 <span class="doccomment">/// Implement ERC-20 transferFrom(address,address,uint256)</span>
-<span class="doccomment">/// ```json</span>
-<span class="doccomment">/// {</span>
-<span class="doccomment">///     &quot;constant&quot;: false,</span>
-<span class="doccomment">///     &quot;inputs&quot;: [</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;sender&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;recipient&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///         { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;amount&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
-<span class="doccomment">///     ],</span>
-<span class="doccomment">///     &quot;name&quot;: &quot;transferFrom&quot;,</span>
-<span class="doccomment">///     &quot;outputs&quot;: [{ &quot;internalType&quot;: &quot;bool&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;bool&quot; }],</span>
-<span class="doccomment">///     &quot;payable&quot;: false, &quot;stateMutability&quot;: &quot;nonpayable&quot;, &quot;type&quot;: &quot;function&quot;</span>
-<span class="doccomment">/// }</span>
-<span class="doccomment">/// ```</span>
-<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">23b872dd</span>)]</span>
+<span class="attribute">#[<span class="ident">ewasm_lib_fn</span>(<span class="number">23b872dd</span>, {
+    <span class="string">&quot;constant&quot;</span>: <span class="bool-val">false</span>,
+    <span class="string">&quot;inputs&quot;</span>: [
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;sender&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> },
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;address&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;recipient&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;address&quot;</span> },
+        { <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;uint256&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;amount&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;uint256&quot;</span> }
+    ]</span>,
+    <span class="string">&quot;name&quot;</span>: <span class="string">&quot;transferFrom&quot;</span>,
+    <span class="string">&quot;outputs&quot;</span>: [{ <span class="string">&quot;internalType&quot;</span>: <span class="string">&quot;bool&quot;</span>, <span class="string">&quot;name&quot;</span>: <span class="string">&quot;&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;bool&quot;</span> }],
+    <span class="string">&quot;payable&quot;</span>: <span class="bool-val">false</span>, <span class="string">&quot;stateMutability&quot;</span>: <span class="string">&quot;nonpayable&quot;</span>, <span class="string">&quot;type&quot;</span>: <span class="string">&quot;function&quot;</span>
+})]
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">transfer_from</span>(<span class="ident">contract</span>: <span class="kw-2">&amp;</span><span class="ident">Contract</span>) {
     <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">ewasm_api::caller</span>();
     <span class="kw">let</span> <span class="ident">owner</span> <span class="op">=</span> <span class="ident">copy_into_address</span>(<span class="kw-2">&amp;</span><span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">16</span>..<span class="number">36</span>]);
