@@ -25,3 +25,6 @@ jobs:
 
       - name: Deploy test
         run: nix-shell --run 'cli-test erc721'
+
+      - name: ABI test
+        run: nix-shell --run 'abi-test erc721'

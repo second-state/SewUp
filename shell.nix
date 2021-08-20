@@ -23,6 +23,12 @@ let
     rc=$?
     exit $rc
   '';
+  abiTestScript = nixpkgs.writeShellScriptBin "abi-test" ''
+    cd cargo-sewup
+    cargo run -- -g -p ../examples/$1-contract | jq
+    rc=$?
+    exit $rc
+  '';
 in
 with nixpkgs; pkgs.mkShell {
   buildInputs = [
@@ -33,9 +39,11 @@ with nixpkgs; pkgs.mkShell {
     pkg-config
     rust-nightly
     wabt
+    jq
 
     exampleTestScript
     cliTestScript
+    abiTestScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
