@@ -64,9 +64,9 @@ pub async fn run() -> Result<()> {
         version = "0.1.0"
         edition = "2018"
         [dependencies]
-        #sewup = "*"
+        sewup = { version = "*", features=["kv", "rdb", "token"], path = "/home/yanganto/data/2nd-state/SewUp/sewup" }
     "#,
-    )
+    ) //TODO: FIX path before deploy
     .await?;
 
     let generator = format!(
@@ -74,12 +74,13 @@ pub async fn run() -> Result<()> {
             {}
             fn main () {{
                 println!(
-                        "[{{}}]"
+                        "[{}]"
                         , {}
                 );
             }}
         "#,
         contract_abi_context,
+        vec!["{}"; all_abis.len()].join(","),
         all_abis.into_iter().collect::<Vec<String>>().join(",")
     );
 
