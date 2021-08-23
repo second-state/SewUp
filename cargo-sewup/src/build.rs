@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::process::Stdio;
 
 use anyhow::{Context, Result};
 use hex::encode;
@@ -8,19 +7,11 @@ use tokio::{
     fs::{read, read_to_string, write},
     process::Command,
 };
+use wasmprinter::print_file;
 use wat;
 
 use crate::config::Toml;
 use crate::deploy_wasm;
-
-async fn check_dependency() -> Result<()> {
-    Command::new("wasm2wat")
-        .stderr(Stdio::null())
-        .output()
-        .await
-        .context("wasm2wat not found")?;
-    Ok(())
-}
 
 async fn check_cargo_toml() -> Result<String> {
     let config_contents = read_to_string("Cargo.toml")
@@ -44,13 +35,8 @@ async fn build_constructor_template(contract_wasm_path: &str) -> Result<String> 
         .output()
         .await
         .context("fail to build runtime wasm")?;
-    let output = Command::new("wasm2wat")
-        .args(&[contract_wasm_path])
-        .output()
-        .await
-        .context("fail to build runtime wasm")?;
-    let tmpl = String::from_utf8_lossy(&output.stdout);
-    Ok(tmpl.to_string())
+    let wit = print_file(contract_wasm_path)?;
+    Ok(wit)
 }
 
 async fn build_runtime_wat(contract_wasm_path: &str) -> Result<String> {
@@ -59,12 +45,7 @@ async fn build_runtime_wat(contract_wasm_path: &str) -> Result<String> {
         .output()
         .await
         .context("fail to build runtime wasm")?;
-    let output = Command::new("wasm2wat")
-        .args(&[contract_wasm_path])
-        .output()
-        .await
-        .context("fail to build runtime wasm")?;
-    let rt_content = String::from_utf8_lossy(&output.stdout);
+    let rt_content = print_file(contract_wasm_path)?;
 
     let hinden_export_re = Regex::new(r#"\(export "__.*\)\)\n"#).unwrap();
     Ok(hinden_export_re
@@ -186,11 +167,7 @@ async fn generate_debug_wat(wat_path: &str, wat_content: &str) -> Result<()> {
 }
 
 pub async fn run(debug: bool) -> Result<String> {
-    let res = tokio::try_join!(check_dependency(), check_cargo_toml());
-    let contract_name = match res {
-        Ok((_, contract_name)) => contract_name,
-        Err(err) => return Err(err),
-    };
+    let contract_name = check_cargo_toml().await?;
 
     let mut wasm_path = format!(
         "./target/wasm32-unknown-unknown/release/{}.wasm",
