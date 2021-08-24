@@ -1347,6 +1347,29 @@
 <span id="1344">1344</span>
 <span id="1345">1345</span>
 <span id="1346">1346</span>
+<span id="1347">1347</span>
+<span id="1348">1348</span>
+<span id="1349">1349</span>
+<span id="1350">1350</span>
+<span id="1351">1351</span>
+<span id="1352">1352</span>
+<span id="1353">1353</span>
+<span id="1354">1354</span>
+<span id="1355">1355</span>
+<span id="1356">1356</span>
+<span id="1357">1357</span>
+<span id="1358">1358</span>
+<span id="1359">1359</span>
+<span id="1360">1360</span>
+<span id="1361">1361</span>
+<span id="1362">1362</span>
+<span id="1363">1363</span>
+<span id="1364">1364</span>
+<span id="1365">1365</span>
+<span id="1366">1366</span>
+<span id="1367">1367</span>
+<span id="1368">1368</span>
+<span id="1369">1369</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -2427,7 +2450,7 @@
 
                 fn _build_runtime_and_runner() -&gt; (
                     Arc&lt;RefCell&lt;TestRuntime&gt;&gt;,
-                    impl Fn(Arc&lt;RefCell&lt;TestRuntime&gt;&gt;, &amp;str, [u8; 4], Option&lt;&amp;[u8]&gt;, Vec&lt;u8&gt;) -&gt; (),
+                    impl Fn(Arc&lt;RefCell&lt;TestRuntime&gt;&gt;, Option&lt;&amp;str&gt;, &amp;str, [u8; 4], Option&lt;&amp;[u8]&gt;, Vec&lt;u8&gt;) -&gt; (),
                 ) {
                     let rt = Arc::new(RefCell::new(TestRuntime::default()&quot;#</span>.<span class="ident">to_string</span>()
                             <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">runtime_log_option</span>
@@ -2446,16 +2469,17 @@
 
                     (rt,
                         |runtime: Arc&lt;RefCell&lt;TestRuntime&gt;&gt;,
-                         fn_name: &amp;str,
-                         sig: [u8; 4],
-                         input_data: Option&lt;&amp;[u8]&gt;,
-                         expect_output: Vec&lt;u8&gt;| {
+                        caller: Option&lt;&amp;str&gt;,
+                        fn_name: &amp;str,
+                        sig: [u8; 4],
+                        input_data: Option&lt;&amp;[u8]&gt;,
+                        expect_output: Vec&lt;u8&gt;| {
                             let mut h = ContractHandler {
                                 call_data: Some(_build_wasm(None)),
                                 rt: Some(runtime.clone())
                             };
 
-                            match h.execute(sig, input_data, 1_000_000_000_000) {
+                            match h.execute(caller, sig, input_data, 1_000_000_000_000) {
                                 Ok(r) =&gt; assert_eq!(r.output_data, expect_output, &quot;{} output is unexpected&quot;, fn_name),
                                 Err(e) =&gt; {
                                     panic!(&quot;vm error: {:?}&quot;, e);
@@ -2516,23 +2540,27 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\),(?P&lt;equivalence&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
         <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
+            .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;None&quot;</span>.<span class="ident">to_string</span>());
         <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), None, {});&quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
+                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), None, {});&quot;#</span>,
+                <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(
                 <span class="string">r#&quot;_bin = bincode::serialize(&amp;{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), {});&quot;#</span>,
-                <span class="ident">params</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
+                   _run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), {});&quot;#</span>,
+                <span class="ident">params</span>, <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
@@ -2549,23 +2577,27 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_auto_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\),(?P&lt;equivalence&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
         <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
+            .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;None&quot;</span>.<span class="ident">to_string</span>());
         <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));&quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
+                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));&quot;#</span>,
+                <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(
                 <span class="string">r#&quot;_bin = bincode::serialize(&amp;{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), sewup_derive::ewasm_output_from!({}));&quot;#</span>,
-                <span class="ident">params</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
+                   _run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), sewup_derive::ewasm_output_from!({}));&quot;#</span>,
+                <span class="ident">params</span>, <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>, <span class="ident">equivalence</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
@@ -2591,22 +2623,29 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
+        <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
+    )
+    .<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
         <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
+            .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;None&quot;</span>.<span class="ident">to_string</span>());
         <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), None, Vec::with_capacity(0));&quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
+                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), None, Vec::with_capacity(0));&quot;#</span>,
+                <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(
                 <span class="string">r#&quot;_bin = bincode::serialize(&amp;{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), Vec::with_capacity(0));&quot;#</span>,
-                <span class="ident">params</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
+                   _run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), Vec::with_capacity(0));&quot;#</span>,
+                <span class="ident">params</span>, <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
@@ -2623,22 +2662,29 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_rusty_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
+        <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
+    )
+    .<span class="ident">unwrap</span>();
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
         <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
+            .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;None&quot;</span>.<span class="ident">to_string</span>());
         <span class="kw">if</span> <span class="ident">params</span>.<span class="ident">is_empty</span>() {
             <span class="macro">format!</span>(
-                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);&quot;#</span>,
-                <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
+                <span class="string">r#&quot;_run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);&quot;#</span>,
+                <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
         } <span class="kw">else</span> {
             <span class="macro">format!</span>(
                 <span class="string">r#&quot;_bin = bincode::serialize(&amp;{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), vec![0, 0, 0, 0]);&quot;#</span>,
-                <span class="ident">params</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
+                   _run_wasm_fn( _runtime.clone(), {}, &quot;{}&quot;, ewasm_fn_sig!({}), Some(&amp;_bin), vec![0, 0, 0, 0]);&quot;#</span>,
+                <span class="ident">params</span>, <span class="ident">caller</span>, <span class="ident">fn_name</span>, <span class="ident">fn_name</span>
             )
             .<span class="ident">parse</span>()
             .<span class="ident">unwrap</span>()
