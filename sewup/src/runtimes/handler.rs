@@ -1,6 +1,7 @@
 //! Contract handler
 //! The handler helps you deploy contract and test the contract you developing
 use std::cell::RefCell;
+use std::convert::TryInto;
 use std::fmt;
 use std::fs::read;
 use std::sync::Arc;
@@ -10,6 +11,7 @@ use crate::runtimes::traits::{VMMessageBuilder, VMResult, RT};
 
 use anyhow::{Context, Result};
 use ethereum_types::Address;
+use hex::decode;
 use serde_derive::{Deserialize, Serialize};
 
 #[derive(Clone, Deserialize, Serialize, Default)]
@@ -59,8 +61,10 @@ impl ContractHandler {
         }
         panic!("rt should be init when parsing the connection string")
     }
+
     pub fn execute(
         &mut self,
+        addr: Option<&str>,
         fun_sig: [u8; 4],
         input: Option<&[u8]>,
         gas: i64,
@@ -73,7 +77,17 @@ impl ContractHandler {
                 if let Some(input) = input {
                     input_data.extend_from_slice(input);
                 }
-                let sender = Address::default();
+
+                let sender = if let Some(addr) = addr {
+                    let byte20: [u8; 20] = decode(addr)
+                        .expect("address should be hex format")
+                        .try_into()
+                        .expect("address should be byte20");
+                    Address::from(byte20)
+                } else {
+                    Address::default()
+                };
+
                 let msg = VMMessageBuilder {
                     sender: Some(&sender),
                     input_data: Some(&input_data),
