@@ -32,8 +32,9 @@ mod tests {
 
     #[ewasm_test]
     fn test_execute_basic_operations() {
+        // assert the name() function of contract and call by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993"
         ewasm_assert_eq!(
-            name(),
+            name() by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
             vec![
                 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
