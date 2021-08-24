@@ -8,7 +8,7 @@ use crate::types::*;
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::Address;
 
-/// The small storage unit in the contract, which contains 32 bytes.
+/// The storage unit in the contract, which contains 32 bytes
 #[derive(Clone)]
 pub struct Raw {
     pub(crate) bytes: [u8; 32],
