@@ -1077,7 +1077,7 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
                 fn _build_runtime_and_runner() -> (
                     Arc<RefCell<TestRuntime>>,
-                    impl Fn(Arc<RefCell<TestRuntime>>, &str, [u8; 4], Option<&[u8]>, Vec<u8>) -> (),
+                    impl Fn(Arc<RefCell<TestRuntime>>, Option<&str>, &str, [u8; 4], Option<&[u8]>, Vec<u8>) -> (),
                 ) {
                     let rt = Arc::new(RefCell::new(TestRuntime::default()"#.to_string()
                             + &runtime_log_option
@@ -1096,16 +1096,17 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 
                     (rt,
                         |runtime: Arc<RefCell<TestRuntime>>,
-                         fn_name: &str,
-                         sig: [u8; 4],
-                         input_data: Option<&[u8]>,
-                         expect_output: Vec<u8>| {
+                        caller: Option<&str>,
+                        fn_name: &str,
+                        sig: [u8; 4],
+                        input_data: Option<&[u8]>,
+                        expect_output: Vec<u8>| {
                             let mut h = ContractHandler {
                                 call_data: Some(_build_wasm(None)),
                                 rt: Some(runtime.clone())
                             };
 
-                            match h.execute(sig, input_data, 1_000_000_000_000) {
+                            match h.execute(caller, sig, input_data, 1_000_000_000_000) {
                                 Ok(r) => assert_eq!(r.output_data, expect_output, "{} output is unexpected", fn_name),
                                 Err(e) => {
                                     panic!("vm error: {:?}", e);
@@ -1166,23 +1167,27 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
+    let re = Regex::new(r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*,(?P<equivalence>.*)"#).unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = cap.name("fn_name").unwrap().as_str().replace(" ", "");
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         let equivalence = cap.name("equivalence").unwrap().as_str();
+        let caller = cap
+            .name("caller")
+            .map(|c| format!("Some({})", c.as_str()))
+            .unwrap_or_else(|| "None".to_string());
         if params.is_empty() {
             format!(
-                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, {});"#,
-                fn_name, fn_name, equivalence
+                r#"_run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), None, {});"#,
+                caller, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
                 r#"_bin = bincode::serialize(&{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), {});"#,
-                params, fn_name, fn_name, equivalence
+                   _run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), Some(&_bin), {});"#,
+                params, caller, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
@@ -1199,23 +1204,27 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\),(?P<equivalence>.*)").unwrap();
+    let re = Regex::new(r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*,(?P<equivalence>.*)"#).unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = cap.name("fn_name").unwrap().as_str();
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
         let equivalence = cap.name("equivalence").unwrap().as_str();
+        let caller = cap
+            .name("caller")
+            .map(|c| format!("Some({})", c.as_str()))
+            .unwrap_or_else(|| "None".to_string());
         if params.is_empty() {
             format!(
-                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));"#,
-                fn_name, fn_name, equivalence
+                r#"_run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), None, sewup_derive::ewasm_output_from!({}));"#,
+                caller, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
         } else {
             format!(
                 r#"_bin = bincode::serialize(&{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), sewup_derive::ewasm_output_from!({}));"#,
-                params, fn_name, fn_name, equivalence
+                   _run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), Some(&_bin), sewup_derive::ewasm_output_from!({}));"#,
+                params, caller, fn_name, fn_name, equivalence
             )
             .parse()
             .unwrap()
@@ -1241,22 +1250,29 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    let re = Regex::new(
+        r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*"#,
+    )
+    .unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = cap.name("fn_name").unwrap().as_str();
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        let caller = cap
+            .name("caller")
+            .map(|c| format!("Some({})", c.as_str()))
+            .unwrap_or_else(|| "None".to_string());
         if params.is_empty() {
             format!(
-                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, Vec::with_capacity(0));"#,
-                fn_name, fn_name
+                r#"_run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), None, Vec::with_capacity(0));"#,
+                caller, fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
                 r#"_bin = bincode::serialize(&{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), Vec::with_capacity(0));"#,
-                params, fn_name, fn_name
+                   _run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), Some(&_bin), Vec::with_capacity(0));"#,
+                params, caller, fn_name, fn_name
             )
             .parse()
             .unwrap()
@@ -1273,22 +1289,29 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    let re = Regex::new(
+        r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*"#,
+    )
+    .unwrap();
     if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = cap.name("fn_name").unwrap().as_str();
         let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        let caller = cap
+            .name("caller")
+            .map(|c| format!("Some({})", c.as_str()))
+            .unwrap_or_else(|| "None".to_string());
         if params.is_empty() {
             format!(
-                r#"_run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);"#,
-                fn_name, fn_name
+                r#"_run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), None, vec![0, 0, 0, 0]);"#,
+                caller, fn_name, fn_name
             )
             .parse()
             .unwrap()
         } else {
             format!(
                 r#"_bin = bincode::serialize(&{}).unwrap();
-                   _run_wasm_fn( _runtime.clone(), "{}", ewasm_fn_sig!({}), Some(&_bin), vec![0, 0, 0, 0]);"#,
-                params, fn_name, fn_name
+                   _run_wasm_fn( _runtime.clone(), {}, "{}", ewasm_fn_sig!({}), Some(&_bin), vec![0, 0, 0, 0]);"#,
+                params, caller, fn_name, fn_name
             )
             .parse()
             .unwrap()
