@@ -401,7 +401,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ewasm_api::types::Address</span>;
 
-<span class="doccomment">/// The small storage unit in the contract, which contains 32 bytes.</span>
+<span class="doccomment">/// The storage unit in the contract, which contains 32 bytes</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Raw</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="number">32</span>],
