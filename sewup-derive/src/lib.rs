@@ -1164,6 +1164,11 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+///
+/// Besides, you can run the handler as a block chan user with `by` syntax
+/// ```compile_fail
+/// ewasm_assert_eq!(handler_fn() by "eD5897cCEa7aee785D31cdcA87Cf59D1D041aAFC", vec![74, 111, 118, 121]);
+/// ```
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
@@ -1201,6 +1206,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_eq`, but the contract main function should be
 /// decorated with `#[ewasm_main(auto)]`, and the equivalence arm will be serialized into `Vec<u8>`
+/// Besides, you can run the handler as a block chan user with `by` syntax as the same usage of `ewasm_assert_eq`.
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
@@ -1247,6 +1253,11 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
+///
+/// Besides, you can run the handler as a block chan user with `by` syntax.
+/// ```compile_fail
+/// ewasm_assert_ok!(contract_fn() by "eD5897cCEa7aee785D31cdcA87Cf59D1D041aAFC");
+/// ```
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
@@ -1286,6 +1297,7 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
 ///
 /// This usage of the macro likes `ewasm_assert_ok`, this only difference is that the contract main
 /// function should be decorated with `#[ewasm_main(rusty)]`.
+/// Besides, you can run the handler as a block chan user with `by` syntax as the same usage of `ewasm_assert_ok`.
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
