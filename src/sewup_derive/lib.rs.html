@@ -1370,6 +1370,18 @@
 <span id="1367">1367</span>
 <span id="1368">1368</span>
 <span id="1369">1369</span>
+<span id="1370">1370</span>
+<span id="1371">1371</span>
+<span id="1372">1372</span>
+<span id="1373">1373</span>
+<span id="1374">1374</span>
+<span id="1375">1375</span>
+<span id="1376">1376</span>
+<span id="1377">1377</span>
+<span id="1378">1378</span>
+<span id="1379">1379</span>
+<span id="1380">1380</span>
+<span id="1381">1381</span>
 </pre><pre class="rust">
 <span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
@@ -2537,6 +2549,11 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Besides, you can run the handler as a block chan user with `by` syntax</span>
+<span class="doccomment">/// ```compile_fail</span>
+<span class="doccomment">/// ewasm_assert_eq!(handler_fn() by &quot;eD5897cCEa7aee785D31cdcA87Cf59D1D041aAFC&quot;, vec![74, 111, 118, 121]);</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
@@ -2574,6 +2591,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This usage of the macro likes `ewasm_assert_eq`, but the contract main function should be</span>
 <span class="doccomment">/// decorated with `#[ewasm_main(auto)]`, and the equivalence arm will be serialized into `Vec&lt;u8&gt;`</span>
+<span class="doccomment">/// Besides, you can run the handler as a block chan user with `by` syntax as the same usage of `ewasm_assert_eq`.</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_auto_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
@@ -2620,6 +2638,11 @@
 <span class="doccomment">///     }</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Besides, you can run the handler as a block chan user with `by` syntax.</span>
+<span class="doccomment">/// ```compile_fail</span>
+<span class="doccomment">/// ewasm_assert_ok!(contract_fn() by &quot;eD5897cCEa7aee785D31cdcA87Cf59D1D041aAFC&quot;);</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
@@ -2659,6 +2682,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This usage of the macro likes `ewasm_assert_ok`, this only difference is that the contract main</span>
 <span class="doccomment">/// function should be decorated with `#[ewasm_main(rusty)]`.</span>
+<span class="doccomment">/// Besides, you can run the handler as a block chan user with `by` syntax as the same usage of `ewasm_assert_ok`.</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_rusty_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
