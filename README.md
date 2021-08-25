@@ -23,7 +23,7 @@ as following, then you are ready to build contract with sewup.
 Features list (should select none or one of following)
 - kv - for writing contract as key value database
 - rdb - for writing contract as relational database
-- token - for writing ERC-20, ERC-721 tokens
+- token - for writing ERC-20, ERC-721, ERC-1155 tokens
 
 Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
 if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
@@ -117,13 +117,15 @@ mod tests {
 Run `cargo build --release --target=wasm32-unknown-unknown`, then the contract will build in `target/wasm32-unknown-unknown/release/*.wasm`
 Besides, you can run deploy the ewasm contract on [WasmEdge](https://github.com/WasmEdge/WasmEdge) and run tests on it with `cargo test`,
 furthermore the constructor will also run when the contract deploying on [WasmEdge](https://github.com/WasmEdge/WasmEdge).
+If you want to learn more details about the testing flow, please check out [Test the contract](https://github.com/second-state/SewUp/wiki/Develop-Guide#test-the-contract) section of develop guide wiki page.
+
 
 ### Debugging
 Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
 To learn more about the usage, you check out the examples in the [example](./examples/) folder.
 
 ### Deployment
-Once you want to deploy your contract to any network which support Ewasm by sweup command line tool, please read the [wiki](https://github.com/second-state/SewUp/wiki/Deploy-Guide).
+Once you want to deploy your contract to any network which support Ewasm by sweup command line tool, please read the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Deploy-Guide) wiki page.
 
 ## SewUp Development
 There are two projects and several examples in the workspace, the contract project should build with target
