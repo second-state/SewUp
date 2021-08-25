@@ -130,5 +130,5 @@ There are two projects and several examples in the workspace, the contract proje
 `wasm32-unknown-unknown` and the flag `-C link-arg=--export-table`.
 You can run `cargo test` in each example folder to check on the test your modification.
 
-It is easy to participate with help want issues and the good first issues.
+It is easy to participate with [help want issues](https://github.com/second-state/SewUp/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) and the [good first issues](https://github.com/second-state/SewUp/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22).
 Less but not least, please feel free to open any issue on this project.
