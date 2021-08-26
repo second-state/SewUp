@@ -31,7 +31,7 @@ fn constructor() {
         .expect("there is no return for constructor currently");
 }
 
-#[ewasm_fn]
+#[ewasm_fn("00000001")]
 fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage = sewup::kv::Store::load(None)?;
@@ -42,7 +42,7 @@ fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::Ewa
     Ok(().into())
 }
 
-#[ewasm_fn]
+#[ewasm_fn("00000002")]
 fn get_value_to_bucket1(key: u32) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage =
