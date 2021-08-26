@@ -217,6 +217,11 @@
 <span id="214">214</span>
 <span id="215">215</span>
 <span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
 
@@ -267,6 +272,11 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_raw_vec</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">inner</span>
+    }
+
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_u8_vec</span>(<span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">make_buffer</span>();
+        <span class="self">self</span>.<span class="ident">_buffer</span>
     }
 
     <span class="doccomment">/// wipe the header with header size in bytes</span>
