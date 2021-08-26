@@ -150,6 +150,10 @@ impl Raw {
         &self.bytes
     }
 
+    pub fn to_vec(&self) -> Vec<u8> {
+        self.bytes.to_vec()
+    }
+
     /// wipe the header with header size in bytes
     pub fn wipe_header(&mut self, header_size: usize) {
         assert!(header_size <= 32);

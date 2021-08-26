@@ -49,6 +49,11 @@ impl Row {
         self.inner
     }
 
+    pub fn into_u8_vec(mut self) -> Vec<u8> {
+        self.make_buffer();
+        self._buffer
+    }
+
     /// wipe the header with header size in bytes
     pub fn wipe_header(&mut self, header_size: usize) {
         assert!(header_size <= 32);

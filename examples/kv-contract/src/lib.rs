@@ -10,16 +10,53 @@ struct SimpleStruct {
     description: String,
 }
 
+#[derive(Default, Serialize, Deserialize)]
+struct InputPair(u32, Vec<u8>);
+
 #[ewasm_constructor]
 fn constructor() {
-    let storage = sewup::kv::Store::new().expect("there is no return for constructor currently");
+    use sewup::types::{Raw, Row};
+    let mut storage =
+        sewup::kv::Store::new().expect("there is no return for constructor currently");
+    let bucket1 = storage
+        .bucket::<Raw, Row>("bucket1")
+        .expect("there is no return for constructor currently");
+    let bucket2 = storage
+        .bucket::<Raw, SimpleStruct>("bucket2")
+        .expect("there is no return for constructor currently");
+    storage.save(bucket1);
+    storage.save(bucket2);
     storage
         .commit()
         .expect("there is no return for constructor currently");
 }
 
+#[ewasm_fn("00000001")]
+fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup::types::{Raw, Row};
+    let mut storage = sewup::kv::Store::load(None)?;
+    let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
+    bucket1.set(Raw::from(pair.0), Raw::from(pair.1).into())?;
+    storage.save(bucket1);
+    storage.commit()?;
+    Ok(().into())
+}
+
+#[ewasm_fn("00000002")]
+fn get_value_to_bucket1(key: u32) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup::types::{Raw, Row};
+    let mut storage =
+        sewup::kv::Store::load(None).expect("there is no return for constructor currently");
+    let bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
+    let value = bucket1.get(Raw::from(key))?.map(|x| x.into_u8_vec());
+    Ok(sewup::primitives::EwasmAny::from(value))
+}
+
 #[ewasm_fn]
-fn check_ver_and_feat(version: u8, features: Vec<sewup::kv::Feature>) -> anyhow::Result<()> {
+fn check_ver_and_feat(
+    version: u8,
+    features: Vec<sewup::kv::Feature>,
+) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let storage = sewup::kv::Store::load(None)?;
     if storage.version() != version {
         return Err(KVError::UnexpectedVersion(storage.version()).into());
@@ -29,53 +66,26 @@ fn check_ver_and_feat(version: u8, features: Vec<sewup::kv::Feature>) -> anyhow:
         return Err(KVError::IncompatibleFeatures(current_features).into());
     };
 
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn check_empty_storage_size(size: u32) -> anyhow::Result<()> {
-    let storage = sewup::kv::Store::load(None)?;
-    let load_size = storage.load_size();
-    if load_size != size {
-        return Err(KVError::UnexpectedDBSize(load_size).into());
-    }
-    Ok(())
-}
-
-#[ewasm_fn]
-fn add_buckets() -> anyhow::Result<()> {
-    use sewup::types::{Raw, Row};
-
-    let mut storage = sewup::kv::Store::load(None)?;
-    let bucket1 = storage.bucket::<Raw, Raw>("bucket1")?;
-    let bucket2 = storage.bucket::<Row, Row>("bucket2")?;
-    if !bucket1.is_empty() {
-        return Err(KVError::BucketError("inited bucket should be empty.".to_string()).into());
-    }
-    if bucket2.len() != 0 {
-        return Err(
-            KVError::BucketError(format!("bucket len {} incorrect.", bucket2.len())).into(),
-        );
-    }
-    storage.save(bucket1);
-    storage.save(bucket2);
-    storage.commit()?;
-    Ok(())
-}
-
-#[ewasm_fn]
-fn check_buckets(buckets: Vec<String>) -> anyhow::Result<()> {
+fn check_buckets(buckets: Vec<String>) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut storage = sewup::kv::Store::load(None)?;
     let mut current_buckets = storage.buckets();
     current_buckets.sort();
+
     if current_buckets != buckets {
         return Err(KVError::IncorrectBuckets(current_buckets).into());
     }
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> anyhow::Result<()> {
+fn drop_bucket_than_check(
+    name: &str,
+    remine_buckets: Vec<String>,
+) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut storage = sewup::kv::Store::load(None)?;
     storage.drop_bucket(name)?;
     storage.commit()?;
@@ -86,11 +96,11 @@ fn drop_bucket_than_check(name: &str, remine_buckets: Vec<String>) -> anyhow::Re
     if current_buckets != remine_buckets {
         return Err(KVError::IncorrectBuckets(current_buckets).into());
     }
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn new_bucket_with_specific_struct() -> anyhow::Result<()> {
+fn new_bucket_with_specific_struct() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
 
     let mut storage = sewup::kv::Store::new()?;
@@ -111,11 +121,11 @@ fn new_bucket_with_specific_struct() -> anyhow::Result<()> {
     storage.save(bucket2);
 
     storage.commit()?;
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn check_objects_in_bucket() -> anyhow::Result<()> {
+fn check_objects_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
 
     let mut storage = sewup::kv::Store::load(None)?;
@@ -148,11 +158,11 @@ fn check_objects_in_bucket() -> anyhow::Result<()> {
 
     storage.commit()?;
 
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn delete_object_in_bucket() -> anyhow::Result<()> {
+fn delete_object_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
 
     let mut storage = sewup::kv::Store::load(None)?;
@@ -170,30 +180,34 @@ fn delete_object_in_bucket() -> anyhow::Result<()> {
         );
     }
 
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_fn]
-fn non_register_function() -> anyhow::Result<()> {
+fn non_register_function() -> anyhow::Result<sewup::primitives::EwasmAny> {
     // A function forget to register
-    Ok(())
+    Ok(().into())
 }
 
-#[ewasm_main]
-fn main() -> anyhow::Result<()> {
+#[ewasm_main(auto)]
+fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup_derive::ewasm_input_from;
+
     let contract = sewup::primitives::Contract::new()?;
 
-    match contract.get_function_selector()? {
+    let output = match contract.get_function_selector()? {
         ewasm_fn_sig!(check_ver_and_feat) => {
             check_ver_and_feat(0, vec![sewup::kv::Feature::Default])?
         }
-        ewasm_fn_sig!(check_empty_storage_size) => check_empty_storage_size(8u32)?,
-        ewasm_fn_sig!(add_buckets) => add_buckets()?,
         ewasm_fn_sig!(check_buckets) => {
             check_buckets(vec!["bucket1".to_string(), "bucket2".to_string()])?
         }
         ewasm_fn_sig!(drop_bucket_than_check) => {
             drop_bucket_than_check("bucket1", vec!["bucket2".to_string()])?
+        }
+        ewasm_fn_sig!(put_pair_to_bucket1) => ewasm_input_from!(contract move put_pair_to_bucket1)?,
+        ewasm_fn_sig!(get_value_to_bucket1) => {
+            ewasm_input_from!(contract move get_value_to_bucket1)?
         }
 
         // Following handler is for other test
@@ -203,7 +217,7 @@ fn main() -> anyhow::Result<()> {
         _ => return Err(KVError::UnknownHandle.into()),
     };
 
-    Ok(())
+    Ok(output)
 }
 
 #[ewasm_test]
@@ -220,11 +234,18 @@ mod tests {
 
         ewasm_assert_ok!(check_ver_and_feat());
 
-        ewasm_assert_ok!(check_empty_storage_size());
-
-        ewasm_assert_ok!(add_buckets());
-
         ewasm_assert_ok!(check_buckets());
+
+        let input_pair = InputPair(100, vec![1, 2, 3, 4]);
+        ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
+
+        ewasm_assert_eq!(
+            get_value_to_bucket1(100),
+            vec![
+                1, 32, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            ]
+        );
 
         ewasm_assert_ok!(drop_bucket_than_check());
     }
