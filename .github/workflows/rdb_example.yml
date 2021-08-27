@@ -25,3 +25,6 @@ jobs:
 
       - name: Deploy test
         run: nix-shell --run 'cli-test rdb'
+
+      - name: Client test
+        run: nix-shell --run 'run-client-test rdb'
