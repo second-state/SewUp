@@ -3,14 +3,15 @@ use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_
 
 mod errors;
 use errors::KVError;
-mod inputs;
-use inputs::Pair;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
 struct SimpleStruct {
     trust: bool,
     description: String,
 }
+
+#[derive(Default, Serialize, Deserialize)]
+pub struct Pair(pub u32, pub Vec<u8>);
 
 #[ewasm_constructor]
 fn constructor() {
@@ -30,7 +31,7 @@ fn constructor() {
         .expect("there is no return for constructor currently");
 }
 
-#[ewasm_fn("00000001")]
+#[ewasm_fn]
 fn put_pair_to_bucket1(pair: Pair) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage = sewup::kv::Store::load(None)?;
@@ -41,7 +42,7 @@ fn put_pair_to_bucket1(pair: Pair) -> anyhow::Result<sewup::primitives::EwasmAny
     Ok(().into())
 }
 
-#[ewasm_fn("00000002")]
+#[ewasm_fn]
 fn get_value_to_bucket1(key: u32) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage =

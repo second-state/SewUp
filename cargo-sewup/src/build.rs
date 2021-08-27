@@ -10,8 +10,8 @@ use tokio::{
 use wasmprinter::print_file;
 use wat;
 
-use crate::config::Toml;
-use crate::deploy_wasm;
+use cargo_sewup::config::Toml;
+use cargo_sewup::deploy_wasm;
 
 async fn check_cargo_toml() -> Result<String> {
     let config_contents = read_to_string("Cargo.toml")

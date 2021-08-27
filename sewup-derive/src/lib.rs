@@ -278,7 +278,7 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         Span::call_site(),
     );
     let result = quote! {
-        pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
         pub(crate) const #abi_info: &'static str = #abi_str;
 
         #[cfg(target_arch = "wasm32")]

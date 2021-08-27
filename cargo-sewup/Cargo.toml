@@ -7,6 +7,13 @@ license = "Apache-2.0"
 repository = "https://github.com/second-state/SewUp"
 readme = "../README.md"
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "cargo-sewup"
+path = "src/main.rs"
+
 [dependencies]
 anyhow = "1.0.40"
 hex = "0.4.3"

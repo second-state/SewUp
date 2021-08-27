@@ -6,10 +6,7 @@ use structopt::StructOpt;
 use tokio;
 
 mod build;
-mod config;
-mod constants;
 mod deploy;
-mod errors;
 mod generate;
 mod inspect;
 

@@ -7,7 +7,7 @@ description = "The example contract using sewup kv feature"
 
 [lib]
 path = "src/lib.rs"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "kv-client"
@@ -19,10 +19,11 @@ anyhow = "1.0.40"
 serde = "1.0"
 serde_derive = "1.0"
 
-sewup ={ version = "*", path = "../../sewup", features = [ "kv" ] }
+sewup = { version = "*", path = "../../sewup", features = [ "kv" ] }
 sewup-derive = { version = "*", path = "../../sewup-derive", features = [ "kv" ] }
 thiserror = "1.0.24"
 
+cargo-sewup = { version = "*", path = "../../cargo-sewup", optional = true }
 web3 = { version = "0.16.0", optional = true }
 tokio = { version = "1.0", features = ["full"], optional = true }
 secp256k1 = { version = "0.20.3", optional = true }
@@ -42,10 +43,10 @@ opt-level = "z"
 
 [deploy]
 url = "http://localhost:8545"
-private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+private = "0000000000000000000000000000000000000000000000000000000000000000"
+address = "0x0000000000000000000000000000000000000000"
 
 [features]
-client = [ "web3", "tokio", "secp256k1", "reqwest", "serde_json", "bincode"]
+client = [ "web3", "tokio", "secp256k1", "reqwest", "serde_json", "bincode", "cargo-sewup"]
 constructor = []
 constructor-test = []
