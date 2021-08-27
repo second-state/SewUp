@@ -16,6 +16,37 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     sig
 }
 
+fn write_function_signature(sig_str: &str) -> String {
+    let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    if let Some(cap) = re.captures(sig_str) {
+        let fn_name = cap.name("name").unwrap().as_str();
+        let params = cap.name("params").unwrap().as_str().replace(" ", "");
+        let canonical_fn = format!(
+            "{}({})",
+            fn_name,
+            params
+                .split(',')
+                .map(|p| {
+                    let p_split = p.split(':').collect::<Vec<_>>();
+                    if p_split.len() == 2 {
+                        p_split[1]
+                    } else {
+                        p_split[0]
+                    }
+                    .trim()
+                })
+                .collect::<Vec<_>>()
+                .join(",")
+        );
+        format!(r"{:?}", get_function_signature(&canonical_fn))
+    } else {
+        format!(
+            "{}_SIG",
+            sig_str.to_string().replace(" ", "").to_ascii_uppercase()
+        )
+    }
+}
+
 /// helps you setup the main function of a contract
 ///
 /// There are three different kind contract output.
@@ -473,37 +504,33 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro]
 pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
-    let re = Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap();
+    write_function_signature(&item.to_string()).parse().unwrap()
+}
+
+/// helps you generate the input raw data for specific contract handler
+/// ```compile_fail
+/// let create_input = person::protocol(person.clone());
+/// let mut input = ewasm_input!(create_input for person::create);
+/// ```
+#[proc_macro]
+pub fn ewasm_input(item: TokenStream) -> TokenStream {
+    let re = Regex::new(r"(?P<instance>.*)\s+for\s+(?P<sig>.*)").unwrap();
     if let Some(cap) = re.captures(&item.to_string()) {
-        let fn_name = cap.name("name").unwrap().as_str();
-        let params = cap.name("params").unwrap().as_str().replace(" ", "");
-        let canonical_fn = format!(
-            "{}({})",
-            fn_name,
-            params
-                .split(',')
-                .map(|p| {
-                    let p_split = p.split(':').collect::<Vec<_>>();
-                    if p_split.len() == 2 {
-                        p_split[1]
-                    } else {
-                        p_split[0]
-                    }
-                    .trim()
-                })
-                .collect::<Vec<_>>()
-                .join(",")
-        );
-        format!(r"{:?}", get_function_signature(&canonical_fn))
-            .parse()
-            .unwrap()
-    } else {
+        let sig = cap.name("sig").unwrap().as_str();
+        let instance = cap.name("instance").unwrap().as_str();
         format!(
-            "{}_SIG",
-            item.to_string().replace(" ", "").to_ascii_uppercase()
+            "{{
+            let mut input = {}.to_vec();
+            input.append(&mut bincode::serialize(&{}).unwrap());
+            input
+        }}",
+            write_function_signature(sig),
+            instance
         )
         .parse()
         .unwrap()
+    } else {
+        panic!("ewasm_input input incorrect")
     }
 }
 

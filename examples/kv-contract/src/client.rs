@@ -5,8 +5,8 @@ use anyhow::Result;
 use cargo_sewup::config::{get_deploy_config, Deploy};
 use reqwest::Client;
 use secp256k1::SecretKey;
-use serde_derive::{Deserialize, Serialize};
 use serde_json::{self, value::Value};
+use sewup_derive::ewasm_input;
 use tokio::{
     self,
     time::{sleep, Duration},
@@ -16,7 +16,8 @@ use web3::{
     Web3,
 };
 
-use kv_contract::{Pair, GET_VALUE_TO_BUCKET1_SIG, PUT_PAIR_TO_BUCKET1_SIG};
+// Share struct and sig definition in the contract
+use kv_contract::*;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -41,8 +42,7 @@ async fn main() -> Result<()> {
     ];
     let input_pair = Pair(key, value.clone());
 
-    let mut input = PUT_PAIR_TO_BUCKET1_SIG.to_vec();
-    input.append(&mut bincode::serialize(&input_pair).unwrap());
+    let mut input = ewasm_input!(input_pair for put_pair_to_bucket1);
 
     let tx_object = TransactionParameters {
         data: input.into(),
@@ -98,8 +98,7 @@ async fn main() -> Result<()> {
         return Ok(());
     }
 
-    input = GET_VALUE_TO_BUCKET1_SIG.to_vec();
-    input.append(&mut bincode::serialize(&key).unwrap());
+    input = ewasm_input!(key for get_value_to_bucket1);
 
     let call_req = CallRequest {
         from: Some(Address::from_str(&address)?),
