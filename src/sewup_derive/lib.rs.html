@@ -2224,10 +2224,10 @@
         }
         <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">captal_name</span> {
             <span class="kw">use</span> <span class="ident">sewup_derive::ewasm_fn_sig</span>;
-            <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">GET_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::get</span>());
-            <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">CREATE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::create</span>());
-            <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">UPDATE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::update</span>());
-            <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">const</span> <span class="ident">DELETE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::delete</span>());
+            <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GET_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::get</span>());
+            <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">CREATE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::create</span>());
+            <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">UPDATE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::update</span>());
+            <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::delete</span>());
         }
 
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
