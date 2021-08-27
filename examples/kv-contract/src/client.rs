@@ -15,8 +15,8 @@ use web3::{
     Web3,
 };
 
-#[derive(Serialize, Deserialize)]
-struct InputPair(u32, Vec<u8>);
+mod inputs;
+use inputs::Pair;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -35,7 +35,7 @@ async fn main() -> Result<()> {
         1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0,
     ];
-    let input_pair = InputPair(key, value.clone());
+    let input_pair = Pair(key, value.clone());
 
     let mut input = vec![0, 0, 0, 1]; // signature for put_pair_to_bucket1
     input.append(&mut bincode::serialize(&input_pair).unwrap());

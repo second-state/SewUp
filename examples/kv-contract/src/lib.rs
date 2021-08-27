@@ -3,15 +3,14 @@ use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_
 
 mod errors;
 use errors::KVError;
+mod inputs;
+use inputs::Pair;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
 struct SimpleStruct {
     trust: bool,
     description: String,
 }
-
-#[derive(Default, Serialize, Deserialize)]
-struct InputPair(u32, Vec<u8>);
 
 #[ewasm_constructor]
 fn constructor() {
@@ -32,7 +31,7 @@ fn constructor() {
 }
 
 #[ewasm_fn("00000001")]
-fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::EwasmAny> {
+fn put_pair_to_bucket1(pair: Pair) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage = sewup::kv::Store::load(None)?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
@@ -236,7 +235,7 @@ mod tests {
 
         ewasm_assert_ok!(check_buckets());
 
-        let input_pair = InputPair(100, vec![1, 2, 3, 4]);
+        let input_pair = Pair(100, vec![1, 2, 3, 4]);
         ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
 
         ewasm_assert_eq!(

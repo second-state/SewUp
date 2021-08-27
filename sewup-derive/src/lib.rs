@@ -109,7 +109,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -134,7 +134,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -161,7 +161,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -182,7 +182,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
