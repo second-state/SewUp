@@ -7,15 +7,15 @@ use sewup_derive::Table;
 // please check out the test case in the end of this document
 #[derive(Table, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Person {
-    pub(crate) trusted: bool,
-    pub(crate) age: u8,
+    pub trusted: bool,
+    pub age: u8,
 }
 
 #[derive(Table, Default, Copy, Clone, PartialEq, Serialize, Deserialize)]
 #[belongs_to(Person)]
 pub struct Post {
-    pub(crate) words: u8,
+    pub words: u8,
 
     // Currently, this field need to set up manually, this will be enhance later
-    pub(crate) person_id: usize,
+    pub person_id: usize,
 }

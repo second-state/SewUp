@@ -839,10 +839,10 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         }
         pub mod #captal_name {
             use sewup_derive::ewasm_fn_sig;
-            pub(crate) const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
-            pub(crate) const CREATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::create());
-            pub(crate) const UPDATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::update());
-            pub(crate) const DELETE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::delete());
+            pub const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
+            pub const CREATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::create());
+            pub const UPDATE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::update());
+            pub const DELETE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::delete());
         }
 
         #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
