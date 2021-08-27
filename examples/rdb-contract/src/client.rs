@@ -2,10 +2,13 @@
 use std::str::FromStr;
 
 use anyhow::Result;
+use cargo_sewup::config::{get_deploy_config, Deploy};
+use rdb_contract::modules::{person, Person, PERSON};
 use reqwest::Client;
 use secp256k1::SecretKey;
 use serde_derive::{Deserialize, Serialize};
 use serde_json::{self, value::Value};
+use sewup_derive::ewasm_fn_sig;
 use tokio::{
     self,
     time::{sleep, Duration},
@@ -18,7 +21,7 @@ use web3::{
 #[tokio::main]
 async fn main() -> Result<()> {
     // NOTE: modify the contract addr after you deploy the contract
-    let contract_addr = "0xe903bc1ef72215a2e6a74b6f1693add99b3afa10";
+    let contract_addr = "0x1f903bcebacae5e7187cdf20838272c973360271";
 
     let Deploy {
         url,
@@ -29,86 +32,88 @@ async fn main() -> Result<()> {
 
     let transport = web3::transports::Http::new(&url)?;
     let web3 = Web3::new(transport);
-    let prvk = SecretKey::from_str(secret_key)?;
+    let prvk = SecretKey::from_str(&private)?;
 
-    // let key = 100u32;
-    // let value = vec![
-    //     1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    //     0, 0,
-    // ];
-    // let input_pair = Pair(key, value.clone());
+    let person = Person {
+        trusted: true,
+        age: 18,
+    };
+    let mut create_input = person::protocol(person.clone());
 
-    // let mut input = vec![0, 0, 0, 1]; // signature for put_pair_to_bucket1
-    // input.append(&mut bincode::serialize(&input_pair).unwrap());
+    let mut input = ewasm_fn_sig!(person::create).to_vec();
+    input.append(&mut bincode::serialize(&create_input).unwrap());
 
-    // let tx_object = TransactionParameters {
-    //     data: input.into(),
-    //     gas: 5000000.into(),
-    //     gas_price: Some(1.into()),
-    //     to: Some(Address::from_str(&contract_addr)?),
-    //     ..Default::default()
-    // };
+    let tx_object = TransactionParameters {
+        data: input.into(),
+        gas: 5000000.into(),
+        gas_price: Some(1.into()),
+        to: Some(Address::from_str(&contract_addr)?),
+        ..Default::default()
+    };
 
-    // let signed = web3.accounts().sign_transaction(tx_object, &prvk).await?;
-    // let r = web3
-    //     .eth()
-    //     .send_raw_transaction(signed.raw_transaction)
-    //     .await?;
+    let signed = web3.accounts().sign_transaction(tx_object, &prvk).await?;
+    let r = web3
+        .eth()
+        .send_raw_transaction(signed.raw_transaction)
+        .await?;
 
-    // let mut data_on_chain = false;
-    // let mut retry_times = 5;
+    let mut data_on_chain = false;
+    let mut retry_times = 5;
 
-    // while !data_on_chain && retry_times > 0 {
-    //     sleep(Duration::from_millis(6000)).await;
+    while !data_on_chain && retry_times > 0 {
+        sleep(Duration::from_millis(6000)).await;
 
-    //     let receipt: serde_json::Value = Client::new()
-    //         .post(url)
-    //         .json(&serde_json::json!({
-    //             "jsonrpc": "2.0",
-    //             "method": "eth_getTransactionReceipt",
-    //             "params": [format!("{:?}", r)],
-    //             "id": 1
-    //         }))
-    //         .send()
-    //         .await?
-    //         .json()
-    //         .await?;
-    //     match receipt {
-    //         Value::Object(m) => match m.get("result") {
-    //             Some(Value::Object(r)) => match r.get("status") {
-    //                 Some(Value::String(code)) if code == "0x1" => {
-    //                     data_on_chain = true;
-    //                 }
-    //                 _ => (),
-    //             },
-    //             _ => (),
-    //         },
-    //         _ => (),
-    //     };
-    //     retry_times -= 1;
-    // }
+        let receipt: serde_json::Value = Client::new()
+            .post(&url)
+            .json(&serde_json::json!({
+                "jsonrpc": "2.0",
+                "method": "eth_getTransactionReceipt",
+                "params": [format!("{:?}", r)],
+                "id": 1
+            }))
+            .send()
+            .await?
+            .json()
+            .await?;
+        match receipt {
+            Value::Object(m) => match m.get("result") {
+                Some(Value::Object(r)) => match r.get("status") {
+                    Some(Value::String(code)) if code == "0x1" => {
+                        data_on_chain = true;
+                    }
+                    _ => (),
+                },
+                _ => (),
+            },
+            _ => (),
+        };
+        retry_times -= 1;
+    }
 
-    // if data_on_chain {
-    //     println!("success put key value pair on chain: {:?}", r);
-    // } else {
-    //     eprintln!("fail to put key value pair on chain");
-    //     return Ok(());
-    // }
+    if data_on_chain {
+        println!("success put key value pair on chain: {:?}", r);
+    } else {
+        eprintln!("fail to put key value pair on chain");
+        return Ok(());
+    }
 
-    // input = vec![0, 0, 0, 2]; // signature for get_value_to_bucket1
-    // input.append(&mut bincode::serialize(&key).unwrap());
+    input = ewasm_fn_sig!(person::get).to_vec();
+    let mut get_input: person::Protocol = Person::default().into();
+    get_input.set_id(1);
+    input.append(&mut bincode::serialize(&get_input).unwrap());
 
-    // let call_req = CallRequest {
-    //     from: Some(Address::from_str(&address)?),
-    //     data: Some(input.into()),
-    //     to: Some(Address::from_str(&contract_addr)?),
-    //     ..Default::default()
-    // };
+    let call_req = CallRequest {
+        from: Some(Address::from_str(&address)?),
+        data: Some(input.into()),
+        to: Some(Address::from_str(&contract_addr)?),
+        ..Default::default()
+    };
 
-    // let resp = web3.eth().call(call_req, None).await?;
-    // println!("resp: {:?}", resp);
-    // let expect_output: Option<Vec<u8>> = Some(value);
-    // let expect_bytes = bincode::serialize(&expect_output).unwrap();
-    // assert_eq!(resp.0, expect_bytes);
+    let resp = web3.eth().call(call_req, None).await?;
+    println!("resp: {:?}", resp);
+    let mut expect_output = create_input.clone();
+    expect_output.set_id(1);
+    let expect_bytes = bincode::serialize(&expect_output).unwrap();
+    assert_eq!(resp.0, expect_bytes);
     Ok(())
 }

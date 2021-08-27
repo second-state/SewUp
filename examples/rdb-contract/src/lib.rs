@@ -5,7 +5,7 @@ use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_
 
 mod errors;
 
-mod modules;
+pub mod modules;
 use modules::{person, post, Person, Post, PERSON, POST};
 
 #[derive(Serialize, Deserialize)]
