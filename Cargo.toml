@@ -12,7 +12,6 @@ exclude = [
     "examples/erc721-contract",
     "examples/erc1155-contract",
     "examples/kv-contract",
-    "examples/kv-client",
     "examples/rdb-contract",
     "examples/rusty-contract",
 ]

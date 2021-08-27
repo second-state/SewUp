@@ -1,7 +1,0 @@
-error: The function wrapped with ewasm_main need to be compiled with wasm32 target
- --> $DIR/ewasm_main.rs:3:1
-  |
-3 | #[ewasm_main]
-  | ^^^^^^^^^^^^^
-  |
-  = note: this error originates in the attribute macro `ewasm_main` (in Nightly builds, run with -Z macro-backtrace for more info)

@@ -2,6 +2,7 @@
 use std::str::FromStr;
 
 use anyhow::Result;
+use cargo_sewup::config::{get_deploy_config, Deploy};
 use reqwest::Client;
 use secp256k1::SecretKey;
 use serde_derive::{Deserialize, Serialize};
@@ -15,29 +16,32 @@ use web3::{
     Web3,
 };
 
-#[derive(Serialize, Deserialize)]
-struct InputPair(u32, Vec<u8>);
+use kv_contract::{Pair, GET_VALUE_TO_BUCKET1_SIG, PUT_PAIR_TO_BUCKET1_SIG};
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    // NOTE: modify these parameters for your environment
-    let url = "http://127.0.0.1:8545";
-    let address = "0x0000000000000000000000000000000000000000";
-    let secret_key = "0000000000000000000000000000000000000000000000000000000000000000";
-    let contract_addr = "0x0000000000000000000000000000000000000000";
+    // NOTE: modify the contract addr after you deploy the contract
+    let contract_addr = "0xe903bc1ef72215a2e6a74b6f1693add99b3afa10";
+
+    let Deploy {
+        url,
+        private,
+        address,
+        ..
+    } = get_deploy_config().await?;
 
     let transport = web3::transports::Http::new(&url)?;
     let web3 = Web3::new(transport);
-    let prvk = SecretKey::from_str(secret_key)?;
+    let prvk = SecretKey::from_str(&private)?;
 
     let key = 100u32;
     let value = vec![
         1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         0, 0,
     ];
-    let input_pair = InputPair(key, value.clone());
+    let input_pair = Pair(key, value.clone());
 
-    let mut input = vec![0, 0, 0, 1]; // signature for put_pair_to_bucket1
+    let mut input = PUT_PAIR_TO_BUCKET1_SIG.to_vec();
     input.append(&mut bincode::serialize(&input_pair).unwrap());
 
     let tx_object = TransactionParameters {
@@ -61,7 +65,7 @@ async fn main() -> Result<()> {
         sleep(Duration::from_millis(6000)).await;
 
         let receipt: serde_json::Value = Client::new()
-            .post(url)
+            .post(&url)
             .json(&serde_json::json!({
                 "jsonrpc": "2.0",
                 "method": "eth_getTransactionReceipt",
@@ -94,7 +98,7 @@ async fn main() -> Result<()> {
         return Ok(());
     }
 
-    input = vec![0, 0, 0, 2]; // signature for get_value_to_bucket1
+    input = GET_VALUE_TO_BUCKET1_SIG.to_vec();
     input.append(&mut bincode::serialize(&key).unwrap());
 
     let call_req = CallRequest {

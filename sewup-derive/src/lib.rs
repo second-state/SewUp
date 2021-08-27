@@ -109,7 +109,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -134,7 +134,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -161,7 +161,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -182,7 +182,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(target_arch = "wasm32")]
             use sewup::ewasm_api::finish_data;
             #[cfg(all(not(target_arch = "wasm32"), not(test)))]
-            pub fn main() { compile_error!("The function wrapped with ewasm_main need to be compiled with wasm32 target"); }
+            pub fn main() {}
             #[cfg(target_arch = "wasm32")]
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #[no_mangle]
@@ -278,7 +278,7 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         Span::call_site(),
     );
     let result = quote! {
-        pub(crate) const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
         pub(crate) const #abi_info: &'static str = #abi_str;
 
         #[cfg(target_arch = "wasm32")]

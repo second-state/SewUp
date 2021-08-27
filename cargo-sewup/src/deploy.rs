@@ -4,7 +4,7 @@ use anyhow::{Context, Result};
 use reqwest::Client;
 use secp256k1::SecretKey;
 use serde_json::{self, value::Value};
-use tokio::fs::{read_to_string, File};
+use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 use tokio::time::{sleep, Duration};
 use web3::{
@@ -12,24 +12,9 @@ use web3::{
     Web3,
 };
 
-use crate::config::Deploy;
-use crate::config::Toml;
-use crate::constants::{DEFAULT_GAS, DEFAULT_GAS_PRICE};
-use crate::deploy_wasm;
-use crate::errors::DeployError;
-
-async fn get_deploy_config() -> Result<Deploy> {
-    let config_contents = read_to_string("Cargo.toml")
-        .await
-        .context("can not read Cargo.toml")?;
-    let config: Toml = toml::from_str(config_contents.as_str())?;
-
-    if let Some(deploy) = config.deploy {
-        Ok(deploy)
-    } else {
-        Err(DeployError::ConfigIncorrect.into())
-    }
-}
+use cargo_sewup::config::{get_deploy_config, Deploy};
+use cargo_sewup::constants::{DEFAULT_GAS, DEFAULT_GAS_PRICE};
+use cargo_sewup::deploy_wasm;
 
 pub async fn run(contract_name: String, verbose: bool, debug: bool) -> Result<()> {
     let config = get_deploy_config().await?;

@@ -11,7 +11,7 @@ struct SimpleStruct {
 }
 
 #[derive(Default, Serialize, Deserialize)]
-struct InputPair(u32, Vec<u8>);
+pub struct Pair(pub u32, pub Vec<u8>);
 
 #[ewasm_constructor]
 fn constructor() {
@@ -31,8 +31,8 @@ fn constructor() {
         .expect("there is no return for constructor currently");
 }
 
-#[ewasm_fn("00000001")]
-fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::EwasmAny> {
+#[ewasm_fn]
+fn put_pair_to_bucket1(pair: Pair) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage = sewup::kv::Store::load(None)?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
@@ -42,7 +42,7 @@ fn put_pair_to_bucket1(pair: InputPair) -> anyhow::Result<sewup::primitives::Ewa
     Ok(().into())
 }
 
-#[ewasm_fn("00000002")]
+#[ewasm_fn]
 fn get_value_to_bucket1(key: u32) -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
     let mut storage =
@@ -236,7 +236,7 @@ mod tests {
 
         ewasm_assert_ok!(check_buckets());
 
-        let input_pair = InputPair(100, vec![1, 2, 3, 4]);
+        let input_pair = Pair(100, vec![1, 2, 3, 4]);
         ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
 
         ewasm_assert_eq!(
