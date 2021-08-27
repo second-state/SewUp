@@ -3,12 +3,10 @@ use std::str::FromStr;
 
 use anyhow::Result;
 use cargo_sewup::config::{get_deploy_config, Deploy};
-use rdb_contract::modules::{person, Person, PERSON};
 use reqwest::Client;
 use secp256k1::SecretKey;
-use serde_derive::{Deserialize, Serialize};
 use serde_json::{self, value::Value};
-use sewup_derive::ewasm_fn_sig;
+use sewup_derive::ewasm_input;
 use tokio::{
     self,
     time::{sleep, Duration},
@@ -17,6 +15,9 @@ use web3::{
     types::{Address, CallRequest, TransactionParameters},
     Web3,
 };
+
+// Share struct, table and sig definition in the contract
+use rdb_contract::modules::*;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -38,10 +39,8 @@ async fn main() -> Result<()> {
         trusted: true,
         age: 18,
     };
-    let mut create_input = person::protocol(person.clone());
-
-    let mut input = ewasm_fn_sig!(person::create).to_vec();
-    input.append(&mut bincode::serialize(&create_input).unwrap());
+    let create_input = person::protocol(person.clone());
+    let mut input = ewasm_input!(create_input for person::create);
 
     let tx_object = TransactionParameters {
         data: input.into(),
@@ -97,10 +96,10 @@ async fn main() -> Result<()> {
         return Ok(());
     }
 
-    input = ewasm_fn_sig!(person::get).to_vec();
     let mut get_input: person::Protocol = Person::default().into();
     get_input.set_id(1);
-    input.append(&mut bincode::serialize(&get_input).unwrap());
+
+    input = ewasm_input!(get_input for person::get);
 
     let call_req = CallRequest {
         from: Some(Address::from_str(&address)?),

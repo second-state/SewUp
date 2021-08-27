@@ -31,6 +31,13 @@ let
     rc=$?
     exit $rc
   '';
+  clientTestScript = nixpkgs.writeShellScriptBin "run-client-test" ''
+    cd examples/$1-contract
+    cargo build --bin $1-client --features=client
+    rc=$?
+    cd ../../
+    exit $rc
+  '';
 in
 with nixpkgs; pkgs.mkShell {
   buildInputs = [
@@ -46,6 +53,7 @@ with nixpkgs; pkgs.mkShell {
     exampleTestScript
     cliTestScript
     abiTestScript
+    clientTestScript
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.frameworks.Security
   ];
