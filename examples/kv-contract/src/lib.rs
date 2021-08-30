@@ -22,7 +22,7 @@ fn constructor() {
         .bucket::<Raw, Row>("bucket1")
         .expect("there is no return for constructor currently");
     let bucket2 = storage
-        .bucket::<Raw, SimpleStruct>("bucket2")
+        .bucket::<Row, SimpleStruct>("bucket2")
         .expect("there is no return for constructor currently");
     storage.save(bucket1);
     storage.save(bucket2);
@@ -105,7 +105,7 @@ fn new_bucket_with_specific_struct() -> anyhow::Result<sewup::primitives::EwasmA
 
     let mut storage = sewup::kv::Store::new()?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
-    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+    let mut bucket2 = storage.bucket::<Row, SimpleStruct>("bucket2")?;
 
     bucket1.set(
         b"jovy".into(),
@@ -115,7 +115,7 @@ fn new_bucket_with_specific_struct() -> anyhow::Result<sewup::primitives::EwasmA
         trust: true,
         description: "An action without doubt".to_string(),
     };
-    bucket2.set(b"ant".into(), simple_struct)?;
+    bucket2.set(b"ant"[..].into(), simple_struct)?;
 
     storage.save(bucket1);
     storage.save(bucket2);
@@ -130,7 +130,7 @@ fn check_objects_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
 
     let mut storage = sewup::kv::Store::load(None)?;
     let mut bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
-    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+    let mut bucket2 = storage.bucket::<Row, SimpleStruct>("bucket2")?;
 
     if let Some(faith) = bucket1.get(b"jovy".into())? {
         if faith.to_utf8_string()? !=
@@ -141,7 +141,7 @@ fn check_objects_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
         return Err(KVError::ValueNotFound.into());
     }
 
-    if let Some(simple_struct) = bucket2.get(b"ant".into())? {
+    if let Some(simple_struct) = bucket2.get(b"ant"[..].into())? {
         if !simple_struct.trust {
             return Err(KVError::ValueError("struct trust not true".to_string()).into());
         }
@@ -151,7 +151,7 @@ fn check_objects_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
     } else {
         return Err(KVError::ValueNotFound.into());
     }
-    bucket2.set(b"bug".into(), SimpleStruct::default())?;
+    bucket2.set(b"bug"[..].into(), SimpleStruct::default())?;
 
     storage.save(bucket1);
     storage.save(bucket2);
@@ -166,15 +166,15 @@ fn delete_object_in_bucket() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup::types::{Raw, Row};
 
     let mut storage = sewup::kv::Store::load(None)?;
-    let mut bucket2 = storage.bucket::<Raw, SimpleStruct>("bucket2")?;
+    let mut bucket2 = storage.bucket::<Row, SimpleStruct>("bucket2")?;
 
-    if bucket2.get(b"bug".into())?.is_none() {
+    if bucket2.get(b"bug"[..].into())?.is_none() {
         return Err(KVError::ValueError("there should be a bug for testing".to_string()).into());
     }
 
-    bucket2.remove(b"bug".into())?;
+    bucket2.remove(b"bug"[..].into())?;
 
-    if bucket2.get(b"bug".into())?.is_some() {
+    if bucket2.get(b"bug"[..].into())?.is_some() {
         return Err(
             KVError::ValueError("there should be no bug after deleting".to_string()).into(),
         );
@@ -239,13 +239,22 @@ mod tests {
         let input_pair = Pair(100, vec![1, 2, 3, 4]);
         ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
 
-        ewasm_assert_eq!(
-            get_value_to_bucket1(100),
-            vec![
-                1, 32, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-            ]
-        );
+        let expected_of_100_value = vec![
+            1, 32, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        let expected_of_200_value = vec![
+            1, 32, 0, 0, 0, 0, 0, 0, 0, 4, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        ewasm_assert_eq!(get_value_to_bucket1(100), expected_of_100_value.clone());
+
+        let input_pair = Pair(200, vec![4, 3, 2, 1]);
+        ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
+
+        ewasm_assert_eq!(get_value_to_bucket1(100), expected_of_100_value);
+
+        ewasm_assert_eq!(get_value_to_bucket1(200), expected_of_200_value);
 
         ewasm_assert_ok!(drop_bucket_than_check());
     }
