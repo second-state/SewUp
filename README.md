@@ -9,6 +9,7 @@
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
+Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wiki) helps you work with sewup, once you got problems or confusing you can learn more on the wiki.
 
 ## Slides
 | Date       | Event                 | Slides                                                      |
@@ -117,7 +118,7 @@ mod tests {
 ```
 
 ### Interact
-There are so many clients can interacte with contract.
+There are so many clients can interact with contract.
 
 For ERC tokens, we provide `web3js` examples in [wiki page](https://github.com/second-state/SewUp/wiki/ERC-Testing).
 The example of clients interacting with contract with [kv](https://github.com/second-state/SewUp/blob/main/examples/kv-contract/src/client.rs) or [rdb](https://github.com/second-state/SewUp/blob/main/examples/rdb-contract/src/client.rs) features.
