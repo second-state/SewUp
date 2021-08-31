@@ -82,14 +82,21 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         }
     }
 
+    fn bloom_filter(&self, hash: &[u8; 24]) -> bool {
+        // TODO: bloom filter here
+        true
+    }
+
     /// Check the `Key` in the bucket
     pub fn contains(&self, key: K) -> Result<bool> {
         let hash = key.gen_hash()?;
 
-        // TODO: bloom filter here
+        if !self.bloom_filter(&hash) {
+            return Ok(false);
+        }
 
         for item in self.raw_bucket.0.iter() {
-            if item.get_size_from_hash(hash).0 {
+            if item.get_size_from_hash(&hash).0 {
                 return Ok(true);
             }
         }
@@ -104,7 +111,7 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         let mut idx = 0u32;
 
         for item in self.raw_bucket.0.iter() {
-            let (is_match, k_size, v_size) = item.get_size_from_hash(hash);
+            let (is_match, k_size, v_size) = item.get_size_from_hash(&hash);
             if is_match {
                 let mut row = Row::from(
                     &self.raw_bucket.1[(idx + k_size) as usize..(idx + k_size + v_size) as usize],
@@ -124,8 +131,26 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         let mut row_key: Vec<Raw> = key.to_row_key()?.into();
 
         let hash_key = key.gen_hash_key(row_key.len() as u32, value.len() as u32)?;
+        let hash = key.gen_hash()?;
 
-        // TODO: handle key duplicate here
+        if self.bloom_filter(&hash) {
+            let mut matched: Option<usize> = None;
+            let mut idx = 0u32;
+            for (i, item) in self.raw_bucket.0.iter().enumerate() {
+                let (is_match, k_size, v_size) = item.get_size_from_hash(&hash);
+                if is_match {
+                    self.raw_bucket
+                        .1
+                        .drain((idx + k_size - 1) as usize..(idx + k_size + v_size) as usize);
+                    matched = Some(i);
+                    break;
+                }
+                idx = idx + k_size + v_size;
+            }
+            if let Some(i) = matched {
+                self.raw_bucket.0.remove(i);
+            }
+        }
 
         self.raw_bucket.0.push(hash_key);
         self.raw_bucket.1.append(&mut row_key);
@@ -140,19 +165,21 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
 
         let mut idx = 0u32;
 
+        let mut matched: Option<usize> = None;
         for (i, item) in self.raw_bucket.0.iter().enumerate() {
-            let (is_match, k_size, v_size) = item.get_size_from_hash(hash);
+            let (is_match, k_size, v_size) = item.get_size_from_hash(&hash);
             if is_match {
-                // TODO: better implement here
-                for _ in (idx + k_size)..(idx + k_size + v_size) {
-                    self.raw_bucket.1.remove(idx as usize);
-                }
-                idx = i as u32;
+                self.raw_bucket
+                    .1
+                    .drain((idx + k_size - 1) as usize..(idx + k_size + v_size) as usize);
+                matched = Some(i);
                 break;
             }
             idx = idx + k_size + v_size;
         }
-        self.raw_bucket.0.remove(idx as usize);
+        if let Some(i) = matched {
+            self.raw_bucket.0.remove(i);
+        }
         Ok(())
     }
 
