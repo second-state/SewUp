@@ -17,7 +17,7 @@ use crate::types::{Raw, Row};
 /// | Header    | Binary | padding to n times Byte32 |
 /// ```
 /// Header is the number of bytes for binary
-pub trait Key: Sized + Serialize + DeserializeOwned {
+pub trait Key: Clone + Sized + Serialize + DeserializeOwned {
     fn from_row_key(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
@@ -63,14 +63,14 @@ pub trait Key: Sized + Serialize + DeserializeOwned {
 }
 
 pub trait AsHashKey {
-    fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32);
+    fn get_size_from_hash(&self, hash: &[u8; 24]) -> (bool, u32, u32);
     fn get_size(&self) -> (u32, u32);
 }
 
 impl AsHashKey for Raw {
-    fn get_size_from_hash(&self, hash: [u8; 24]) -> (bool, u32, u32) {
+    fn get_size_from_hash(&self, hash: &[u8; 24]) -> (bool, u32, u32) {
         let (k_size, v_size) = self.get_size();
-        (hash == self.bytes[0..24], k_size, v_size)
+        (*hash == self.bytes[0..24], k_size, v_size)
     }
     fn get_size(&self) -> (u32, u32) {
         let key_bytes: &[u8; 4] = (&self.bytes[24..28]).try_into().unwrap();
