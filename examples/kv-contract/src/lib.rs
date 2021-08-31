@@ -13,6 +13,9 @@ struct SimpleStruct {
 #[derive(Default, Serialize, Deserialize)]
 pub struct Pair(pub u32, pub Vec<u8>);
 
+#[derive(Default, Serialize, Deserialize)]
+pub struct SimpleStructPair(pub String, pub bool, pub String);
+
 #[ewasm_constructor]
 fn constructor() {
     use sewup::types::{Raw, Row};
@@ -49,6 +52,33 @@ fn get_value_to_bucket1(key: u32) -> anyhow::Result<sewup::primitives::EwasmAny>
         sewup::kv::Store::load(None).expect("there is no return for constructor currently");
     let bucket1 = storage.bucket::<Raw, Row>("bucket1")?;
     let value = bucket1.get(Raw::from(key))?.map(|x| x.into_u8_vec());
+    Ok(sewup::primitives::EwasmAny::from(value))
+}
+
+#[ewasm_fn]
+fn put_pair_to_bucket2(pair: SimpleStructPair) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup::types::Row;
+    let mut storage = sewup::kv::Store::load(None)?;
+    let mut bucket = storage.bucket::<Row, SimpleStruct>("bucket2")?;
+    bucket.set(
+        pair.0.into(),
+        SimpleStruct {
+            trust: pair.1,
+            description: pair.2,
+        },
+    );
+    storage.save(bucket);
+    storage.commit()?;
+    Ok(().into())
+}
+
+#[ewasm_fn]
+fn get_value_to_bucket2(key: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    use sewup::types::Row;
+    let mut storage =
+        sewup::kv::Store::load(None).expect("there is no return for constructor currently");
+    let bucket = storage.bucket::<Row, SimpleStruct>("bucket2")?;
+    let value = bucket.get(key.into())?;
     Ok(sewup::primitives::EwasmAny::from(value))
 }
 
@@ -209,7 +239,10 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
         ewasm_fn_sig!(get_value_to_bucket1) => {
             ewasm_input_from!(contract move get_value_to_bucket1)?
         }
-
+        ewasm_fn_sig!(put_pair_to_bucket2) => ewasm_input_from!(contract move put_pair_to_bucket2)?,
+        ewasm_fn_sig!(get_value_to_bucket2) => {
+            ewasm_input_from!(contract move get_value_to_bucket2)?
+        }
         // Following handler is for other test
         ewasm_fn_sig!(new_bucket_with_specific_struct) => new_bucket_with_specific_struct()?,
         ewasm_fn_sig!(check_objects_in_bucket) => check_objects_in_bucket()?,
@@ -257,6 +290,39 @@ mod tests {
         ewasm_assert_eq!(get_value_to_bucket1(200), expected_of_200_value);
 
         ewasm_assert_ok!(drop_bucket_than_check());
+    }
+
+    #[ewasm_test]
+    fn test_insert_big_objects() {
+        // big key
+        let mut input_pair = SimpleStructPair(
+            "a really looooooooooooooooooooooooooooooong key".to_string(),
+            true,
+            "desc".to_string(),
+        );
+        ewasm_assert_ok!(put_pair_to_bucket2(input_pair));
+        let mut input = "a really looooooooooooooooooooooooooooooong key".to_string();
+        ewasm_assert_eq!(
+            get_value_to_bucket2(input),
+            vec![1, 1, 4, 0, 0, 0, 0, 0, 0, 0, 100, 101, 115, 99]
+        );
+
+        // big value
+        input_pair = SimpleStructPair(
+            "key".to_string(),
+            true,
+            "loooooooooooooooooooooooooooooong desc".to_string(),
+        );
+        ewasm_assert_ok!(put_pair_to_bucket2(input_pair));
+        input = "key".to_string();
+        ewasm_assert_eq!(
+            get_value_to_bucket2(input),
+            vec![
+                1, 1, 38, 0, 0, 0, 0, 0, 0, 0, 108, 111, 111, 111, 111, 111, 111, 111, 111, 111,
+                111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111, 111,
+                111, 111, 111, 111, 111, 110, 103, 32, 100, 101, 115, 99
+            ]
+        );
     }
 
     #[ewasm_test]
