@@ -143,7 +143,10 @@ mod tests {
         ewasm_auto_assert_eq!(person::create(create_input), expect_output);
 
         let post = Post {
-            words: 100,
+            content: [
+                sewup::types::Raw::from("No Day but today"),
+                sewup::types::Raw::from("Embrace who you are"),
+            ],
             person_id: 1,
         };
         let mut create_post_input = post::protocol(post);
