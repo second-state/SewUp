@@ -41,7 +41,7 @@ fn check_version_and_features(
 
 #[ewasm_fn]
 fn check_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let mut db = sewup::rdb::Db::load(None)?;
+    let db = sewup::rdb::Db::load(None)?;
     let info = db.table_info::<Person>().unwrap();
     if info.record_raw_size != 1 {
         return Err(
@@ -67,7 +67,7 @@ fn drop_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
 
 #[ewasm_fn]
 fn check_tables_again() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let mut db = sewup::rdb::Db::load(None)?;
+    let db = sewup::rdb::Db::load(None)?;
     if db.table_info::<Person>().is_some() {
         return Err(errors::RDBError::SimpleError("Person table should be deleted".into()).into());
     }
@@ -102,7 +102,7 @@ fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> 
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup_derive::ewasm_input_from;
-    let mut contract = sewup::primitives::Contract::new()?;
+    let contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get),
