@@ -292,4 +292,38 @@ mod tests {
         get_input.set_id(1);
         ewasm_auto_assert_eq!(location::get(get_input), expect_output);
     }
+
+    #[ewasm_test]
+    fn test_record_extended_and_causing_tables_migration() {
+        ewasm_assert_ok!(add_address_table());
+
+        let location = Location {
+            address: Raw::from("Utopia"),
+        };
+
+        let create_input = location::protocol(location.clone());
+        let mut location_expect_output = create_input.clone();
+        location_expect_output.set_id(1);
+        ewasm_auto_assert_eq!(location::create(create_input), location_expect_output);
+
+        let mut location_get_input: location::Protocol = Location::default().into();
+        location_get_input.set_id(1);
+        ewasm_auto_assert_eq!(location::get(location_get_input), location_expect_output);
+
+        let person = Person {
+            trusted: true,
+            age: 1,
+        };
+
+        let create_input = person::protocol(person.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        let mut get_input: person::Protocol = Person::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+
+        ewasm_auto_assert_eq!(location::get(location_get_input), location_expect_output);
+    }
 }
