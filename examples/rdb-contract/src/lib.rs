@@ -221,6 +221,25 @@ mod tests {
     }
 
     #[ewasm_test]
+    fn test_insert_large_records() {
+        for i in 1..100 {
+            let person = Person {
+                trusted: true,
+                age: i as u8,
+            };
+
+            let mut create_input = person::protocol(person.clone());
+            let mut expect_output = create_input.clone();
+            expect_output.set_id(i);
+            ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+            let mut get_input: person::Protocol = Person::default().into();
+            get_input.set_id(i);
+            ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+        }
+    }
+
+    #[ewasm_test]
     fn test_table_management() {
         ewasm_assert_ok!(check_version_and_features());
         ewasm_assert_ok!(check_tables());
