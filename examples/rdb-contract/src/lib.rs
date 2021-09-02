@@ -6,7 +6,7 @@ use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_
 mod errors;
 
 pub mod modules;
-use modules::{person, post, Person, Post, PERSON, POST};
+use modules::{location, person, post, Location, Person, Post, LOCATION, PERSON, POST};
 
 #[derive(Serialize, Deserialize)]
 pub struct Input {
@@ -20,6 +20,14 @@ fn constructor() {
     db.create_table::<Post>();
     db.commit()
         .expect("there is no return for constructor currently");
+}
+
+#[ewasm_fn]
+fn add_address_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let mut db = sewup::rdb::Db::load(None)?;
+    db.create_table::<Location>();
+    db.commit()?;
+    Ok(().into())
 }
 
 #[ewasm_fn]
@@ -41,7 +49,7 @@ fn check_version_and_features(
 
 #[ewasm_fn]
 fn check_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let mut db = sewup::rdb::Db::load(None)?;
+    let db = sewup::rdb::Db::load(None)?;
     let info = db.table_info::<Person>().unwrap();
     if info.record_raw_size != 1 {
         return Err(
@@ -58,7 +66,7 @@ fn check_tables() -> anyhow::Result<sewup::primitives::EwasmAny> {
 }
 
 #[ewasm_fn]
-fn drop_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
+fn drop_person_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut db = sewup::rdb::Db::load(None)?;
     db.drop_table::<Person>();
     db.commit()?;
@@ -67,7 +75,7 @@ fn drop_table() -> anyhow::Result<sewup::primitives::EwasmAny> {
 
 #[ewasm_fn]
 fn check_tables_again() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let mut db = sewup::rdb::Db::load(None)?;
+    let db = sewup::rdb::Db::load(None)?;
     if db.table_info::<Person>().is_some() {
         return Err(errors::RDBError::SimpleError("Person table should be deleted".into()).into());
     }
@@ -102,7 +110,7 @@ fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> 
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup_derive::ewasm_input_from;
-    let mut contract = sewup::primitives::Contract::new()?;
+    let contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
         ewasm_fn_sig!(person::get) => ewasm_input_from!(contract move person::get),
@@ -113,14 +121,19 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
         ewasm_fn_sig!(post::create) => ewasm_input_from!(contract move post::create),
         ewasm_fn_sig!(post::update) => ewasm_input_from!(contract move post::update),
         ewasm_fn_sig!(post::delete) => ewasm_input_from!(contract move post::delete),
+        ewasm_fn_sig!(location::get) => ewasm_input_from!(contract move location::get),
+        ewasm_fn_sig!(location::create) => ewasm_input_from!(contract move location::create),
+        ewasm_fn_sig!(location::update) => ewasm_input_from!(contract move location::update),
+        ewasm_fn_sig!(location::delete) => ewasm_input_from!(contract move location::delete),
         ewasm_fn_sig!(check_version_and_features) => {
             check_version_and_features(0, vec![sewup::rdb::Feature::Default])
         }
         ewasm_fn_sig!(get_post_author) => ewasm_input_from!(contract move get_post_author),
         ewasm_fn_sig!(get_children) => get_children(),
         ewasm_fn_sig!(check_tables) => check_tables(),
-        ewasm_fn_sig!(drop_table) => drop_table(),
+        ewasm_fn_sig!(drop_person_table) => drop_person_table(),
         ewasm_fn_sig!(check_tables_again) => check_tables_again(),
+        ewasm_fn_sig!(add_address_table) => add_address_table(),
         _ => return Err(errors::RDBError::UnknownHandle.into()),
     }
 }
@@ -128,6 +141,7 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_test]
 mod tests {
     use super::*;
+    use sewup::types::Raw;
     use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_auto_assert_eq, ewasm_err_output};
 
     #[ewasm_test]
@@ -143,7 +157,10 @@ mod tests {
         ewasm_auto_assert_eq!(person::create(create_input), expect_output);
 
         let post = Post {
-            words: 100,
+            content: [
+                sewup::types::Raw::from("No Day but today"),
+                sewup::types::Raw::from("Embrace who you are"),
+            ],
             person_id: 1,
         };
         let mut create_post_input = post::protocol(post);
@@ -218,10 +235,127 @@ mod tests {
     }
 
     #[ewasm_test]
+    fn test_insert_large_records() {
+        for i in 1..100 {
+            let person = Person {
+                trusted: true,
+                age: i as u8,
+            };
+
+            let create_input = person::protocol(person.clone());
+            let mut expect_output = create_input.clone();
+            expect_output.set_id(i);
+            ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+            let mut get_input: person::Protocol = Person::default().into();
+            get_input.set_id(i);
+            ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+        }
+    }
+
+    #[ewasm_test]
     fn test_table_management() {
         ewasm_assert_ok!(check_version_and_features());
         ewasm_assert_ok!(check_tables());
-        ewasm_assert_ok!(drop_table());
+        ewasm_assert_ok!(drop_person_table());
         ewasm_assert_ok!(check_tables_again());
+    }
+
+    #[ewasm_test]
+    fn test_create_tables_after_used() {
+        let person = Person {
+            trusted: true,
+            age: 1,
+        };
+
+        let create_input = person::protocol(person.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        let mut get_input: person::Protocol = Person::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+
+        ewasm_assert_ok!(add_address_table());
+
+        let location = Location {
+            address: Raw::from("Utopia"),
+        };
+
+        let create_input = location::protocol(location.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(location::create(create_input), expect_output);
+
+        let mut get_input: location::Protocol = Location::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(location::get(get_input), expect_output);
+    }
+
+    #[ewasm_test]
+    fn test_record_extended_and_causing_migration() {
+        ewasm_assert_ok!(add_address_table());
+
+        let location = Location {
+            address: Raw::from("Utopia"),
+        };
+
+        let create_input = location::protocol(location.clone());
+        let mut location_expect_output = create_input.clone();
+        location_expect_output.set_id(1);
+        ewasm_auto_assert_eq!(location::create(create_input), location_expect_output);
+
+        let mut location_get_input: location::Protocol = Location::default().into();
+        location_get_input.set_id(1);
+        ewasm_auto_assert_eq!(location::get(location_get_input), location_expect_output);
+
+        let person = Person {
+            trusted: true,
+            age: 1,
+        };
+
+        let create_input = person::protocol(person.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        let mut get_input: person::Protocol = Person::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(person::get(get_input), expect_output);
+
+        ewasm_auto_assert_eq!(location::get(location_get_input), location_expect_output);
+    }
+
+    #[ewasm_test]
+    fn test_table_deleting_causing_migration() {
+        let person = Person {
+            trusted: true,
+            age: 1,
+        };
+
+        let create_input = person::protocol(person.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        ewasm_assert_ok!(add_address_table());
+
+        let location = Location {
+            address: Raw::from("Utopia"),
+        };
+
+        let create_input = location::protocol(location.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(location::create(create_input), expect_output);
+
+        let mut get_input: location::Protocol = Location::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(location::get(get_input), expect_output.clone());
+
+        ewasm_assert_ok!(drop_person_table());
+
+        ewasm_auto_assert_eq!(location::get(get_input), expect_output);
     }
 }

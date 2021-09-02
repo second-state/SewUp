@@ -872,7 +872,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             pub const DELETE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::delete());
         }
 
-        #[derive(Default, Clone, Copy, sewup::Serialize, sewup::Deserialize)]
+        #[derive(Default, Clone, sewup::Serialize, sewup::Deserialize)]
         pub struct #wrapper_name {
             #(pub #wrapper_field_names: #wrapper_field_types,)*
         }
@@ -907,7 +907,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         #(
                             paste::paste! {
                                 let [<#clone_field_names2 _filed_filter>] : Option<#field_types> =
-                                    sewup::utils::get_field_by_name(proc.records[0], stringify!(#clone_field_names2));
+                                    sewup::utils::get_field_by_name(proc.records[0].clone(), stringify!(#clone_field_names2));
 
                                 let  [<#clone_field_names2 _field>] : #field_types =
                                     sewup::utils::get_field_by_name(&r, stringify!(#clone_field_names2));
@@ -946,7 +946,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             pub fn create(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let mut output_proc = proc.clone();
-                output_proc.records[0].id = Some(table.add_record(proc.records[0].into())?);
+                output_proc.records[0].id = Some(table.add_record(proc.records[0].clone().into())?);
                 table.commit()?;
                 Ok(output_proc.into_ewasm_any())
             }
