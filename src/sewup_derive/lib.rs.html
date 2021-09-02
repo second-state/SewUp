@@ -2280,7 +2280,7 @@
             <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::delete</span>());
         }
 
-        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
+        <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> #<span class="ident">wrapper_name</span> {
             #(<span class="kw">pub</span> #<span class="ident">wrapper_field_names</span>: #<span class="ident">wrapper_field_types</span>,)<span class="op">*</span>
         }
@@ -2315,7 +2315,7 @@
                         #(
                             <span class="macro">paste::paste!</span> {
                                 <span class="kw">let</span> [<span class="op">&lt;</span>#<span class="ident">clone_field_names2</span> <span class="ident">_filed_filter</span><span class="op">&gt;</span>] : <span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">field_types</span><span class="op">&gt;</span> <span class="op">=</span>
-                                    <span class="ident">sewup::utils::get_field_by_name</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>], <span class="macro">stringify!</span>(#<span class="ident">clone_field_names2</span>));
+                                    <span class="ident">sewup::utils::get_field_by_name</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">clone</span>(), <span class="macro">stringify!</span>(#<span class="ident">clone_field_names2</span>));
 
                                 <span class="kw">let</span>  [<span class="op">&lt;</span>#<span class="ident">clone_field_names2</span> <span class="ident">_field</span><span class="op">&gt;</span>] : #<span class="ident">field_types</span> <span class="op">=</span>
                                     <span class="ident">sewup::utils::get_field_by_name</span>(<span class="kw-2">&amp;</span><span class="ident">r</span>, <span class="macro">stringify!</span>(#<span class="ident">clone_field_names2</span>));
@@ -2354,7 +2354,7 @@
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_proc</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">clone</span>();
-                <span class="ident">output_proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">add_record</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">into</span>())<span class="question-mark">?</span>);
+                <span class="ident">output_proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">add_record</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">clone</span>().<span class="ident">into</span>())<span class="question-mark">?</span>);
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
                 <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into_ewasm_any</span>())
             }
