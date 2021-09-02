@@ -21,3 +21,8 @@ pub struct Post {
     // Currently, this field need to set up manually, this will be enhance later
     pub person_id: usize,
 }
+
+#[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
+pub struct Location {
+    pub address: Raw,
+}
