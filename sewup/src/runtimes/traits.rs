@@ -6,7 +6,6 @@
 //! evm_error, evm_message and evm_result
 
 use anyhow::Result;
-use contract_address::ContractAddress;
 use ethereum_types::{Address, H256, U256};
 use evmc_sys::evmc_call_kind;
 use thiserror::Error;
@@ -190,6 +189,6 @@ pub trait RT {
     /// let VM execute the message
     fn execute(&mut self, msg: VMMessage) -> Result<VMResult>;
 
-    /// Deploy contract and return the contract address
-    fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress>;
+    /// Deploy contract
+    fn deploy(&mut self, msg: VMMessage) -> Result<()>;
 }

@@ -7,10 +7,7 @@ use serde_json::{self, value::Value};
 use tokio::fs::File;
 use tokio::io::AsyncReadExt;
 use tokio::time::{sleep, Duration};
-use web3::{
-    types::{Address, TransactionParameters},
-    Web3,
-};
+use web3::{types::TransactionParameters, Web3};
 
 use cargo_sewup::config::{get_deploy_config, Deploy};
 use cargo_sewup::constants::{DEFAULT_GAS, DEFAULT_GAS_PRICE};
@@ -24,14 +21,13 @@ pub async fn run(contract_name: String, verbose: bool, debug: bool) -> Result<()
     let Deploy {
         url,
         private,
-        address,
         gas,
         gas_price,
+        ..
     } = config;
     let transport = web3::transports::Http::new(&url)?;
     let web3 = Web3::new(transport);
 
-    let _from = Address::from_str(&address)?;
     let prvk = SecretKey::from_str(&private)?;
 
     let wasm_path = format!(deploy_wasm!(), contract_name);

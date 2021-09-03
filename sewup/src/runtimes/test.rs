@@ -7,8 +7,6 @@ use std::fs::{self, OpenOptions};
 use std::io::prelude::*;
 
 use anyhow::Result;
-use contract_address::ContractAddress;
-use ethereum_types::U256;
 use evmc_sys::{evmc_call_kind, evmc_revision, evmc_status_code, evmc_storage_status};
 use hex::encode;
 use rust_ssvm::{create as create_vm, host::HostContext, EvmcVm};
@@ -111,13 +109,10 @@ impl RT for TestRuntime {
         }
     }
 
-    fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress> {
+    fn deploy(&mut self, msg: VMMessage) -> Result<()> {
         let sender = *msg.sender;
         self.execute(msg)?;
-        Ok(ContractAddress::from_sender_and_nonce(
-            &sender,
-            &U256::default(),
-        ))
+        Ok(())
     }
 }
 
