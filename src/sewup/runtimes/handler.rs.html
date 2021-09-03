@@ -144,9 +144,9 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::errors::ContractError</span> <span class="kw">as</span> <span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::runtimes::traits</span>::{<span class="ident">VMMessageBuilder</span>, <span class="ident">VMResult</span>, <span class="ident">RT</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Raw</span>;
 
 <span class="kw">use</span> <span class="ident">anyhow</span>::{<span class="ident">Context</span>, <span class="prelude-ty">Result</span>};
-<span class="kw">use</span> <span class="ident">ethereum_types::Address</span>;
 <span class="kw">use</span> <span class="ident">hex::decode</span>;
 <span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
@@ -182,7 +182,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">input</span>) <span class="op">=</span> <span class="ident">input</span> {
                 <span class="ident">input_data</span>.<span class="ident">extend_from_slice</span>(<span class="ident">input</span>);
             }
-            <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">Address::default</span>();
+            <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="ident">Raw::default</span>();
             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">VMMessageBuilder</span> {
                 <span class="ident">sender</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>),
                 <span class="ident">input_data</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">input_data</span>),
@@ -219,9 +219,9 @@
                         .<span class="ident">expect</span>(<span class="string">&quot;address should be hex format&quot;</span>)
                         .<span class="ident">try_into</span>()
                         .<span class="ident">expect</span>(<span class="string">&quot;address should be byte20&quot;</span>);
-                    <span class="ident">Address::from</span>(<span class="ident">byte20</span>)
+                    <span class="ident">Raw::from_raw_address</span>(<span class="kw-2">&amp;</span><span class="ident">byte20</span>)
                 } <span class="kw">else</span> {
-                    <span class="ident">Address::default</span>()
+                    <span class="ident">Raw::default</span>()
                 };
 
                 <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">VMMessageBuilder</span> {

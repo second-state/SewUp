@@ -1,1 +1,0 @@
-initSidebarItems({"struct":[["ContractAddress","Represents an ethereum contract address"],["H256","Fixed-size uninterpreted hash type with 32 bytes (256 bits) size."],["U256","Little-endian large integer type"]],"type":[["Address",""]]});

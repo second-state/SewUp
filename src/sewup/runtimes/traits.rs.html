@@ -192,7 +192,6 @@
 <span id="192">192</span>
 <span id="193">193</span>
 <span id="194">194</span>
-<span id="195">195</span>
 </pre><pre class="rust"><code><span class="doccomment">//! RT Trait</span>
 <span class="doccomment">//! This trait help you abstract any VM into application runtime layer,</span>
 <span class="doccomment">//! such that you can easily use your VM with SewUp libs.</span>
@@ -201,10 +200,10 @@
 <span class="doccomment">//! evm_error, evm_message and evm_result</span>
 
 <span class="kw">use</span> <span class="ident">anyhow::Result</span>;
-<span class="kw">use</span> <span class="ident">contract_address::ContractAddress</span>;
-<span class="kw">use</span> <span class="ident">ethereum_types</span>::{<span class="ident">Address</span>, <span class="ident">H256</span>, <span class="ident">U256</span>};
 <span class="kw">use</span> <span class="ident">evmc_sys::evmc_call_kind</span>;
 <span class="kw">use</span> <span class="ident">thiserror::Error</span>;
+
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Raw</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VmError</span> {
@@ -261,7 +260,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VMResult</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">gas_left</span>: <span class="ident">i64</span>,
     <span class="kw">pub</span> <span class="ident">output_data</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">create_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Address</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">create_address</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
@@ -277,12 +276,12 @@
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">Flags</span>,
     <span class="kw">pub</span> <span class="ident">depth</span>: <span class="ident">i32</span>,
     <span class="kw">pub</span> <span class="ident">gas</span>: <span class="ident">i64</span>,
-    <span class="kw">pub</span> <span class="ident">destination</span>: <span class="ident">Address</span>,
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Address</span>,
+    <span class="kw">pub</span> <span class="ident">destination</span>: <span class="ident">Raw</span>,
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span>,
     <span class="kw">pub</span> <span class="ident">input_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">U256</span>,
+    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Raw</span>,
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">create2_salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">H256</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">create2_salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -291,12 +290,12 @@
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="ident">Flags</span>,
     <span class="kw">pub</span> <span class="ident">depth</span>: <span class="ident">i32</span>,
     <span class="kw">pub</span> <span class="ident">gas</span>: <span class="ident">i64</span>,
-    <span class="kw">pub</span> <span class="ident">destination</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Address</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Address</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">destination</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">sender</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">input_data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">U256</span>,
+    <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Raw</span>,
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span> <span class="ident">create2_salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">H256</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">create2_salt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">VMMessageBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -308,13 +307,13 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">destination</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">destination</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">destination</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>);
         <span class="self">self</span>
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sender</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">addr</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Raw</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">sender</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">addr</span>);
         <span class="self">self</span>
     }
@@ -336,9 +335,9 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">sender</span>) <span class="op">=</span> <span class="ident">sender</span> {
             <span class="kw">let</span> <span class="ident">destination</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">destination</span>) <span class="op">=</span> <span class="ident">destination</span> {
-                <span class="kw-2">*</span><span class="ident">destination</span>
+                <span class="ident">destination</span>.<span class="ident">clone</span>()
             } <span class="kw">else</span> {
-                <span class="ident">Address::from_low_u64_be</span>(<span class="number">0</span>)
+                <span class="ident">Raw::from</span>(<span class="number">0u32</span>)
             };
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">VMMessage</span> {
                 <span class="ident">kind</span>,
@@ -358,9 +357,8 @@
 
     <span class="doccomment">/// Use Create2 EVM call with predefined salt</span>
     <span class="doccomment">/// The call help you generate the contract address.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create2</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">salt</span>: <span class="ident">H256</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">create2_salt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">salt</span>);
-        <span class="self">self</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create2</span>(<span class="self">self</span>, <span class="ident">_salt</span>: ()) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="macro">unimplemented!</span>()
     }
 }
 
@@ -370,7 +368,7 @@
             <span class="ident">kind</span>: <span class="ident">evmc_call_kind::EVMC_CALL</span>,
             <span class="ident">flags</span>: <span class="ident">Flags::Default</span>,
             <span class="ident">depth</span>: <span class="ident">i32::MAX</span>,
-            <span class="ident">value</span>: <span class="ident">U256::from</span>(<span class="number">0u64</span>),
+            <span class="ident">value</span>: <span class="ident">Raw::from</span>(<span class="number">0u32</span>),
             <span class="ident">gas</span>: <span class="number">0</span>,
             <span class="ident">destination</span>: <span class="prelude-val">None</span>,
             <span class="ident">sender</span>: <span class="prelude-val">None</span>,
@@ -385,8 +383,8 @@
     <span class="doccomment">/// let VM execute the message</span>
     <span class="kw">fn</span> <span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">VMMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">VMResult</span><span class="op">&gt;</span>;
 
-    <span class="doccomment">/// Deploy contract and return the contract address</span>
-    <span class="kw">fn</span> <span class="ident">deploy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">VMMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ContractAddress</span><span class="op">&gt;</span>;
+    <span class="doccomment">/// Deploy contract</span>
+    <span class="kw">fn</span> <span class="ident">deploy</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">VMMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
