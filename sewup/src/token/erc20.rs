@@ -5,8 +5,8 @@ use crate::types::Raw;
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_array, copy_into_storage_value, get_allowance, get_balance,
-    set_allowance, set_balance,
+    copy_into_address, copy_into_storage_value, get_allowance, get_balance, set_allowance,
+    set_balance,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -14,7 +14,7 @@ use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, types::Address};
+use ewasm_api::{log3, prelude::Bytes20, types::Address};
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
 
@@ -38,10 +38,13 @@ use sewup_derive::ewasm_lib_fn;
 })]
 pub fn transfer(contract: &Contract) {
     let sender = ewasm_api::caller();
-    let recipient = copy_into_address(&contract.input_data[16..36]);
+    let recipient: Bytes20 = {
+        let buffer: [u8; 20] = contract.input_data[16..36].try_into().unwrap();
+        buffer.into()
+    };
 
     let value = {
-        let value_data: [u8; 32] = copy_into_array(&contract.input_data[36..68]);
+        let value_data: [u8; 32] = contract.input_data[36..68].try_into().unwrap();
         Uint256::from_be_bytes(value_data)
     };
 
@@ -174,7 +177,7 @@ pub fn approve(contract: &Contract) {
     let sender = ewasm_api::caller();
     let spender = copy_into_address(&contract.input_data[16..36]);
     let value = {
-        let buffer: [u8; 32] = copy_into_array(&contract.input_data[36..68]);
+        let buffer: [u8; 32] = contract.input_data[36..68].try_into().unwrap();
         copy_into_storage_value(&buffer)
     };
     set_allowance(&sender, &spender, &value);
@@ -229,7 +232,7 @@ pub fn transfer_from(contract: &Contract) {
     let recipient = copy_into_address(&contract.input_data[48..68]);
 
     let amount = {
-        let buffer: [u8; 32] = copy_into_array(&contract.input_data[68..100]);
+        let buffer: [u8; 32] = contract.input_data[68..100].try_into().unwrap();
         Uint256::from_be_bytes(buffer)
     };
 

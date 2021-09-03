@@ -6,8 +6,7 @@ use sewup_derive::ewasm_lib_fn;
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_array, copy_into_storage_value, get_approval, get_token_balance,
-    set_token_balance,
+    copy_into_address, copy_into_storage_value, get_approval, get_token_balance, set_token_balance,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -161,7 +160,7 @@ pub fn safe_transfer_from(contract: &Contract) {
         ewasm_api::revert();
     }
     let value = {
-        let value_data: [u8; 32] = copy_into_array(&contract.input_data[100..132]);
+        let value_data: [u8; 32] = contract.input_data[100..132].try_into().unwrap();
         Uint256::from_be_bytes(value_data)
     };
 
@@ -236,9 +235,10 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
         .unwrap();
     while i < usize::from_be_bytes(buf) {
         let value = {
-            let value_data: [u8; 32] = copy_into_array(
-                &contract.input_data[value_offset + 32 + i * 32..value_offset + 64 + i * 32],
-            );
+            let value_data: [u8; 32] = contract.input_data
+                [value_offset + 32 + i * 32..value_offset + 64 + i * 32]
+                .try_into()
+                .unwrap();
             Uint256::from_be_bytes(value_data)
         };
         do_transfer_from(&from, &to, &token_list[i], value);
