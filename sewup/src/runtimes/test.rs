@@ -50,12 +50,10 @@ impl RT for TestRuntime {
             input_data,
             value,
             code,
-            create2_salt,
+            ..
         } = msg;
 
         let null_input_data = Vec::<u8>::new();
-        let mut v = [0u8; 32];
-        value.to_big_endian(&mut v);
 
         let (output_data, gas_left, status_code) = self.vm.execute(
             &mut self.host,
@@ -64,12 +62,12 @@ impl RT for TestRuntime {
             flags == Flags::Static,
             depth,
             gas,
-            &destination.0,
-            &sender.0,
+            &destination.to_bytes20(),
+            &sender.to_bytes20(),
             input_data.unwrap_or(&null_input_data),
-            &v,
+            &value.to_bytes32(),
             code.unwrap_or_else(|| input_data.unwrap_or(&null_input_data)),
-            &create2_salt.map_or_else(|| [0; 32], |h| h.0),
+            &[0; 32],
         );
         match status_code {
             evmc_status_code::EVMC_SUCCESS => Ok(VMResult {
@@ -110,7 +108,7 @@ impl RT for TestRuntime {
     }
 
     fn deploy(&mut self, msg: VMMessage) -> Result<()> {
-        let sender = *msg.sender;
+        let sender = msg.sender;
         self.execute(msg)?;
         Ok(())
     }
