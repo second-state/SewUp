@@ -83,16 +83,6 @@ pub fn ewasm_return_bool(is_true: bool) {
     finish_data(&output);
 }
 
-pub fn copy_into_array<A, T>(slice: &[T]) -> A
-where
-    A: Default + AsMut<[T]>,
-    T: Copy,
-{
-    let mut a = A::default();
-    <A as AsMut<[T]>>::as_mut(&mut a).copy_from_slice(slice);
-    a
-}
-
 pub fn sha3_256(input: &[u8]) -> [u8; 32] {
     let mut output = [0; 32];
     let mut hasher = Sha3::v256();

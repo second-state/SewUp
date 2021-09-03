@@ -1,7 +1,7 @@
 use std::convert::TryInto;
 
 use crate::types::Raw;
-pub use crate::utils::{copy_into_array, sha3_256};
+use crate::utils::sha3_256;
 
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::{Address, StorageKey, StorageValue};

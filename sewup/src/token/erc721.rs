@@ -11,9 +11,8 @@ pub use super::erc20::{
 
 #[cfg(target_arch = "wasm32")]
 use super::helpers::{
-    copy_into_address, copy_into_array, copy_into_storage_value, get_approval, get_balance,
-    get_token_approval, get_token_owner, set_approval, set_balance, set_token_approval,
-    set_token_owner,
+    copy_into_address, copy_into_storage_value, get_approval, get_balance, get_token_approval,
+    get_token_owner, set_approval, set_balance, set_token_approval, set_token_owner,
 };
 
 #[cfg(target_arch = "wasm32")]
@@ -122,7 +121,7 @@ pub fn transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let owner = copy_into_address(&contract.input_data[16..36]);
     let to = copy_into_address(&contract.input_data[48..68]);
-    let token_id = copy_into_array(&contract.input_data[68..100]);
+    let token_id = contract.input_data[68..100].try_into().unwrap();
 
     if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
         ewasm_api::revert();
