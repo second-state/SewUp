@@ -6,10 +6,10 @@
 //! evm_error, evm_message and evm_result
 
 use anyhow::Result;
-use contract_address::ContractAddress;
-use ethereum_types::{Address, H256, U256};
 use evmc_sys::evmc_call_kind;
 use thiserror::Error;
+
+use crate::types::Raw;
 
 #[derive(Error, Debug, PartialEq)]
 pub enum VmError {
@@ -66,7 +66,7 @@ pub enum VmError {
 pub struct VMResult {
     pub(crate) gas_left: i64,
     pub output_data: Vec<u8>,
-    pub(crate) create_address: Option<Address>,
+    pub(crate) create_address: Option<Raw>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -82,12 +82,12 @@ pub struct VMMessage<'a> {
     pub flags: Flags,
     pub depth: i32,
     pub gas: i64,
-    pub destination: Address,
-    pub sender: &'a Address,
+    pub destination: Raw,
+    pub sender: &'a Raw,
     pub input_data: Option<&'a Vec<u8>>,
-    pub value: U256,
+    pub value: Raw,
     pub code: Option<&'a Vec<u8>>,
-    pub create2_salt: Option<H256>,
+    pub create2_salt: Option<()>,
 }
 
 #[derive(Debug)]
@@ -96,12 +96,12 @@ pub struct VMMessageBuilder<'a> {
     pub flags: Flags,
     pub depth: i32,
     pub gas: i64,
-    pub destination: Option<&'a Address>,
-    pub sender: Option<&'a Address>,
+    pub destination: Option<&'a Raw>,
+    pub sender: Option<&'a Raw>,
     pub input_data: Option<&'a Vec<u8>>,
-    pub value: U256,
+    pub value: Raw,
     pub code: Option<&'a Vec<u8>>,
-    pub create2_salt: Option<H256>,
+    pub create2_salt: Option<()>,
 }
 
 impl<'a> VMMessageBuilder<'a> {
@@ -113,13 +113,13 @@ impl<'a> VMMessageBuilder<'a> {
     }
 
     #[inline]
-    pub fn destination(mut self, addr: &'a Address) -> Self {
+    pub fn destination(mut self, addr: &'a Raw) -> Self {
         self.destination = Some(addr);
         self
     }
 
     #[inline]
-    pub fn sender(mut self, addr: &'a Address) -> Self {
+    pub fn sender(mut self, addr: &'a Raw) -> Self {
         self.sender = Some(addr);
         self
     }
@@ -141,9 +141,9 @@ impl<'a> VMMessageBuilder<'a> {
 
         if let Some(sender) = sender {
             let destination = if let Some(destination) = destination {
-                *destination
+                destination.clone()
             } else {
-                Address::from_low_u64_be(0)
+                Raw::from(0u32)
             };
             return Ok(VMMessage {
                 kind,
@@ -163,9 +163,8 @@ impl<'a> VMMessageBuilder<'a> {
 
     /// Use Create2 EVM call with predefined salt
     /// The call help you generate the contract address.
-    pub fn create2(mut self, salt: H256) -> Self {
-        self.create2_salt = Some(salt);
-        self
+    pub fn create2(self, _salt: ()) -> Self {
+        unimplemented!()
     }
 }
 
@@ -175,7 +174,7 @@ impl Default for VMMessageBuilder<'_> {
             kind: evmc_call_kind::EVMC_CALL,
             flags: Flags::Default,
             depth: i32::MAX,
-            value: U256::from(0u64),
+            value: Raw::from(0u32),
             gas: 0,
             destination: None,
             sender: None,
@@ -190,6 +189,6 @@ pub trait RT {
     /// let VM execute the message
     fn execute(&mut self, msg: VMMessage) -> Result<VMResult>;
 
-    /// Deploy contract and return the contract address
-    fn deploy(&mut self, msg: VMMessage) -> Result<ContractAddress>;
+    /// Deploy contract
+    fn deploy(&mut self, msg: VMMessage) -> Result<()>;
 }

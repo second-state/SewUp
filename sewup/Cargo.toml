@@ -26,8 +26,6 @@ hex = "0.4.3"
 bitcoin = { version = "0.27.0", features = ["no-std"], default-features = false }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-ethereum-types = { version = "0.11.0", features = ["serialize"] }
-contract-address = "0.6.0"
 evmc-sys = { version = "6.3.1-rc4", package = "ssvm-evmc-sys" }
 rust-ssvm = "0.1.0-rc2"
 hex = "0.4.3"

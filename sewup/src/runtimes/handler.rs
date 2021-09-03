@@ -8,9 +8,9 @@ use std::sync::Arc;
 
 use crate::errors::ContractError as Error;
 use crate::runtimes::traits::{VMMessageBuilder, VMResult, RT};
+use crate::types::Raw;
 
 use anyhow::{Context, Result};
-use ethereum_types::Address;
 use hex::decode;
 use serde_derive::{Deserialize, Serialize};
 
@@ -46,7 +46,7 @@ impl ContractHandler {
             if let Some(input) = input {
                 input_data.extend_from_slice(input);
             }
-            let sender = Address::default();
+            let sender = Raw::default();
             let msg = VMMessageBuilder {
                 sender: Some(&sender),
                 input_data: Some(&input_data),
@@ -83,9 +83,9 @@ impl ContractHandler {
                         .expect("address should be hex format")
                         .try_into()
                         .expect("address should be byte20");
-                    Address::from(byte20)
+                    Raw::from_raw_address(&byte20)
                 } else {
-                    Address::default()
+                    Raw::default()
                 };
 
                 let msg = VMMessageBuilder {

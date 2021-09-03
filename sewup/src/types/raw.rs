@@ -1,4 +1,8 @@
-use std::{convert::TryFrom, fmt, iter::FromIterator};
+use std::{
+    convert::{TryFrom, TryInto},
+    fmt,
+    iter::FromIterator,
+};
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_derive::Deserialize as DeserializeDerive;
@@ -138,12 +142,24 @@ impl Raw {
         }
     }
 
+    pub fn from_raw_address(addr: &[u8; 20]) -> Self {
+        Raw::from(&[
+            0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, addr[0], addr[1], addr[2],
+            addr[3], addr[4], addr[5], addr[6], addr[7], addr[8], addr[9], addr[10], addr[11],
+            addr[12], addr[13], addr[14], addr[15], addr[16], addr[17], addr[18], addr[19],
+        ])
+    }
+
     pub fn as_str(&self) -> Result<&str, std::str::Utf8Error> {
         std::str::from_utf8(&self.bytes)
     }
 
     pub fn to_bytes32(&self) -> [u8; 32] {
         self.bytes
+    }
+
+    pub fn to_bytes20(&self) -> [u8; 20] {
+        self.bytes[12..32].try_into().unwrap()
     }
 
     pub fn as_bytes(&self) -> &[u8] {
