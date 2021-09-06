@@ -13,10 +13,12 @@ jobs:
 
       - uses: cachix/install-nix-action@v13
         with:
-          nix_path: nixpkgs=channel:nixos-21.05-small
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
+          install_options: '--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve'
+          extra_nix_config: experimental-features = nix-command flakes
 
       - name: Build Documentation
-        run: nix-shell --run "cargo doc -p sewup -p sewup-derive --features=kv,rdb,token"
+        run: nix develop -c 'cargo' doc -p sewup -p sewup-derive --features=kv,rdb,token
 
       - name: Deploy Documentation
         env:
