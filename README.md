@@ -15,7 +15,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 | Date       | Event                 | Slides / Demo video                                         |
 |------------|-----------------------|-------------------------------------------------------------|
 | 2021/09/07 | Version 0.1 release   | [ERC-20](https://youtu.be/sVGEuNBY1dc)                      |
-|            |                       | [ERC-721]()                                                 |
+|            |                       | [ERC-721](https://youtu.be/ivZIqnhOAfA)                     |
 |            |                       | [ERC-1155]()                                                |
 |            |                       | [KV]()                                                      |
 |            |                       | [RDB]()                                                     |
