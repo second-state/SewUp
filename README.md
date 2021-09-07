@@ -16,7 +16,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 |------------|-----------------------|-------------------------------------------------------------|
 | 2021/09/07 | Version 0.1 release   | [ERC-20](https://youtu.be/sVGEuNBY1dc)                      |
 |            |                       | [ERC-721](https://youtu.be/ivZIqnhOAfA)                     |
-|            |                       | [ERC-1155]()                                                |
+|            |                       | [ERC-1155](https://youtu.be/BsbAFT5rNGw)                    |
 |            |                       | [KV]()                                                      |
 |            |                       | [RDB]()                                                     |
 | 2021/06/22 | Rust online meetup    | [v0.0.2](https://slides.com/yanganto/ethereum-wasm-in-rust) |
