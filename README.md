@@ -11,9 +11,14 @@
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
 Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wiki) helps you work with sewup, once you got problems or confusing you can learn more on the wiki.
 
-## Slides
-| Date       | Event                 | Slides                                                      |
+## Slides & Demo
+| Date       | Event                 | Slides / Demo video                                         |
 |------------|-----------------------|-------------------------------------------------------------|
+| 2021/09/07 | Version 0.1 release   | [ERC-20](https://youtu.be/sVGEuNBY1dc)                      |
+|            |                       | [ERC-721]()                                                 |
+|            |                       | [ERC-1155]()                                                |
+|            |                       | [KV]()                                                      |
+|            |                       | [RDB]()                                                     |
 | 2021/06/22 | Rust online meetup    | [v0.0.2](https://slides.com/yanganto/ethereum-wasm-in-rust) |
 | 2021/06/19 | Rust meetup (Beijing) | [v0.0.1-pre](https://slides.com/yanganto/sewup)             |
 
