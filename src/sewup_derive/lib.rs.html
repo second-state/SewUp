@@ -1406,6 +1406,9 @@
 <span id="1406">1406</span>
 <span id="1407">1407</span>
 <span id="1408">1408</span>
+<span id="1409">1409</span>
+<span id="1410">1410</span>
+<span id="1411">1411</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -1926,17 +1929,20 @@
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
         <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;sig&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;instance&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="macro">format!</span>(
-            <span class="string">&quot;{{
-            let mut input = {}.to_vec();
-            input.append(&amp;mut bincode::serialize(&amp;{}).unwrap());
-            input
-        }}&quot;</span>,
-            <span class="ident">write_function_signature</span>(<span class="ident">sig</span>),
-            <span class="ident">instance</span>
-        )
-        .<span class="ident">parse</span>()
-        .<span class="ident">unwrap</span>()
+        <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">instance</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot;None&quot;</span> {
+            <span class="macro">format!</span>(<span class="string">&quot;{}.to_vec()&quot;</span>, <span class="ident">write_function_signature</span>(<span class="ident">sig</span>),)
+        } <span class="kw">else</span> {
+            <span class="macro">format!</span>(
+                <span class="string">&quot;{{
+                let mut input = {}.to_vec();
+                input.append(&amp;mut bincode::serialize(&amp;{}).unwrap());
+                input
+            }}&quot;</span>,
+                <span class="ident">write_function_signature</span>(<span class="ident">sig</span>),
+                <span class="ident">instance</span>
+            )
+        };
+        <span class="ident">output</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()
     } <span class="kw">else</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;ewasm_input input incorrect&quot;</span>)
     }
