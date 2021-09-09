@@ -14,7 +14,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 ## Slides & Demo
 | Date       | Event                 | Slides / Demo video                                                                                                                                                                            |
 |------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 2021/09/07 | Version 0.1 release   | [KV](https://youtu.be/LUpYIFGG36s) [RDB](https://youtu.be/sJLOcJRheIw) [ERC-20](https://youtu.be/sVGEuNBY1dc) [ERC-721](https://youtu.be/ivZIqnhOAfA) [ERC-1155](https://youtu.be/BsbAFT5rNGw) |
+| 2021/09/07 | Version 0.1 release   | [Hello](https://youtu.be/kbe3uuxkBNQ), [KV](https://youtu.be/LUpYIFGG36s), [RDB](https://youtu.be/sJLOcJRheIw), [ERC-20](https://youtu.be/sVGEuNBY1dc), [ERC-721](https://youtu.be/ivZIqnhOAfA), [ERC-1155](https://youtu.be/BsbAFT5rNGw) |
 | 2021/06/22 | Rust online meetup    | [v0.0.2](https://slides.com/yanganto/ethereum-wasm-in-rust)                                                                                                                                    |
 | 2021/06/19 | Rust meetup (Beijing) | [v0.0.1-pre](https://slides.com/yanganto/sewup)                                                                                                                                                |
 

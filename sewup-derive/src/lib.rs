@@ -518,17 +518,20 @@ pub fn ewasm_input(item: TokenStream) -> TokenStream {
     if let Some(cap) = re.captures(&item.to_string()) {
         let sig = cap.name("sig").unwrap().as_str();
         let instance = cap.name("instance").unwrap().as_str();
-        format!(
-            "{{
-            let mut input = {}.to_vec();
-            input.append(&mut bincode::serialize(&{}).unwrap());
-            input
-        }}",
-            write_function_signature(sig),
-            instance
-        )
-        .parse()
-        .unwrap()
+        let output = if instance == "None" {
+            format!("{}.to_vec()", write_function_signature(sig),)
+        } else {
+            format!(
+                "{{
+                let mut input = {}.to_vec();
+                input.append(&mut bincode::serialize(&{}).unwrap());
+                input
+            }}",
+                write_function_signature(sig),
+                instance
+            )
+        };
+        output.parse().unwrap()
     } else {
         panic!("ewasm_input input incorrect")
     }
