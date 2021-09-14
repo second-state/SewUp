@@ -141,7 +141,7 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_test]
 mod tests {
     use super::*;
-    use sewup::types::Raw;
+    use sewup::types::{Raw, SizedString};
     use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_auto_assert_eq, ewasm_err_output};
 
     #[ewasm_test]
@@ -155,12 +155,11 @@ mod tests {
         let mut expect_output = create_input.clone();
         expect_output.set_id(1);
         ewasm_auto_assert_eq!(person::create(create_input), expect_output);
-
+        let s = SizedString::new(50)
+            .from_str("No Day but today, Embrace who you are.")
+            .unwrap();
         let post = Post {
-            content: [
-                sewup::types::Raw::from("No Day but today"),
-                sewup::types::Raw::from("Embrace who you are"),
-            ],
+            content: s.into(),
             person_id: 1,
         };
         let mut create_post_input = post::protocol(post);
