@@ -13,7 +13,7 @@ use crate::types::*;
 use ewasm_api::types::Address;
 
 /// The storage unit in the contract, which contains 32 bytes
-#[derive(Clone)]
+#[derive(Clone, Copy)]
 pub struct Raw {
     pub(crate) bytes: [u8; 32],
     // TODO: design a feature using the flag to write only needed
