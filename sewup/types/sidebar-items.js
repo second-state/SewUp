@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Raw","The storage unit in the contract, which contains 32 bytes"],["Row","A list of `Raw`, which helps you store much bigger data than a `Raw`"]]});
+initSidebarItems({"mod":[["errors",""],["sized_str",""]],"struct":[["Raw","The storage unit in the contract, which contains 32 bytes"],["Row","A list of `Raw`, which helps you store much bigger data than a `Raw`"]]});

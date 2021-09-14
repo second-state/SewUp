@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["SizedString","SizedString is a type help you store string in with a predefined size"]]});
