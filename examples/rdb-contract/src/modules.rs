@@ -1,6 +1,6 @@
 use serde_derive::{Deserialize, Serialize};
 use sewup::types::Raw;
-use sewup_derive::Table;
+use sewup_derive::{SizedString, Table};
 
 // Table derive provides the handers for CRUD,
 // to communicate with these handler, you will need protocol.
@@ -15,8 +15,7 @@ pub struct Person {
 #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
 #[belongs_to(Person)]
 pub struct Post {
-    // Use the fix size Raw to save the content
-    pub content: [Raw; 2],
+    pub content: SizedString!(50),
 
     // Currently, this field need to set up manually, this will be enhance later
     pub person_id: usize,

@@ -1409,3 +1409,27 @@ pub fn ewasm_err_output(item: TokenStream) -> TokenStream {
         .parse()
         .unwrap()
 }
+
+/// help you write the field which storage string no longer than the specific size
+///```compile_fail
+///#[derive(Table)]
+///pub struct Blog {
+///     pub content: SizedString!(50),
+///}
+///```
+#[allow(non_snake_case)]
+#[proc_macro_error]
+#[proc_macro]
+pub fn SizedString(item: TokenStream) -> TokenStream {
+    let num = item.to_string();
+
+    if let Ok(num) = num.trim().parse::<usize>() {
+        if num > 0 {
+            let raw_size = num / 32usize + 1;
+            return format!("[sewup::types::Raw; {}]", raw_size)
+                .parse()
+                .unwrap();
+        }
+    }
+    panic!("The input of SizedString! should be a greator than zero integer")
+}
