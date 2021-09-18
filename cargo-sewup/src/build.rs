@@ -10,14 +10,14 @@ use tokio::{
 use wasmprinter::print_file;
 use wat;
 
-use cargo_sewup::config::Toml;
+use cargo_sewup::config::CargoToml;
 use cargo_sewup::deploy_wasm;
 
 async fn check_cargo_toml() -> Result<String> {
     let config_contents = read_to_string("Cargo.toml")
         .await
         .context("can not read Cargo.toml")?;
-    let config: Toml = toml::from_str(config_contents.as_str())?;
+    let config: CargoToml = toml::from_str(config_contents.as_str())?;
 
     // TODO: more toml config checking here
 
