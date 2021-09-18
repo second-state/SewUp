@@ -27,13 +27,6 @@ opt-level = "z"
 incremental = false
 opt-level = "z"
 
-[deploy]
-url = "http://localhost:8545"
-private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-gas = 5000000
-gas_price = 1
-
 [features]
 constructor = []
 constructor-test = []

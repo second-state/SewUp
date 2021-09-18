@@ -1,0 +1,5 @@
+# This config file is for examples, it is good for you to ignore this config in your sewup project
+[deploy]
+url = "http://localhost:8545"
+private = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"

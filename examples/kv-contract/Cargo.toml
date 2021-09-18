@@ -41,11 +41,6 @@ opt-level = "z"
 incremental = false
 opt-level = "z"
 
-[deploy]
-url = "http://localhost:8545"
-private = "0000000000000000000000000000000000000000000000000000000000000000"
-address = "0x0000000000000000000000000000000000000000"
-
 [features]
 client = [ "web3", "tokio", "secp256k1", "reqwest", "serde_json", "bincode", "cargo-sewup"]
 constructor = []

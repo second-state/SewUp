@@ -60,6 +60,15 @@ opt-level = "z"
 incremental = false
 opt-level = "z"
 
+# Following features helps are used when building or testing a contract
+[features]
+constructor = []  # required
+constructor-test = [] # required
+```
+
+```toml
+# sewup.toml
+
 # Following section including the parameters to deploy the contract
 [deploy]
 url = "http://localhost:8545"  # url for rpc node
@@ -68,11 +77,6 @@ address = "0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"  # account address
 # gas = 5000000 # optional
 # gas_price = 1 # optional
 
-
-# Following features helps are used when building or testing a contract
-[features]
-constructor = []  # required
-constructor-test = [] # required
 ```
 Place [.cargo/config](./examples/hello-contract/.cargo/config) file in your project to specify the flags for build.
 
