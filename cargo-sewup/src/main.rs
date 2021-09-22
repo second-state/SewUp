@@ -8,6 +8,7 @@ use tokio;
 mod build;
 mod deploy;
 mod generate;
+mod init;
 mod inspect;
 
 #[derive(StructOpt)]
@@ -36,6 +37,9 @@ struct Opt {
     /// Generate ABI JSON if the handler is compaitabled with web3.js
     #[structopt(short, long)]
     generate_abi: bool,
+
+    /// `init` sub command to init project on current folder or on `--project_path`
+    sub_command: Option<String>,
 }
 
 #[tokio::main]
@@ -43,26 +47,38 @@ async fn main() -> Result<()> {
     let opt = Opt::from_args();
 
     if let Some(path) = opt.project_path {
-        env::set_current_dir(&Path::new(&path))?
+        let path = Path::new(&path);
+        if tokio::fs::metadata(path).await.is_err() {
+            tokio::fs::create_dir_all(path).await?;
+        }
+        env::set_current_dir(&path)?;
+    }
+    if opt.verbose {
+        println!("project   : {}", env::current_dir()?.display());
     }
 
-    return if let Some(inspect_file) = opt.inspect_file {
-        inspect::run(inspect_file).await
-    } else if opt.generate_abi {
-        generate::run().await
+    if let Some(sub_command) = opt.sub_command {
+        if sub_command == "init" {
+            init::run().await
+        } else {
+            println!("Unknown sub command {:?}", sub_command);
+            Ok(())
+        }
     } else {
-        if opt.verbose {
-            println!("project   : {}", env::current_dir()?.display());
-        }
+        return if let Some(inspect_file) = opt.inspect_file {
+            inspect::run(inspect_file).await
+        } else if opt.generate_abi {
+            generate::run().await
+        } else {
+            let contract_name = build::run(opt.debug).await?;
 
-        let contract_name = build::run(opt.debug).await?;
-
-        if !opt.build_only {
-            if opt.verbose {
-                println!("contract  : {}", contract_name);
+            if !opt.build_only {
+                if opt.verbose {
+                    println!("contract  : {}", contract_name);
+                }
+                deploy::run(contract_name, opt.verbose, opt.debug).await?;
             }
-            deploy::run(contract_name, opt.verbose, opt.debug).await?;
-        }
-        Ok(())
-    };
+            Ok(())
+        };
+    }
 }
