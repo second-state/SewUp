@@ -25,7 +25,7 @@ thiserror = "1.0.24"
 serde-value = "0.7.0"
 paste = "1.0"
 
-cargo-sewup = { version = "*", path = "../../cargo-sewup", optional = true }
+cargo-sewup = { version = "0.1.2-1", path = "../../cargo-sewup", optional = true }
 web3 = { version = "0.16.0", optional = true }
 tokio = { version = "1.0", features = ["full"], optional = true }
 secp256k1 = { version = "0.20.3", optional = true }
