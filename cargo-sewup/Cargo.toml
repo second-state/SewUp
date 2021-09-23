@@ -1,8 +1,8 @@
 [package]
 name = "cargo-sewup"
-version = "0.1.3"
+version = "0.1.2-1"
 edition = "2018"
-description = "A cli tool build sewup project to a deploy wasm"
+description = "A cli tool for initializing sewup project and deploying ewasm contract"
 license = "Apache-2.0"
 repository = "https://github.com/second-state/SewUp"
 readme = "../README.md"
