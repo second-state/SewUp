@@ -40,6 +40,9 @@ struct Opt {
 
     /// `init` sub command to init project on current folder or on `--project_path`
     sub_command: Option<String>,
+
+    // The seconde argument will be the real sub_command if user call the cargo-sewup from cargo
+    second_argument: Option<String>,
 }
 
 #[tokio::main]
@@ -58,7 +61,9 @@ async fn main() -> Result<()> {
     }
 
     if let Some(sub_command) = opt.sub_command {
-        if sub_command == "init" {
+        if sub_command == "init"
+            || (sub_command == "sewup" && opt.second_argument == Some("init".into()))
+        {
             init::run().await
         } else {
             println!("Unknown sub command {:?}", sub_command);

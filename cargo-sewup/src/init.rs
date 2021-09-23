@@ -26,14 +26,17 @@ gas_price = 1"#,
     Ok(())
 }
 async fn init_cargo_config() -> Result<()> {
-    create_dir(Path::new("./cargo")).await?;
+    create_dir(Path::new("./.cargo"))
+        .await
+        .context("failed to create .cargo folder")?;
     write(
         "./.cargo/config.rs",
         r#"
 [target.'cfg(target_arch="wasm32")']
 rustflags = ["-C", "link-arg=--export-table"]"#,
     )
-    .await?;
+    .await
+    .context("failed to create cargo config")?;
     Ok(())
 }
 
@@ -84,7 +87,9 @@ constructor-test = []"#,
 }
 
 async fn init_lib_file() -> Result<()> {
-    create_dir(Path::new("./src")).await?;
+    create_dir(Path::new("./src"))
+        .await
+        .context("failed to create src folder")?;
     write(
         "./src/lib.rs",
         r#"
@@ -119,7 +124,8 @@ mod tests {
     }
 }"#,
     )
-    .await?;
+    .await
+    .context("failed to create sample code")?;
     Ok(())
 }
 

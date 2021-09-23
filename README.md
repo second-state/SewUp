@@ -34,7 +34,10 @@ please checkout `#[ewasm_main(auto)]` and `EwasmAny` or the example of rdb featu
 how to write a flexible smart contract with ewasm.
 
 ### Develop
-It is easy to setup your sewup project with `cargo-sewup init`, and you can learn more about the project configure with the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide) wiki page.
+It is easy to setup your sewup project with cargo-sewup with following commands.
+- `cargo install --version 0.1.2-1 cargo-sewup`
+- `cargo sewup init`
+And you can learn more about the project configure with the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide) wiki page.
 
 ### Interact
 There are so many clients can interact with contract.
