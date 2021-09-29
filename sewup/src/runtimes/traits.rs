@@ -11,54 +11,53 @@ use thiserror::Error;
 
 use crate::types::Raw;
 
+#[remain::sorted]
 #[derive(Error, Debug, PartialEq)]
 pub enum VmError {
-    #[error("failure")]
-    Failure,
-    #[error("revert")]
-    Revert,
-    #[error("out of gas")]
-    OutOfGas,
-    #[error("invalid instruction")]
-    InvalidInstruction,
-    #[error("undefined instruction")]
-    UndefinedInstruction,
-    #[error("stack overflow")]
-    StackOverflow,
-    #[error("stack underflow")]
-    StackUnderflow,
-    #[error("bad jump destination")]
-    BadJumpDestination,
-    #[error("invalid memory access")]
-    InvalidMemoryAccess,
-    #[error("call depth exceeded")]
-    CallDepthExceeded,
-    #[error("static mode violation")]
-    StaticModeViolation,
-    #[error("precompile failure")]
-    PrecompileFailure,
-    #[error("contract validation failure")]
-    ContractValidationFailure,
     #[error("argument out of range")]
     ArgumentOutOfRange,
-    #[error("wasm unreachable instruction")]
-    WasmUnreachableInstruction,
-    #[error("wasm trap")]
-    WasmTrap,
-    #[error("internal error")]
-    InternalError,
-    #[error("rejected")]
-    Rejected,
-    #[error("out of memory")]
-    OutOfMemory,
-
-    #[error("there shoulbe be a caller(sender) for the message")]
-    UnknownCaller,
-
+    #[error("bad jump destination")]
+    BadJumpDestination,
+    #[error("call depth exceeded")]
+    CallDepthExceeded,
+    #[error("contract validation failure")]
+    ContractValidationFailure,
     /// If the EWASM errors are not enough for your VM,
     /// you can use this error type to help you customized you error message
     #[error("`{0}`")]
     CustomizedError(String),
+    #[error("failure")]
+    Failure,
+    #[error("internal error")]
+    InternalError,
+    #[error("invalid instruction")]
+    InvalidInstruction,
+    #[error("invalid memory access")]
+    InvalidMemoryAccess,
+    #[error("out of gas")]
+    OutOfGas,
+    #[error("out of memory")]
+    OutOfMemory,
+    #[error("precompile failure")]
+    PrecompileFailure,
+    #[error("rejected")]
+    Rejected,
+    #[error("revert")]
+    Revert,
+    #[error("stack overflow")]
+    StackOverflow,
+    #[error("stack underflow")]
+    StackUnderflow,
+    #[error("static mode violation")]
+    StaticModeViolation,
+    #[error("undefined instruction")]
+    UndefinedInstruction,
+    #[error("there shoulbe be a caller(sender) for the message")]
+    UnknownCaller,
+    #[error("wasm trap")]
+    WasmTrap,
+    #[error("wasm unreachable instruction")]
+    WasmUnreachableInstruction,
 }
 
 // TODO: abstract this, such that this can suitable for other chain than ETH
