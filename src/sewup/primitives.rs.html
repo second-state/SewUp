@@ -84,7 +84,6 @@
 <span id="84">84</span>
 <span id="85">85</span>
 <span id="86">86</span>
-<span id="87">87</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">serde::Serialize</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std::convert::TryInto</span>;
@@ -161,16 +160,15 @@
     }
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EwasmAny</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="kw">_</span>: ()) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EwasmAny</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">Serialize</span>,
+{
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">i</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
-            <span class="ident">bin</span>: <span class="ident">Vec::with_capacity</span>(<span class="number">0</span>),
+            <span class="ident">bin</span>: <span class="ident">bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="ident">i</span>).<span class="ident">unwrap</span>(),
         }
     }
-}
-
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">IntoEwasmAny</span>: <span class="ident">Serialize</span> {
-    <span class="kw">fn</span> <span class="ident">into_ewasm_any</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">EwasmAny</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

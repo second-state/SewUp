@@ -1424,15 +1424,6 @@
 <span id="1424">1424</span>
 <span id="1425">1425</span>
 <span id="1426">1426</span>
-<span id="1427">1427</span>
-<span id="1428">1428</span>
-<span id="1429">1429</span>
-<span id="1430">1430</span>
-<span id="1431">1431</span>
-<span id="1432">1432</span>
-<span id="1433">1433</span>
-<span id="1434">1434</span>
-<span id="1435">1435</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -2243,14 +2234,6 @@
             <span class="kw">pub</span> <span class="ident">records</span>: <span class="ident">Vec</span><span class="op">&lt;</span>#<span class="ident">wrapper_name</span><span class="op">&gt;</span>
         }
 
-        <span class="kw">impl</span> <span class="ident">sewup::primitives::IntoEwasmAny</span> <span class="kw">for</span> #<span class="ident">protocol_name</span> {
-            <span class="kw">fn</span> <span class="ident">into_ewasm_any</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::primitives::EwasmAny</span> {
-                <span class="ident">sewup::primitives::EwasmAny</span> {
-                    <span class="ident">bin</span>: <span class="ident">sewup::bincode::serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>).<span class="ident">expect</span>(<span class="string">&quot;The input should be serializable&quot;</span>)
-                }
-            }
-        }
-
         <span class="kw">impl</span> #<span class="ident">protocol_name</span> {
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_select_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {
                 <span class="kw">if</span> <span class="ident">fields</span>.<span class="ident">is_empty</span>() {
@@ -2332,7 +2315,6 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
         <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">lower_name</span> {
             <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
-            <span class="kw">use</span> <span class="ident">sewup::primitives::IntoEwasmAny</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Protocol</span> <span class="op">=</span> #<span class="ident">protocol_name</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">Wrapper</span> <span class="op">=</span> #<span class="ident">wrapper_name</span>;
             <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">_InstanceType</span> <span class="op">=</span> #<span class="ident">struct_name</span>;
@@ -2373,12 +2355,12 @@
                         }
                     }
                     <span class="kw">let</span> <span class="ident">p</span>: #<span class="ident">protocol_name</span> <span class="op">=</span> <span class="ident">raw_output</span>.<span class="ident">into</span>();
-                    <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">into_ewasm_any</span>())
+                    <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">into</span>())
                 } <span class="kw">else</span> {
                     <span class="kw">let</span> <span class="ident">raw_output</span> <span class="op">=</span> <span class="ident">table</span>.<span class="ident">get_record</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>.<span class="ident">unwrap_or_default</span>())<span class="question-mark">?</span>;
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_proc</span>: <span class="ident">Protocol</span> <span class="op">=</span> <span class="ident">raw_output</span>.<span class="ident">into</span>();
                     <span class="ident">output_proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>;
-                    <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into_ewasm_any</span>())
+                    <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into</span>())
                 }
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
@@ -2386,21 +2368,21 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output_proc</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">clone</span>();
                 <span class="ident">output_proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">table</span>.<span class="ident">add_record</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">clone</span>().<span class="ident">into</span>())<span class="question-mark">?</span>);
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into_ewasm_any</span>())
+                <span class="prelude-val">Ok</span>(<span class="ident">output_proc</span>.<span class="ident">into</span>())
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>.<span class="ident">unwrap_or_default</span>();
                 <span class="ident">table</span>.<span class="ident">update_record</span>(<span class="ident">id</span>, <span class="prelude-val">Some</span>(<span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">clone</span>().<span class="ident">into</span>()))<span class="question-mark">?</span>;
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">proc</span>.<span class="ident">into_ewasm_any</span>())
+                <span class="prelude-val">Ok</span>(<span class="ident">proc</span>.<span class="ident">into</span>())
             }
             <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="ident">proc</span>: <span class="ident">Protocol</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="ident">sewup::primitives::EwasmAny</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">records</span>[<span class="number">0</span>].<span class="ident">id</span>.<span class="ident">unwrap_or_default</span>();
                 <span class="ident">table</span>.<span class="ident">update_record</span>(<span class="ident">id</span>, <span class="prelude-val">None</span>)<span class="question-mark">?</span>;
                 <span class="ident">table</span>.<span class="ident">commit</span>()<span class="question-mark">?</span>;
-                <span class="prelude-val">Ok</span>(<span class="ident">proc</span>.<span class="ident">into_ewasm_any</span>())
+                <span class="prelude-val">Ok</span>(<span class="ident">proc</span>.<span class="ident">into</span>())
             }
         }
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>))]</span>
