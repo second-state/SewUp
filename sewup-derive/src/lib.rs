@@ -808,14 +808,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             pub records: Vec<#wrapper_name>
         }
 
-        impl sewup::primitives::IntoEwasmAny for #protocol_name {
-            fn into_ewasm_any(self) -> sewup::primitives::EwasmAny {
-                sewup::primitives::EwasmAny {
-                    bin: sewup::bincode::serialize(&self).expect("The input should be serializable")
-                }
-            }
-        }
-
         impl #protocol_name {
             pub fn set_select_fields(&mut self, fields: Vec<String>) {
                 if fields.is_empty() {
@@ -897,7 +889,6 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         #[cfg(target_arch = "wasm32")]
         pub mod #lower_name {
             use super::*;
-            use sewup::primitives::IntoEwasmAny;
             pub type Protocol = #protocol_name;
             pub type Wrapper = #wrapper_name;
             pub type _InstanceType = #struct_name;
@@ -938,12 +929,12 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                         }
                     }
                     let p: #protocol_name = raw_output.into();
-                    Ok(p.into_ewasm_any())
+                    Ok(p.into())
                 } else {
                     let raw_output = table.get_record(proc.records[0].id.unwrap_or_default())?;
                     let mut output_proc: Protocol = raw_output.into();
                     output_proc.records[0].id = proc.records[0].id;
-                    Ok(output_proc.into_ewasm_any())
+                    Ok(output_proc.into())
                 }
             }
             pub fn create(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
@@ -951,21 +942,21 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 let mut output_proc = proc.clone();
                 output_proc.records[0].id = Some(table.add_record(proc.records[0].clone().into())?);
                 table.commit()?;
-                Ok(output_proc.into_ewasm_any())
+                Ok(output_proc.into())
             }
             pub fn update(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, Some(proc.records[0].clone().into()))?;
                 table.commit()?;
-                Ok(proc.into_ewasm_any())
+                Ok(proc.into())
             }
             pub fn delete(proc: Protocol) -> sewup::Result<sewup::primitives::EwasmAny> {
                 let mut table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 let id = proc.records[0].id.unwrap_or_default();
                 table.update_record(id, None)?;
                 table.commit()?;
-                Ok(proc.into_ewasm_any())
+                Ok(proc.into())
             }
         }
         #[cfg(not(target_arch = "wasm32"))]
