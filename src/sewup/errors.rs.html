@@ -11,18 +11,20 @@
 <span id="11">11</span>
 <span id="12">12</span>
 <span id="13">13</span>
+<span id="14">14</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">thiserror::Error</span>;
 
+<span class="attribute">#[<span class="ident">remain::sorted</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ContractError</span> {
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;calldata is absent&quot;</span>)]</span>
+    <span class="ident">CalldataAbsent</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the format of calldata is hexaliteral&quot;</span>)]</span>
+    <span class="ident">CalldataMalformat</span>,
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the size of contract `{0}` is not correct&quot;</span>)]</span>
     <span class="ident">ContractSizeError</span>(<span class="ident">usize</span>),
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;contract address and call data are both absent&quot;</span>)]</span>
     <span class="ident">InsufficientContractInfoError</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;the format of calldata is hexaliteral&quot;</span>)]</span>
-    <span class="ident">CalldataMalformat</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;calldata is absent&quot;</span>)]</span>
-    <span class="ident">CalldataAbsent</span>,
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

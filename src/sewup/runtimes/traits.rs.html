@@ -191,7 +191,6 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-<span id="194">194</span>
 </pre><pre class="rust"><code><span class="doccomment">//! RT Trait</span>
 <span class="doccomment">//! This trait help you abstract any VM into application runtime layer,</span>
 <span class="doccomment">//! such that you can easily use your VM with SewUp libs.</span>
@@ -205,54 +204,53 @@
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Raw</span>;
 
+<span class="attribute">#[<span class="ident">remain::sorted</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Error</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VmError</span> {
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failure&quot;</span>)]</span>
-    <span class="ident">Failure</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;revert&quot;</span>)]</span>
-    <span class="ident">Revert</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;out of gas&quot;</span>)]</span>
-    <span class="ident">OutOfGas</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid instruction&quot;</span>)]</span>
-    <span class="ident">InvalidInstruction</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;undefined instruction&quot;</span>)]</span>
-    <span class="ident">UndefinedInstruction</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;stack overflow&quot;</span>)]</span>
-    <span class="ident">StackOverflow</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;stack underflow&quot;</span>)]</span>
-    <span class="ident">StackUnderflow</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;bad jump destination&quot;</span>)]</span>
-    <span class="ident">BadJumpDestination</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid memory access&quot;</span>)]</span>
-    <span class="ident">InvalidMemoryAccess</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;call depth exceeded&quot;</span>)]</span>
-    <span class="ident">CallDepthExceeded</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;static mode violation&quot;</span>)]</span>
-    <span class="ident">StaticModeViolation</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;precompile failure&quot;</span>)]</span>
-    <span class="ident">PrecompileFailure</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;contract validation failure&quot;</span>)]</span>
-    <span class="ident">ContractValidationFailure</span>,
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;argument out of range&quot;</span>)]</span>
     <span class="ident">ArgumentOutOfRange</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;wasm unreachable instruction&quot;</span>)]</span>
-    <span class="ident">WasmUnreachableInstruction</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;wasm trap&quot;</span>)]</span>
-    <span class="ident">WasmTrap</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;internal error&quot;</span>)]</span>
-    <span class="ident">InternalError</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;rejected&quot;</span>)]</span>
-    <span class="ident">Rejected</span>,
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;out of memory&quot;</span>)]</span>
-    <span class="ident">OutOfMemory</span>,
-
-    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;there shoulbe be a caller(sender) for the message&quot;</span>)]</span>
-    <span class="ident">UnknownCaller</span>,
-
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;bad jump destination&quot;</span>)]</span>
+    <span class="ident">BadJumpDestination</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;call depth exceeded&quot;</span>)]</span>
+    <span class="ident">CallDepthExceeded</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;contract validation failure&quot;</span>)]</span>
+    <span class="ident">ContractValidationFailure</span>,
     <span class="doccomment">/// If the EWASM errors are not enough for your VM,</span>
     <span class="doccomment">/// you can use this error type to help you customized you error message</span>
     <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;`{0}`&quot;</span>)]</span>
     <span class="ident">CustomizedError</span>(<span class="ident">String</span>),
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;failure&quot;</span>)]</span>
+    <span class="ident">Failure</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;internal error&quot;</span>)]</span>
+    <span class="ident">InternalError</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid instruction&quot;</span>)]</span>
+    <span class="ident">InvalidInstruction</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;invalid memory access&quot;</span>)]</span>
+    <span class="ident">InvalidMemoryAccess</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;out of gas&quot;</span>)]</span>
+    <span class="ident">OutOfGas</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;out of memory&quot;</span>)]</span>
+    <span class="ident">OutOfMemory</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;precompile failure&quot;</span>)]</span>
+    <span class="ident">PrecompileFailure</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;rejected&quot;</span>)]</span>
+    <span class="ident">Rejected</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;revert&quot;</span>)]</span>
+    <span class="ident">Revert</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;stack overflow&quot;</span>)]</span>
+    <span class="ident">StackOverflow</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;stack underflow&quot;</span>)]</span>
+    <span class="ident">StackUnderflow</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;static mode violation&quot;</span>)]</span>
+    <span class="ident">StaticModeViolation</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;undefined instruction&quot;</span>)]</span>
+    <span class="ident">UndefinedInstruction</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;there shoulbe be a caller(sender) for the message&quot;</span>)]</span>
+    <span class="ident">UnknownCaller</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;wasm trap&quot;</span>)]</span>
+    <span class="ident">WasmTrap</span>,
+    <span class="attribute">#[<span class="ident">error</span>(<span class="string">&quot;wasm unreachable instruction&quot;</span>)]</span>
+    <span class="ident">WasmUnreachableInstruction</span>,
 }
 
 <span class="comment">// TODO: abstract this, such that this can suitable for other chain than ETH</span>
