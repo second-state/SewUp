@@ -74,14 +74,13 @@ impl EwasmAny {
     }
 }
 
-impl From<()> for EwasmAny {
-    fn from(_: ()) -> Self {
+impl<T> From<T> for EwasmAny
+where
+    T: Serialize,
+{
+    fn from(i: T) -> Self {
         Self {
-            bin: Vec::with_capacity(0),
+            bin: bincode::serialize(&i).unwrap(),
         }
     }
-}
-
-pub trait IntoEwasmAny: Serialize {
-    fn into_ewasm_any(self) -> EwasmAny;
 }
