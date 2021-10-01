@@ -710,7 +710,7 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Raw</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Raw</span> {
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">v</span>.<span class="ident">clone</span>()
+        <span class="kw-2">*</span><span class="ident">v</span>
     }
 }
 
@@ -751,7 +751,7 @@
         <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
             <span class="prelude-val">Err</span>(<span class="string">&quot;Row is bigger than raw&quot;</span>)
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">inner</span>[<span class="number">0</span>].<span class="ident">clone</span>())
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">inner</span>[<span class="number">0</span>])
         }
     }
 }
@@ -763,7 +763,7 @@
         <span class="kw">if</span> <span class="ident">value</span>.<span class="ident">len</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="number">1</span> {
             <span class="prelude-val">Err</span>(<span class="string">&quot;Row is bigger than raw&quot;</span>)
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">inner</span>[<span class="number">0</span>].<span class="ident">clone</span>())
+            <span class="prelude-val">Ok</span>(<span class="ident">value</span>.<span class="ident">inner</span>[<span class="number">0</span>])
         }
     }
 }
