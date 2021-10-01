@@ -26,4 +26,4 @@ jobs:
         run: nix develop -c 'run-example-test' hello
 
       - name: Deploy test
-        run: nix develop -c 'cli-test' hello
+        run: nix develop -c 'cli-build-test' hello

@@ -26,4 +26,4 @@ jobs:
         run: nix develop -c 'run-example-test' default
 
       - name: Deploy test
-        run: nix develop -c 'cli-test' default
+        run: nix develop -c 'cli-build-test' default

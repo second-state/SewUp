@@ -26,7 +26,7 @@ jobs:
         run: nix develop -c 'run-example-test' erc20
 
       - name: Deploy test
-        run: nix develop -c 'cli-test' erc20
+        run: nix develop -c 'cli-build-test' erc20
 
       - name: ABI test
         run: nix develop -c 'abi-test' erc20

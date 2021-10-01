@@ -26,4 +26,4 @@ jobs:
         run: nix develop -c 'run-example-test' rusty
 
       - name: Deploy test
-        run: nix develop -c 'cli-test' rusty
+        run: nix develop -c 'cli-build-test' rusty

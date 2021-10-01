@@ -23,7 +23,7 @@
           cd ../../
           exit $rc
         '';
-        cliTestScript = pkgs.writeShellScriptBin "cli-test" ''
+        cliBuildTestScript = pkgs.writeShellScriptBin "cli-build-test" ''
           cd cargo-sewup
           cargo run -- -d -b -p ../examples/$1-contract
           cd ../
@@ -58,7 +58,7 @@
             pkg-config
             devRustNightly
             exampleTestScript
-            cliTestScript
+            cliBuildTestScript
             abiTestScript
             clientTestScript
           ];

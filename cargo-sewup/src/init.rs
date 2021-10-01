@@ -1,7 +1,22 @@
 use std::path::Path;
 
 use anyhow::{Context, Result};
+use clap::arg_enum;
 use tokio::fs::{create_dir, write};
+
+arg_enum! {
+    pub enum Mode {
+        Default,
+        Rusty,
+        Auto
+    }
+}
+
+impl Default for Mode {
+    fn default() -> Self {
+        Mode::Default
+    }
+}
 
 async fn init_gitignore() -> Result<()> {
     write(".gitignore", b"/target\n/sewup.toml")
@@ -40,7 +55,7 @@ rustflags = ["-C", "link-arg=--export-table"]"#,
     Ok(())
 }
 
-async fn init_cargo_toml() -> Result<()> {
+async fn init_cargo_toml(mode: &Mode) -> Result<()> {
     let current_folder = std::env::current_dir()?;
     let project_name = current_folder.file_name().unwrap().to_string_lossy();
 
@@ -86,7 +101,7 @@ constructor-test = []"#,
     Ok(())
 }
 
-async fn init_lib_file() -> Result<()> {
+async fn init_lib_file(mode: &Mode) -> Result<()> {
     create_dir(Path::new("./src"))
         .await
         .context("failed to create src folder")?;
@@ -129,13 +144,13 @@ mod tests {
     Ok(())
 }
 
-pub async fn run() -> Result<()> {
+pub async fn run(mode: Mode) -> Result<()> {
     tokio::try_join!(
         init_gitignore(),
         init_sewup_config(),
         init_cargo_config(),
-        init_cargo_toml(),
-        init_lib_file()
+        init_cargo_toml(&mode),
+        init_lib_file(&mode)
     )?;
     Ok(())
 }

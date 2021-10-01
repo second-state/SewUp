@@ -38,6 +38,11 @@ struct Opt {
     #[structopt(short, long)]
     generate_abi: bool,
 
+    /// Specify the mode when initialize the project
+    /// https://second-state.github.io/SewUp/sewup_derive/attr.ewasm_main.html
+    #[structopt(short, long, possible_values = &init::Mode::variants(), case_insensitive = true)]
+    mode: Option<init::Mode>,
+
     /// `init` sub command to init project on current folder or on `--project_path`
     sub_command: Option<String>,
 
@@ -64,7 +69,7 @@ async fn main() -> Result<()> {
         if sub_command == "init"
             || (sub_command == "sewup" && opt.second_argument == Some("init".into()))
         {
-            init::run().await
+            init::run(opt.mode.unwrap_or_default()).await
         } else {
             println!("Unknown sub command {:?}", sub_command);
             Ok(())
