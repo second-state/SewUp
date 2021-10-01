@@ -318,7 +318,7 @@ impl Db {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(not(target_arch = "wasm32"), test))]
 fn migration_table(mut _list: Vec<(Range<u32>, Range<u32>)>) -> Result<()> {
     Ok(())
 }

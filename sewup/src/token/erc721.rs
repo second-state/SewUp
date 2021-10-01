@@ -1,6 +1,8 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+#[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
 
@@ -243,7 +245,7 @@ pub fn is_approved_for_all(contract: &Contract) {
     "stateMutability": "view",
     "type": "function"
 })]
-pub fn tokenMetadata(contract: &Contract) {
+pub fn token_metadata(contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/161
 }
