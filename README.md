@@ -37,7 +37,8 @@ how to write a flexible smart contract with ewasm.
 It is easy to setup your sewup project with cargo-sewup with following commands.
 - `cargo install cargo-sewup`
 - `cargo sewup init`
-And you can learn more about the project configure with the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide) wiki page.
+You can use `-m <rusty|auto>` option to initialize different type of sewup project,
+and you can learn more about the project configure with the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide) wiki page.
 
 ### Interact
 There are so many clients can interact with contract.
