@@ -1,6 +1,8 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+#[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
 

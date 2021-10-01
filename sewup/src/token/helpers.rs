@@ -1,5 +1,7 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
+#[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use crate::utils::sha3_256;
 
@@ -76,7 +78,7 @@ pub fn set_balance(address: &Address, value: &StorageValue) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_token_balance(_address: &Address, token_id: &[u8; 32]) -> StorageValue {
+pub fn get_token_balance(_address: &Address, _token_id: &[u8; 32]) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
@@ -90,7 +92,7 @@ pub fn get_token_balance(address: &Address, token_id: &[u8; 32]) -> StorageValue
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_token_balance(_address: &Address, token_id: &[u8; 32], _value: &StorageValue) {}
+pub fn set_token_balance(_address: &Address, _token_id: &[u8; 32], _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
 pub fn set_token_balance(address: &Address, token_id: &[u8; 32], value: &StorageValue) {
     let hash = calculate_token_balance_hash(&address.bytes, token_id);

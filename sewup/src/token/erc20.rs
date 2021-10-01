@@ -1,6 +1,8 @@
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+#[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 
 #[cfg(target_arch = "wasm32")]
@@ -17,9 +19,6 @@ use bitcoin::util::uint::Uint256;
 use ewasm_api::{log3, prelude::Bytes20, types::Address};
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
-
-#[cfg(not(target_arch = "wasm32"))]
-use super::helpers::Address;
 
 use sewup_derive::ewasm_lib_fn;
 

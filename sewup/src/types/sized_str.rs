@@ -64,15 +64,19 @@ impl SizedString {
     pub fn len(&self) -> usize {
         self.len
     }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
 }
 
 macro_rules! into_slice {
     ($($s:expr),*) => {
         $(
-            impl Into<[Raw; $s]> for SizedString {
-                fn into(self) -> [Raw; $s] {
+            impl From<SizedString> for [Raw; $s] {
+                fn from(s: SizedString) -> [Raw; $s] {
                     let mut output = Default::default();
-                    <[Raw; $s] as AsMut<[Raw]>>::as_mut(&mut output).copy_from_slice(self.inner.as_slice());
+                    <[Raw; $s] as AsMut<[Raw]>>::as_mut(&mut output).copy_from_slice(s.inner.as_slice());
                     output
                 }
             }

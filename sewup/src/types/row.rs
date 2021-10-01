@@ -165,7 +165,7 @@ impl From<&String> for Row {
 impl From<&Raw> for Row {
     fn from(v: &Raw) -> Self {
         Self {
-            inner: vec![v.clone()],
+            inner: vec![*v],
             ..Default::default()
         }
     }

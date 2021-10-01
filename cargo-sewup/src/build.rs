@@ -8,7 +8,6 @@ use tokio::{
     process::Command,
 };
 use wasmprinter::print_file;
-use wat;
 
 use cargo_sewup::config::CargoToml;
 use cargo_sewup::deploy_wasm;
@@ -78,11 +77,9 @@ async fn build_wat(
 ) -> Result<String> {
     let eth_finish_re =
         Regex::new(r#"\(import "ethereum" "finish" \(func (?P<eth_finish_sig>[^\s]*) "#).unwrap();
-    let eth_finish_sig = if let Some(cap) = eth_finish_re.captures(&tmpl) {
-        Some(cap.name("eth_finish_sig").unwrap().as_str())
-    } else {
-        None
-    };
+    let eth_finish_sig = eth_finish_re
+        .captures(&tmpl)
+        .map(|cap| cap.name("eth_finish_sig").unwrap().as_str());
 
     let memory_re = Regex::new(r#"\(memory \(;0;\) (?P<mem_size>\d*)"#).unwrap();
     let mem_size = if let Some(cap) = memory_re.captures(&tmpl) {

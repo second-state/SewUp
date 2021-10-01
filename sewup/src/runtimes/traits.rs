@@ -140,7 +140,7 @@ impl<'a> VMMessageBuilder<'a> {
 
         if let Some(sender) = sender {
             let destination = if let Some(destination) = destination {
-                destination.clone()
+                *destination
             } else {
                 Raw::from(0u32)
             };

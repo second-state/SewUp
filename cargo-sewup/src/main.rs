@@ -3,7 +3,6 @@ use std::path::Path;
 
 use anyhow::Result;
 use structopt::StructOpt;
-use tokio;
 
 mod build;
 mod deploy;
