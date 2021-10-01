@@ -301,7 +301,7 @@ impl From<&String> for Raw {
 
 impl From<&Raw> for Raw {
     fn from(v: &Self) -> Self {
-        v.clone()
+        *v
     }
 }
 
@@ -342,7 +342,7 @@ impl TryFrom<&Row> for Raw {
         if value.len() <= 1 {
             Err("Row is bigger than raw")
         } else {
-            Ok(value.inner[0].clone())
+            Ok(value.inner[0])
         }
     }
 }
@@ -354,7 +354,7 @@ impl TryFrom<Row> for Raw {
         if value.len() <= 1 {
             Err("Row is bigger than raw")
         } else {
-            Ok(value.inner[0].clone())
+            Ok(value.inner[0])
         }
     }
 }

@@ -1,7 +1,6 @@
 #![feature(box_into_inner)]
 extern crate proc_macro;
 
-use hex;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
@@ -93,7 +92,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         syn::ReturnType::Type(_, boxed) => match Box::into_inner(boxed) {
             syn::Type::Path(syn::TypePath { path: p, .. }) => {
                 let mut ok_type: Option<String> = None;
-                let mut segments = p.segments.clone();
+                let mut segments = p.segments;
                 while let Some(pair) = segments.pop() {
                     ok_type = match pair.into_value() {
                         syn::PathSegment {
@@ -103,21 +102,16 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                                 ),
                             ..
                         } => match a.first() {
-                            Some(a) => match a {
-                                syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
-                                    path: p,
-                                    ..
-                                })) => {
-                                    if let Some(syn::PathSegment { ident: i, .. }) =
-                                        p.segments.last()
-                                    {
-                                        Some(i.to_string())
-                                    } else {
-                                        None
-                                    }
+                            Some(syn::GenericArgument::Type(syn::Type::Path(syn::TypePath {
+                                path: p,
+                                ..
+                            }))) => {
+                                if let Some(syn::PathSegment { ident: i, .. }) = p.segments.last() {
+                                    Some(i.to_string())
+                                } else {
+                                    None
                                 }
-                                _ => None,
-                            },
+                            }
                             _ => None,
                         },
                         _ => None,
@@ -252,15 +246,13 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         (None, "{}".to_string())
     } else if attr_str.starts_with('{') {
         (None, attr_str.split_whitespace().collect())
+    } else if let Some((head, tail)) = attr_str.split_once(',') {
+        (
+            Some(head.replace("\"", "")),
+            tail.split_whitespace().collect(),
+        )
     } else {
-        if let Some((head, tail)) = attr_str.split_once(',') {
-            (
-                Some(head.replace("\"", "")),
-                tail.split_whitespace().collect(),
-            )
-        } else {
-            (Some(attr_str.replace("\"", "")), "{}".to_string())
-        }
+        (Some(attr_str.replace("\"", "")), "{}".to_string())
     };
 
     let input = syn::parse_macro_input!(item as syn::ItemFn);
@@ -325,7 +317,7 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
 pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
-    if name.to_string() != "constructor" {
+    if *name != "constructor" {
         abort!(input.sig.ident, "please name the function as `constructor`");
     }
     let result = quote! {
@@ -382,13 +374,11 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     let (hex_str, abi_str) = if attr_str.is_empty() {
         (None, "{}".to_string())
     } else if attr_str.starts_with('{') {
-        (None, attr_str.to_string())
+        (None, attr_str)
+    } else if let Some((head, tail)) = attr_str.split_once(',') {
+        (Some(head.replace("\"", "")), tail.to_string())
     } else {
-        if let Some((head, tail)) = attr_str.split_once(',') {
-            (Some(head.replace("\"", "")), tail.to_string())
-        } else {
-            (Some(attr_str.replace("\"", "")), "{}".to_string())
-        }
+        (Some(attr_str.replace("\"", "")), "{}".to_string())
     };
 
     let input = syn::parse_macro_input!(item as syn::ItemFn);
