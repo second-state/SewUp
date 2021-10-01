@@ -46,6 +46,14 @@
           cd ../../
           exit $rc
         '';
+        cliInitTestScript = pkgs.writeShellScriptBin "cli-init-test" ''
+          cd cargo-sewup
+          cargo run -- init -p /tmp/$1-proj -m $1
+          cd /tmp/$1-proj
+          cargo test
+          rc=$?
+          exit $rc
+        '';
       in
       with pkgs;
       {
@@ -57,8 +65,10 @@
             openssl
             pkg-config
             devRustNightly
+
             exampleTestScript
             cliBuildTestScript
+            cliInitTestScript
             abiTestScript
             clientTestScript
           ];
