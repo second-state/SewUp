@@ -1,4 +1,4 @@
-name: Example
+name: Cli
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  erc20-example:
+  default-example:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -22,11 +22,11 @@ jobs:
           install_options: '--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve'
           extra_nix_config: experimental-features = nix-command flakes
 
-      - name: Run test
-        run: nix develop -c 'run-example-test' erc20
+      - name: Init default project test
+        run: nix develop -c 'cli-init-test' default
 
-      - name: Deploy test
-        run: nix develop -c 'cli-build-test' erc20
+      - name: Init rusty project test
+        run: nix develop -c 'cli-init-test' rusty
 
-      - name: ABI test
-        run: nix develop -c 'abi-test' erc20
+      - name: Init auto project test
+        run: nix develop -c 'cli-init-test' auto
