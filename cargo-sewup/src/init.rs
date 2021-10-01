@@ -5,7 +5,7 @@ use clap::arg_enum;
 use tokio::fs::{create_dir, write};
 
 use cargo_sewup::{
-    constants::{DEFAULT_CONTRACT, RUSTY_CONTRACT},
+    constants::{AUTO_CONTRACT, DEFAULT_CONTRACT, RUSTY_CONTRACT},
     default_cargo_template, rusty_cargo_template,
 };
 
@@ -80,7 +80,8 @@ async fn init_lib_file(mode: &Mode) -> Result<()> {
         .context("failed to create src folder")?;
     let task = match mode {
         Mode::Rusty => write("./src/lib.rs", RUSTY_CONTRACT),
-        _ => write("./src/lib.rs", DEFAULT_CONTRACT),
+        Mode::Auto => write("./src/lib.rs", AUTO_CONTRACT),
+        Mode::Default => write("./src/lib.rs", DEFAULT_CONTRACT),
     };
     task.await.context("failed to create sample code")?;
     Ok(())
