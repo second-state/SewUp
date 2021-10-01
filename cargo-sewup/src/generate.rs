@@ -37,15 +37,12 @@ pub async fn run() -> Result<()> {
         .find_iter(&expanded)
         .map(|m| m.as_str().replace("_SIG", "_ABI"))
         .collect();
-    let contract_abis: Vec<(String, String)> = abi_re
-        .captures_iter(&expanded)
-        .map(|c| {
-            (
-                c.name("abi_name").unwrap().as_str().to_string(),
-                c.get(0).unwrap().as_str().to_string(),
-            )
-        })
-        .collect();
+    let contract_abis = abi_re.captures_iter(&expanded).map(|c| {
+        (
+            c.name("abi_name").unwrap().as_str().to_string(),
+            c.get(0).unwrap().as_str().to_string(),
+        )
+    });
 
     let all_abis = linked_hash_set::LinkedHashSet::<String>::from_iter(total_abis.iter().cloned());
     let mut lib_abis = all_abis.clone();
