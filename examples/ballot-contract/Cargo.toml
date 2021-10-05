@@ -1,0 +1,35 @@
+
+[package]
+name = "ballot-contract"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+sewup = { version = "*", path = "../../sewup", features = [ "kv" ] }
+sewup-derive = { version = "*", path = "../../sewup-derive", features = [ "kv" ] }
+hex = "0.4.3"
+serde = "1.0"
+serde_derive = "1.0"
+anyhow = "*"
+thiserror = "*"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+ewasm_api = { version = "0.11.0", default-features = false, features = ["std", "qimalloc"], package = "ss_ewasm_api" }
+
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z"
+
+[profile.release.package.ballot-contract]
+incremental = false
+opt-level = "z"
+
+[features]
+constructor = []
+constructor-test = []
