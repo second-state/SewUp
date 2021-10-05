@@ -50,7 +50,7 @@ async fn init_cargo_config() -> Result<()> {
         .await
         .context("failed to create .cargo folder")?;
     write(
-        "./.cargo/config.rs",
+        "./.cargo/config",
         r#"
 [target.'cfg(target_arch="wasm32")']
 rustflags = ["-C", "link-arg=--export-table"]"#,
