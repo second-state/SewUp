@@ -29,7 +29,6 @@ remain = "0.2"
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 evmc-sys = { version = "6.3.1-rc4", package = "ssvm-evmc-sys" }
 rust-ssvm = "0.1.0-rc2"
-hex = "0.4.3"
 
 [build-dependencies]
 cmake = "0.1.42"
