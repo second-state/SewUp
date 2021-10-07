@@ -8,7 +8,7 @@ use cryptoxide::mac::Mac;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::types::{Raw, Row};
+use crate::types::{Address, Raw, Row};
 
 /// helps to serialize struct as Key to row or deserialized from row
 /// ```compile_fail
@@ -94,5 +94,51 @@ impl Key for Raw {
 impl Key for Row {
     fn from_row_key(x: &Row) -> Result<Self> {
         Ok(x.clone())
+    }
+}
+
+impl Key for Address {
+    fn from_row_key(x: &Row) -> Result<Self> {
+        #[cfg(not(target_arch = "wasm32"))]
+        let addr = Address {};
+        #[cfg(target_arch = "wasm32")]
+        let addr: Address = {
+            let raw: Raw = x.try_into().expect("row key should at least one raw");
+            let byte20: [u8; 20] = [
+                raw.bytes[12],
+                raw.bytes[13],
+                raw.bytes[14],
+                raw.bytes[15],
+                raw.bytes[16],
+                raw.bytes[17],
+                raw.bytes[18],
+                raw.bytes[19],
+                raw.bytes[20],
+                raw.bytes[21],
+                raw.bytes[22],
+                raw.bytes[23],
+                raw.bytes[24],
+                raw.bytes[25],
+                raw.bytes[26],
+                raw.bytes[27],
+                raw.bytes[28],
+                raw.bytes[29],
+                raw.bytes[30],
+                raw.bytes[31],
+            ];
+            Address {
+                inner: ewasm_api::types::Address::from(byte20),
+            }
+        };
+        Ok(addr)
+    }
+    fn to_row_key(&self) -> Result<Row> {
+        #[cfg(not(target_arch = "wasm32"))]
+        let raw: Raw = Raw::default();
+
+        #[cfg(target_arch = "wasm32")]
+        let raw: Raw = self.inner.into();
+
+        Ok(raw.into())
     }
 }

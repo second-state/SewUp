@@ -2,16 +2,20 @@
 use std::convert::TryInto;
 
 #[cfg(target_arch = "wasm32")]
+use ewasm_api::types::Address;
+
+#[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use crate::utils::sha3_256;
 
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::types::{Address, StorageKey, StorageValue};
+use ewasm_api::types::{StorageKey, StorageValue};
+
+#[cfg(not(target_arch = "wasm32"))]
+pub struct StorageValue {}
 
 #[cfg(not(target_arch = "wasm32"))]
 pub struct Address {}
-#[cfg(not(target_arch = "wasm32"))]
-pub struct StorageValue {}
 
 pub fn calculate_approval_hash(sender: &[u8; 20], spender: &[u8; 20]) -> Vec<u8> {
     let mut allowance: Vec<u8> = "approval".as_bytes().into();
