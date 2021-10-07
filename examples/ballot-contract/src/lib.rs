@@ -29,6 +29,11 @@ struct Proposal {
     vote_count: usize,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Input {
+    proposal_id: usize,
+}
+
 #[ewasm_constructor]
 fn constructor() {
     let mut storage =
@@ -103,7 +108,7 @@ fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmA
 }
 
 #[ewasm_fn]
-fn vote(proposal_id: usize) -> anyhow::Result<sewup::primitives::EwasmAny> {
+fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let caller = ewasm_api::caller();
     let caller_address = {
         let byte20: [u8; 20] = hex::decode(CHARIMAN)
@@ -121,12 +126,12 @@ fn vote(proposal_id: usize) -> anyhow::Result<sewup::primitives::EwasmAny> {
         if voter.voted {
             return Err(errors::Error::AlreadyVote.into());
         } else {
-            if let Some(mut proposal) = proposals_bucket.get(Raw::from(proposal_id))? {
+            if let Some(mut proposal) = proposals_bucket.get(Raw::from(input.proposal_id))? {
                 voter.voted = true;
                 voters_bucket.set(Raw::from(caller_address), voter);
 
                 proposal.vote_count += 1;
-                proposals_bucket.set(Raw::from(proposal_id), proposal);
+                proposals_bucket.set(Raw::from(input.proposal_id), proposal);
 
                 storage.save(voters_bucket);
                 storage.save(proposals_bucket);
@@ -134,7 +139,7 @@ fn vote(proposal_id: usize) -> anyhow::Result<sewup::primitives::EwasmAny> {
 
                 return Ok(().into());
             } else {
-                return Err(errors::Error::ProposalNonExist(proposal_id).into());
+                return Err(errors::Error::ProposalNonExist(input.proposal_id).into());
             }
         }
     } else {
@@ -152,6 +157,7 @@ fn winning_proposals() -> anyhow::Result<sewup::primitives::EwasmAny> {
             return Err(errors::Error::StillVoting.into());
         }
     }
+
     let mut highest_vote = 0;
     let mut highest_proposals: Vec<Proposal> = vec![];
     for (_, proposal) in proposals_bucket.iter() {
@@ -181,10 +187,41 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_test]
 mod tests {
     use super::*;
-    use sewup_derive::{ewasm_assert_eq, ewasm_auto_assert_eq, ewasm_output_from};
+    use sewup_derive::{
+        ewasm_assert_eq, ewasm_auto_assert_eq, ewasm_err_output, ewasm_output_from,
+    };
 
     #[ewasm_test]
-    fn test_get_greeting() {
-        assert!(true);
+    fn test_give_right_to_vote() {
+        ewasm_assert_eq!(
+            give_right_to_vote("8663DBF0cC68AaF37fC8BA262F2df4c666a41993"),
+            ewasm_err_output!(errors::Error::ChairmanOnly)
+        );
+
+        // TODO: handle input with primitive types, ex: usize
+        let input = Input { proposal_id: 1 };
+        ewasm_assert_eq!(
+            vote(input) by "1cCA28600d7491365520B31b466f88647B9839eC",
+            ewasm_err_output!(errors::Error::LackRightToVote)
+        );
+
+        ewasm_auto_assert_eq!(
+            give_right_to_vote("8663DBF0cC68AaF37fC8BA262F2df4c666a41993") by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            ()
+        );
+
+        ewasm_auto_assert_eq!(
+            vote(input) by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            ()
+        );
+
+        let name = sewup::types::sized_str::SizedString::new(50)
+            .from_str("safety with Rust in 2022")
+            .unwrap();
+        let proposal = Proposal {
+            name: name.into(),
+            vote_count: 1,
+        };
+        ewasm_auto_assert_eq!(winning_proposals(), vec![proposal]);
     }
 }
