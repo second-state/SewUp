@@ -339,8 +339,8 @@ impl TryFrom<&Row> for Raw {
     type Error = &'static str;
 
     fn try_from(value: &Row) -> Result<Self, Self::Error> {
-        if value.len() <= 1 {
-            Err("Row is bigger than raw")
+        if value.len() < 1 {
+            Err("Row should be bigger than raw")
         } else {
             Ok(value.inner[0])
         }
@@ -351,8 +351,8 @@ impl TryFrom<Row> for Raw {
     type Error = &'static str;
 
     fn try_from(value: Row) -> Result<Self, Self::Error> {
-        if value.len() <= 1 {
-            Err("Row is bigger than raw")
+        if value.len() < 1 {
+            Err("Row should be bigger than raw")
         } else {
             Ok(value.inner[0])
         }
