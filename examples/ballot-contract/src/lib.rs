@@ -53,9 +53,7 @@ fn constructor() {
     let proposals = ["carbon neutral in 2021", "safety with Rust in 2022"];
 
     for (idx, name) in proposals.iter().enumerate() {
-        let name = sewup::types::sized_str::SizedString::new(50)
-            .from_str(name)
-            .unwrap();
+        let name = sewup::types::SizedString::new(50).from_str(name).unwrap();
         proposals_bucket.set(
             Raw::from(idx),
             Proposal {
@@ -215,7 +213,7 @@ mod tests {
             ()
         );
 
-        let name = sewup::types::sized_str::SizedString::new(50)
+        let name = sewup::types::SizedString::new(50)
             .from_str("safety with Rust in 2022")
             .unwrap();
         let proposal = Proposal {

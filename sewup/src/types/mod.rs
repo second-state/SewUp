@@ -16,5 +16,9 @@ mod row;
 pub use row::*;
 
 pub mod errors;
-pub mod sized_str;
+
+mod sized_str;
 pub use sized_str::*;
+
+mod address;
+pub use address::*;

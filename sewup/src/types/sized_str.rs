@@ -6,7 +6,7 @@ use crate::types::*;
 
 /// SizedString is a type help you store string in with a predefined size
 /// ```
-/// let ss = sewup::types::sized_str::SizedString::new(10).from_str("hello").unwrap();
+/// let ss = sewup::types::SizedString::new(10).from_str("hello").unwrap();
 /// assert!(ss.len() == 5);
 /// assert!(ss.capacity() == 10);
 /// assert_eq!(ss.to_utf8_string().unwrap(), "hello");
