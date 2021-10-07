@@ -49,6 +49,7 @@ impl<'a, K: Key, V: Value> Iterator for Iter<'a, K, V> {
             }
 
             let (k_size, v_size) = self.raw_bucket.0[self.index].get_size();
+            self.index += 1;
 
             let mut key_row = Row::from(
                 &self.raw_bucket.1[(self.item_idx) as usize..(self.item_idx + k_size) as usize],
