@@ -228,6 +228,11 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 /// `ewasm_fn_sig!` macro to get your function signature;
 ///
 /// ```compile_fail
+/// #[ewasm_fn]
+/// fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
+///     Ok(())
+/// }
+///
 /// #[ewasm_main]
 /// fn main() -> Result<()> {
 ///     let contract = Contract::new()?;
@@ -238,6 +243,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+///
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -1413,4 +1419,30 @@ pub fn SizedString(item: TokenStream) -> TokenStream {
         }
     }
     panic!("The input of SizedString! should be a greator than zero integer")
+}
+
+/// helps you return handler when caller is not in access control list
+/// ```compile_fail
+/// ewasm_call_only_by!("8663..1993")
+/// ```
+#[proc_macro]
+pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
+    let input = item.to_string().replace(" ", "");
+    let output = if input.starts_with("\"") {
+        let addr = format!("{}", input.replace("\"", ""));
+        quote! {
+            if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
+                return Err(sewup::errors::HandlerError::Unauthorized.into())
+            }
+        }
+    } else {
+        let addr = Ident::new(&format!("{}", input), Span::call_site());
+        quote! {
+            if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
+                return Err(sewup::errors::HandlerError::Unauthorized.into())
+            }
+        }
+    };
+
+    output.into()
 }

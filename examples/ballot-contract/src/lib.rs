@@ -11,7 +11,8 @@ use std::convert::TryInto;
 use serde_derive::{Deserialize, Serialize};
 use sewup::types::{Address, Raw};
 use sewup_derive::{
-    ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, SizedString, Value,
+    ewasm_call_only_by, ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test,
+    SizedString, Value,
 };
 
 mod errors;
@@ -71,12 +72,9 @@ fn constructor() {
 
 #[ewasm_fn]
 fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let caller = sewup::utils::caller();
-    let charman_address = Address::from_str(CHAIRMAN)?;
-
-    if caller != charman_address {
-        return Err(errors::Error::ChairmanOnly.into());
-    }
+    ewasm_call_only_by!(CHAIRMAN);
+    // or
+    // ewasm_call_only_by!("8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
 
     let mut storage = sewup::kv::Store::load(None)?;
     let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
@@ -173,7 +171,7 @@ mod tests {
     fn test_give_right_to_vote() {
         ewasm_assert_eq!(
             give_right_to_vote("1cCA28600d7491365520B31b466f88647B9839eC"),
-            ewasm_err_output!(errors::Error::ChairmanOnly)
+            ewasm_err_output!(sewup::errors::HandlerError::Unauthorized)
         );
 
         // TODO: handle input with primitive types, ex: usize
