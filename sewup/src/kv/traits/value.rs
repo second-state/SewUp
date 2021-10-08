@@ -1,12 +1,14 @@
 //! helps serialized value object into raw and also deserialize the raw back to object
 use std::borrow::Borrow;
 use std::convert::TryFrom;
+#[cfg(target_arch = "wasm32")]
+use std::convert::TryInto;
 
 use anyhow::Result;
 use serde::de::DeserializeOwned;
 use serde::Serialize;
 
-use crate::types::{Raw, Row};
+use crate::types::{Address, Raw, Row};
 
 /// helps to serialize struct as Value to row or deserialized from row
 /// ```compile_fail
@@ -51,5 +53,51 @@ impl Value for Row {
 
     fn from_row_value(r: &Row) -> Result<Self> {
         Ok(r.clone())
+    }
+}
+
+impl Value for Address {
+    fn from_row_value(x: &Row) -> Result<Self> {
+        #[cfg(not(target_arch = "wasm32"))]
+        let addr = Address {};
+        #[cfg(target_arch = "wasm32")]
+        let addr: Address = {
+            let raw: Raw = x.try_into().expect("row key should at least one raw");
+            let byte20: [u8; 20] = [
+                raw.bytes[12],
+                raw.bytes[13],
+                raw.bytes[14],
+                raw.bytes[15],
+                raw.bytes[16],
+                raw.bytes[17],
+                raw.bytes[18],
+                raw.bytes[19],
+                raw.bytes[20],
+                raw.bytes[21],
+                raw.bytes[22],
+                raw.bytes[23],
+                raw.bytes[24],
+                raw.bytes[25],
+                raw.bytes[26],
+                raw.bytes[27],
+                raw.bytes[28],
+                raw.bytes[29],
+                raw.bytes[30],
+                raw.bytes[31],
+            ];
+            Address {
+                inner: ewasm_api::types::Address::from(byte20),
+            }
+        };
+        Ok(addr)
+    }
+    fn to_row_value(&self) -> Result<Row> {
+        #[cfg(not(target_arch = "wasm32"))]
+        let raw: Raw = Raw::default();
+
+        #[cfg(target_arch = "wasm32")]
+        let raw: Raw = self.inner.into();
+
+        Ok(raw.into())
     }
 }
