@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["ContractError",""]]});
+initSidebarItems({"enum":[["ContractError",""],["HandlerError",""]]});

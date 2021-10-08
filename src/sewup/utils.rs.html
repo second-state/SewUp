@@ -166,6 +166,11 @@
 <span id="166">166</span>
 <span id="167">167</span>
 <span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ewasm_api::finish_data</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
@@ -177,7 +182,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">serde_value</span>::{<span class="ident">to_value</span>, <span class="ident">Value</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types::Raw</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::{<span class="ident">Address</span>, <span class="ident">Raw</span>};
 
 <span class="doccomment">/// helps you debug the ewasm contract when executing in the test runtime</span>
 <span class="doccomment">/// To show the debug message pllease run the test case as following command</span>
@@ -249,6 +254,11 @@
         ]
     };
     <span class="ident">finish_data</span>(<span class="kw-2">&amp;</span><span class="ident">output</span>);
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">caller</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Address</span> {
+    <span class="ident">ewasm_api::caller</span>().<span class="ident">into</span>()
 }
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sha3_256</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
