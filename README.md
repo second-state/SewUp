@@ -1,11 +1,11 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.1.3-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.1.4-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.3-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.4-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
-[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.3-green.svg)](https://crates.io/crates/cargo-sewup)
+[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.4-green.svg)](https://crates.io/crates/cargo-sewup)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
@@ -14,7 +14,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 ## Slides & Demo
 | Date       | Event                 | Slides | Demo video                                         |
 |------------|-----------------------|--------|----------------------------------------------------|
-| 2021/10/16 | ParaState Hackathon   | [v0.1.3](https://slides.com/yanganto/ethereum-wasm-in-rust) | |
+| 2021/10/16 | ParaState Hackathon   | [v0.1.4](https://slides.com/yanganto/ethereum-wasm-in-rust) | |
 | 2021/09/07 | Version 0.1 release   | | [Hello](https://youtu.be/kbe3uuxkBNQ), [KV](https://youtu.be/LUpYIFGG36s), [RDB](https://youtu.be/sJLOcJRheIw), [ERC-20](https://youtu.be/sVGEuNBY1dc), [ERC-721](https://youtu.be/ivZIqnhOAfA), [ERC-1155](https://youtu.be/BsbAFT5rNGw) |
 | 2021/06/19 | Rust meetup (Beijing) | [v0.0.1-pre](https://slides.com/yanganto/sewup) |           |
 
