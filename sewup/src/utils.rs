@@ -9,7 +9,7 @@ pub use serde::Serialize;
 pub use serde_value::{to_value, Value};
 
 #[cfg(target_arch = "wasm32")]
-use crate::types::Raw;
+use crate::types::{Address, Raw};
 
 /// helps you debug the ewasm contract when executing in the test runtime
 /// To show the debug message pllease run the test case as following command
@@ -81,6 +81,11 @@ pub fn ewasm_return_bool(is_true: bool) {
         ]
     };
     finish_data(&output);
+}
+
+#[cfg(target_arch = "wasm32")]
+pub fn caller() -> Address {
+    ewasm_api::caller().into()
 }
 
 pub fn sha3_256(input: &[u8]) -> [u8; 32] {

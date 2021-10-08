@@ -71,7 +71,7 @@ fn constructor() {
 
 #[ewasm_fn]
 fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let caller: Address = ewasm_api::caller().into();
+    let caller = sewup::utils::caller();
     let charman_address = Address::from_str(CHAIRMAN)?;
 
     if caller != charman_address {
@@ -94,7 +94,7 @@ fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmA
 
 #[ewasm_fn]
 fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let caller_address: Address = ewasm_api::caller().into();
+    let caller_address = sewup::utils::caller();
 
     let mut storage = sewup::kv::Store::load(None)?;
     let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
