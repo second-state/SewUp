@@ -172,7 +172,7 @@ mod tests {
     #[ewasm_test]
     fn test_give_right_to_vote() {
         ewasm_assert_eq!(
-            give_right_to_vote("8663DBF0cC68AaF37fC8BA262F2df4c666a41993"),
+            give_right_to_vote("1cCA28600d7491365520B31b466f88647B9839eC"),
             ewasm_err_output!(errors::Error::ChairmanOnly)
         );
 
@@ -184,12 +184,12 @@ mod tests {
         );
 
         ewasm_auto_assert_eq!(
-            give_right_to_vote("8663DBF0cC68AaF37fC8BA262F2df4c666a41993") by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            give_right_to_vote("1cCA28600d7491365520B31b466f88647B9839eC") by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
             ()
         );
 
         ewasm_auto_assert_eq!(
-            vote(input) by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            vote(input) by "1cCA28600d7491365520B31b466f88647B9839eC",
             ()
         );
 
