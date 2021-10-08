@@ -9,14 +9,14 @@
 use std::convert::TryInto;
 
 use serde_derive::{Deserialize, Serialize};
-use sewup::types::Raw;
+use sewup::types::{Address, Raw};
 use sewup_derive::{
     ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, SizedString, Value,
 };
 
 mod errors;
 
-static CHARIMAN: &str = "8663DBF0cC68AaF37fC8BA262F2df4c666a41993";
+static CHAIRMAN: &str = "8663DBF0cC68AaF37fC8BA262F2df4c666a41993";
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
 struct Voter {
@@ -39,9 +39,8 @@ fn constructor() {
     let mut storage =
         sewup::kv::Store::new().expect("there is no return for constructor currently");
 
-    // TODO: Use Address type, and make sure it compatiable with Key trait of KV
     let voters_bucket = storage
-        .bucket::<Raw, Voter>("voters")
+        .bucket::<Address, Voter>("voters")
         .expect("there is no return for constructor currently");
 
     // TODO: make usize be compatiable with Key trait of KV
@@ -72,33 +71,21 @@ fn constructor() {
 
 #[ewasm_fn]
 fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let caller = ewasm_api::caller();
-    let charman_address = {
-        let byte20: [u8; 20] = hex::decode(CHARIMAN)
-            .expect("address should be hex format")
-            .try_into()
-            .expect("address should be byte20");
-        ewasm_api::types::Address::from(byte20)
-    };
+    let caller: Address = ewasm_api::caller().into();
+    let charman_address = Address::from_str(CHAIRMAN)?;
 
     if caller != charman_address {
         return Err(errors::Error::ChairmanOnly.into());
     }
 
     let mut storage = sewup::kv::Store::load(None)?;
-    let mut voters_bucket = storage.bucket::<Raw, Voter>("voters")?;
-    let voter_address = {
-        let byte20: [u8; 20] = hex::decode(&voter)
-            .expect("address should be hex format")
-            .try_into()
-            .map_err(|_| errors::Error::VoterAddressIncorrect(voter.clone()))?;
-        ewasm_api::types::Address::from(byte20)
-    };
+    let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
+    let voter_address = Address::from_str(&voter)?;
 
-    return if voters_bucket.get(Raw::from(voter_address))?.is_some() {
+    return if voters_bucket.get(voter_address.clone())?.is_some() {
         Err(errors::Error::VoterExist(voter).into())
     } else {
-        voters_bucket.set(Raw::from(voter_address), Voter { voted: false });
+        voters_bucket.set(voter_address, Voter { voted: false });
         storage.save(voters_bucket);
         storage.commit()?;
         Ok(().into())
@@ -107,26 +94,19 @@ fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmA
 
 #[ewasm_fn]
 fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    let caller = ewasm_api::caller();
-    let caller_address = {
-        let byte20: [u8; 20] = hex::decode(CHARIMAN)
-            .expect("address should be hex format")
-            .try_into()
-            .expect("address should be byte20");
-        ewasm_api::types::Address::from(byte20)
-    };
+    let caller_address: Address = ewasm_api::caller().into();
 
     let mut storage = sewup::kv::Store::load(None)?;
-    let mut voters_bucket = storage.bucket::<Raw, Voter>("voters")?;
+    let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
     let mut proposals_bucket = storage.bucket::<Raw, Proposal>("proposals")?;
 
-    if let Some(mut voter) = voters_bucket.get(Raw::from(caller_address))? {
+    if let Some(mut voter) = voters_bucket.get(caller_address.clone())? {
         if voter.voted {
             return Err(errors::Error::AlreadyVote.into());
         } else {
             if let Some(mut proposal) = proposals_bucket.get(Raw::from(input.proposal_id))? {
                 voter.voted = true;
-                voters_bucket.set(Raw::from(caller_address), voter);
+                voters_bucket.set(caller_address, voter);
 
                 proposal.vote_count += 1;
                 proposals_bucket.set(Raw::from(input.proposal_id), proposal);
@@ -148,7 +128,7 @@ fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_fn]
 fn winning_proposals() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut storage = sewup::kv::Store::load(None)?;
-    let voters_bucket = storage.bucket::<Raw, Voter>("voters")?;
+    let voters_bucket = storage.bucket::<Address, Voter>("voters")?;
     let proposals_bucket = storage.bucket::<Raw, Proposal>("proposals")?;
     for (_, voter) in voters_bucket.iter() {
         if !voter.voted {

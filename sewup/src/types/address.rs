@@ -1,4 +1,7 @@
 #[cfg(target_arch = "wasm32")]
+use std::convert::TryInto;
+
+#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 #[cfg(not(target_arch = "wasm32"))]
 use serde_derive::{Deserialize, Serialize};
@@ -10,16 +13,23 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 use crate::types::Raw;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, PartialEq)]
 pub struct AddressType {}
 
 #[cfg(target_arch = "wasm32")]
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct AddressType {
     pub(crate) inner: EwasmAddress,
 }
 
 pub type Address = AddressType;
+
+#[cfg(target_arch = "wasm32")]
+impl From<EwasmAddress> for AddressType {
+    fn from(inner: EwasmAddress) -> Self {
+        Self { inner }
+    }
+}
 
 #[cfg(target_arch = "wasm32")]
 impl Serialize for AddressType {
@@ -65,5 +75,22 @@ impl<'de> Deserialize<'de> for AddressType {
                 inner: ewasm_api::types::Address::from(byte20),
             }
         })
+    }
+}
+
+impl AddressType {
+    #[cfg(target_arch = "wasm32")]
+    pub fn from_str(s: &str) -> anyhow::Result<Self> {
+        // TODO: handle str starts with 0x
+        let byte20: [u8; 20] = hex::decode(s)?
+            .try_into()
+            .map_err(|_| anyhow::anyhow!("hex str can not convert to [u8; 20]"))?;
+        Ok(Self {
+            inner: ewasm_api::types::Address::from(byte20),
+        })
+    }
+    #[cfg(not(target_arch = "wasm32"))]
+    pub fn from_str(_: &str) -> anyhow::Result<Self> {
+        Ok(Self {})
     }
 }
