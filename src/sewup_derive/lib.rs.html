@@ -1446,6 +1446,21 @@
 <span id="1446">1446</span>
 <span id="1447">1447</span>
 <span id="1448">1448</span>
+<span id="1449">1449</span>
+<span id="1450">1450</span>
+<span id="1451">1451</span>
+<span id="1452">1452</span>
+<span id="1453">1453</span>
+<span id="1454">1454</span>
+<span id="1455">1455</span>
+<span id="1456">1456</span>
+<span id="1457">1457</span>
+<span id="1458">1458</span>
+<span id="1459">1459</span>
+<span id="1460">1460</span>
+<span id="1461">1461</span>
+<span id="1462">1462</span>
+<span id="1463">1463</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -2571,8 +2586,23 @@
                                 rt: Some(runtime.clone())
                             };
 
-                            match h.execute(caller, sig, input_data, 1_000_000_000_000) {
-                                Ok(r) =&gt; assert_eq!(r.output_data, expect_output, &quot;{} output is unexpected&quot;, fn_name),
+                            match h.execute(caller.clone(), sig, input_data, 1_000_000_000_000) {
+                                Ok(r) =&gt; {
+                                    if !(*r.output_data == *expect_output) {
+                                        if let Some(caller) = caller {
+                                            eprintln!(&quot;vm caller : {}&quot;, caller);
+                                        }
+                                        if let (Ok(output_msg), Ok(expect_msg)) =
+                                            (std::str::from_utf8(&amp;r.output_data), std::str::from_utf8(&amp;expect_output)) {
+                                            eprintln!(&quot;vm output : {}&quot;, output_msg);
+                                            eprintln!(&quot;expected  : {}&quot;, expect_msg);
+                                        } else {
+                                            eprintln!(&quot;vm output : {:?}&quot;, r.output_data);
+                                            eprintln!(&quot;expected  : {:?}&quot;, expect_output);
+                                        }
+                                        panic!(&quot;function `{}` output is unexpected&quot;, fn_name);
+                                    }
+                                },
                                 Err(e) =&gt; {
                                     panic!(&quot;vm error: {:?}&quot;, e);
                                 }
