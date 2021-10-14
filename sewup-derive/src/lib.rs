@@ -1124,7 +1124,19 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                             };
 
                             match h.execute(caller, sig, input_data, 1_000_000_000_000) {
-                                Ok(r) => assert_eq!(r.output_data, expect_output, "{} output is unexpected", fn_name),
+                                Ok(r) => {
+                                    if !(*r.output_data == *expect_output) {
+                                        if let (Ok(output_msg), Ok(expect_msg)) =
+                                            (std::str::from_utf8(&r.output_data), std::str::from_utf8(&expect_output)) {
+                                            eprintln!("vm output: {}", output_msg);
+                                            eprintln!("expected : {}", expect_msg);
+                                        } else {
+                                            eprintln!("vm output: {:?}", r.output_data);
+                                            eprintln!("expected : {:?}", expect_output);
+                                        }
+                                        panic!("function `{}` output is unexpected", fn_name);
+                                    }
+                                },
                                 Err(e) => {
                                     panic!("vm error: {:?}", e);
                                 }
