@@ -81,8 +81,12 @@ impl<'de> Deserialize<'de> for AddressType {
 impl AddressType {
     #[cfg(target_arch = "wasm32")]
     pub fn from_str(s: &str) -> anyhow::Result<Self> {
-        // TODO: handle str starts with 0x
-        let byte20: [u8; 20] = hex::decode(s)?
+        let hex_s: &str = if s.starts_with("0x") {
+            &s[2..s.len()]
+        } else {
+            s
+        };
+        let byte20: [u8; 20] = hex::decode(hex_s)?
             .try_into()
             .map_err(|_| anyhow::anyhow!("hex str can not convert to [u8; 20]"))?;
         Ok(Self {
