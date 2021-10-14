@@ -137,7 +137,7 @@ impl Key for Address {
         let raw: Raw = Raw::default();
 
         #[cfg(target_arch = "wasm32")]
-        let raw: Raw = self.inner.into();
+        let raw: Raw = self.into();
 
         Ok(raw.into())
     }

@@ -7,12 +7,16 @@ use std::{
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde_derive::Deserialize as DeserializeDerive;
 
-use crate::types::*;
+use crate::types::Row;
 
+#[cfg(target_arch = "wasm32")]
+use crate::types::Address as SewupAddress;
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::Address;
 
-/// The storage unit in the contract, which contains 32 bytes
+/// The storage unit in the contract of Ethereum, which contains 32 bytes
+/// The structure is easiler to try_from `Row`; from `Address`, bytes;
+/// or into `bytes32`, `bytes20`, etc.
 #[derive(Clone, Copy)]
 pub struct Raw {
     pub(crate) bytes: [u8; 32],
@@ -142,6 +146,7 @@ impl Raw {
         }
     }
 
+    /// build Raw from the address type(bytes20) of ehtereum
     pub fn from_raw_address(addr: &[u8; 20]) -> Self {
         Raw::from(&[
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, addr[0], addr[1], addr[2],
@@ -154,6 +159,7 @@ impl Raw {
         std::str::from_utf8(&self.bytes)
     }
 
+    /// return the storage unit of Ethereum
     pub fn to_bytes32(&self) -> [u8; 32] {
         self.bytes
     }
@@ -263,6 +269,13 @@ impl From<Address> for Raw {
 }
 
 #[cfg(target_arch = "wasm32")]
+impl From<SewupAddress> for Raw {
+    fn from(addr: SewupAddress) -> Self {
+        addr.inner.into()
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
 impl From<&Address> for Raw {
     fn from(addr: &Address) -> Self {
         let bytes = addr.bytes;
@@ -272,6 +285,13 @@ impl From<&Address> for Raw {
             bytes[10], bytes[11], bytes[12], bytes[13], bytes[14], bytes[15], bytes[16], bytes[17],
             bytes[18], bytes[19],
         ])
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl From<&SewupAddress> for Raw {
+    fn from(addr: &SewupAddress) -> Self {
+        addr.inner.into()
     }
 }
 

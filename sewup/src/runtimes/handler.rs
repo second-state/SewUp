@@ -79,10 +79,15 @@ impl ContractHandler {
                 }
 
                 let sender = if let Some(addr) = addr {
-                    let byte20: [u8; 20] = decode(addr)
-                        .expect("address should be hex format")
+                    let hex_str: &str = if addr.starts_with("0x") {
+                        &addr[2..addr.len()]
+                    } else {
+                        addr
+                    };
+                    let byte20: [u8; 20] = decode(hex_str)
+                        .expect("contract caller's address should be hex format")
                         .try_into()
-                        .expect("address should be byte20");
+                        .expect("contract caller's address should be bytes20");
                     Raw::from_raw_address(&byte20)
                 } else {
                     Raw::default()
