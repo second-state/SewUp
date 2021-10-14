@@ -281,7 +281,7 @@
         <span class="kw">let</span> <span class="ident">raw</span>: <span class="ident">Raw</span> <span class="op">=</span> <span class="ident">Raw::default</span>();
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
-        <span class="kw">let</span> <span class="ident">raw</span>: <span class="ident">Raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>.<span class="ident">into</span>();
+        <span class="kw">let</span> <span class="ident">raw</span>: <span class="ident">Raw</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">into</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">raw</span>.<span class="ident">into</span>())
     }
