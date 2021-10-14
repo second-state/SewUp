@@ -22,6 +22,14 @@ pub struct AddressType {
     pub(crate) inner: EwasmAddress,
 }
 
+/// Address is a 20 bytes binary, you can build a Address with hex string easily.
+/// ```
+/// let address = sewup::types::Address::from_str("8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
+///
+/// let same_address = sewup::types::Address::from_str("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
+///
+/// assert!(address == same_address);
+/// ```
 pub type Address = AddressType;
 
 #[cfg(target_arch = "wasm32")]

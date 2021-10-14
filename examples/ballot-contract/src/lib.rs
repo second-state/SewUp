@@ -75,6 +75,8 @@ fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmA
     ewasm_call_only_by!(CHAIRMAN);
     // or
     // ewasm_call_only_by!("8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
+    // or
+    // ewasm_call_only_by!("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
 
     let mut storage = sewup::kv::Store::load(None)?;
     let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
@@ -182,12 +184,12 @@ mod tests {
         );
 
         ewasm_auto_assert_eq!(
-            give_right_to_vote("1cCA28600d7491365520B31b466f88647B9839eC") by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            give_right_to_vote("0x1cCA28600d7491365520B31b466f88647B9839eC") by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
             ()
         );
 
         ewasm_auto_assert_eq!(
-            vote(input) by "1cCA28600d7491365520B31b466f88647B9839eC",
+            vote(input) by "0x1cCA28600d7491365520B31b466f88647B9839eC",
             ()
         );
 
