@@ -1,7 +1,7 @@
 name: Doc
 on:
   push:
-    branches: [ main ]
+    branches: [ main, doc ]
 
 jobs:
   doc:
@@ -17,8 +17,11 @@ jobs:
           install_options: '--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve'
           extra_nix_config: experimental-features = nix-command flakes
 
-      - name: Build Documentation
-        run: nix develop -c 'cargo' doc -p sewup -p sewup-derive --features=kv,rdb,token
+      - name: Build Native Documentation
+        run: nix develop -c 'cargo' doc -p sewup -p sewup-derive --all-features
+
+      - name: Build Wasm Documentation
+        run: nix develop -c 'cargo' doc -p sewup -p sewup-derive --all-features --target=wasm32-unknown-unknown
 
       - name: Deploy Documentation
         env:
