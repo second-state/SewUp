@@ -1129,12 +1129,16 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                                         if let Some(caller) = caller {
                                             eprintln!("vm caller : {}", caller);
                                         }
-                                        if let (Ok(output_msg), Ok(expect_msg)) =
-                                            (std::str::from_utf8(&r.output_data), std::str::from_utf8(&expect_output)) {
-                                            eprintln!("vm output : {}", output_msg);
-                                            eprintln!("expected  : {}", expect_msg);
+
+                                        if let Ok(output_msg) = std::str::from_utf8(&r.output_data) {
+                                            eprintln!("vm msg    : {}", output_msg);
                                         } else {
                                             eprintln!("vm output : {:?}", r.output_data);
+                                        }
+
+                                        if let Ok(expect_msg) = std::str::from_utf8(&expect_output) {
+                                            eprintln!("expected  : {}", expect_msg);
+                                        } else {
                                             eprintln!("expected  : {:?}", expect_output);
                                         }
                                         panic!("function `{}` output is unexpected", fn_name);
