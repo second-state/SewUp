@@ -18,4 +18,4 @@ jobs:
         run: nix develop -c 'cargo' install typos-cli
 
       - name: Check typo
-        run: nix develop -c 'typos' --exclude examples
+        run: nix develop -c 'typos' --exclude ssvm-evmc

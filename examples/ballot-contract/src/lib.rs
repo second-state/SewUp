@@ -44,7 +44,7 @@ fn constructor() {
         .bucket::<Address, Voter>("voters")
         .expect("there is no return for constructor currently");
 
-    // TODO: make usize be compatiable with Key trait of KV
+    // TODO: make usize be compatible with Key trait of KV
     /// use KV to storage array like data structure
     let mut proposals_bucket = storage
         .bucket::<Raw, Proposal>("proposals")
