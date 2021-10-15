@@ -112,7 +112,7 @@ macro_rules! primitive_value {
                 }
 
                 fn from_row_value(row: &Row) -> Result<Self> {
-                    let r: Raw = TryFrom::try_from(row).expect("primitive key should be 1 Raw");
+                    let r: Raw = TryFrom::try_from(row).expect("primitive value should be 1 Raw");
                     Ok(r.into())
                 }
             }
@@ -121,3 +121,34 @@ macro_rules! primitive_value {
 }
 
 primitive_value!(u8, u16, u32, u64, usize);
+
+impl Value for String {
+    fn to_row_value(&self) -> Result<Row> {
+        Ok(self.into())
+    }
+    fn from_row_value(row: &Row) -> Result<Self> {
+        Ok(row.to_utf8_string()?)
+    }
+}
+
+macro_rules! sized_string_value {
+    ( $($n:expr),* ) => {
+        $(
+            impl Value for [Raw; $n] {
+                fn to_row_value(&self) -> Result<Row> {
+                    Ok(self.to_vec().into())
+                }
+                fn from_row_value(row: &Row) -> Result<Self> {
+                    let mut buffer: [Raw; $n] = Default::default();
+                    buffer.copy_from_slice(&row.inner[0..$n]);
+                    Ok(buffer)
+                }
+            }
+         )*
+    }
+}
+
+sized_string_value!(
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    26, 27, 28, 29, 30, 31, 32
+);
