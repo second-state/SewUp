@@ -142,3 +142,22 @@ impl Key for Address {
         Ok(raw.into())
     }
 }
+
+macro_rules! primitive_key {
+    ( $($t:ty),* ) => {
+        $(
+            impl Key for $t{
+                fn from_row_key(x: &Row) -> Result<Self> {
+                    let r: Raw = TryFrom::try_from(x).expect("primitive key should be 1 Raw");
+                    Ok(r.into())
+                }
+                fn to_row_key(&self) -> Result<Row> {
+                    let r = Raw::from(*self);
+                    Ok(r.into())
+                }
+            }
+         )*
+    }
+}
+
+primitive_key!(u8, u16, u32, u64, usize);

@@ -101,3 +101,23 @@ impl Value for Address {
         Ok(raw.into())
     }
 }
+
+macro_rules! primitive_value {
+    ( $($t:ty),* ) => {
+        $(
+            impl Value for $t {
+                fn to_row_value(&self) -> Result<Row> {
+                    let r = Raw::from(*self);
+                    Ok(r.into())
+                }
+
+                fn from_row_value(row: &Row) -> Result<Self> {
+                    let r: Raw = TryFrom::try_from(row).expect("primitive key should be 1 Raw");
+                    Ok(r.into())
+                }
+            }
+         )*
+    }
+}
+
+primitive_value!(u8, u16, u32, u64, usize);
