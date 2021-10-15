@@ -9,7 +9,7 @@
 use std::convert::TryInto;
 
 use serde_derive::{Deserialize, Serialize};
-use sewup::types::{Address, Raw};
+use sewup::types::Address;
 use sewup_derive::{
     ewasm_call_only_by, ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test,
     SizedString, Value,
@@ -44,10 +44,9 @@ fn constructor() {
         .bucket::<Address, Voter>("voters")
         .expect("there is no return for constructor currently");
 
-    // TODO: make usize be compatible with Key trait of KV
     /// use KV to storage array like data structure
     let mut proposals_bucket = storage
-        .bucket::<Raw, Proposal>("proposals")
+        .bucket::<usize, Proposal>("proposals")
         .expect("there is no return for constructor currently");
 
     let proposals = ["carbon neutral in 2021", "safety with Rust in 2022"];
@@ -55,7 +54,7 @@ fn constructor() {
     for (idx, name) in proposals.iter().enumerate() {
         let name = sewup::types::SizedString::new(50).from_str(name).unwrap();
         proposals_bucket.set(
-            Raw::from(idx),
+            idx,
             Proposal {
                 name: name.into(),
                 vote_count: 0,
@@ -98,18 +97,18 @@ fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
 
     let mut storage = sewup::kv::Store::load(None)?;
     let mut voters_bucket = storage.bucket::<Address, Voter>("voters")?;
-    let mut proposals_bucket = storage.bucket::<Raw, Proposal>("proposals")?;
+    let mut proposals_bucket = storage.bucket::<usize, Proposal>("proposals")?;
 
     if let Some(mut voter) = voters_bucket.get(caller_address.clone())? {
         if voter.voted {
             return Err(errors::Error::AlreadyVote.into());
         } else {
-            if let Some(mut proposal) = proposals_bucket.get(Raw::from(input.proposal_id))? {
+            if let Some(mut proposal) = proposals_bucket.get(input.proposal_id)? {
                 voter.voted = true;
                 voters_bucket.set(caller_address, voter);
 
                 proposal.vote_count += 1;
-                proposals_bucket.set(Raw::from(input.proposal_id), proposal);
+                proposals_bucket.set(input.proposal_id, proposal);
 
                 storage.save(voters_bucket);
                 storage.save(proposals_bucket);
@@ -129,7 +128,7 @@ fn vote(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
 fn winning_proposals() -> anyhow::Result<sewup::primitives::EwasmAny> {
     let mut storage = sewup::kv::Store::load(None)?;
     let voters_bucket = storage.bucket::<Address, Voter>("voters")?;
-    let proposals_bucket = storage.bucket::<Raw, Proposal>("proposals")?;
+    let proposals_bucket = storage.bucket::<usize, Proposal>("proposals")?;
     for (_, voter) in voters_bucket.iter() {
         if !voter.voted {
             return Err(errors::Error::StillVoting.into());

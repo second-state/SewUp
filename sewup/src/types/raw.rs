@@ -204,6 +204,12 @@ impl From<u8> for Raw {
     }
 }
 
+impl Into<u8> for Raw {
+    fn into(self) -> u8 {
+        self.bytes[31]
+    }
+}
+
 impl From<u16> for Raw {
     fn from(num: u16) -> Self {
         let bytes = num.to_be_bytes();
@@ -211,6 +217,12 @@ impl From<u16> for Raw {
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8,
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1],
         ])
+    }
+}
+
+impl Into<u16> for Raw {
+    fn into(self) -> u16 {
+        u16::from_be_bytes(self.bytes[30..32].try_into().unwrap())
     }
 }
 
@@ -225,6 +237,12 @@ impl From<u32> for Raw {
     }
 }
 
+impl Into<u32> for Raw {
+    fn into(self) -> u32 {
+        u32::from_be_bytes(self.bytes[28..32].try_into().unwrap())
+    }
+}
+
 impl From<u64> for Raw {
     fn from(num: u64) -> Self {
         let bytes = num.to_be_bytes();
@@ -233,6 +251,12 @@ impl From<u64> for Raw {
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2], bytes[3], bytes[4],
             bytes[5], bytes[6], bytes[7],
         ])
+    }
+}
+
+impl Into<u64> for Raw {
+    fn into(self) -> u64 {
+        u64::from_be_bytes(self.bytes[24..32].try_into().unwrap())
     }
 }
 
@@ -252,6 +276,16 @@ impl From<usize> for Raw {
             0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, 0u8, bytes[0], bytes[1], bytes[2],
             bytes[3],
         ]);
+    }
+}
+
+impl Into<usize> for Raw {
+    fn into(self) -> usize {
+        #[cfg(target_pointer_width = "64")]
+        return u64::from_be_bytes(self.bytes[24..32].try_into().unwrap()) as usize;
+
+        #[cfg(target_pointer_width = "32")]
+        return u32::from_be_bytes(self.bytes[28..32].try_into().unwrap()) as usize;
     }
 }
 
