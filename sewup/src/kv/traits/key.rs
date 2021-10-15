@@ -161,3 +161,34 @@ macro_rules! primitive_key {
 }
 
 primitive_key!(u8, u16, u32, u64, usize);
+
+impl Key for String {
+    fn from_row_key(x: &Row) -> Result<Self> {
+        Ok(x.to_utf8_string()?)
+    }
+    fn to_row_key(&self) -> Result<Row> {
+        Ok(self.into())
+    }
+}
+
+macro_rules! sized_string_key {
+    ( $($n:expr),* ) => {
+        $(
+            impl Key for [Raw; $n] {
+                fn from_row_key(r: &Row) -> Result<Self> {
+                    let mut buffer: [Raw; $n] = Default::default();
+                    buffer.copy_from_slice(&r.inner[0..$n]);
+                    Ok(buffer)
+                }
+                fn to_row_key(&self) -> Result<Row> {
+                    Ok(self.to_vec().into())
+                }
+            }
+         )*
+    }
+}
+
+sized_string_key!(
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    26, 27, 28, 29, 30, 31, 32
+);

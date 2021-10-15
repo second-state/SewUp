@@ -7,7 +7,7 @@ use crate::types::*;
 /// A list of `Raw`, which helps you store much bigger data than a `Raw`
 #[derive(Clone, Serialize, Deserialize)]
 pub struct Row {
-    pub(super) inner: Vec<Raw>,
+    pub(crate) inner: Vec<Raw>,
     _buffer: Vec<u8>,
 }
 
@@ -219,3 +219,28 @@ impl std::borrow::Borrow<[u8]> for &Row {
         self._buffer.as_ref()
     }
 }
+
+macro_rules! from_array {
+    ($($n:expr),*) => {
+        $(
+            impl From<&[Raw; $n]> for Row {
+                fn from(v: &[Raw; $n]) -> Self {
+                    Self::from(v.to_vec())
+                }
+            }
+
+            impl Into<[Raw; $n]> for Row {
+                fn into(self) -> [Raw; $n]{
+                    let mut buffer : [Raw; $n] = Default::default();
+                    buffer.copy_from_slice(&self.inner[0..$n]);
+                    buffer
+                }
+            }
+        )*
+    }
+}
+
+from_array!(
+    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
+    26, 27, 28, 29, 30, 31, 32
+);
