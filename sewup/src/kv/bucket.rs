@@ -253,3 +253,43 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
         self.raw_bucket.0.is_empty()
     }
 }
+
+pub type SewUpVec<T> = super::bucket::Bucket<usize, T>;
+
+impl<'a, V: Clone + Value> SewUpVec<V> {
+    //pub fn to_vec(&self) -> Vec<V>
+    //
+    //pub fn append(&mut self, other: &mut Vec<T, A>)
+    //pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
+    //pub fn clear(&mut self)
+    //pub fn resize_with<F>(&mut self, new_len: usize, f: F)
+    //pub fn resize(&mut self, new_len: usize, value: T)
+    //pub fn extend_from_slice(&mut self, other: &[T])
+    //pub fn dedup(&mut self)
+    //pub fn first(&self) -> Option<&T>
+    //pub fn first_mut(&mut self) -> Option<&mut T>
+    //
+    //pub fn last(&self) -> Option<&T>
+    //pub fn last_mut(&mut self) -> Option<&mut T>
+    //pub fn get_mut<I>(&mut self, index: I) -> Option<&mut <I as SliceIndex<[T]>>::Output>
+    //
+    //pub fn swap(&mut self, a: usize, b: usize)
+    //pub fn reverse(&mut self)
+    //pub fn windows(&self, size: usize) -> Windows<'_, T>
+    //pub fn chunks(&self, chunk_size: usize) -> Chunks<'_, T>
+    //pub fn chunks_mut(&mut self, chunk_size: usize) -> ChunksMut<'_, T>
+    //pub fn chunks_exact(&self, chunk_size: usize) -> ChunksExact<'_, T>
+    //pub fn chunks_exact_mut(&mut self, chunk_size: usize) -> ChunksExactMut<'_, T>
+    //pub fn contains(&self, x: &T) -> bool
+    //pub fn starts_with(&self, needle: &[T]) -> bool
+    //pub fn ends_with(&self, needle: &[T]) -> bool
+    //pub fn strip_prefix<P>(&self, prefix: &P) -> Option<&[T]>
+    //pub fn strip_suffix<P>(&self, suffix: &P) -> Option<&[T]>
+    //pub fn rotate_left(&mut self, mid: usize)
+    //pub fn rotate_right(&mut self, k: usize)
+    //pub fn fill_with<F>(&mut self, f: F)
+    //pub fn copy_from_slice(&mut self, src: &[T]) where T: Copy,
+    //pub fn sort(&mut self) where T: Ord,
+    //pub fn concat<Item>(&self) -> <[T] as Concat<Item>>::Output
+    //pub fn join<Separator>(&self, sep: Separator) -> <[T] as Join<Separator>>::Output
+}
