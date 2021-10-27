@@ -256,31 +256,66 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
 
 pub type SewUpVec<T> = super::bucket::Bucket<usize, T>;
 
+// TODO abstract the ewasm part and write test for SewUpVec
 impl<'a, V: Clone + Value> SewUpVec<V> {
-    //pub fn to_vec(&self) -> Vec<V>
-    //
-    //pub fn append(&mut self, other: &mut Vec<T, A>)
+    pub fn to_vec(&self) -> Vec<V> {
+        self.iter().map(|(_, v)| v).collect()
+    }
+
+    pub fn append(&mut self, other: &mut Vec<V>) {
+        for (i, v) in other.into_iter().enumerate() {
+            self.set(self.len() + i, v.clone());
+        }
+    }
+
     //pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
-    //pub fn clear(&mut self)
+
+    pub fn clear(&mut self) {
+        *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));
+    }
+
     //pub fn resize_with<F>(&mut self, new_len: usize, f: F)
     //pub fn resize(&mut self, new_len: usize, value: T)
-    //pub fn extend_from_slice(&mut self, other: &[T])
+
+    pub fn extend_from_slice(&mut self, other: &[V]) {
+        for (i, v) in other.into_iter().enumerate() {
+            self.set(self.len() + i, v.clone());
+        }
+    }
+
     //pub fn dedup(&mut self)
-    //pub fn first(&self) -> Option<&T>
+
+    // Following api can not implement due to the `malke_buffer` issue
+    //pub fn first(&self) -> Option<&V>
     //pub fn first_mut(&mut self) -> Option<&mut T>
-    //
     //pub fn last(&self) -> Option<&T>
     //pub fn last_mut(&mut self) -> Option<&mut T>
     //pub fn get_mut<I>(&mut self, index: I) -> Option<&mut <I as SliceIndex<[T]>>::Output>
-    //
-    //pub fn swap(&mut self, a: usize, b: usize)
+
+    pub fn swap(&mut self, a: usize, b: usize) {
+        let tmp = self.get(a).expect("swap index should exist in Vec");
+        assert!(b < self.len());
+        self.set(b, tmp.expect("swap instance should exist"));
+    }
+
     //pub fn reverse(&mut self)
     //pub fn windows(&self, size: usize) -> Windows<'_, T>
     //pub fn chunks(&self, chunk_size: usize) -> Chunks<'_, T>
     //pub fn chunks_mut(&mut self, chunk_size: usize) -> ChunksMut<'_, T>
     //pub fn chunks_exact(&self, chunk_size: usize) -> ChunksExact<'_, T>
     //pub fn chunks_exact_mut(&mut self, chunk_size: usize) -> ChunksExactMut<'_, T>
-    //pub fn contains(&self, x: &T) -> bool
+
+    // TODO: add bloom filter field for SewUpVec
+    // TODO: overwrite contains for Vec
+    // pub fn contains(&self, x: &V) -> bool {
+    //     for v in self.iter() {
+    //         if v == x {
+    //             return true;
+    //         }
+    //     }
+    //     false
+    // }
+
     //pub fn starts_with(&self, needle: &[T]) -> bool
     //pub fn ends_with(&self, needle: &[T]) -> bool
     //pub fn strip_prefix<P>(&self, prefix: &P) -> Option<&[T]>
