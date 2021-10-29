@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.3&#x2F;src&#x2F;sha2&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.4&#x2F;src&#x2F;sha2&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -511,94 +511,64 @@
 <span id="511">511</span>
 <span id="512">512</span>
 <span id="513">513</span>
-<span id="514">514</span>
-<span id="515">515</span>
-<span id="516">516</span>
-<span id="517">517</span>
-<span id="518">518</span>
-<span id="519">519</span>
-<span id="520">520</span>
-<span id="521">521</span>
-<span id="522">522</span>
-<span id="523">523</span>
-<span id="524">524</span>
-<span id="525">525</span>
-<span id="526">526</span>
-<span id="527">527</span>
-<span id="528">528</span>
-<span id="529">529</span>
-<span id="530">530</span>
-</pre><pre class="rust"><code><span class="comment">// Copyright 2012-2013 The Rust Project Developers. See the COPYRIGHT</span>
-<span class="comment">// file at the top-level directory of this distribution and at</span>
-<span class="comment">// http://rust-lang.org/COPYRIGHT.</span>
-<span class="comment">//</span>
-<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
-<span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
-<span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
-<span class="comment">// option. This file may not be copied, modified, or distributed</span>
-<span class="comment">// except according to those terms.</span>
-
-<span class="doccomment">/*!
-An implementation of the SHA-2 cryptographic hash algorithms.
-
-There are 6 standard algorithms specified in the SHA-2 standard:
-
- * `Sha224`, which is the 32-bit `Sha256` algorithm with the result truncated to 224 bits.
- * `Sha256`, which is the 32-bit `Sha256` algorithm.
- * `Sha384`, which is the 64-bit `Sha512` algorithm with the result truncated to 384 bits.
- * `Sha512`, which is the 64-bit `Sha512` algorithm.
- * `Sha512Trunc224`, which is the 64-bit `Sha512` algorithm with the result truncated to 224 bits.
- * `Sha512Trunc256`, which is the 64-bit `Sha512` algorithm with the result truncated to 256 bits.
-
-Algorithmically, there are only 2 core algorithms: `Sha256` and `Sha512`.
-All other algorithms are just applications of these with different initial hash
-values, and truncated to different digest bit lengths.
-
-# Usage
-
-An example of using `Sha256` is:
-
-```rust
-use self::cryptoxide::digest::Digest;
-use self::cryptoxide::sha2::Sha256;
-
-// create a Sha256 object
-let mut hasher = Sha256::new();
-
-// write input message
-hasher.input_str(&quot;hello world&quot;);
-
-// read hash digest
-let hex = hasher.result_str();
-
-assert_eq!(hex,
-           concat!(&quot;b94d27b9934d3e08a52e52d7da7dabfa&quot;,
-                   &quot;c484efe37a5380ee9088f7ace2efcde9&quot;));
-```
-
-An example of using `Sha512` is:
-
-```rust
-use self::cryptoxide::digest::Digest;
-use self::cryptoxide::sha2::Sha512;
-
-// create a Sha512 object
-let mut hasher = Sha512::new();
-
-// write input message
-hasher.input_str(&quot;hello world&quot;);
-
-// read hash digest
-let hex = hasher.result_str();
-
-assert_eq!(hex,
-           concat!(&quot;309ecc489c12d6eb4cc40f50c902f2b4&quot;,
-                   &quot;d0ed77ee511a7c7a9bcd3ca86d4cd86f&quot;,
-                   &quot;989dd35bc5ff499670da34255b45b0cf&quot;,
-                   &quot;d830e81f605dcf7dc5542e93ae9cd76f&quot;));
-```
-
- */</span>
+</pre><pre class="rust"><code><span class="doccomment">//! An implementation of the SHA-2 cryptographic hash algorithms.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There are 6 standard algorithms specified in the SHA-2 standard:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//!  * `Sha224`, which is the 32-bit `Sha256` algorithm with the result truncated to 224 bits.</span>
+<span class="doccomment">//!  * `Sha256`, which is the 32-bit `Sha256` algorithm.</span>
+<span class="doccomment">//!  * `Sha384`, which is the 64-bit `Sha512` algorithm with the result truncated to 384 bits.</span>
+<span class="doccomment">//!  * `Sha512`, which is the 64-bit `Sha512` algorithm.</span>
+<span class="doccomment">//!  * `Sha512Trunc224`, which is the 64-bit `Sha512` algorithm with the result truncated to 224 bits.</span>
+<span class="doccomment">//!  * `Sha512Trunc256`, which is the 64-bit `Sha512` algorithm with the result truncated to 256 bits.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! Algorithmically, there are only 2 core algorithms: `Sha256` and `Sha512`.</span>
+<span class="doccomment">//! All other algorithms are just applications of these with different initial hash</span>
+<span class="doccomment">//! values, and truncated to different digest bit lengths.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Usage</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! An example of using `Sha256` is:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use self::cryptoxide::digest::Digest;</span>
+<span class="doccomment">//! use self::cryptoxide::sha2::Sha256;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // create a Sha256 object</span>
+<span class="doccomment">//! let mut hasher = Sha256::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // write input message</span>
+<span class="doccomment">//! hasher.input_str(&quot;hello world&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // read hash digest</span>
+<span class="doccomment">//! let hex = hasher.result_str();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(hex,</span>
+<span class="doccomment">//!            concat!(&quot;b94d27b9934d3e08a52e52d7da7dabfa&quot;,</span>
+<span class="doccomment">//!                    &quot;c484efe37a5380ee9088f7ace2efcde9&quot;));</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! An example of using `Sha512` is:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```rust</span>
+<span class="doccomment">//! use self::cryptoxide::digest::Digest;</span>
+<span class="doccomment">//! use self::cryptoxide::sha2::Sha512;</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // create a Sha512 object</span>
+<span class="doccomment">//! let mut hasher = Sha512::new();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // write input message</span>
+<span class="doccomment">//! hasher.input_str(&quot;hello world&quot;);</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! // read hash digest</span>
+<span class="doccomment">//! let hex = hasher.result_str();</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! assert_eq!(hex,</span>
+<span class="doccomment">//!            concat!(&quot;309ecc489c12d6eb4cc40f50c902f2b4&quot;,</span>
+<span class="doccomment">//!                    &quot;d0ed77ee511a7c7a9bcd3ca86d4cd86f&quot;,</span>
+<span class="doccomment">//!                    &quot;989dd35bc5ff499670da34255b45b0cf&quot;,</span>
+<span class="doccomment">//!                    &quot;d830e81f605dcf7dc5542e93ae9cd76f&quot;));</span>
+<span class="doccomment">//! ```</span>
 
 <span class="kw">mod</span> <span class="ident">eng256</span>;
 <span class="kw">mod</span> <span class="ident">eng512</span>;
@@ -606,9 +576,7 @@ assert_eq!(hex,
 <span class="kw">mod</span> <span class="ident">impl512</span>;
 <span class="kw">mod</span> <span class="ident">initials</span>;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cryptoutil</span>::{
-    <span class="ident">write_u128_be</span>, <span class="ident">write_u64_be</span>, <span class="ident">FixedBuffer</span>, <span class="ident">FixedBuffer128</span>, <span class="ident">FixedBuffer64</span>, <span class="ident">StandardPadding</span>,
-};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cryptoutil</span>::{<span class="ident">write_u128_be</span>, <span class="ident">write_u64_be</span>, <span class="ident">FixedBuffer</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::digest::Digest</span>;
 <span class="kw">use</span> <span class="ident">initials</span>::<span class="kw-2">*</span>;
 
@@ -671,7 +639,7 @@ assert_eq!(hex,
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Engine512</span> {
     <span class="ident">length_bits</span>: <span class="ident">u128</span>,
-    <span class="ident">buffer</span>: <span class="ident">FixedBuffer128</span>,
+    <span class="ident">buffer</span>: <span class="ident">FixedBuffer</span><span class="op">&lt;</span><span class="number">128</span><span class="op">&gt;</span>,
     <span class="ident">state</span>: <span class="ident">eng512::Engine</span>,
     <span class="ident">finished</span>: <span class="ident">bool</span>,
 }
@@ -680,7 +648,7 @@ assert_eq!(hex,
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="ident">eng512::STATE_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Engine512</span> {
         <span class="ident">Engine512</span> {
             <span class="ident">length_bits</span>: <span class="number">0</span>,
-            <span class="ident">buffer</span>: <span class="ident">FixedBuffer128::new</span>(),
+            <span class="ident">buffer</span>: <span class="ident">FixedBuffer::new</span>(),
             <span class="ident">state</span>: <span class="ident">eng512::Engine::new</span>(<span class="ident">h</span>),
             <span class="ident">finished</span>: <span class="bool-val">false</span>,
         }
@@ -697,8 +665,7 @@ assert_eq!(hex,
         <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
         <span class="self">self</span>.<span class="ident">length_bits</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">input</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u128</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="kw">let</span> <span class="ident">self_state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>;
-        <span class="self">self</span>.<span class="ident">buffer</span>
-            .<span class="ident">input</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
+        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">input</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
     }
 
     <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -708,7 +675,7 @@ assert_eq!(hex,
 
         <span class="kw">let</span> <span class="ident">self_state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>;
         <span class="self">self</span>.<span class="ident">buffer</span>
-            .<span class="ident">standard_padding</span>(<span class="number">16</span>, <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
+            .<span class="ident">standard_padding</span>(<span class="number">16</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
         <span class="ident">write_u128_be</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">next</span>(<span class="number">16</span>), <span class="self">self</span>.<span class="ident">length_bits</span>);
         <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">full_buffer</span>());
 
@@ -721,7 +688,7 @@ assert_eq!(hex,
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">struct</span> <span class="ident">Engine256</span> {
     <span class="ident">length_bits</span>: <span class="ident">u64</span>,
-    <span class="ident">buffer</span>: <span class="ident">FixedBuffer64</span>,
+    <span class="ident">buffer</span>: <span class="ident">FixedBuffer</span><span class="op">&lt;</span><span class="number">64</span><span class="op">&gt;</span>,
     <span class="ident">state</span>: <span class="ident">eng256::Engine</span>,
     <span class="ident">finished</span>: <span class="ident">bool</span>,
 }
@@ -730,7 +697,7 @@ assert_eq!(hex,
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">h</span>: <span class="kw-2">&amp;</span>[<span class="ident">u32</span>; <span class="ident">eng256::STATE_LEN</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Engine256</span> {
         <span class="ident">Engine256</span> {
             <span class="ident">length_bits</span>: <span class="number">0</span>,
-            <span class="ident">buffer</span>: <span class="ident">FixedBuffer64::new</span>(),
+            <span class="ident">buffer</span>: <span class="ident">FixedBuffer::new</span>(),
             <span class="ident">state</span>: <span class="ident">eng256::Engine::new</span>(<span class="ident">h</span>),
             <span class="ident">finished</span>: <span class="bool-val">false</span>,
         }
@@ -747,8 +714,7 @@ assert_eq!(hex,
         <span class="macro">assert!</span>(<span class="op">!</span><span class="self">self</span>.<span class="ident">finished</span>);
         <span class="self">self</span>.<span class="ident">length_bits</span> <span class="op">+</span><span class="op">=</span> (<span class="ident">input</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">u64</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">3</span>;
         <span class="kw">let</span> <span class="ident">self_state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>;
-        <span class="self">self</span>.<span class="ident">buffer</span>
-            .<span class="ident">input</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
+        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">input</span>(<span class="ident">input</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
     }
 
     <span class="kw">fn</span> <span class="ident">finish</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
@@ -758,7 +724,7 @@ assert_eq!(hex,
 
         <span class="kw">let</span> <span class="ident">self_state</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">state</span>;
         <span class="self">self</span>.<span class="ident">buffer</span>
-            .<span class="ident">standard_padding</span>(<span class="number">8</span>, <span class="op">|</span><span class="ident">input</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]<span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
+            .<span class="ident">standard_padding</span>(<span class="number">8</span>, <span class="op">|</span><span class="ident">input</span><span class="op">|</span> <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="ident">input</span>));
         <span class="ident">write_u64_be</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">next</span>(<span class="number">8</span>), <span class="self">self</span>.<span class="ident">length_bits</span>);
         <span class="ident">self_state</span>.<span class="ident">blocks</span>(<span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">full_buffer</span>());
 

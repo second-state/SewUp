@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Hmac","The Hmac struct represents an Hmac function - a Message Authentication Code using a Digest."]]});
+initSidebarItems({"struct":[["Hmac","HMAC context parametrized by the hashing function"]]});

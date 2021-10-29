@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.3&#x2F;src&#x2F;pbkdf2.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pbkdf2.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.4&#x2F;src&#x2F;pbkdf2.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pbkdf2.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -100,16 +100,61 @@
 <span id="100">100</span>
 <span id="101">101</span>
 <span id="102">102</span>
-</pre><pre class="rust"><code><span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This module implements the PBKDF2 Key Derivation Function as specified in [Specification][1].</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Examples</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//! use cryptoxide::{pbkdf2::pbkdf2, hmac::Hmac, sha2::Sha256};</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! let password = b&quot;password&quot;;</span>
+<span class="doccomment">//! let salt = b&quot;salt&quot;;</span>
+<span class="doccomment">//! let c = 2;</span>
+<span class="doccomment">//! let mut out = [0u8; 64];</span>
+<span class="doccomment">//! pbkdf2(&amp;mut Hmac::new(Sha256::new(), password), salt, c, &amp;mut out);</span>
+<span class="doccomment">//! ```</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [1]: &lt;https://tools.ietf.org/html/rfc2898&gt;</span>
+
+<span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
 <span class="comment">// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
 <span class="comment">// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your</span>
 <span class="comment">// option. This file may not be copied, modified, or distributed</span>
 <span class="comment">// except according to those terms.</span>
-
-<span class="doccomment">/*!
- * This module implements the PBKDF2 Key Derivation Function as specified by
- * &lt;http://tools.ietf.org/html/rfc2898&gt;.
- */</span>
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::cryptoutil</span>::{<span class="ident">copy_memory</span>, <span class="ident">write_u32_be</span>};
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::mac::Mac</span>;
@@ -200,6 +245,29 @@
             <span class="kw">let</span> <span class="ident">chunk_len</span> <span class="op">=</span> <span class="ident">chunk</span>.<span class="ident">len</span>();
             <span class="ident">copy_memory</span>(<span class="kw-2">&amp;</span><span class="ident">tmp</span>[..<span class="ident">chunk_len</span>], <span class="ident">chunk</span>);
         }
+    }
+}
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="kw">mod</span> <span class="ident">test</span> {
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::pbkdf2</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::hmac::Hmac</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::sha1::Sha1</span>;
+
+    <span class="attribute">#[<span class="ident">test</span>]</span>
+    <span class="kw">fn</span> <span class="ident">test1</span>() {
+        <span class="kw">let</span> <span class="ident">password</span> <span class="op">=</span> <span class="string">b&quot;password&quot;</span>;
+        <span class="kw">let</span> <span class="ident">salt</span> <span class="op">=</span> <span class="string">b&quot;salt&quot;</span>;
+        <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="number">2</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">out</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">20</span>];
+        <span class="ident">pbkdf2</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Hmac::new</span>(<span class="ident">Sha1::new</span>(), <span class="ident">password</span>), <span class="ident">salt</span>, <span class="ident">c</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">out</span>);
+        <span class="macro">assert_eq!</span>(
+            <span class="ident">out</span>,
+            [
+                <span class="number">0xea</span>, <span class="number">0x6c</span>, <span class="number">0x01</span>, <span class="number">0x4d</span>, <span class="number">0xc7</span>, <span class="number">0x2d</span>, <span class="number">0x6f</span>, <span class="number">0x8c</span>, <span class="number">0xcd</span>, <span class="number">0x1e</span>, <span class="number">0xd9</span>, <span class="number">0x2a</span>, <span class="number">0xce</span>, <span class="number">0x1d</span>,
+                <span class="number">0x41</span>, <span class="number">0xf0</span>, <span class="number">0xd8</span>, <span class="number">0xde</span>, <span class="number">0x89</span>, <span class="number">0x57</span>
+            ]
+        )
     }
 }
 </code></pre></div>

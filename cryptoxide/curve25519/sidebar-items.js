@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["curve25519",""],["curve25519_base",""],["ge_scalarmult_base",""],["sc_muladd",""],["sc_reduce",""]],"struct":[["Fe",""],["GeCached",""],["GeP1P1",""],["GeP2",""],["GeP3",""],["GePrecomp",""]]});
+initSidebarItems({"fn":[["curve25519","Computes a shared secret from the curve25519 private key (n) and public key (p)"],["curve25519_base","Derives a public key from a private key"]]});

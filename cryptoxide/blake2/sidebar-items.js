@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["LastBlock",""]],"struct":[["EngineB","Blake2b Context"],["EngineS","Blake2s Context"]]});
+initSidebarItems({"enum":[["LastBlock","Parameter when hashing the last block for the engine compress function"]],"struct":[["EngineB","Blake2b Context"],["EngineS","Blake2s Context"]]});
