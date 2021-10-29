@@ -21,7 +21,7 @@ pub trait Key: Clone + Sized + Serialize + DeserializeOwned {
     fn from_row_key(r: &Row) -> Result<Self> {
         let buffer: &[u8] = r.borrow();
         let header = buffer[0] as usize;
-        let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header + 1])
+        let instance: Self = bincode::deserialize(&buffer[1..buffer.len() - header])
             .expect("load binary to key fail");
         Ok(instance)
     }
