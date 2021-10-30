@@ -9,7 +9,6 @@ use super::traits::{Key, Value};
 use crate::kv::traits::key::AsHashKey;
 use crate::types::{Raw, Row};
 
-// TODO: quick for first iteration
 /// `RawBucket` is a structure the data format really store
 /// The hash key is stored in the first item, and the `Key` and `Value` are
 /// stored in the second item
@@ -256,13 +255,70 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
 
 pub type SewUpVec<T> = super::bucket::Bucket<usize, T>;
 
-// TODO abstract the ewasm part and write test for SewUpVec
-impl<'a, V: Clone + Value> SewUpVec<V> {
-    pub fn to_vec(&self) -> Vec<V> {
+pub trait VecLike<V> {
+    fn to_vec(&self) -> Vec<V>;
+    fn append(&mut self, other: &mut Vec<V>);
+    //fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
+    fn clear(&mut self);
+    fn resize_with<F>(&mut self, new_len: usize, f: F)
+    where
+        F: FnMut() -> V;
+    fn resize(&mut self, new_len: usize, value: V);
+    fn extend_from_slice(&mut self, other: &[V]);
+    fn dedup(&mut self);
+
+    // Following api can not implement due to the `malke_buffer` issue
+    // fn first(&self) -> Option<&V>
+    // fn first_mut(&mut self) -> Option<&mut T>
+    // fn last(&self) -> Option<&T>
+    // fn last_mut(&mut self) -> Option<&mut T>
+    // fn get_mut<I>(&mut self, index: I) -> Option<&mut <I as SliceIndex<[T]>>::Output>
+
+    fn swap(&mut self, a: usize, b: usize);
+
+    fn reverse(&mut self);
+
+    // fn windows(&self, size: usize) -> Windows<'_, V>;
+    // fn chunks(&self, chunk_size: usize) -> Chunks<'_, V>;
+    // fn chunks_mut(&mut self, chunk_size: usize) -> ChunksMut<'_, V>;
+    // fn chunks_exact(&self, chunk_size: usize) -> ChunksExact<'_, V>;
+    // fn chunks_exact_mut(&mut self, chunk_size: usize) -> ChunksExactMut<'_, V>;
+
+    fn contains(&self, x: &V) -> bool;
+    fn starts_with(&self, needle: &[V]) -> bool;
+    fn ends_with(&self, needle: &[V]) -> bool;
+    // fn strip_prefix<P>(&self, prefix: &P) -> Option<&[V]>;
+    // fn strip_suffix<P>(&self, suffix: &P) -> Option<&[V]>;
+    fn rotate_left(&mut self, mid: usize);
+    fn rotate_right(&mut self, k: usize);
+    fn fill_with<F>(&mut self, f: F)
+    where
+        F: FnMut() -> V;
+    fn copy_from_slice(&mut self, src: &[V])
+    where
+        V: Copy;
+    fn sort(&mut self)
+    where
+        V: Ord;
+    fn truncate(&mut self, len: usize);
+    // fn concat<Item>(&self) -> <[V] as Concat<Item>>::Output Item: ?Sized, [V]: Concat<Item>,
+    // fn join<Separator>(&self, sep: Separator) -> <[T] as Join<Separator>>::Output
+}
+
+impl<V: Clone + Value> SewUpVec<V> {
+    fn from_vec(&mut self, v: Vec<V>) {
+        *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));
+        v.into_iter().enumerate().map(|(i, v)| self.set(i, v));
+    }
+}
+
+// TODO: check thiese function can be done without from_vec method
+impl<V: Clone + Value + PartialEq> VecLike<V> for SewUpVec<V> {
+    fn to_vec(&self) -> Vec<V> {
         self.iter().map(|(_, v)| v).collect()
     }
 
-    pub fn append(&mut self, other: &mut Vec<V>) {
+    fn append(&mut self, other: &mut Vec<V>) {
         for (i, v) in other.into_iter().enumerate() {
             self.set(self.len() + i, v.clone());
         }
@@ -270,61 +326,122 @@ impl<'a, V: Clone + Value> SewUpVec<V> {
 
     //pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
 
-    pub fn clear(&mut self) {
+    fn clear(&mut self) {
         *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));
     }
 
-    //pub fn resize_with<F>(&mut self, new_len: usize, f: F)
-    //pub fn resize(&mut self, new_len: usize, value: T)
+    fn resize_with<F>(&mut self, new_len: usize, mut f: F)
+    where
+        F: FnMut() -> V,
+    {
+        let len = self.len();
+        if new_len > len {
+            for i in len..new_len {
+                self.set(i, f());
+            }
+        } else {
+            self.truncate(new_len);
+        }
+    }
 
-    pub fn extend_from_slice(&mut self, other: &[V]) {
+    fn resize(&mut self, new_len: usize, value: V) {
+        let len = self.len();
+        if new_len > len {
+            for i in len..new_len {
+                self.set(i, value.clone());
+            }
+        } else {
+            self.truncate(new_len);
+        }
+    }
+
+    fn extend_from_slice(&mut self, other: &[V]) {
         for (i, v) in other.into_iter().enumerate() {
             self.set(self.len() + i, v.clone());
         }
     }
 
-    //pub fn dedup(&mut self)
+    fn dedup(&mut self) {
+        let mut v = self.to_vec();
+        v.dedup();
+        self.from_vec(v);
+    }
 
-    // Following api can not implement due to the `malke_buffer` issue
-    //pub fn first(&self) -> Option<&V>
-    //pub fn first_mut(&mut self) -> Option<&mut T>
-    //pub fn last(&self) -> Option<&T>
-    //pub fn last_mut(&mut self) -> Option<&mut T>
-    //pub fn get_mut<I>(&mut self, index: I) -> Option<&mut <I as SliceIndex<[T]>>::Output>
-
-    pub fn swap(&mut self, a: usize, b: usize) {
+    fn swap(&mut self, a: usize, b: usize) {
         let tmp = self.get(a).expect("swap index should exist in Vec");
         assert!(b < self.len());
         self.set(b, tmp.expect("swap instance should exist"));
     }
 
-    //pub fn reverse(&mut self)
-    //pub fn windows(&self, size: usize) -> Windows<'_, T>
-    //pub fn chunks(&self, chunk_size: usize) -> Chunks<'_, T>
-    //pub fn chunks_mut(&mut self, chunk_size: usize) -> ChunksMut<'_, T>
-    //pub fn chunks_exact(&self, chunk_size: usize) -> ChunksExact<'_, T>
-    //pub fn chunks_exact_mut(&mut self, chunk_size: usize) -> ChunksExactMut<'_, T>
+    fn reverse(&mut self) {
+        let mut v = self.to_vec();
+        v.reverse();
+        self.from_vec(v);
+    }
 
     // TODO: add bloom filter field for SewUpVec
-    // TODO: overwrite contains for Vec
-    // pub fn contains(&self, x: &V) -> bool {
-    //     for v in self.iter() {
-    //         if v == x {
-    //             return true;
-    //         }
-    //     }
-    //     false
-    // }
+    fn contains(&self, x: &V) -> bool {
+        for (_, v) in self.iter() {
+            if v == *x {
+                return true;
+            }
+        }
+        false
+    }
 
-    //pub fn starts_with(&self, needle: &[T]) -> bool
-    //pub fn ends_with(&self, needle: &[T]) -> bool
-    //pub fn strip_prefix<P>(&self, prefix: &P) -> Option<&[T]>
-    //pub fn strip_suffix<P>(&self, suffix: &P) -> Option<&[T]>
-    //pub fn rotate_left(&mut self, mid: usize)
-    //pub fn rotate_right(&mut self, k: usize)
-    //pub fn fill_with<F>(&mut self, f: F)
-    //pub fn copy_from_slice(&mut self, src: &[T]) where T: Copy,
-    //pub fn sort(&mut self) where T: Ord,
-    //pub fn concat<Item>(&self) -> <[T] as Concat<Item>>::Output
-    //pub fn join<Separator>(&self, sep: Separator) -> <[T] as Join<Separator>>::Output
+    fn starts_with(&self, needle: &[V]) -> bool {
+        self.to_vec().starts_with(needle)
+    }
+
+    fn ends_with(&self, needle: &[V]) -> bool {
+        self.to_vec().ends_with(needle)
+    }
+
+    fn rotate_left(&mut self, mid: usize) {
+        let mut v = self.to_vec();
+        v.rotate_left(mid);
+        self.from_vec(v);
+    }
+
+    fn rotate_right(&mut self, k: usize) {
+        let mut v = self.to_vec();
+        v.rotate_right(k);
+        self.from_vec(v);
+    }
+
+    fn fill_with<F>(&mut self, mut f: F)
+    where
+        F: FnMut() -> V,
+    {
+        for i in 0..self.len() {
+            self.set(i, f());
+        }
+    }
+
+    fn copy_from_slice(&mut self, src: &[V])
+    where
+        V: Copy,
+    {
+        let mut v = self.to_vec();
+        v.copy_from_slice(src);
+        self.from_vec(v);
+    }
+
+    fn sort(&mut self)
+    where
+        V: Ord,
+    {
+        let mut v = self.to_vec();
+        v.sort();
+        self.from_vec(v);
+    }
+
+    fn truncate(&mut self, len: usize) {
+        if len > self.len() {
+            return;
+        }
+        for i in self.len()..len {
+            self.remove(i);
+        }
+    }
 }
