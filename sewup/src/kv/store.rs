@@ -104,8 +104,8 @@ impl Store {
         Ok(())
     }
 
-    /// A contiguous growable array type with Bucket<usize, T>, written `SewUpVec<T>`.
-    ///
+    /// A contiguous growable array type with `Bucket<usize, T>`, written `SewUpVec<T>`.
+    /// Use traits [`sewup::kv::traits::VecLike`] for more vec like methods for `SewUpVec<T>`
     /// Vectors ensure they never allocate more than `usize::MAX`.
     ///
     /// ```
