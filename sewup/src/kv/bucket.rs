@@ -5,11 +5,10 @@ use std::marker::PhantomData;
 
 use anyhow::Result;
 
-use super::traits::{Key, Value};
+use super::traits::{Key, Value, VecLike};
 use crate::kv::traits::key::AsHashKey;
 use crate::types::{Raw, Row};
 
-// TODO: quick for first iteration
 /// `RawBucket` is a structure the data format really store
 /// The hash key is stored in the first item, and the `Key` and `Value` are
 /// stored in the second item
@@ -251,5 +250,162 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
     /// Check there is something in the bucket
     pub fn is_empty(&self) -> bool {
         self.raw_bucket.0.is_empty()
+    }
+}
+
+pub type SewUpVec<T> = super::bucket::Bucket<usize, T>;
+
+impl<V: Clone + Value> SewUpVec<V> {
+    fn from_vec(&mut self, v: Vec<V>) {
+        *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));
+        v.into_iter().enumerate().map(|(i, v)| self.set(i, v));
+    }
+}
+
+// TODO: check thiese function can be done without from_vec method
+impl<V: Clone + Value + PartialEq> VecLike<V> for SewUpVec<V> {
+    fn to_vec(&self) -> Vec<V> {
+        self.iter().map(|(_, v)| v).collect()
+    }
+
+    fn append(&mut self, other: &mut Vec<V>) {
+        for (i, v) in other.into_iter().enumerate() {
+            self.set(self.len() + i, v.clone());
+        }
+    }
+
+    fn push(&mut self, value: V) {
+        self.set(self.len(), value);
+    }
+
+    fn pop(&mut self) -> Option<V> {
+        // TODO refactor this when `pop` of bucket implemented
+        let len = self.len();
+        if len == 0 {
+            None
+        } else {
+            let v = self.get(len - 1).expect("there should be value");
+            self.remove(len - 1);
+            v
+        }
+    }
+
+    fn clear(&mut self) {
+        *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));
+    }
+
+    fn resize_with<F>(&mut self, new_len: usize, mut f: F)
+    where
+        F: FnMut() -> V,
+    {
+        let len = self.len();
+        if new_len > len {
+            for i in len..new_len {
+                self.set(i, f());
+            }
+        } else {
+            self.truncate(new_len);
+        }
+    }
+
+    fn resize(&mut self, new_len: usize, value: V) {
+        let len = self.len();
+        if new_len > len {
+            for i in len..new_len {
+                self.set(i, value.clone());
+            }
+        } else {
+            self.truncate(new_len);
+        }
+    }
+
+    fn extend_from_slice(&mut self, other: &[V]) {
+        for (i, v) in other.into_iter().enumerate() {
+            self.set(self.len() + i, v.clone());
+        }
+    }
+
+    fn dedup(&mut self) {
+        let mut v = self.to_vec();
+        v.dedup();
+        self.from_vec(v);
+    }
+
+    fn swap(&mut self, a: usize, b: usize) {
+        let tmp = self.get(a).expect("swap index should exist in Vec");
+        assert!(b < self.len());
+        self.set(b, tmp.expect("swap instance should exist"));
+    }
+
+    fn reverse(&mut self) {
+        let mut v = self.to_vec();
+        v.reverse();
+        self.from_vec(v);
+    }
+
+    // TODO: add bloom filter field for SewUpVec
+    fn contains(&self, x: &V) -> bool {
+        for (_, v) in self.iter() {
+            if v == *x {
+                return true;
+            }
+        }
+        false
+    }
+
+    fn starts_with(&self, needle: &[V]) -> bool {
+        self.to_vec().starts_with(needle)
+    }
+
+    fn ends_with(&self, needle: &[V]) -> bool {
+        self.to_vec().ends_with(needle)
+    }
+
+    fn rotate_left(&mut self, mid: usize) {
+        let mut v = self.to_vec();
+        v.rotate_left(mid);
+        self.from_vec(v);
+    }
+
+    fn rotate_right(&mut self, k: usize) {
+        let mut v = self.to_vec();
+        v.rotate_right(k);
+        self.from_vec(v);
+    }
+
+    fn fill_with<F>(&mut self, mut f: F)
+    where
+        F: FnMut() -> V,
+    {
+        for i in 0..self.len() {
+            self.set(i, f());
+        }
+    }
+
+    fn copy_from_slice(&mut self, src: &[V])
+    where
+        V: Copy,
+    {
+        let mut v = self.to_vec();
+        v.copy_from_slice(src);
+        self.from_vec(v);
+    }
+
+    fn sort(&mut self)
+    where
+        V: Ord,
+    {
+        let mut v = self.to_vec();
+        v.sort();
+        self.from_vec(v);
+    }
+
+    fn truncate(&mut self, len: usize) {
+        if len > self.len() {
+            return;
+        }
+        for i in self.len()..len {
+            self.remove(i);
+        }
     }
 }

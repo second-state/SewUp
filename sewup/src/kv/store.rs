@@ -8,7 +8,7 @@ use crate::kv::{
 };
 use crate::utils::storage_index_to_addr;
 
-use super::bucket::{Bucket, RawBucket};
+use super::bucket::{Bucket, RawBucket, SewUpVec};
 use anyhow::Result;
 use ewasm_api::{storage_load, storage_store};
 
@@ -102,6 +102,28 @@ impl Store {
         let name = name.as_ref().to_string();
         self.tenants.remove(&name);
         Ok(())
+    }
+
+    /// A contiguous growable array type with `Bucket<usize, T>`, written `SewUpVec<T>`.
+    /// Use traits [`sewup::kv::traits::VecLike`] for more vec like methods for `SewUpVec<T>`
+    /// Vectors ensure they never allocate more than `usize::MAX`.
+    ///
+    /// ```
+    /// let mut storage = sewup::kv::Store::new().unwrap();
+    /// let v = storage.vec::<SimpleStruct>("vector1").unwrap();
+    /// ```
+    pub fn vec<'a, V: Default + Clone + Value>(&mut self, name: &str) -> Result<SewUpVec<V>> {
+        let raw_bucket = if self.tenants.contains_key(name) {
+            if let Some(bucket) = self.tenants.get_mut(name).unwrap().take() {
+                bucket
+            } else {
+                return Err(Error::BucketAlreadyOpen.into());
+            }
+        } else {
+            self.tenants.insert(name.into(), None);
+            (Vec::new(), Vec::new())
+        };
+        Ok(Bucket::new(name.into(), raw_bucket))
     }
 
     /// Returns the size on load
