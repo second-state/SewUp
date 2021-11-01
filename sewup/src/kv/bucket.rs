@@ -258,7 +258,11 @@ pub type SewUpVec<T> = super::bucket::Bucket<usize, T>;
 pub trait VecLike<V> {
     fn to_vec(&self) -> Vec<V>;
     fn append(&mut self, other: &mut Vec<V>);
+    fn push(&mut self, value: V);
+    fn pop(&mut self) -> Option<V>;
+
     //fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
+
     fn clear(&mut self);
     fn resize_with<F>(&mut self, new_len: usize, f: F)
     where
@@ -324,7 +328,21 @@ impl<V: Clone + Value + PartialEq> VecLike<V> for SewUpVec<V> {
         }
     }
 
-    //pub fn drain<R>(&mut self, range: R) -> Drain<'_, T, A>
+    fn push(&mut self, value: V) {
+        self.set(self.len(), value);
+    }
+
+    fn pop(&mut self) -> Option<V> {
+        // TODO refactor this when `pop` of bucket implemented
+        let len = self.len();
+        if len == 0 {
+            None
+        } else {
+            let v = self.get(len - 1).expect("there should be value");
+            self.remove(len - 1);
+            v
+        }
+    }
 
     fn clear(&mut self) {
         *self = super::bucket::Bucket::<usize, V>::new(self.name.clone(), (Vec::new(), Vec::new()));

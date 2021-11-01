@@ -104,14 +104,9 @@ impl Store {
         Ok(())
     }
 
-    /// A contiguous growable array type with Bucket<usize, T>, written `Vec<T>`.
+    /// A contiguous growable array type with Bucket<usize, T>, written `SewUpVec<T>`.
     ///
-    /// Vectors have `O(1)` indexing, amortized `O(1)` push (to the end) and
-    /// `O(1)` pop (from the end).
-    ///
-    /// Vectors ensure they never allocate more than `usize::MAX` bytes32.
-    ///
-    /// # Examples
+    /// Vectors ensure they never allocate more than `usize::MAX`.
     ///
     /// ```
     /// let mut storage = sewup::kv::Store::new().unwrap();
