@@ -68,26 +68,29 @@ async fn main() -> Result<()> {
         if sub_command == "init"
             || (sub_command == "sewup" && opt.second_argument == Some("init".into()))
         {
-            init::run(opt.mode.unwrap_or_default()).await
-        } else {
+            return init::run(opt.mode.unwrap_or_default()).await;
+        } else if sub_command != "sewup" && opt.second_argument.is_none() {
             println!("Unknown sub command {:?}", sub_command);
-            Ok(())
+            return Ok(());
+        } else if sub_command == "sewup" && opt.second_argument.is_some() {
+            println!("Unknown sub command {:?}", opt.second_argument.unwrap());
+            return Ok(());
         }
-    } else {
-        return if let Some(inspect_file) = opt.inspect_file {
-            inspect::run(inspect_file).await
-        } else if opt.generate_abi {
-            generate::run().await
-        } else {
-            let contract_name = build::run(opt.debug).await?;
-
-            if !opt.build_only {
-                if opt.verbose {
-                    println!("contract  : {}", contract_name);
-                }
-                deploy::run(contract_name, opt.verbose, opt.debug).await?;
-            }
-            Ok(())
-        };
     }
+
+    return if let Some(inspect_file) = opt.inspect_file {
+        inspect::run(inspect_file).await
+    } else if opt.generate_abi {
+        generate::run().await
+    } else {
+        let contract_name = build::run(opt.debug).await?;
+
+        if !opt.build_only {
+            if opt.verbose {
+                println!("contract  : {}", contract_name);
+            }
+            deploy::run(contract_name, opt.verbose, opt.debug).await?;
+        }
+        Ok(())
+    };
 }
