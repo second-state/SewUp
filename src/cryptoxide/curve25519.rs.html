@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.5&#x2F;src&#x2F;curve25519.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>curve25519.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;cryptoxide-0.3.6&#x2F;src&#x2F;curve25519.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>curve25519.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../cryptoxide/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -6132,6 +6132,21 @@
 <span id="6132">6132</span>
 <span id="6133">6133</span>
 <span id="6134">6134</span>
+<span id="6135">6135</span>
+<span id="6136">6136</span>
+<span id="6137">6137</span>
+<span id="6138">6138</span>
+<span id="6139">6139</span>
+<span id="6140">6140</span>
+<span id="6141">6141</span>
+<span id="6142">6142</span>
+<span id="6143">6143</span>
+<span id="6144">6144</span>
+<span id="6145">6145</span>
+<span id="6146">6146</span>
+<span id="6147">6147</span>
+<span id="6148">6148</span>
+<span id="6149">6149</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Curve25519 elliptic curve diffie hellman (X25519)</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Curve25519 elliptic curve from [Specification][1], and extra information also on [Wikipedia][2]</span>
@@ -6173,7 +6188,8 @@ Bounds on each t[i] vary depending on context.
 */</span>
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">Fe</span>(<span class="kw">pub</span> [<span class="ident">i32</span>; <span class="number">10</span>]);
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Fe</span>(<span class="kw">pub</span> [<span class="ident">i32</span>; <span class="number">10</span>]);
 
 <span class="kw">impl</span> <span class="ident">PartialEq</span> <span class="kw">for</span> <span class="ident">Fe</span> {
     <span class="kw">fn</span> <span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Fe</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -6586,8 +6602,9 @@ Bounds on each t[i] vary depending on context.
 }
 
 <span class="kw">impl</span> <span class="ident">Fe</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fe</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_bytes</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fe</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h0</span> <span class="op">=</span> <span class="ident">load_4i</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">0</span>..<span class="number">4</span>]);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h1</span> <span class="op">=</span> <span class="ident">load_3i</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">4</span>..<span class="number">7</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">6</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h2</span> <span class="op">=</span> <span class="ident">load_3i</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">7</span>..<span class="number">10</span>]) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">5</span>;
@@ -6640,8 +6657,9 @@ Bounds on each t[i] vary depending on context.
       so floor(2^(-255)(h + 19 2^(-25) h9 + 2^(-1))) = q.
     */</span>
 
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="ident">Fe</span>(<span class="ident">es</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h0</span> <span class="op">=</span> <span class="ident">es</span>[<span class="number">0</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">h1</span> <span class="op">=</span> <span class="ident">es</span>[<span class="number">1</span>];
@@ -6725,7 +6743,8 @@ Bounds on each t[i] vary depending on context.
         ]
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">maybe_swap_with</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fe</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maybe_swap_with</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fe</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fe</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fe</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="ident">other</span>;
         <span class="kw">let</span> <span class="ident">f0</span> <span class="op">=</span> <span class="ident">f</span>[<span class="number">0</span>];
@@ -6795,7 +6814,8 @@ Bounds on each t[i] vary depending on context.
         ]);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Fe</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">Fe</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Fe</span>(<span class="ident">f</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="ident">Fe</span>(<span class="ident">g</span>) <span class="op">=</span> <span class="ident">other</span>;
         <span class="kw">let</span> <span class="ident">f0</span> <span class="op">=</span> <span class="ident">f</span>[<span class="number">0</span>];
@@ -7162,7 +7182,8 @@ Bounds on each t[i] vary depending on context.
             <span class="ident">h5</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">h6</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">h7</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">h8</span> <span class="kw">as</span> <span class="ident">i32</span>, <span class="ident">h9</span> <span class="kw">as</span> <span class="ident">i32</span>])
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">invert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fe</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">invert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Fe</span> {
         <span class="kw">let</span> <span class="ident">z1</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">clone</span>();
 
         <span class="comment">/* qhasm: z2 = z1^2^1 */</span>
@@ -7282,7 +7303,8 @@ Bounds on each t[i] vary depending on context.
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GeP2</span> {
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GeP2</span> {
     <span class="ident">x</span>: <span class="ident">Fe</span>,
     <span class="ident">y</span>: <span class="ident">Fe</span>,
     <span class="ident">z</span>: <span class="ident">Fe</span>,
@@ -7298,7 +7320,8 @@ Bounds on each t[i] vary depending on context.
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GeP1P1</span> {
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GeP1P1</span> {
     <span class="ident">x</span>: <span class="ident">Fe</span>,
     <span class="ident">y</span>: <span class="ident">Fe</span>,
     <span class="ident">z</span>: <span class="ident">Fe</span>,
@@ -7306,14 +7329,16 @@ Bounds on each t[i] vary depending on context.
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GePrecomp</span> {
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GePrecomp</span> {
     <span class="ident">y_plus_x</span>: <span class="ident">Fe</span>,
     <span class="ident">y_minus_x</span>: <span class="ident">Fe</span>,
     <span class="ident">xy2d</span>: <span class="ident">Fe</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct</span> <span class="ident">GeCached</span> {
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GeCached</span> {
     <span class="ident">y_plus_x</span>: <span class="ident">Fe</span>,
     <span class="ident">y_minus_x</span>: <span class="ident">Fe</span>,
     <span class="ident">z</span>: <span class="ident">Fe</span>,
@@ -7321,7 +7346,8 @@ Bounds on each t[i] vary depending on context.
 }
 
 <span class="kw">impl</span> <span class="ident">GeP1P1</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_p2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeP2</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_p2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeP2</span> {
         <span class="ident">GeP2</span> {
             <span class="ident">x</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">t</span>,
             <span class="ident">y</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">z</span>,
@@ -7348,7 +7374,8 @@ Bounds on each t[i] vary depending on context.
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="kw">let</span> <span class="ident">recip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">invert</span>();
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
@@ -7415,11 +7442,8 @@ Bounds on each t[i] vary depending on context.
     and b = b[0]+256*b[1]+...+256^31 b[31].
     B is the Ed25519 base point (x,4/5) with x positive.
     */</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">double_scalarmult_vartime</span>(
-        <span class="ident">a_scalar</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-        <span class="ident">a_point</span>: <span class="ident">GeP3</span>,
-        <span class="ident">b_scalar</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeP2</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">double_scalarmult_vartime</span>(<span class="ident">a_scalar</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">a_point</span>: <span class="ident">GeP3</span>, <span class="ident">b_scalar</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeP2</span> {
         <span class="kw">let</span> <span class="ident">aslide</span> <span class="op">=</span> <span class="ident">GeP2::slide</span>(<span class="ident">a_scalar</span>);
         <span class="kw">let</span> <span class="ident">bslide</span> <span class="op">=</span> <span class="ident">GeP2::slide</span>(<span class="ident">b_scalar</span>);
 
@@ -7517,7 +7541,8 @@ Bounds on each t[i] vary depending on context.
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_cached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeCached</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_cached</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GeCached</span> {
         <span class="ident">GeCached</span> {
             <span class="ident">y_plus_x</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">+</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x</span>,
             <span class="ident">y_minus_x</span>: <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">-</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x</span>,
@@ -7539,7 +7564,8 @@ Bounds on each t[i] vary depending on context.
         <span class="self">self</span>.<span class="ident">to_p2</span>().<span class="ident">dbl</span>()
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="number">32</span>] {
         <span class="kw">let</span> <span class="ident">recip</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">z</span>.<span class="ident">invert</span>();
         <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">x</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
         <span class="kw">let</span> <span class="ident">y</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">y</span> <span class="op">*</span> <span class="kw-2">&amp;</span><span class="ident">recip</span>;
@@ -7699,13 +7725,15 @@ Bounds on each t[i] vary depending on context.
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">GePrecomp</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">GePrecomp</span>, <span class="ident">do_swap</span>: <span class="ident">i32</span>) {
         <span class="self">self</span>.<span class="ident">y_plus_x</span>.<span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">y_plus_x</span>, <span class="ident">do_swap</span>);
         <span class="self">self</span>.<span class="ident">y_minus_x</span>.<span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">y_minus_x</span>, <span class="ident">do_swap</span>);
         <span class="self">self</span>.<span class="ident">xy2d</span>.<span class="ident">maybe_set</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">xy2d</span>, <span class="ident">do_swap</span>);
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">select</span>(<span class="ident">pos</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GePrecomp</span> {
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">select</span>(<span class="ident">pos</span>: <span class="ident">usize</span>, <span class="ident">b</span>: <span class="ident">i8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GePrecomp</span> {
         <span class="kw">let</span> <span class="ident">bnegative</span> <span class="op">=</span> (<span class="ident">b</span> <span class="kw">as</span> <span class="ident">u8</span>) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">7</span>;
         <span class="kw">let</span> <span class="ident">babs</span>: <span class="ident">u8</span> <span class="op">=</span> (<span class="ident">b</span> <span class="op">-</span> (((<span class="op">-</span>(<span class="ident">bnegative</span> <span class="kw">as</span> <span class="ident">i8</span>)) <span class="op">&amp;</span> <span class="ident">b</span>) <span class="op">&lt;</span><span class="op">&lt;</span> <span class="number">1</span>)) <span class="kw">as</span> <span class="ident">u8</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">t</span> <span class="op">=</span> <span class="ident">GePrecomp::zero</span>();
@@ -7794,8 +7822,9 @@ Output:
     where l = 2^252 + 27742317777372353535851937790883648493.
     Overwrites s in place.
 */</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sc_reduce</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sc_reduce</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">u8</span>]) {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s0</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> <span class="ident">load_3i</span>(<span class="ident">s</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s1</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> (<span class="ident">load_4i</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">2</span>..<span class="number">6</span>]) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s2</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> (<span class="ident">load_3i</span>(<span class="kw-2">&amp;</span><span class="ident">s</span>[<span class="number">5</span>..<span class="number">8</span>]) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>);
@@ -8046,8 +8075,9 @@ Output:
     s[0]+256*s[1]+...+256^31*s[31] = (ab+c) mod l
     where l = 2^252 + 27742317777372353535851937790883648493.
 */</span>
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">rustfmt::skip</span>]</span>
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">sc_muladd</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span>[<span class="ident">u8</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">c</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sc_muladd</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span>[<span class="ident">u8</span>], <span class="ident">a</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">b</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>], <span class="ident">c</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) {
     <span class="kw">let</span> <span class="ident">a0</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> <span class="ident">load_3i</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>[<span class="number">0</span>..<span class="number">3</span>]);
     <span class="kw">let</span> <span class="ident">a1</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> (<span class="ident">load_4i</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>[<span class="number">2</span>..<span class="number">6</span>]) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">5</span>);
     <span class="kw">let</span> <span class="ident">a2</span> <span class="op">=</span> <span class="number">2097151</span> <span class="op">&amp;</span> (<span class="ident">load_3i</span>(<span class="kw-2">&amp;</span><span class="ident">a</span>[<span class="number">5</span>..<span class="number">8</span>]) <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">2</span>);
