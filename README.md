@@ -12,18 +12,21 @@ There is an [issue](https://github.com/second-state/SewUp/issues/116) on buildin
 Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wiki) helps you work with sewup, once you got problems or confusing you can learn more on the wiki.
 
 ## Slides & Demo
-| Date       | Event                  | Version | Slide        | Video                                                 | Material                  |
-|------------|------------------------|---------|--------------|-------------------------------------------------------|---------------------------|
-| 2021/11/3  | ParaState Hackathon II | 0.1.5   | [hackthon2]  |                                                       | [material][h2], [hangman] |
-| 2021/10/30 | COSCon'21              | 0.1.4   | [coscon21]   |                                                       |                           |
-| 2021/10/26 | ParaState Hackathon    | 0.1.4   | [hackthon1]  | [record1]                                             | [material][h1]            |
-| 2021/09/07 | Version 0.1 release    | 0.1.0   |              | [Hello], [KV], [RDB], [ERC-20], [ERC-721], [ERC-1155] |                           |
-| 2021/06/19 | Rust meetup (Beijing)  | 0.0.1   | [prerelease] |                                                       |                           |
+| Date       | Event                   | Version | Slide        | Video                                                 | Material                  |
+|------------|-------------------------|---------|--------------|-------------------------------------------------------|---------------------------|
+| Drafting   | ParaState Hackathon III | 0.1.7   | [hackthon3]  |                                                       | [utility token]           |
+| 2021/11/3  | ParaState Hackathon II  | 0.1.6   | [hackthon2]  | [record2]                                             | [material][h2], [hangman] |
+| 2021/10/30 | COSCon'21               | 0.1.4   | [coscon21]   |                                                       |                           |
+| 2021/10/26 | ParaState Hackathon     | 0.1.4   | [hackthon1]  | [record1]                                             | [material][h1]            |
+| 2021/09/07 | Version 0.1 release     | 0.1.0   |              | [Hello], [KV], [RDB], [ERC-20], [ERC-721], [ERC-1155] |                           |
+| 2021/06/19 | Rust meetup (Beijing)   | 0.0.1   | [prerelease] |                                                       |                           |
 
 [coscon21]: https://slides.com/yanganto/coscon21-writing-ewasm-contract-in-rust
 [hackthon1]: https://slides.com/yanganto/ethereum-wasm-in-rust
 [hackthon2]: https://slides.com/yanganto/key-value-storage-with-sewup
+[hackthon3]: https://slides.com/yanganto/writing-ethereum-webassembly-in-rust-iii-utility-token-with-sewup
 [record1]: https://www.youtube.com/watch?v=DaVg5WCM2LI
+[record2]: https://youtu.be/XWeOALFPJQ0
 [prerelease]: https://slides.com/yanganto/sewup
 [Hello]: https://youtu.be/kbe3uuxkBNQ
 [KV]: https://youtu.be/LUpYIFGG36s
@@ -34,6 +37,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 [h1]: https://docs.google.com/document/d/1CTh3whx7jRtO4UQLqkp6S8w0fthVVHaDlhgfkAdDp8Q/edit?usp=sharing
 [h2]: https://docs.google.com/document/d/1qNYOFK1uCZauAJ0ghBc_ykI4RDYncdB0hiQULj5kNow/edit?usp=sharing
 [hangman]: https://github.com/second-state/sewup-kv-example
+[utility token]: https://github.com/second-state/sewup-token-example
 
 
 ## Usage
