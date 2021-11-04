@@ -1,0 +1,58 @@
+name: Rust Crate Release
+
+concurrency:
+  group: rust-crate-release-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  crate_release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    container:
+      image: wasmedge/wasmedge:ubuntu-build-clang
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v14
+        with:
+          install_url: https://nixos-nix-install-tests.cachix.org/serve/i6laym9jw3wg9mw6ncyrk6gjx4l34vvx/install
+          install_options: '--tarball-url-prefix https://nixos-nix-install-tests.cachix.org/serve'
+          extra_nix_config: experimental-features = nix-command flakes
+
+      - name: Default feature test
+        run: nix develop -c 'cargo' test -p sewup
+
+      - name: Publish cargo-sewup crate
+        uses: katyo/publish-crates@v1
+        with:
+            path: './cargo-sewup'
+            registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Publish sewup-derive crate
+        uses: katyo/publish-crates@v1
+        with:
+            path: './sewup-derive'
+            registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Prepare sewup crate
+        run: |
+          VERSION=`cat sewup-derive/Cargo.toml | grep '^version' | awk -F\" '{print $2}'`
+          sed -i 's/sewup-derive =/sewup-derive = "'${VERSION}'"#/' sewup/Cargo.toml
+          git config --global user.email "github_action@github.com"
+          git config --global user.name "GithubAction"
+          git add sewup/Cargo.toml
+          git commit -m '[CI] update sewup dependency'
+
+      - name: Publish sewup crate
+        uses: katyo/publish-crates@v1
+        with:
+            path: './sewup'
+            registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
