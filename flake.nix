@@ -1,4 +1,5 @@
 {
+
   inputs = {
     nixpkgs.url = "nixpkgs/nixpkgs-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
@@ -54,6 +55,11 @@
           rc=$?
           exit $rc
         '';
+        publishScript = pkgs.writeShellScriptBin "crate-publish" ''
+          cd $1
+          cargo login $2
+          cargo publish
+        '';
       in
       with pkgs;
       {
@@ -71,6 +77,7 @@
             cliInitTestScript
             abiTestScript
             clientTestScript
+            publishScript
           ];
 
           LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
