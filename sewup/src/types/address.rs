@@ -13,13 +13,20 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 use crate::types::Raw;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[derive(Clone, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Deserialize, Serialize, PartialEq, Default)]
 pub struct AddressType {}
 
 #[cfg(target_arch = "wasm32")]
 #[derive(Clone, PartialEq)]
 pub struct AddressType {
     pub(crate) inner: EwasmAddress,
+}
+
+#[cfg(target_arch = "wasm32")]
+impl Default for AddressType {
+    fn default() -> Self {
+        Self::from_str("0x0000000000000000000000000000000000000000").unwrap()
+    }
 }
 
 /// Address is a 20 bytes binary, you can build a Address with hex string easily.
