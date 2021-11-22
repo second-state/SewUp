@@ -1,10 +1,6 @@
-#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
-#[cfg(target_arch = "wasm32")]
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-#[cfg(not(target_arch = "wasm32"))]
-use serde_derive::{Deserialize, Serialize};
 
 #[cfg(target_arch = "wasm32")]
 pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
@@ -13,8 +9,70 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 use crate::types::Raw;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[derive(Clone, Deserialize, Serialize, PartialEq, Default)]
-pub struct AddressType {}
+#[derive(Clone, PartialEq, Default)]
+pub struct AddressType {
+    pub inner: [u8; 20],
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl Serialize for AddressType {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let bytes32: [u8; 32] = [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            self.inner[0],
+            self.inner[1],
+            self.inner[2],
+            self.inner[3],
+            self.inner[4],
+            self.inner[5],
+            self.inner[6],
+            self.inner[7],
+            self.inner[8],
+            self.inner[9],
+            self.inner[10],
+            self.inner[11],
+            self.inner[12],
+            self.inner[13],
+            self.inner[14],
+            self.inner[15],
+            self.inner[16],
+            self.inner[17],
+            self.inner[18],
+            self.inner[19],
+        ];
+        bytes32.serialize(serializer)
+    }
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl<'de> Deserialize<'de> for AddressType {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Deserialize::deserialize(deserializer).map(|bytes: [u8; 32]| AddressType {
+            inner: [
+                bytes[12], bytes[13], bytes[14], bytes[15], bytes[16], bytes[17], bytes[18],
+                bytes[19], bytes[20], bytes[21], bytes[22], bytes[23], bytes[24], bytes[25],
+                bytes[26], bytes[27], bytes[28], bytes[29], bytes[30], bytes[31],
+            ],
+        })
+    }
+}
 
 #[cfg(target_arch = "wasm32")]
 #[derive(Clone, PartialEq)]
@@ -109,7 +167,16 @@ impl AddressType {
         })
     }
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn from_str(_: &str) -> anyhow::Result<Self> {
-        Ok(Self {})
+    pub fn from_str(s: &str) -> anyhow::Result<Self> {
+        let hex_s: &str = if s.starts_with("0x") {
+            &s[2..s.len()]
+        } else {
+            s
+        };
+        Ok(Self {
+            inner: hex::decode(hex_s)?
+                .try_into()
+                .map_err(|_| anyhow::anyhow!("hex str can not convert to [u8; 20]"))?,
+        })
     }
 }
