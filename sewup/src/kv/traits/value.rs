@@ -59,7 +59,9 @@ impl Value for Row {
 impl Value for Address {
     fn from_row_value(x: &Row) -> Result<Self> {
         #[cfg(not(target_arch = "wasm32"))]
-        let addr = Address {};
+        let addr = Address {
+            ..Default::default()
+        };
         #[cfg(target_arch = "wasm32")]
         let addr: Address = {
             let raw: Raw = x.try_into().expect("row key should at least one raw");
