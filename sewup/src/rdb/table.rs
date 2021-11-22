@@ -62,14 +62,14 @@ impl<T: Record> Table<T> {
 
     #[allow(bare_trait_objects)]
     /// Filter the records
-    pub fn filter_records(&self, filter: &Fn(&T) -> bool) -> Result<Vec<T>> {
-        let mut output: Vec<T> = Vec::new();
-        for r in self.data.iter() {
+    pub fn filter_records(&self, filter: &Fn(&T) -> bool) -> Result<Vec<(usize, T)>> {
+        let mut output: Vec<(usize, T)> = Vec::new();
+        for (idx, r) in self.data.iter().enumerate() {
             let mut buffer_row = r.clone();
             buffer_row.make_buffer();
             if let Some(i) = T::from_row(&buffer_row) {
                 if filter(&i) {
-                    output.push(i);
+                    output.push((idx + 1, i));
                 }
             }
         }

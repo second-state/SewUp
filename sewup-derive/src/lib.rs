@@ -784,6 +784,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
     let clone_field_names2 = field_names.clone();
     let clone_field_names3 = field_names.clone();
     let clone_field_names4 = field_names.clone();
+    let clone_field_names5 = field_names.clone();
     let field_types = fields_with_type.iter().map(|(_, t)| t);
 
     let protocol_name = Ident::new(&format!("{}Protocol", struct_name), Span::call_site());
@@ -829,8 +830,19 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
+
         impl From<#struct_name> for #protocol_name {
             fn from(instance: #struct_name) -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records: vec![instance.into()]
+                }
+            }
+        }
+
+        impl From<(usize, #struct_name)> for #protocol_name {
+            fn from(instance: (usize, #struct_name)) -> Self {
                 Self {
                     select_fields: None,
                     filter: false,
@@ -848,6 +860,17 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
+
+        impl From<Vec<(usize, #struct_name)>> for #protocol_name {
+            fn from(instances: Vec<(usize, #struct_name)>) -> Self {
+                Self {
+                    select_fields: None,
+                    filter: false,
+                    records: instances.into_iter().map(|i| i.into()).collect::<Vec<_>>()
+                }
+            }
+        }
+
         impl From<Vec<#wrapper_name>> for #protocol_name {
             fn from(records: Vec<#wrapper_name>) -> Self {
                 Self {
@@ -857,6 +880,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
+
         pub mod #captal_name {
             use sewup_derive::ewasm_fn_sig;
             pub const GET_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::get());
@@ -869,6 +893,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         pub struct #wrapper_name {
             #(pub #wrapper_field_names: #wrapper_field_types,)*
         }
+
         impl From<#struct_name> for #wrapper_name {
             fn from(instance: #struct_name) -> Self {
                 Self {
@@ -877,6 +902,16 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 }
             }
         }
+
+        impl From<(usize, #struct_name)> for #wrapper_name {
+            fn from(t: (usize, #struct_name)) -> Self {
+                Self {
+                    id: Some(t.0),
+                    #(#clone_field_names5: Some(t.1.#clone_field_names5),)*
+                }
+            }
+        }
+
         impl From<#wrapper_name> for #struct_name {
             fn from(wrapper: #wrapper_name) -> Self {
                 Self {
@@ -894,7 +929,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                 let table = sewup::rdb::Db::load(None)?.table::<_InstanceType>()?;
                 if proc.filter {
                     let mut raw_output: Vec<Wrapper> = Vec::new();
-                    for r in table.all_records()?.drain(..){
+                    for (idx, r) in table.all_records()?.drain(..).enumerate(){
                         let mut all_field_match = true;
                         #(
                             paste::paste! {
@@ -913,17 +948,17 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                          )*
 
                         if all_field_match {
-                            let mut wrapper: Wrapper = r.into();
-                            raw_output.push(wrapper);
+                            raw_output.push((idx + 1, r).into());
                         }
                     }
                     if let Some(select_fields) = proc.select_fields {
                         for w in raw_output.iter_mut() {
                             #(
-                                if ! select_fields.contains(stringify!(#clone_field_names3)) {
+                                if (! select_fields.contains(stringify!(#clone_field_names3)))
+                                    && stringify!(#clone_field_names3) != "id" {
                                     w.#clone_field_names3 = None;
                                 }
-                             )*
+                            )*
                         }
                     }
                     let p: #protocol_name = raw_output.into();

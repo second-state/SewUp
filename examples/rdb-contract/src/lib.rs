@@ -202,16 +202,16 @@ mod tests {
         person_query.trusted = Some(true);
         let mut person_query_protocol: person::Protocol = person_query.into();
         assert!(person_query_protocol.filter);
-        person_query_protocol.set_select_fields(vec!["age".to_string()]);
+        person_query_protocol.set_select_fields(vec!["id".to_string(), "age".to_string()]);
 
         // The expected result only return the age of the trusted person,
         // and other fields will be None
-        expect_output = vec![older_person].into();
+        expect_output = vec![(1, older_person)].into();
         expect_output.records[0].trusted = None;
         ewasm_auto_assert_eq!(person::get(person_query_protocol), expect_output);
 
         // Get the children by the customized handler
-        expect_output = vec![child].into();
+        expect_output = vec![(2, child)].into();
         ewasm_auto_assert_eq!(get_children(), expect_output);
 
         // Please Notice that protocol from the default instance may not be empty,
