@@ -9,7 +9,7 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 use crate::types::Raw;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[derive(Clone, PartialEq, Default)]
+#[derive(Clone, PartialEq, Default, Debug)]
 pub struct AddressType {
     pub inner: [u8; 20],
 }
@@ -84,6 +84,14 @@ pub struct AddressType {
 impl Default for AddressType {
     fn default() -> Self {
         Self::from_str("0x0000000000000000000000000000000000000000").unwrap()
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
+impl std::fmt::Debug for AddressType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let bytes = self.inner.bytes;
+        f.debug_struct("Address").field("inner", &bytes).finish()
     }
 }
 
