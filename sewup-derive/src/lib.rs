@@ -583,7 +583,9 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
         let error_handler = cap.name("error_handler").unwrap().as_str();
         return if error_handler.is_empty() {
             quote! {
-                #name(sewup::bincode::deserialize(&#contract.input_data[4..])?)
+                #name(sewup::bincode::deserialize(&#contract.input_data[4..])
+                      .map_err(|e| anyhow::anyhow!("contract input deserialize error: {}", e))?
+                )
             }
         } else {
             let closure: syn::Result<syn::ExprClosure> = syn::parse_str(error_handler);
