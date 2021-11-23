@@ -1467,6 +1467,39 @@
 <span id="1467">1467</span>
 <span id="1468">1468</span>
 <span id="1469">1469</span>
+<span id="1470">1470</span>
+<span id="1471">1471</span>
+<span id="1472">1472</span>
+<span id="1473">1473</span>
+<span id="1474">1474</span>
+<span id="1475">1475</span>
+<span id="1476">1476</span>
+<span id="1477">1477</span>
+<span id="1478">1478</span>
+<span id="1479">1479</span>
+<span id="1480">1480</span>
+<span id="1481">1481</span>
+<span id="1482">1482</span>
+<span id="1483">1483</span>
+<span id="1484">1484</span>
+<span id="1485">1485</span>
+<span id="1486">1486</span>
+<span id="1487">1487</span>
+<span id="1488">1488</span>
+<span id="1489">1489</span>
+<span id="1490">1490</span>
+<span id="1491">1491</span>
+<span id="1492">1492</span>
+<span id="1493">1493</span>
+<span id="1494">1494</span>
+<span id="1495">1495</span>
+<span id="1496">1496</span>
+<span id="1497">1497</span>
+<span id="1498">1498</span>
+<span id="1499">1499</span>
+<span id="1500">1500</span>
+<span id="1501">1501</span>
+<span id="1502">1502</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -2253,6 +2286,7 @@
     <span class="kw">let</span> <span class="ident">clone_field_names2</span> <span class="op">=</span> <span class="ident">field_names</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">clone_field_names3</span> <span class="op">=</span> <span class="ident">field_names</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">clone_field_names4</span> <span class="op">=</span> <span class="ident">field_names</span>.<span class="ident">clone</span>();
+    <span class="kw">let</span> <span class="ident">clone_field_names5</span> <span class="op">=</span> <span class="ident">field_names</span>.<span class="ident">clone</span>();
     <span class="kw">let</span> <span class="ident">field_types</span> <span class="op">=</span> <span class="ident">fields_with_type</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="kw">_</span>, <span class="ident">t</span>)<span class="op">|</span> <span class="ident">t</span>);
 
     <span class="kw">let</span> <span class="ident">protocol_name</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}Protocol&quot;</span>, <span class="ident">struct_name</span>), <span class="ident">Span::call_site</span>());
@@ -2298,8 +2332,19 @@
                 }
             }
         }
+
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>#<span class="ident">struct_name</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">protocol_name</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instance</span>: #<span class="ident">struct_name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="self">Self</span> {
+                    <span class="ident">select_fields</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">filter</span>: <span class="bool-val">false</span>,
+                    <span class="ident">records</span>: <span class="macro">vec!</span>[<span class="ident">instance</span>.<span class="ident">into</span>()]
+                }
+            }
+        }
+
+        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">usize</span>, #<span class="ident">struct_name</span>)<span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">protocol_name</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instance</span>: (<span class="ident">usize</span>, #<span class="ident">struct_name</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="self">Self</span> {
                     <span class="ident">select_fields</span>: <span class="prelude-val">None</span>,
                     <span class="ident">filter</span>: <span class="bool-val">false</span>,
@@ -2317,6 +2362,17 @@
                 }
             }
         }
+
+        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, #<span class="ident">struct_name</span>)<span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">protocol_name</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instances</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">usize</span>, #<span class="ident">struct_name</span>)<span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="self">Self</span> {
+                    <span class="ident">select_fields</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">filter</span>: <span class="bool-val">false</span>,
+                    <span class="ident">records</span>: <span class="ident">instances</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">i</span>.<span class="ident">into</span>()).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+                }
+            }
+        }
+
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span>#<span class="ident">wrapper_name</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">protocol_name</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">records</span>: <span class="ident">Vec</span><span class="op">&lt;</span>#<span class="ident">wrapper_name</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="self">Self</span> {
@@ -2326,6 +2382,7 @@
                 }
             }
         }
+
         <span class="kw">pub</span> <span class="kw">mod</span> #<span class="ident">captal_name</span> {
             <span class="kw">use</span> <span class="ident">sewup_derive::ewasm_fn_sig</span>;
             <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GET_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::get</span>());
@@ -2338,6 +2395,7 @@
         <span class="kw">pub</span> <span class="kw">struct</span> #<span class="ident">wrapper_name</span> {
             #(<span class="kw">pub</span> #<span class="ident">wrapper_field_names</span>: #<span class="ident">wrapper_field_types</span>,)<span class="op">*</span>
         }
+
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>#<span class="ident">struct_name</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">wrapper_name</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">instance</span>: #<span class="ident">struct_name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="self">Self</span> {
@@ -2346,6 +2404,16 @@
                 }
             }
         }
+
+        <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">usize</span>, #<span class="ident">struct_name</span>)<span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">wrapper_name</span> {
+            <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: (<span class="ident">usize</span>, #<span class="ident">struct_name</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+                <span class="self">Self</span> {
+                    <span class="ident">id</span>: <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="number">0</span>),
+                    #(#<span class="ident">clone_field_names5</span>: <span class="prelude-val">Some</span>(<span class="ident">t</span>.<span class="number">1.</span>#<span class="ident">clone_field_names5</span>),)<span class="op">*</span>
+                }
+            }
+        }
+
         <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>#<span class="ident">wrapper_name</span><span class="op">&gt;</span> <span class="kw">for</span> #<span class="ident">struct_name</span> {
             <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">wrapper</span>: #<span class="ident">wrapper_name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                 <span class="self">Self</span> {
@@ -2363,7 +2431,7 @@
                 <span class="kw">let</span> <span class="ident">table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span><span class="ident">_InstanceType</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                 <span class="kw">if</span> <span class="ident">proc</span>.<span class="ident">filter</span> {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">raw_output</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Wrapper</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                    <span class="kw">for</span> <span class="ident">r</span> <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">all_records</span>()<span class="question-mark">?</span>.<span class="ident">drain</span>(..){
+                    <span class="kw">for</span> (<span class="ident">idx</span>, <span class="ident">r</span>) <span class="kw">in</span> <span class="ident">table</span>.<span class="ident">all_records</span>()<span class="question-mark">?</span>.<span class="ident">drain</span>(..).<span class="ident">enumerate</span>(){
                         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">all_field_match</span> <span class="op">=</span> <span class="bool-val">true</span>;
                         #(
                             <span class="macro">paste::paste!</span> {
@@ -2382,17 +2450,17 @@
                          )<span class="op">*</span>
 
                         <span class="kw">if</span> <span class="ident">all_field_match</span> {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wrapper</span>: <span class="ident">Wrapper</span> <span class="op">=</span> <span class="ident">r</span>.<span class="ident">into</span>();
-                            <span class="ident">raw_output</span>.<span class="ident">push</span>(<span class="ident">wrapper</span>);
+                            <span class="ident">raw_output</span>.<span class="ident">push</span>((<span class="ident">idx</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">r</span>).<span class="ident">into</span>());
                         }
                     }
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">select_fields</span>) <span class="op">=</span> <span class="ident">proc</span>.<span class="ident">select_fields</span> {
                         <span class="kw">for</span> <span class="ident">w</span> <span class="kw">in</span> <span class="ident">raw_output</span>.<span class="ident">iter_mut</span>() {
                             #(
-                                <span class="kw">if</span> <span class="op">!</span> <span class="ident">select_fields</span>.<span class="ident">contains</span>(<span class="macro">stringify!</span>(#<span class="ident">clone_field_names3</span>)) {
+                                <span class="kw">if</span> (<span class="op">!</span> <span class="ident">select_fields</span>.<span class="ident">contains</span>(<span class="macro">stringify!</span>(#<span class="ident">clone_field_names3</span>)))
+                                    <span class="op">&amp;&amp;</span> <span class="macro">stringify!</span>(#<span class="ident">clone_field_names3</span>) <span class="op">!</span><span class="op">=</span> <span class="string">&quot;id&quot;</span> {
                                     <span class="ident">w</span>.#<span class="ident">clone_field_names3</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                                 }
-                             )<span class="op">*</span>
+                            )<span class="op">*</span>
                         }
                     }
                     <span class="kw">let</span> <span class="ident">p</span>: #<span class="ident">protocol_name</span> <span class="op">=</span> <span class="ident">raw_output</span>.<span class="ident">into</span>();
@@ -2602,16 +2670,14 @@
                                         }
 
                                         if let Ok(output_msg) = std::str::from_utf8(&amp;r.output_data) {
-                                            eprintln!(&quot;vm msg    : {}&quot;, output_msg);
-                                        } else {
-                                            eprintln!(&quot;vm output : {:?}&quot;, r.output_data);
+                                            eprintln!(&quot;vm msg    : \&quot;{}\&quot;&quot;, output_msg);
                                         }
+                                        eprintln!(&quot;vm output : {:?}&quot;, r.output_data);
 
                                         if let Ok(expect_msg) = std::str::from_utf8(&amp;expect_output) {
-                                            eprintln!(&quot;expected  : {}&quot;, expect_msg);
-                                        } else {
-                                            eprintln!(&quot;expected  : {:?}&quot;, expect_output);
+                                            eprintln!(&quot;expected  : \&quot;{}\&quot;&quot;, expect_msg);
                                         }
+                                        eprintln!(&quot;expected  : {:?}&quot;, expect_output);
                                         panic!(&quot;function `{}` output is unexpected&quot;, fn_name);
                                     }
                                 },
