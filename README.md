@@ -1,11 +1,11 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.1.7-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.1.9-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.7-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.9-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
-[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.7-green.svg)](https://crates.io/crates/cargo-sewup)
+[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.9-green.svg)](https://crates.io/crates/cargo-sewup)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
@@ -14,7 +14,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 ## Slides & Demo
 | Date       | Event                   | Version | Slide        | Video                                                 | Material                  |
 |------------|-------------------------|---------|--------------|-------------------------------------------------------|---------------------------|
-| 2021/12/03 | ParaState Hackathon IV  | 0.1.7   | [hackthon4]  |                                                       | [todo app]                |
+| 2021/12/03 | ParaState Hackathon IV  | 0.1.9   | [hackthon4]  |                                                       | [todo app]                |
 | 2021/11/12 | ParaState Hackathon III | 0.1.7   | [hackthon3]  |                                                       | [utility token]           |
 | 2021/11/3  | ParaState Hackathon II  | 0.1.6   | [hackthon2]  | [record2]                                             | [material][h2], [hangman] |
 | 2021/10/30 | COSCon'21               | 0.1.4   | [coscon21]   |                                                       |                           |
