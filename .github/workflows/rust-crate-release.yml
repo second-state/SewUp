@@ -30,7 +30,7 @@ jobs:
         run: nix develop -c 'crate-publish' cargo-sewup ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Publish sewup-derive crate
-        run: nix develop -c 'crate-publish' sewup ${{ secrets.CARGO_REGISTRY_TOKEN }}
+        run: nix develop -c 'crate-publish' sewup-derive ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       - name: Prepare sewup crate
         run: |
