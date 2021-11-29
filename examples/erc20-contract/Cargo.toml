@@ -2,7 +2,7 @@
 name = "erc20-contract"
 version = "0.1.0"
 authors = []
-edition = "2018"
+edition = "2021"
 description = "This is an ERC-20 example for SewUp"
 
 [lib]

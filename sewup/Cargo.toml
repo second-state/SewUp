@@ -2,7 +2,7 @@
 name = "sewup"
 version = "0.1.9"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
-edition = "2018"
+edition = "2021"
 build="build.rs"
 description = "A library to help you sew up your Ethereum project with Rust and just like develop in a common backend."
 license = "Apache-2.0"
