@@ -1,10 +1,10 @@
 error: fail to parsing ewasm_input_from,
-            please use
-                `ewasm_input_from( contract move handler )
-            or
-                `ewasm_input_from( contract move handler, closure_for_map_err)`
+                   please use
+                       `ewasm_input_from( contract move handler )
+                   or
+                       `ewasm_input_from( contract move handler, closure_for_map_err)`
 
-  --> $DIR/ewasm_input_from.rs:10:24
+  --> tests/compile-fail/ewasm_input_from.rs:10:24
    |
 10 |     let _new_handler = ewasm_input_from!(contract, original_handler);
    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -12,13 +12,13 @@ error: fail to parsing ewasm_input_from,
    = note: this error originates in the macro `ewasm_input_from` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: expected expression, found end of macro arguments
-  --> $DIR/ewasm_input_from.rs:10:24
+  --> tests/compile-fail/ewasm_input_from.rs:10:24
    |
 10 |     let _new_handler = ewasm_input_from!(contract, original_handler);
    |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 error: ` "ErrorStr"` is not an closure input for map_err
-  --> $DIR/ewasm_input_from.rs:17:9
+  --> tests/compile-fail/ewasm_input_from.rs:17:9
    |
 17 |         ewasm_input_from!(contract move original_handler, "ErrorStr");
    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -26,7 +26,7 @@ error: ` "ErrorStr"` is not an closure input for map_err
    = note: this error originates in the macro `ewasm_input_from` (in Nightly builds, run with -Z macro-backtrace for more info)
 
 error: expected expression, found end of macro arguments
-  --> $DIR/ewasm_input_from.rs:17:9
+  --> tests/compile-fail/ewasm_input_from.rs:17:9
    |
 17 |         ewasm_input_from!(contract move original_handler, "ErrorStr");
    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
