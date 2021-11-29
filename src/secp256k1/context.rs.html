@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;secp256k1-0.20.3&#x2F;src&#x2F;context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../secp256k1/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;secp256k1-0.20.3&#x2F;src&#x2F;context.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>context.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../secp256k1/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -391,14 +392,14 @@
     <span class="kw">impl</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">GlobalContext</span> {
         <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span>;
 
-        <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
+        <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
             <span class="kw">static</span> <span class="ident">ONCE</span>: <span class="ident">Once</span> <span class="op">=</span> <span class="ident">Once::new</span>();
             <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">CONTEXT</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
             <span class="ident">ONCE</span>.<span class="ident">call_once</span>(<span class="op">|</span><span class="op">|</span> <span class="kw">unsafe</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">Secp256k1::new</span>();
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;global-context&quot;</span>)]</span>
                 {
-                    <span class="ident">ctx</span>.<span class="ident">randomize</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">rand::thread_rng</span>());
+                    <span class="ident">ctx</span>.<span class="ident">randomize</span>(<span class="kw-2">&amp;mut</span> <span class="ident">rand::thread_rng</span>());
                 }
                 <span class="ident">CONTEXT</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">ctx</span>);
             });
@@ -416,7 +417,7 @@
     <span class="doccomment">/// A constant description of the context.</span>
     <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>;
     <span class="doccomment">/// A function to deallocate the memory when the context is dropped.</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>);
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>);
 }
 
 <span class="doccomment">/// Marker trait for indicating that an instance of `Secp256k1` can be used for signing.</span>
@@ -485,7 +486,7 @@
         <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">ffi::SECP256K1_START_SIGN</span>;
         <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;signing only&quot;</span>;
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
             <span class="ident">alloc::dealloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
         }
@@ -495,7 +496,7 @@
         <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">ffi::SECP256K1_START_VERIFY</span>;
         <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;verification only&quot;</span>;
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
             <span class="ident">alloc::dealloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
         }
@@ -505,7 +506,7 @@
         <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">VerifyOnly::FLAGS</span> <span class="op">|</span> <span class="ident">SignOnly::FLAGS</span>;
         <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;all capabilities&quot;</span>;
 
-        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
+        <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">size</span>: <span class="ident">usize</span>) {
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
             <span class="ident">alloc::dealloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
         }
@@ -513,7 +514,7 @@
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
         <span class="doccomment">/// Lets you create a context in a generic manner(sign/verify/all)</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gen_new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gen_new</span>() -&gt; <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
             <span class="ident">ffi::types::sanity_checks_for_wasm</span>();
 
@@ -521,7 +522,7 @@
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> {<span class="ident">alloc::alloc</span>(<span class="ident">layout</span>)};
             <span class="ident">Secp256k1</span> {
-                <span class="ident">ctx</span>: <span class="kw">unsafe</span> { <span class="ident">ffi::secp256k1_context_preallocated_create</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">C::FLAGS</span>) },
+                <span class="ident">ctx</span>: <span class="kw">unsafe</span> { <span class="ident">ffi::secp256k1_context_preallocated_create</span>(<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">C::FLAGS</span>) },
                 <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
                 <span class="ident">size</span>,
             }
@@ -530,38 +531,38 @@
 
     <span class="kw">impl</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span> {
         <span class="doccomment">/// Creates a new Secp256k1 context with all capabilities</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span> {
             <span class="ident">Secp256k1::gen_new</span>()
         }
     }
 
     <span class="kw">impl</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnly</span><span class="op">&gt;</span> {
         <span class="doccomment">/// Creates a new Secp256k1 context that can only be used for signing</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signing_only</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnly</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signing_only</span>() -&gt; <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnly</span><span class="op">&gt;</span> {
             <span class="ident">Secp256k1::gen_new</span>()
         }
     }
 
     <span class="kw">impl</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnly</span><span class="op">&gt;</span> {
         <span class="doccomment">/// Creates a new Secp256k1 context that can only be used for verification</span>
-        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_only</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnly</span><span class="op">&gt;</span> {
+        <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verification_only</span>() -&gt; <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnly</span><span class="op">&gt;</span> {
             <span class="ident">Secp256k1::gen_new</span>()
         }
     }
 
     <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">All</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">fn</span> <span class="ident">default</span>() -&gt; <span class="self">Self</span> {
             <span class="ident"><span class="self">Self</span>::new</span>()
         }
     }
 
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Context</span><span class="op">&gt;</span> <span class="ident">Clone</span> <span class="kw">for</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
-        <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">size</span> <span class="op">=</span> <span class="kw">unsafe</span> {<span class="ident">ffi::secp256k1_context_preallocated_clone_size</span>(<span class="self">self</span>.<span class="ident">ctx</span> <span class="kw">as</span> <span class="kw">_</span>)};
             <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">size</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="kw">unsafe</span> {<span class="ident">alloc::alloc</span>(<span class="ident">layout</span>)};
             <span class="ident">Secp256k1</span> {
-                <span class="ident">ctx</span>: <span class="kw">unsafe</span> { <span class="ident">ffi::secp256k1_context_preallocated_clone</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) },
+                <span class="ident">ctx</span>: <span class="kw">unsafe</span> { <span class="ident">ffi::secp256k1_context_preallocated_clone</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>) },
                 <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
                 <span class="ident">size</span>,
             }
@@ -579,7 +580,7 @@
     <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">ffi::SECP256K1_START_SIGN</span>;
     <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;signing only&quot;</span>;
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
         <span class="comment">// Allocated by the user</span>
     }
 }
@@ -588,7 +589,7 @@
     <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">ffi::SECP256K1_START_VERIFY</span>;
     <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;verification only&quot;</span>;
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
         <span class="comment">// Allocated by the user</span>
     }
 }
@@ -597,14 +598,14 @@
     <span class="kw">const</span> <span class="ident">FLAGS</span>: <span class="ident">c_uint</span> <span class="op">=</span> <span class="ident">SignOnlyPreallocated::FLAGS</span> <span class="op">|</span> <span class="ident">VerifyOnlyPreallocated::FLAGS</span>;
     <span class="kw">const</span> <span class="ident">DESCRIPTION</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;all capabilities&quot;</span>;
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">deallocate</span>(<span class="ident">_ptr</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">_size</span>: <span class="ident">usize</span>) {
         <span class="comment">// Allocated by the user</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span>, <span class="ident">C</span>: <span class="ident">Context</span> <span class="op">+</span> <span class="lifetime">&#39;buf</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Lets you create a context with preallocated buffer in a generic manner(sign/verify/all)</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_gen_new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_gen_new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
         <span class="ident">ffi::types::sanity_checks_for_wasm</span>();
 
@@ -614,7 +615,7 @@
         <span class="prelude-val">Ok</span>(<span class="ident">Secp256k1</span> {
             <span class="ident">ctx</span>: <span class="kw">unsafe</span> {
                 <span class="ident">ffi::secp256k1_context_preallocated_create</span>(
-                    <span class="ident">buf</span>.<span class="ident">as_mut_c_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+                    <span class="ident">buf</span>.<span class="ident">as_mut_c_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
                     <span class="ident">C::FLAGS</span>)
             },
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
@@ -625,11 +626,11 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">AllPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new Secp256k1 context with all capabilities</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">AllPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_new</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">AllPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">Secp256k1::preallocated_gen_new</span>(<span class="ident">buf</span>)
     }
     <span class="doccomment">/// Uses the ffi `secp256k1_context_preallocated_size` to check the memory size needed for a context</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_size</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_size</span>() -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="self">Self</span>::preallocate_size_gen</span>()
     }
 
@@ -644,7 +645,7 @@
     <span class="doccomment">/// * The user must handle the freeing of the context(using the correct functions) by himself.</span>
     <span class="doccomment">/// * Violating these may lead to Undefined Behavior.</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_all</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">AllPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_all</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::Context</span>) -&gt; <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">AllPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">ManuallyDrop::new</span>(<span class="ident">Secp256k1</span> {
             <span class="ident">ctx</span>: <span class="ident">raw_ctx</span>,
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
@@ -655,13 +656,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new Secp256k1 context that can only be used for signing</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_signing_only</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_signing_only</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">Secp256k1::preallocated_gen_new</span>(<span class="ident">buf</span>)
     }
 
     <span class="doccomment">/// Uses the ffi `secp256k1_context_preallocated_size` to check the memory size needed for the context</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_signing_size</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_signing_size</span>() -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="self">Self</span>::preallocate_size_gen</span>()
     }
 
@@ -676,7 +677,7 @@
     <span class="doccomment">/// * The user must handle the freeing of the context(using the correct functions) by himself.</span>
     <span class="doccomment">/// * This list *is not* exhaustive, and any violation may lead to Undefined Behavior.,</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_signining_only</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_signining_only</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::Context</span>) -&gt; <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">SignOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">ManuallyDrop::new</span>(<span class="ident">Secp256k1</span> {
             <span class="ident">ctx</span>: <span class="ident">raw_ctx</span>,
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
@@ -687,13 +688,13 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span> <span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Creates a new Secp256k1 context that can only be used for verification</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_verification_only</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocated_verification_only</span>(<span class="ident">buf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;buf</span> <span class="kw-2">mut</span> [<span class="ident">AlignedType</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">Secp256k1::preallocated_gen_new</span>(<span class="ident">buf</span>)
     }
 
     <span class="doccomment">/// Uses the ffi `secp256k1_context_preallocated_size` to check the memory size needed for the context</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_verification_size</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">preallocate_verification_size</span>() -&gt; <span class="ident">usize</span> {
         <span class="ident"><span class="self">Self</span>::preallocate_size_gen</span>()
     }
 
@@ -708,7 +709,7 @@
     <span class="doccomment">/// * The user must handle the freeing of the context(using the correct functions) by himself.</span>
     <span class="doccomment">/// * This list *is not* exhaustive, and any violation may lead to Undefined Behavior.,</span>
     <span class="doccomment">///</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_verification_only</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">ffi::Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_raw_verification_only</span>(<span class="ident">raw_ctx</span>: <span class="kw-2">*mut</span> <span class="ident">ffi::Context</span>) -&gt; <span class="ident">ManuallyDrop</span><span class="op">&lt;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">VerifyOnlyPreallocated</span><span class="op">&lt;</span><span class="lifetime">&#39;buf</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">ManuallyDrop::new</span>(<span class="ident">Secp256k1</span> {
             <span class="ident">ctx</span>: <span class="ident">raw_ctx</span>,
             <span class="ident">phantom</span>: <span class="ident">PhantomData</span>,
@@ -718,5 +719,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="secp256k1" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

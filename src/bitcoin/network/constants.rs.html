@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;network&#x2F;constants.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constants.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;network&#x2F;constants.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>constants.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -452,13 +453,13 @@
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>, <span class="ident">Debug</span>)]</span>
     <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Network</span> {
         <span class="doccomment">/// Classic Bitcoin</span>
-        <span class="ident">Bitcoin</span> <span class="op">&lt;</span><span class="op">-</span><span class="op">&gt;</span> <span class="string">&quot;bitcoin&quot;</span>,
+        <span class="ident">Bitcoin</span> <span class="op">&lt;</span>-&gt; <span class="string">&quot;bitcoin&quot;</span>,
         <span class="doccomment">/// Bitcoin&#39;s testnet</span>
-        <span class="ident">Testnet</span> <span class="op">&lt;</span><span class="op">-</span><span class="op">&gt;</span> <span class="string">&quot;testnet&quot;</span>,
+        <span class="ident">Testnet</span> <span class="op">&lt;</span>-&gt; <span class="string">&quot;testnet&quot;</span>,
         <span class="doccomment">/// Bitcoin&#39;s signet</span>
-        <span class="ident">Signet</span> <span class="op">&lt;</span><span class="op">-</span><span class="op">&gt;</span> <span class="string">&quot;signet&quot;</span>,
+        <span class="ident">Signet</span> <span class="op">&lt;</span>-&gt; <span class="string">&quot;signet&quot;</span>,
         <span class="doccomment">/// Bitcoin&#39;s regtest</span>
-        <span class="ident">Regtest</span> <span class="op">&lt;</span><span class="op">-</span><span class="op">&gt;</span> <span class="string">&quot;regtest&quot;</span>
+        <span class="ident">Regtest</span> <span class="op">&lt;</span>-&gt; <span class="string">&quot;regtest&quot;</span>
     }
 }
 
@@ -473,14 +474,14 @@
     <span class="doccomment">/// assert_eq!(Some(Network::Bitcoin), Network::from_magic(0xD9B4BEF9));</span>
     <span class="doccomment">/// assert_eq!(None, Network::from_magic(0xFFFFFFFF));</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_magic</span>(<span class="ident">magic</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Network</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_magic</span>(<span class="ident">magic</span>: <span class="ident">u32</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Network</span><span class="op">&gt;</span> {
         <span class="comment">// Note: any new entries here must be added to `magic` below</span>
         <span class="kw">match</span> <span class="ident">magic</span> {
-            <span class="number">0xD9B4BEF9</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Bitcoin</span>),
-            <span class="number">0x0709110B</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Testnet</span>),
-            <span class="number">0x40CF030A</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Signet</span>),
-            <span class="number">0xDAB5BFFA</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">Network::Regtest</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+            <span class="number">0xD9B4BEF9</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Network::Bitcoin</span>),
+            <span class="number">0x0709110B</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Network::Testnet</span>),
+            <span class="number">0x40CF030A</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Network::Signet</span>),
+            <span class="number">0xDAB5BFFA</span> =&gt; <span class="prelude-val">Some</span>(<span class="ident">Network::Regtest</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
         }
     }
 
@@ -495,13 +496,13 @@
     <span class="doccomment">/// let network = Network::Bitcoin;</span>
     <span class="doccomment">/// assert_eq!(network.magic(), 0xD9B4BEF9);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">magic</span>(<span class="self">self</span>) -&gt; <span class="ident">u32</span> {
         <span class="comment">// Note: any new entries here must be added to `from_magic` above</span>
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">Network::Bitcoin</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xD9B4BEF9</span>,
-            <span class="ident">Network::Testnet</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0x0709110B</span>,
-            <span class="ident">Network::Signet</span>  <span class="op">=</span><span class="op">&gt;</span> <span class="number">0x40CF030A</span>,
-            <span class="ident">Network::Regtest</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0xDAB5BFFA</span>,
+            <span class="ident">Network::Bitcoin</span> =&gt; <span class="number">0xD9B4BEF9</span>,
+            <span class="ident">Network::Testnet</span> =&gt; <span class="number">0x0709110B</span>,
+            <span class="ident">Network::Signet</span>  =&gt; <span class="number">0x40CF030A</span>,
+            <span class="ident">Network::Regtest</span> =&gt; <span class="number">0xDAB5BFFA</span>,
         }
     }
 }
@@ -547,7 +548,7 @@
     <span class="doccomment">/// Add [ServiceFlags] together.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ServiceFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ServiceFlags</span>) -&gt; <span class="ident">ServiceFlags</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">|</span><span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>;
         <span class="kw-2">*</span><span class="self">self</span>
     }
@@ -555,43 +556,43 @@
     <span class="doccomment">/// Remove [ServiceFlags] from this.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ServiceFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ServiceFlags</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="ident">ServiceFlags</span>) -&gt; <span class="ident">ServiceFlags</span> {
         <span class="self">self</span>.<span class="number">0</span> <span class="op">^</span><span class="op">=</span> <span class="ident">other</span>.<span class="number">0</span>;
         <span class="kw-2">*</span><span class="self">self</span>
     }
 
     <span class="doccomment">/// Check whether [ServiceFlags] are included in this one.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has</span>(<span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">ServiceFlags</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">flags</span>.<span class="number">0</span>) <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">has</span>(<span class="self">self</span>, <span class="ident">flags</span>: <span class="ident">ServiceFlags</span>) -&gt; <span class="ident">bool</span> {
+        (<span class="self">self</span>.<span class="number">0</span> <span class="op">|</span> <span class="ident">flags</span>.<span class="number">0</span>) <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span>
     }
 
     <span class="doccomment">/// Get the integer representation of this [ServiceFlags].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">as_u64</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::LowerHex</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::LowerHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::UpperHex</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="ident">fmt::UpperHex::fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>, <span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags</span> <span class="op">=</span> <span class="kw-2">*</span><span class="self">self</span>;
-        <span class="kw">if</span> <span class="ident">flags</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ServiceFlags::NONE</span> {
+        <span class="kw">if</span> <span class="ident">flags</span> <span class="op">==</span> <span class="ident">ServiceFlags::NONE</span> {
             <span class="kw">return</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;ServiceFlags(NONE)&quot;</span>);
         }
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first</span> <span class="op">=</span> <span class="bool-val">true</span>;
         <span class="macro">macro_rules!</span> <span class="ident">write_flag</span> {
-            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">ident</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>:<span class="ident">ident</span>) =&gt; {
                 <span class="kw">if</span> <span class="ident">flags</span>.<span class="ident">has</span>(<span class="ident">ServiceFlags</span>::<span class="macro-nonterminal">$</span><span class="macro-nonterminal">f</span>) {
                     <span class="kw">if</span> <span class="op">!</span><span class="ident">first</span> {
                         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;|&quot;</span>)<span class="question-mark">?</span>;
@@ -621,13 +622,13 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: <span class="ident">u64</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">ServiceFlags</span>(<span class="ident">f</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+    <span class="kw">fn</span> <span class="ident">into</span>(<span class="self">self</span>) -&gt; <span class="ident">u64</span> {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -635,13 +636,13 @@
 <span class="kw">impl</span> <span class="ident">ops::BitOr</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">rhs</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ops::BitOrAssign</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">bitor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
         <span class="self">self</span>.<span class="ident">add</span>(<span class="ident">rhs</span>);
     }
 }
@@ -649,13 +650,13 @@
 <span class="kw">impl</span> <span class="ident">ops::BitXor</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="self">Self</span>;
 
-    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">rhs</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">ops::BitXorAssign</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
-    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
+    <span class="kw">fn</span> <span class="ident">bitxor_assign</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">rhs</span>: <span class="self">Self</span>) {
         <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">rhs</span>);
     }
 }
@@ -665,15 +666,15 @@
     <span class="kw">fn</span> <span class="ident">consensus_encode</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">io::Write</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Decodable</span> <span class="kw">for</span> <span class="ident">ServiceFlags</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="ident">ServiceFlags</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>))
+    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Ok</span>(<span class="ident">ServiceFlags</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>))
     }
 }
 
@@ -754,7 +755,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">flags2</span> <span class="op">=</span> <span class="ident">flags</span> <span class="op">|</span> <span class="ident">ServiceFlags::GETUTXO</span>;
         <span class="kw">for</span> <span class="ident">f</span> <span class="kw">in</span> <span class="ident">all</span>.<span class="ident">iter</span>() {
-            <span class="macro">assert_eq!</span>(<span class="ident">flags2</span>.<span class="ident">has</span>(<span class="kw-2">*</span><span class="ident">f</span>), <span class="kw-2">*</span><span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ServiceFlags::WITNESS</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">f</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ServiceFlags::GETUTXO</span>);
+            <span class="macro">assert_eq!</span>(<span class="ident">flags2</span>.<span class="ident">has</span>(<span class="kw-2">*</span><span class="ident">f</span>), <span class="kw-2">*</span><span class="ident">f</span> <span class="op">==</span> <span class="ident">ServiceFlags::WITNESS</span> <span class="op">|</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">f</span> <span class="op">==</span> <span class="ident">ServiceFlags::GETUTXO</span>);
         }
 
         <span class="ident">flags2</span> <span class="op">^</span><span class="op">=</span> <span class="ident">ServiceFlags::WITNESS</span>;
@@ -776,5 +777,4 @@
 
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

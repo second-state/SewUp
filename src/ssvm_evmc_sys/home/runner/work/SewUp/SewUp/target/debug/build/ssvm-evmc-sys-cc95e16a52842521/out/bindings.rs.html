@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;work&#x2F;SewUp&#x2F;SewUp&#x2F;target&#x2F;debug&#x2F;build&#x2F;ssvm-evmc-sys-e70dd07de609fcb6&#x2F;out&#x2F;bindings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bindings.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../../../../../../../../storage.js"></script><script src="../../../../../../../../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../../../../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../../../../../../../../ssvm_evmc_sys/index.html'><div class='logo-container rust-logo'><img src='../../../../../../../../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../../../../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../../../../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../../../../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;work&#x2F;SewUp&#x2F;SewUp&#x2F;target&#x2F;debug&#x2F;build&#x2F;ssvm-evmc-sys-cc95e16a52842521&#x2F;out&#x2F;bindings.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bindings.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../../../../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../../../../../../../../storage.js"></script><script src="../../../../../../../../../../../../crates.js"></script><script defer src="../../../../../../../../../../../../main.js"></script><script defer src="../../../../../../../../../../../../source-script.js"></script><script defer src="../../../../../../../../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../../../../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../../../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../../../../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../../../../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../../../../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../../../../../../../../ssvm_evmc_sys/index.html'><div class='logo-container rust-logo'><img src='../../../../../../../../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../../../../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../../../../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../../../../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -1128,7 +1129,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__daddr_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_int</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__key_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_int</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__clockid_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_int</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__timer_t</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_void</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__timer_t</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_void</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__blksize_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_long</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__blkcnt_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_long</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__blkcnt64_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_long</span>;
@@ -1141,7 +1142,7 @@
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__syscall_slong_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_long</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__syscall_ulong_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_ulong</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__loff_t</span> <span class="op">=</span> <span class="ident">__off64_t</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__caddr_t</span> <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">::std::os::raw::c_char</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__caddr_t</span> <span class="op">=</span> <span class="kw-2">*mut</span> <span class="ident">::std::os::raw::c_char</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__intptr_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_long</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__socklen_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_uint</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">__sig_atomic_t</span> <span class="op">=</span> <span class="ident">::std::os::raw::c_int</span>;
@@ -1237,7 +1238,7 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The message input data.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; This MAY be NULL.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="ident">input_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
+    <span class="kw">pub</span> <span class="ident">input_data</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The size of the message input data.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; If input_data is NULL this MUST be 0.&quot;</span>]</span>
@@ -1276,7 +1277,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  @param      context  The pointer to the Host execution context.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  @return              The transaction context.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_tx_context_fn</span> <span class="op">=</span>
-    <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_tx_context</span><span class="op">&gt;</span>;
+    <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>) -&gt; <span class="ident">evmc_tx_context</span><span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Get block hash callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; This callback function is used by a VM to query the hash of the header of the given block.&quot;</span>]</span>
@@ -1288,7 +1289,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The block hash or null bytes&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                 if the information about the block is not available.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_block_hash_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>, <span class="ident">number</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_bytes32</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>, <span class="ident">number</span>: <span class="ident">i64</span>) -&gt; <span class="ident">evmc_bytes32</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">i32</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The execution status code.&quot;</span>]</span>
@@ -1391,7 +1392,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; struct. Think of this as the best possible C language approximation to&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; passing objects by reference.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_release_result_fn</span> <span class="op">=</span>
-    <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">result</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_result</span>)<span class="op">&gt;</span>;
+    <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">result</span>: <span class="kw-2">*const</span> <span class="ident">evmc_result</span>)<span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The EVM code execution result.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">C</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
@@ -1412,7 +1413,7 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  freed with evmc_result::release().&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  This MAY be NULL.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="ident">output_data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
+    <span class="kw">pub</span> <span class="ident">output_data</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The size of the output data.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  If output_data is NULL this MUST be 0.&quot;</span>]</span>
@@ -1462,7 +1463,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @param address  The address of the account the query is about.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         true if exists, false otherwise.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_account_exists_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>) -&gt; <span class="ident">bool</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Get storage callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1475,10 +1476,10 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                 if the account does not exist.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_storage_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
-        <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_bytes32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_bytes32</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">evmc_bytes32</span>,
+    ) -&gt; <span class="ident">evmc_bytes32</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The effect of an attempt to modify a contract storage item.&quot;</span>]</span>
@@ -1517,11 +1518,11 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The effect on the storage item.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_set_storage_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
-        <span class="ident">key</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_bytes32</span>,
-        <span class="ident">value</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_bytes32</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_storage_status</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">key</span>: <span class="kw-2">*const</span> <span class="ident">evmc_bytes32</span>,
+        <span class="ident">value</span>: <span class="kw-2">*const</span> <span class="ident">evmc_bytes32</span>,
+    ) -&gt; <span class="ident">evmc_storage_status</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Get balance callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1532,9 +1533,9 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The balance of the given account or 0 if the account does not exist.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_balance_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_uint256be</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
+    ) -&gt; <span class="ident">evmc_uint256be</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Get code size callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1545,7 +1546,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @param address  The address of the account.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The size of the code in the account or 0 if the account does not exist.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_code_size_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>) -&gt; <span class="ident">usize</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Get code size callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1557,7 +1558,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @param address  The address of the account.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The hash of the code in the account or null bytes if the account does not exist.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_code_hash_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_bytes32</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>, <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>) -&gt; <span class="ident">evmc_bytes32</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Copy code callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1577,12 +1578,12 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  @return             The number of bytes copied to the buffer by the Client.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_copy_code_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
         <span class="ident">code_offset</span>: <span class="ident">usize</span>,
-        <span class="ident">buffer_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>,
+        <span class="ident">buffer_data</span>: <span class="kw-2">*mut</span> <span class="ident">u8</span>,
         <span class="ident">buffer_size</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>,
+    ) -&gt; <span class="ident">usize</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Selfdestruct callback function.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1596,9 +1597,9 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                      transferred.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_selfdestruct_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
-        <span class="ident">beneficiary</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">beneficiary</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
     ),
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Log callback function.&quot;</span>]</span>
@@ -1615,11 +1616,11 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                       0 and 4 inclusively.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_emit_log_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
-        <span class="ident">address</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_address</span>,
-        <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">address</span>: <span class="kw-2">*const</span> <span class="ident">evmc_address</span>,
+        <span class="ident">data</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
         <span class="ident">data_size</span>: <span class="ident">usize</span>,
-        <span class="ident">topics</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_bytes32</span>,
+        <span class="ident">topics</span>: <span class="kw-2">*const</span> <span class="ident">evmc_bytes32</span>,
         <span class="ident">topics_count</span>: <span class="ident">usize</span>,
     ),
 <span class="op">&gt;</span>;
@@ -1629,7 +1630,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @param  msg     The call parameters.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return         The result of the call.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_call_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>, <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_result</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>, <span class="ident">msg</span>: <span class="kw-2">*const</span> <span class="ident">evmc_message</span>) -&gt; <span class="ident">evmc_result</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The Host interface.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1676,12 +1677,12 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Hash</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">evmc_context</span> {
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The Host interface.&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="ident">host</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_host_interface</span>,
+    <span class="kw">pub</span> <span class="ident">host</span>: <span class="kw-2">*const</span> <span class="ident">evmc_host_interface</span>,
 }
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Destroys the EVM instance.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  @param evm  The EVM instance to be destroyed.&quot;</span>]</span>
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_destroy_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">evm</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_instance</span>)<span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_destroy_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">evm</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_instance</span>)<span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Possible outcomes of evmc_set_option.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>)]</span>
@@ -1703,10 +1704,10 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;  @return       The outcome of the operation.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_set_option_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">evm</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_instance</span>,
-        <span class="ident">name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">::std::os::raw::c_char</span>,
-        <span class="ident">value</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">::std::os::raw::c_char</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_set_option_result</span>,
+        <span class="ident">evm</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_instance</span>,
+        <span class="ident">name</span>: <span class="kw-2">*const</span> <span class="ident">::std::os::raw::c_char</span>,
+        <span class="ident">value</span>: <span class="kw-2">*const</span> <span class="ident">::std::os::raw::c_char</span>,
+    ) -&gt; <span class="ident">evmc_set_option_result</span>,
 <span class="op">&gt;</span>;
 <span class="kw">impl</span> <span class="ident">evmc_revision</span> {
     <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EVMC_MAX_REVISION</span>: <span class="ident">evmc_revision</span> <span class="op">=</span> <span class="ident">evmc_revision::EVMC_ISTANBUL</span>;
@@ -1774,13 +1775,13 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return           The execution result.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_execute_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">instance</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_instance</span>,
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_context</span>,
+        <span class="ident">instance</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_instance</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_context</span>,
         <span class="ident">rev</span>: <span class="ident">evmc_revision</span>,
-        <span class="ident">msg</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_message</span>,
-        <span class="ident">code</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
+        <span class="ident">msg</span>: <span class="kw-2">*const</span> <span class="ident">evmc_message</span>,
+        <span class="ident">code</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
         <span class="ident">code_size</span>: <span class="ident">usize</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_result</span>,
+    ) -&gt; <span class="ident">evmc_result</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u32</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Possible capabilities of a VM.&quot;</span>]</span>
@@ -1812,7 +1813,7 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @param instance  The EVM instance.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; @return          The supported capabilities of the VM. @see evmc_capabilities.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_get_capabilities_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
-    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">instance</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_instance</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">evmc_capabilities_flagset</span>,
+    <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(<span class="ident">instance</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_instance</span>) -&gt; <span class="ident">evmc_capabilities_flagset</span>,
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The opaque type representing a Client-side tracer object.&quot;</span>]</span>
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
@@ -1860,16 +1861,16 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                               of the VM memory.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_trace_callback</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_tracer_context</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_tracer_context</span>,
         <span class="ident">code_offset</span>: <span class="ident">usize</span>,
         <span class="ident">status_code</span>: <span class="ident">evmc_status_code</span>,
         <span class="ident">gas_left</span>: <span class="ident">i64</span>,
         <span class="ident">stack_num_items</span>: <span class="ident">usize</span>,
-        <span class="ident">pushed_stack_item</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">evmc_uint256be</span>,
+        <span class="ident">pushed_stack_item</span>: <span class="kw-2">*const</span> <span class="ident">evmc_uint256be</span>,
         <span class="ident">memory_size</span>: <span class="ident">usize</span>,
         <span class="ident">changed_memory_offset</span>: <span class="ident">usize</span>,
         <span class="ident">changed_memory_size</span>: <span class="ident">usize</span>,
-        <span class="ident">changed_memory</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>,
+        <span class="ident">changed_memory</span>: <span class="kw-2">*const</span> <span class="ident">u8</span>,
     ),
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Sets the EVM instruction tracer.&quot;</span>]</span>
@@ -1890,9 +1891,9 @@
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;                    argument is NULL.&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">evmc_set_tracer_fn</span> <span class="op">=</span> <span class="ident">::std::option::Option</span><span class="op">&lt;</span>
     <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-        <span class="ident">instance</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_instance</span>,
+        <span class="ident">instance</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_instance</span>,
         <span class="ident">callback</span>: <span class="ident">evmc_trace_callback</span>,
-        <span class="ident">context</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">evmc_tracer_context</span>,
+        <span class="ident">context</span>: <span class="kw-2">*mut</span> <span class="ident">evmc_tracer_context</span>,
     ),
 <span class="op">&gt;</span>;
 <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The EVM instance.&quot;</span>]</span>
@@ -1910,12 +1911,12 @@
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; It MUST be a NULL-terminated not empty string.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The content MUST be UTF-8 encoded (this implies ASCII encoding is also allowed).&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">::std::os::raw::c_char</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">*const</span> <span class="ident">::std::os::raw::c_char</span>,
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The version of the EVMC VM implementation, e.g. \&quot;1.2.3b4\&quot;.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; It MUST be a NULL-terminated not empty string.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; The content MUST be UTF-8 encoded (this implies ASCII encoding is also allowed).&quot;</span>]</span>
-    <span class="kw">pub</span> <span class="ident">version</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">::std::os::raw::c_char</span>,
+    <span class="kw">pub</span> <span class="ident">version</span>: <span class="kw-2">*const</span> <span class="ident">::std::os::raw::c_char</span>,
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; Pointer to function destroying the EVM instance.&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot;&quot;</span>]</span>
     <span class="attribute">#[<span class="ident">doc</span> <span class="op">=</span> <span class="string">&quot; This is a mandatory method and MUST NOT be set to NULL.&quot;</span>]</span>
@@ -1948,5 +1949,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../../../../../../../../" data-current-crate="ssvm_evmc_sys" data-search-index-js="../../../../../../../../../../../../search-index.js" data-search-js="../../../../../../../../../../../../search.js"></div>
-    <script src="../../../../../../../../../../../../main.js"></script><script src="../../../../../../../../../../../../source-script.js"></script><script src="../../../../../../../../../../../../source-files.js"></script>
 </body></html>

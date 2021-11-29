@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;psbt&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;psbt&#x2F;mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../storage.js"></script><script src="../../../../crates.js"></script><script defer src="../../../../main.js"></script><script defer src="../../../../source-script.js"></script><script defer src="../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -967,7 +968,7 @@
 <span class="kw">impl</span> <span class="ident">PartiallySignedTransaction</span> {
     <span class="doccomment">/// Create a PartiallySignedTransaction from an unsigned transaction, error</span>
     <span class="doccomment">/// if not unsigned</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unsigned_tx</span>(<span class="ident">tx</span>: <span class="ident">Transaction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unsigned_tx</span>(<span class="ident">tx</span>: <span class="ident">Transaction</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">self</span>::Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="ident">PartiallySignedTransaction</span> {
             <span class="ident">inputs</span>: <span class="macro">vec!</span>[<span class="ident">Default::default</span>(); <span class="ident">tx</span>.<span class="ident">input</span>.<span class="ident">len</span>()],
             <span class="ident">outputs</span>: <span class="macro">vec!</span>[<span class="ident">Default::default</span>(); <span class="ident">tx</span>.<span class="ident">output</span>.<span class="ident">len</span>()],
@@ -977,7 +978,7 @@
 
     <span class="doccomment">/// Extract the Transaction from a PartiallySignedTransaction by filling in</span>
     <span class="doccomment">/// the available signature information in place.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_tx</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Transaction</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">extract_tx</span>(<span class="self">self</span>) -&gt; <span class="ident">Transaction</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span>: <span class="ident">Transaction</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">unsigned_tx</span>;
 
         <span class="kw">for</span> (<span class="ident">vin</span>, <span class="ident">psbtin</span>) <span class="kw">in</span> <span class="ident">tx</span>.<span class="ident">input</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="self">self</span>.<span class="ident">inputs</span>.<span class="ident">into_iter</span>()) {
@@ -989,7 +990,7 @@
     }
 
     <span class="doccomment">/// Attempt to merge with another `PartiallySignedTransaction`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">self</span>::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident"><span class="self">self</span>::Error</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">merge</span>(<span class="ident">other</span>.<span class="ident">global</span>)<span class="question-mark">?</span>;
 
         <span class="kw">for</span> (<span class="ident">self_input</span>, <span class="ident">other_input</span>) <span class="kw">in</span> <span class="self">self</span>.<span class="ident">inputs</span>.<span class="ident">iter_mut</span>().<span class="ident">zip</span>(<span class="ident">other</span>.<span class="ident">inputs</span>.<span class="ident">into_iter</span>()) {
@@ -1022,10 +1023,10 @@
     }
 
     <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">PsbtParseError</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="kw">match</span> <span class="self">self</span> {
-                <span class="ident">PsbtParseError::PsbtEncoding</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Display::fmt</span>(<span class="ident">err</span>, <span class="ident">f</span>),
-                <span class="ident">PsbtParseError::Base64Encoding</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Display::fmt</span>(<span class="ident">err</span>, <span class="ident">f</span>),
+                <span class="ident">PsbtParseError::PsbtEncoding</span>(<span class="ident">err</span>) =&gt; <span class="ident">Display::fmt</span>(<span class="ident">err</span>, <span class="ident">f</span>),
+                <span class="ident">PsbtParseError::Base64Encoding</span>(<span class="ident">err</span>) =&gt; <span class="ident">Display::fmt</span>(<span class="ident">err</span>, <span class="ident">f</span>),
             }
         }
     }
@@ -1034,7 +1035,7 @@
     <span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">PsbtParseError</span> { }
 
     <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">PartiallySignedTransaction</span> {
-        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+        <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="ident">fmt::Result</span> {
             <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">Base64Display::with_config</span>(<span class="kw-2">&amp;</span><span class="ident">encode::serialize</span>(<span class="self">self</span>), <span class="ident">::base64::STANDARD</span>))
         }
     }
@@ -1042,7 +1043,7 @@
     <span class="kw">impl</span> <span class="ident">FromStr</span> <span class="kw">for</span> <span class="ident">PartiallySignedTransaction</span> {
         <span class="kw">type</span> <span class="prelude-val">Err</span> <span class="op">=</span> <span class="ident">PsbtParseError</span>;
 
-        <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
+        <span class="kw">fn</span> <span class="ident">from_str</span>(<span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident"><span class="self">Self</span>::Err</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">::base64::decode</span>(<span class="ident">s</span>).<span class="ident">map_err</span>(<span class="ident">PsbtParseError::Base64Encoding</span>)<span class="question-mark">?</span>;
             <span class="prelude-val">Ok</span>(<span class="ident">encode::deserialize</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">map_err</span>(<span class="ident">PsbtParseError::PsbtEncoding</span>)<span class="question-mark">?</span>)
         }
@@ -1055,20 +1056,20 @@
     <span class="kw">fn</span> <span class="ident">consensus_encode</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">io::Write</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="string">b&quot;psbt&quot;</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="string">b&quot;psbt&quot;</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">0xff_u8</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="number">0xff_u8</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
 
-        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+        <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">global</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">inputs</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
         }
 
         <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">outputs</span> {
-            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+            <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">i</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
         }
 
         <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
@@ -1076,19 +1077,19 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Decodable</span> <span class="kw">for</span> <span class="ident">PartiallySignedTransaction</span> {
-    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">take</span>(<span class="ident">MAX_VEC_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span>);
-        <span class="kw">let</span> <span class="ident">magic</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">magic</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw-2">*</span><span class="string">b&quot;psbt&quot;</span> <span class="op">!</span><span class="op">=</span> <span class="ident">magic</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidMagic</span>.<span class="ident">into</span>());
         }
 
-        <span class="kw">if</span> <span class="number">0xff_u8</span> <span class="op">!</span><span class="op">=</span> <span class="ident">u8::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span> {
+        <span class="kw">if</span> <span class="number">0xff_u8</span> <span class="op">!</span><span class="op">=</span> <span class="ident">u8::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidSeparator</span>.<span class="ident">into</span>());
         }
 
-        <span class="kw">let</span> <span class="ident">global</span>: <span class="ident">Global</span> <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">global</span>: <span class="ident">Global</span> <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">inputs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">inputs_len</span>: <span class="ident">usize</span> <span class="op">=</span> (<span class="kw-2">&amp;</span><span class="ident">global</span>.<span class="ident">unsigned_tx</span>.<span class="ident">input</span>).<span class="ident">len</span>();
@@ -1096,7 +1097,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">inputs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Input</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">inputs_len</span>);
 
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">inputs_len</span> {
-                <span class="ident">inputs</span>.<span class="ident">push</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>);
+                <span class="ident">inputs</span>.<span class="ident">push</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>);
             }
 
             <span class="ident">inputs</span>
@@ -1108,7 +1109,7 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">outputs</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Output</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::with_capacity</span>(<span class="ident">outputs_len</span>);
 
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">outputs_len</span> {
-                <span class="ident">outputs</span>.<span class="ident">push</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>);
+                <span class="ident">outputs</span>.<span class="ident">push</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>);
             }
 
             <span class="ident">outputs</span>
@@ -1421,8 +1422,8 @@
             <span class="ident">PartiallySignedTransaction::from_str</span>(<span class="string">&quot;cHNidP8BAHUCAAAAASaBcTce3/KF6Tet7qSze3gADAVmy7OtZGQXE8pCFxv2AAAAAAD+////AtPf9QUAAAAAGXapFNDFmQPFusKGh2DpD9UhpGZap2UgiKwA4fUFAAAAABepFDVF5uM7gyxHBQ8k0+65PJwDlIvHh7MuEwAAAQD9pQEBAAAAAAECiaPHHqtNIOA3G7ukzGmPopXJRjr6Ljl/hTPMti+VZ+UBAAAAFxYAFL4Y0VKpsBIDna89p95PUzSe7LmF/////4b4qkOnHf8USIk6UwpyN+9rRgi7st0tAXHmOuxqSJC0AQAAABcWABT+Pp7xp0XpdNkCxDVZQ6vLNL1TU/////8CAMLrCwAAAAAZdqkUhc/xCX/Z4Ai7NK9wnGIZeziXikiIrHL++E4sAAAAF6kUM5cluiHv1irHU6m80GfWx6ajnQWHAkcwRAIgJxK+IuAnDzlPVoMR3HyppolwuAJf3TskAinwf4pfOiQCIAGLONfc0xTnNMkna9b7QPZzMlvEuqFEyADS8vAtsnZcASED0uFWdJQbrUqZY3LLh+GFbTZSYG2YVi/jnF6efkE/IQUCSDBFAiEA0SuFLYXc2WHS9fSrZgZU327tzHlMDDPOXMMJ/7X85Y0CIGczio4OFyXBl/saiK9Z9R5E5CVbIBZ8hoQDHAXR8lkqASECI7cr7vCWXRC+B3jv7NYfysb3mk6haTkzgHNEZPhPKrMAAAAAAA==&quot;</span>)
                 <span class="comment">// This weird thing is necessary since rustc 0.29 prints out I/O error in a different format than later versions</span>
                 .<span class="ident">map_err</span>(<span class="op">|</span><span class="ident">err</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">err</span> {
-                    <span class="ident">PsbtParseError::PsbtEncoding</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">err</span>,
-                    <span class="ident">PsbtParseError::Base64Encoding</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">panic!</span>(<span class="string">&quot;PSBT Base64 decoding failed&quot;</span>)
+                    <span class="ident">PsbtParseError::PsbtEncoding</span>(<span class="ident">err</span>) =&gt; <span class="ident">err</span>,
+                    <span class="ident">PsbtParseError::Base64Encoding</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;PSBT Base64 decoding failed&quot;</span>)
                 })
                 .<span class="ident">map_err</span>(<span class="ident">Error::from</span>)
                 .<span class="ident">unwrap</span>();
@@ -1820,5 +1821,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="bitcoin" data-search-index-js="../../../../search-index.js" data-search-js="../../../../search.js"></div>
-    <script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script>
 </body></html>

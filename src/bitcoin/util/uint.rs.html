@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;uint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>uint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;uint.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>uint.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -786,7 +787,7 @@
 <span class="doccomment">//!</span>
 
 <span class="macro">macro_rules!</span> <span class="ident">construct_uint</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>:<span class="ident">expr</span>) =&gt; (
         <span class="doccomment">/// Little-endian large integer type</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">Default</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw">pub</span> [<span class="ident">u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>]);
@@ -795,14 +796,14 @@
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="doccomment">/// Conversion to u32</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u32</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_u32</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u32</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="ident">arr</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u32</span>
             }
 
             <span class="doccomment">/// Conversion to u64</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_u64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">u64</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="ident">arr</span>[<span class="number">0</span>] <span class="kw">as</span> <span class="ident">u64</span>
             }
@@ -810,7 +811,7 @@
 
             <span class="doccomment">/// Return the least number of bits needed to represent the number</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bits</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">1</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> {
                     <span class="kw">if</span> <span class="ident">arr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="ident">i</span>] <span class="op">&gt;</span> <span class="number">0</span> { <span class="kw">return</span> (<span class="number">0x40</span> <span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="ident">i</span> <span class="op">+</span> <span class="number">1</span>)) <span class="op">-</span> <span class="ident">arr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="ident">i</span>].<span class="ident">leading_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>; }
@@ -819,7 +820,7 @@
             }
 
             <span class="doccomment">/// Multiplication by u32</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_u32</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mul_u32</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="ident">u32</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">carry</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -841,7 +842,7 @@
 
             <span class="doccomment">/// Create an object from a given unsigned 64-bit integer</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">init</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_u64</span>(<span class="ident">init</span>: <span class="ident">u64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="ident">init</span>;
                 <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">ret</span>))
@@ -849,7 +850,7 @@
 
             <span class="doccomment">/// Create an object from a given signed 64-bit integer</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_i64</span>(<span class="ident">init</span>: <span class="ident">i64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_i64</span>(<span class="ident">init</span>: <span class="ident">i64</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">init</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">0</span> {
                     <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name::from_u64</span>(<span class="ident">init</span> <span class="kw">as</span> <span class="ident">u64</span>)
                 } <span class="kw">else</span> {
@@ -859,13 +860,13 @@
 
             <span class="doccomment">/// Creates big integer value from a byte array using</span>
             <span class="doccomment">/// big-endian encoding</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_be_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_be_bytes</span>(<span class="ident">bytes</span>: [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>]) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="ident"><span class="self">Self</span>::_from_be_slice</span>(<span class="kw-2">&amp;</span><span class="ident">bytes</span>)
             }
 
             <span class="doccomment">/// Creates big integer value from a byte slice using</span>
             <span class="doccomment">/// big-endian encoding</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_be_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="ident">ParseLengthError</span><span class="op">&gt;</span> {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_be_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="ident">ParseLengthError</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">!</span><span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span> {
                     <span class="prelude-val">Err</span>(<span class="ident">ParseLengthError</span> { <span class="ident">actual</span>: <span class="ident">bytes</span>.<span class="ident">len</span>(), <span class="ident">expected</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span><span class="kw-2">*</span><span class="number">8</span> })
                 } <span class="kw">else</span> {
@@ -873,7 +874,7 @@
                 }
             }
 
-            <span class="kw">fn</span> <span class="ident">_from_be_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">_from_be_slice</span>(<span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::endian::slice_to_u64_be</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">slice</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="ident">slice</span>.<span class="ident">iter_mut</span>()
@@ -884,7 +885,7 @@
             }
 
             <span class="doccomment">/// Convert a big integer into a byte array using big-endian encoding</span>
-            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_be_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>] {
+            <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_be_bytes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; [<span class="ident">u8</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>] {
                 <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::endian::u64_to_array_be</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">res</span> <span class="op">=</span> [<span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> {
@@ -896,7 +897,7 @@
 
             <span class="comment">// divmod like operation, returns (quotient, remainder)</span>
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="self">Self</span>, <span class="self">Self</span>) {
+            <span class="kw">fn</span> <span class="ident">div_rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; (<span class="self">Self</span>, <span class="self">Self</span>) {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_copy</span> <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">shift_copy</span> <span class="op">=</span> <span class="ident">other</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -921,7 +922,7 @@
                         <span class="ident">sub_copy</span> <span class="op">=</span> <span class="ident">sub_copy</span> <span class="op">-</span> <span class="ident">shift_copy</span>;
                     }
                     <span class="ident">shift_copy</span> <span class="op">=</span> <span class="ident">shift_copy</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="number">1</span>;
-                    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                    <span class="kw">if</span> <span class="ident">shift</span> <span class="op">==</span> <span class="number">0</span> {
                         <span class="kw">break</span>;
                     }
                     <span class="ident">shift</span> <span class="op">-</span><span class="op">=</span> <span class="number">1</span>;
@@ -933,14 +934,14 @@
 
         <span class="kw">impl</span> <span class="ident">PartialOrd</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">::core::cmp::Ordering</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">partial_cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">::core::cmp::Ordering</span><span class="op">&gt;</span> {
                 <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>))
             }
         }
 
         <span class="kw">impl</span> <span class="ident">Ord</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::cmp::Ordering</span> {
+            <span class="kw">fn</span> <span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="ident">::core::cmp::Ordering</span> {
                 <span class="comment">// We need to manually implement ordering because we use little-endian</span>
                 <span class="comment">// and the auto derive is a lexicographic ordering(i.e. memcmp)</span>
                 <span class="comment">// which with numbers is equivalent to big-endian</span>
@@ -955,7 +956,7 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Add</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">add</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">me</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">you</span>) <span class="op">=</span> <span class="ident">other</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -976,7 +977,7 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">sub</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="self">self</span> <span class="op">+</span> <span class="op">!</span><span class="ident">other</span> <span class="op">+</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::util::BitArray::one</span>()
             }
         }
@@ -984,7 +985,7 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Mul</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">mul</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::util::BitArray</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">me</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name::zero</span>();
                 <span class="comment">// TODO: be more efficient about this</span>
@@ -999,7 +1000,7 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Div</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">div</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="self">self</span>.<span class="ident">div_rem</span>(<span class="ident">other</span>).<span class="number">0</span>
             }
         }
@@ -1007,25 +1008,25 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Rem</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">rem</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="self">self</span>.<span class="ident">div_rem</span>(<span class="ident">other</span>).<span class="number">1</span>
             }
         }
 
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::util::BitArray</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+            <span class="kw">fn</span> <span class="ident">bit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident">bool</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="ident">arr</span>[<span class="ident">index</span> <span class="op">/</span> <span class="number">64</span>] <span class="op">&amp;</span> (<span class="number">1</span> <span class="op">&lt;</span><span class="op">&lt;</span> (<span class="ident">index</span> <span class="op">%</span> <span class="number">64</span>)) <span class="op">!</span><span class="op">=</span> <span class="number">0</span>
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">bit_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">bit_slice</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 (<span class="kw-2">*</span><span class="self">self</span> <span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">start</span>).<span class="ident">mask</span>(<span class="ident">end</span> <span class="op">-</span> <span class="ident">start</span>)
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">mask</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">n</span>: <span class="ident">usize</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> {
@@ -1040,7 +1041,7 @@
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">trailing_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+            <span class="kw">fn</span> <span class="ident">trailing_zeros</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="number">1</span>) {
                     <span class="kw">if</span> <span class="ident">arr</span>[<span class="ident">i</span>] <span class="op">&gt;</span> <span class="number">0</span> { <span class="kw">return</span> (<span class="number">0x40</span> <span class="op">*</span> <span class="ident">i</span>) <span class="op">+</span> <span class="ident">arr</span>[<span class="ident">i</span>].<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>; }
@@ -1048,8 +1049,8 @@
                 (<span class="number">0x40</span> <span class="op">*</span> (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="number">1</span>)) <span class="op">+</span> <span class="ident">arr</span>[<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">-</span> <span class="number">1</span>].<span class="ident">trailing_zeros</span>() <span class="kw">as</span> <span class="ident">usize</span>
             }
 
-            <span class="kw">fn</span> <span class="ident">zero</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> { <span class="ident">Default::default</span>() }
-            <span class="kw">fn</span> <span class="ident">one</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">zero</span>() -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> { <span class="ident">Default::default</span>() }
+            <span class="kw">fn</span> <span class="ident">one</span>() -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>({ <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>]; <span class="ident">ret</span>[<span class="number">0</span>] <span class="op">=</span> <span class="number">1</span>; <span class="ident">ret</span> })
             }
         }
@@ -1058,7 +1059,7 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">bitand</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr1</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr2</span>) <span class="op">=</span> <span class="ident">other</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -1073,7 +1074,7 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">bitxor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr1</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr2</span>) <span class="op">=</span> <span class="ident">other</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -1088,7 +1089,7 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">bitor</span>(<span class="self">self</span>, <span class="ident">other</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr1</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr2</span>) <span class="op">=</span> <span class="ident">other</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
@@ -1103,7 +1104,7 @@
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">not</span>(<span class="self">self</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> {
@@ -1116,7 +1117,7 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Shl</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">shift</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">shl</span>(<span class="self">self</span>, <span class="ident">shift</span>: <span class="ident">usize</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">original</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">let</span> <span class="ident">word_shift</span> <span class="op">=</span> <span class="ident">shift</span> <span class="op">/</span> <span class="number">64</span>;
@@ -1138,7 +1139,7 @@
         <span class="kw">impl</span> <span class="ident">::core::ops::Shr</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-            <span class="kw">fn</span> <span class="ident">shr</span>(<span class="self">self</span>, <span class="ident">shift</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+            <span class="kw">fn</span> <span class="ident">shr</span>(<span class="self">self</span>, <span class="ident">shift</span>: <span class="ident">usize</span>) -&gt; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
                 <span class="kw">let</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">original</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> [<span class="number">0u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">let</span> <span class="ident">word_shift</span> <span class="op">=</span> <span class="ident">shift</span> <span class="op">/</span> <span class="number">64</span>;
@@ -1156,7 +1157,7 @@
         }
 
         <span class="kw">impl</span> <span class="ident">::core::fmt::Debug</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+            <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::core::fmt::Formatter</span>) -&gt; <span class="ident">::core::fmt::Result</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;0x&quot;</span>)<span class="question-mark">?</span>;
                 <span class="kw">for</span> <span class="ident">ch</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>().<span class="ident">rev</span>() {
@@ -1173,11 +1174,11 @@
             <span class="kw">fn</span> <span class="ident">consensus_encode</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::io::Write</span><span class="op">&gt;</span>(
                 <span class="kw-2">&amp;</span><span class="self">self</span>,
                 <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">S</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::io::Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">usize</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::io::Error</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="kw-2">ref</span> <span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span> <span class="op">=</span> <span class="number">0</span>;
                 <span class="kw">for</span> <span class="ident">word</span> <span class="kw">in</span> <span class="ident">data</span>.<span class="ident">iter</span>() {
-                    <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">word</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
+                    <span class="ident">len</span> <span class="op">+</span><span class="op">=</span> <span class="ident">word</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">s</span>)<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">Ok</span>(<span class="ident">len</span>)
             }
@@ -1186,11 +1187,11 @@
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::consensus::Decodable</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::io::Read</span><span class="op">&gt;</span>(
                 <span class="kw-2">mut</span> <span class="ident">d</span>: <span class="ident">D</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::consensus::encode::Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::consensus::encode::Error</span><span class="op">&gt;</span> {
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::consensus::Decodable</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span>: [<span class="ident">u64</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span>];
                 <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> {
-                    <span class="ident">ret</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
+                    <span class="ident">ret</span>[<span class="ident">i</span>] <span class="op">=</span> <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>)<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>(<span class="ident">ret</span>))
             }
@@ -1198,7 +1199,7 @@
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;serde&quot;</span>)]</span>
         <span class="kw">impl</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Serialize</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
-            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
+            <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S::Ok</span>, <span class="ident">S::Error</span><span class="op">&gt;</span>
             <span class="kw">where</span>
                 <span class="ident">S</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Serializer</span>,
             {
@@ -1216,7 +1217,7 @@
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
                 <span class="ident">deserializer</span>: <span class="ident">D</span>,
-            ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
+            ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D::Error</span><span class="op">&gt;</span> {
                 <span class="kw">use</span> <span class="ident">::core::fmt</span>;
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::hashes::hex::FromHex</span>;
                 <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">crate::serde::de</span>;
@@ -1224,11 +1225,11 @@
                 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">de::Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Visitor</span> {
                     <span class="kw">type</span> <span class="ident">Value</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>;
 
-                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+                    <span class="kw">fn</span> <span class="ident">expecting</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
                         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;{} bytes or a hex string with {} characters&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">n_words</span> <span class="op">*</span> <span class="number">8</span> <span class="op">*</span> <span class="number">2</span>)
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+                    <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">s</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
                     <span class="kw">where</span>
                         <span class="ident">E</span>: <span class="ident">de::Error</span>,
                     {
@@ -1238,7 +1239,7 @@
                             .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">de::Error::invalid_length</span>(<span class="ident">bytes</span>.<span class="ident">len</span>() <span class="op">*</span> <span class="number">2</span>, <span class="kw-2">&amp;</span><span class="self">self</span>))
                     }
 
-                    <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
+                    <span class="kw">fn</span> <span class="ident">visit_bytes</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">bytes</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
                     <span class="kw">where</span>
                         <span class="ident">E</span>: <span class="ident">de::Error</span>,
                     {
@@ -1271,7 +1272,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">::core::fmt::Display</span> <span class="kw">for</span> <span class="ident">ParseLengthError</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">::core::fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">::core::fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">::core::fmt::Formatter</span>) -&gt; <span class="ident">::core::fmt::Result</span> {
         <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;Invalid length: got {}, expected {}&quot;</span>, <span class="self">self</span>.<span class="ident">actual</span>, <span class="self">self</span>.<span class="ident">expected</span>)
     }
 }
@@ -1282,14 +1283,14 @@
 <span class="kw">impl</span> <span class="ident">Uint256</span> {
     <span class="doccomment">/// Increment by 1</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Uint256</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">increment</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw-2">&amp;mut</span> <span class="ident">Uint256</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">arr</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">arr</span>[<span class="number">0</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-        <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">0</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+        <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">0</span>] <span class="op">==</span> <span class="number">0</span> {
             <span class="ident">arr</span>[<span class="number">1</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">1</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">1</span>] <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">arr</span>[<span class="number">2</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">2</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+                <span class="kw">if</span> <span class="ident">arr</span>[<span class="number">2</span>] <span class="op">==</span> <span class="number">0</span> {
                     <span class="ident">arr</span>[<span class="number">3</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
             }
@@ -1298,7 +1299,7 @@
 
     <span class="doccomment">/// Decay to a uint128</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Uint128</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">low_128</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Uint128</span> {
         <span class="kw">let</span> <span class="kw-2">&amp;</span><span class="ident">Uint256</span>(<span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>;
         <span class="ident">Uint128</span>([<span class="ident">data</span>[<span class="number">0</span>], <span class="ident">data</span>[<span class="number">1</span>]])
     }
@@ -1534,5 +1535,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

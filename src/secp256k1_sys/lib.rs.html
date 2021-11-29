@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;secp256k1-sys-0.4.1&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../secp256k1_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;secp256k1-sys-0.4.1&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../secp256k1_sys/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1230,22 +1231,22 @@
 <span class="doccomment">/// Nonces are generated deterministically by RFC6979 by</span>
 <span class="doccomment">/// default; there should be no need to ever change this.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">NonceFn</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-    <span class="ident">nonce32</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-    <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">key32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">algo16</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+    <span class="ident">nonce32</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+    <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">key32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">algo16</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
     <span class="ident">attempt</span>: <span class="ident">c_uint</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span><span class="op">&gt;</span>;
+) -&gt; <span class="ident">c_int</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// Hash function to use to post-process an ECDH point to get</span>
 <span class="doccomment">/// a shared secret.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">EcdhHashFn</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-    <span class="ident">output</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-    <span class="ident">x</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">y</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span><span class="op">&gt;</span>;
+    <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+    <span class="ident">x</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">y</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+) -&gt; <span class="ident">c_int</span><span class="op">&gt;</span>;
 
 <span class="doccomment">///  Same as secp256k1_nonce function with the exception of accepting an</span>
 <span class="doccomment">///  additional pubkey argument and not requiring an attempt argument. The pubkey</span>
@@ -1253,13 +1254,13 @@
 <span class="doccomment">///  inputs against reusing the nonce when signing with the wrong precomputed</span>
 <span class="doccomment">///  pubkey.</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">SchnorrNonceFn</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>(
-    <span class="ident">nonce32</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-    <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">key32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">xonly_pk32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">algo16</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span><span class="op">&gt;</span>;
+    <span class="ident">nonce32</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+    <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">key32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">xonly_pk32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">algo16</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+) -&gt; <span class="ident">c_int</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A Secp256k1 context, containing various precomputed values and such</span>
 <span class="doccomment">/// needed to do elliptic curve computations. If you create one of these</span>
@@ -1280,7 +1281,7 @@
     <span class="doccomment">/// If you pass this to any FFI functions, except as an out-pointer,</span>
     <span class="doccomment">/// the result is likely to be an assertation failure and process</span>
     <span class="doccomment">/// termination.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_array_unchecked</span>([<span class="number">0</span>; <span class="number">64</span>])
     }
 
@@ -1291,7 +1292,7 @@
     <span class="doccomment">/// the underlying library. You should not use this method except with data</span>
     <span class="doccomment">/// that you obtained from the FFI interface of the same version of this</span>
     <span class="doccomment">/// library.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">PublicKey</span>(<span class="ident">data</span>)
     }
 
@@ -1299,13 +1300,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// You should not use this unless you really know what you are doing. It is</span>
     <span class="doccomment">/// essentially only useful for extending the FFI interface itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">PublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="ident">state</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1322,7 +1323,7 @@
     <span class="doccomment">/// If you pass this to any FFI functions, except as an out-pointer,</span>
     <span class="doccomment">/// the result is likely to be an assertation failure and process</span>
     <span class="doccomment">/// termination.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_array_unchecked</span>([<span class="number">0</span>; <span class="number">64</span>])
     }
 
@@ -1333,7 +1334,7 @@
     <span class="doccomment">/// the underlying library. You should not use this method except with data</span>
     <span class="doccomment">/// that you obtained from the FFI interface of the same version of this</span>
     <span class="doccomment">/// library.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">Signature</span>(<span class="ident">data</span>)
     }
 
@@ -1341,7 +1342,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// You should not use this unless you really know what you are doing. It is</span>
     <span class="doccomment">/// essentially only useful for extending the FFI interface itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
@@ -1357,7 +1358,7 @@
     <span class="doccomment">/// If you pass this to any FFI functions, except as an out-pointer,</span>
     <span class="doccomment">/// the result is likely to be an assertation failure and process</span>
     <span class="doccomment">/// termination.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_array_unchecked</span>([<span class="number">0</span>; <span class="number">64</span>])
     }
 
@@ -1368,7 +1369,7 @@
     <span class="doccomment">/// the underlying library. You should not use this method except with data</span>
     <span class="doccomment">/// that you obtained from the FFI interface of the same version of this</span>
     <span class="doccomment">/// library.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">64</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">XOnlyPublicKey</span>(<span class="ident">data</span>)
     }
 
@@ -1376,13 +1377,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// You should not use this unless you really know what you are doing. It is</span>
     <span class="doccomment">/// essentially only useful for extending the FFI interface itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">c_uchar</span>; <span class="number">64</span>] {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">XOnlyPublicKey</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="ident">state</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1398,7 +1399,7 @@
     <span class="doccomment">/// If you pass this to any FFI functions, except as an out-pointer,</span>
     <span class="doccomment">/// the result is likely to be an assertation failure and process</span>
     <span class="doccomment">/// termination.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
         <span class="ident"><span class="self">Self</span>::from_array_unchecked</span>([<span class="number">0</span>; <span class="number">96</span>])
     }
 
@@ -1409,7 +1410,7 @@
     <span class="doccomment">/// the underlying library. You should not use this method except with data</span>
     <span class="doccomment">/// that you obtained from the FFI interface of the same version of this</span>
     <span class="doccomment">/// library.</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">96</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">from_array_unchecked</span>(<span class="ident">data</span>: [<span class="ident">c_uchar</span>; <span class="number">96</span>]) -&gt; <span class="self">Self</span> {
         <span class="ident">KeyPair</span>(<span class="ident">data</span>)
     }
 
@@ -1417,13 +1418,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// You should not use this unless you really know what you are doing. It is</span>
     <span class="doccomment">/// essentially only useful for extending the FFI interface itself.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> [<span class="ident">c_uchar</span>; <span class="number">96</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">underlying_bytes</span>(<span class="self">self</span>) -&gt; [<span class="ident">c_uchar</span>; <span class="number">96</span>] {
         <span class="self">self</span>.<span class="number">0</span>
     }
 }
 
 <span class="kw">impl</span> <span class="ident">hash::Hash</span> <span class="kw">for</span> <span class="ident">KeyPair</span> {
-    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">H</span>) {
+    <span class="kw">fn</span> <span class="ident">hash</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">hash::Hasher</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">state</span>: <span class="kw-2">&amp;mut</span> <span class="ident">H</span>) {
         <span class="ident">state</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -1443,264 +1444,264 @@
     <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">secp256k1_nonce_function_bip340</span>: <span class="ident">SchnorrNonceFn</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_no_precomp&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">secp256k1_context_no_precomp</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>;
+    <span class="kw">pub</span> <span class="kw">static</span> <span class="ident">secp256k1_context_no_precomp</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>;
 
     <span class="comment">// Contexts</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_preallocated_destroy&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_destroy</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>);
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_destroy</span>(<span class="ident">cx</span>: <span class="kw-2">*mut</span> <span class="ident">Context</span>);
 
     <span class="comment">// Signatures</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_parse_der&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_parse_der</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                               <span class="ident">input</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
-                                               <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_parse_der</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                               <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
+                                               -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_parse_compact&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_parse_compact</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                                   <span class="ident">input64</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                                   <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_parse_compact</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                                   <span class="ident">input64</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                                   -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_parse_der_lax&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ecdsa_signature_parse_der_lax</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                         <span class="ident">input</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
-                                         <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ecdsa_signature_parse_der_lax</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                         <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
+                                         -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_serialize_der&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_serialize_der</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                                   <span class="ident">out_len</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">size_t</span>, <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Signature</span>)
-                                                   <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_serialize_der</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                                   <span class="ident">out_len</span>: <span class="kw-2">*mut</span> <span class="ident">size_t</span>, <span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">Signature</span>)
+                                                   -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_serialize_compact&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_serialize_compact</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">output64</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                                       <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Signature</span>)
-                                                       <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_serialize_compact</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">output64</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                                       <span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">Signature</span>)
+                                                       -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_signature_normalize&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_normalize</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">out_sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                               <span class="ident">in_sig</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Signature</span>)
-                                               <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_signature_normalize</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">out_sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                               <span class="ident">in_sig</span>: <span class="kw-2">*const</span> <span class="ident">Signature</span>)
+                                               -&gt; <span class="ident">c_int</span>;
 
     <span class="comment">// Secret Keys</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_seckey_verify&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                      <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                      <span class="ident">sk</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use the secp256k1_ec_seckey_tweak_add function instead&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_privkey_negate&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                       <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                       <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_seckey_negate&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                      <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                      <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use the secp256k1_ec_seckey_tweak_add function instead&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_privkey_tweak_add&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                          <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                          <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                          <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                          <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                          <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                          -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_seckey_tweak_add&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                        <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                        <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                        <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                        <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                        -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.2.0&quot;</span>,<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use the secp256k1_ec_seckey_tweak_mul function instead&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_privkey_tweak_mul&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                          <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                          <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                          <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_privkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                          <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                          <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                          -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_seckey_tweak_mul&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                        <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                        <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_seckey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                        <span class="ident">sk</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                        <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                        -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_keypair_sec&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_sec</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                 <span class="ident">output_seckey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                 <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>)
-                                 <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_sec</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                 <span class="ident">output_seckey</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                 <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>)
+                                 -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_keypair_pub&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_pub</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                 <span class="ident">output_pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                 <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>)
-                                 <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_pub</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                 <span class="ident">output_pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                 <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>)
+                                 -&gt; <span class="ident">c_int</span>;
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">fuzzing</span>))]</span>
 <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
     <span class="comment">// Contexts</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_preallocated_size&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">size_t</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="ident">size_t</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_preallocated_create&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_preallocated_clone_size&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone_size</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">size_t</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone_size</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>) -&gt; <span class="ident">size_t</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_preallocated_clone&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_context_randomize&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_randomize</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
-                                       <span class="ident">seed32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                       <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_randomize</span>(<span class="ident">cx</span>: <span class="kw-2">*mut</span> <span class="ident">Context</span>,
+                                       <span class="ident">seed32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                       -&gt; <span class="ident">c_int</span>;
     <span class="comment">// Pubkeys</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_parse&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_parse</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                     <span class="ident">input</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
-                                     <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_parse</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                     <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
+                                     -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_serialize&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_serialize</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                         <span class="ident">out_len</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">size_t</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_serialize</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                         <span class="ident">out_len</span>: <span class="kw-2">*mut</span> <span class="ident">size_t</span>, <span class="ident">pk</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
                                          <span class="ident">compressed</span>: <span class="ident">c_uint</span>)
-                                         <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+                                         -&gt; <span class="ident">c_int</span>;
 
     <span class="comment">// EC</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_create&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                      <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                      <span class="ident">sk</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span>;
 
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_negate&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                      <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                      <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>) -&gt; <span class="ident">c_int</span>;
 
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_tweak_add&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                         <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                         <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                         <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                         <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                         <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                         -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_tweak_mul&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                         <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                         <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                         <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                         <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                         <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                         -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ec_pubkey_combine&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_combine</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                       <span class="ident">out</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                       <span class="ident">ins</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_combine</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                       <span class="ident">out</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                       <span class="ident">ins</span>: <span class="kw-2">*const</span> <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
                                        <span class="ident">n</span>: <span class="ident">c_int</span>)
-                                       <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+                                       -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdh&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdh</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">output</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
-        <span class="ident">seckey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
+        <span class="ident">seckey</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
         <span class="ident">hashfp</span>: <span class="ident">EcdhHashFn</span>,
-        <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="comment">// ECDSA</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_verify&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                  <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Signature</span>,
-                                  <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-                                  <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>)
-                                  <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                  <span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">Signature</span>,
+                                  <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+                                  <span class="ident">pk</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>)
+                                  -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_ecdsa_sign&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_sign</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-                                <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_sign</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+                                <span class="ident">sk</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
                                 <span class="ident">noncefn</span>: <span class="ident">NonceFn</span>,
-                                <span class="ident">noncedata</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>)
-                                <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+                                <span class="ident">noncedata</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>)
+                                -&gt; <span class="ident">c_int</span>;
 
     <span class="comment">// Schnorr Signatures</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_schnorrsig_sign&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_schnorrsig_sign</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>,
         <span class="ident">noncefp</span>: <span class="ident">SchnorrNonceFn</span>,
-        <span class="ident">noncedata</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">noncedata</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_schnorrsig_verify&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_schnorrsig_verify</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">sig64</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">sig64</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="comment">// Extra keys</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_keypair_create&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_create</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">KeyPair</span>,
-        <span class="ident">seckey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*mut</span> <span class="ident">KeyPair</span>,
+        <span class="ident">seckey</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_xonly_pubkey_parse&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_parse</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">input32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">input32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_xonly_pubkey_serialize&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_serialize</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">output32</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">output32</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_xonly_pubkey_from_pubkey&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_from_pubkey</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">xonly_pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">pk_parity</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">xonly_pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">pk_parity</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_xonly_pubkey_tweak_add&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">output_pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-        <span class="ident">internal_pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">output_pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+        <span class="ident">internal_pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_keypair_xonly_pub&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_xonly_pub</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">pk_parity</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">pk_parity</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_keypair_xonly_tweak_add&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_xonly_tweak_add</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">KeyPair</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*mut</span> <span class="ident">KeyPair</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>), <span class="ident">link_name</span> <span class="op">=</span> <span class="string">&quot;rustsecp256k1_v0_4_1_xonly_pubkey_tweak_add_check&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add_check</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">tweaked_pubkey32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">tweaked_pubkey32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
         <span class="ident">tweaked_pubkey_parity</span>: <span class="ident">c_int</span>,
-        <span class="ident">internal_pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span>;
+        <span class="ident">internal_pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span>;
 }
 
 <span class="doccomment">/// A reimplementation of the C function `secp256k1_context_create` in rust.</span>
@@ -1713,7 +1714,7 @@
 <span class="comment">//  In:      flags: which parts of the context to initialize.</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_create</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_create</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span> {
     <span class="kw">use</span> <span class="ident">core::mem</span>;
     <span class="kw">use</span> <span class="ident">std::alloc</span>;
     <span class="macro">assert!</span>(<span class="ident">ALIGN_TO</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">mem::align_of</span>::<span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span>());
@@ -1724,15 +1725,15 @@
     <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">secp256k1_context_preallocated_size</span>(<span class="ident">flags</span>) <span class="op">+</span> <span class="ident">ALIGN_TO</span>;
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">bytes</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
     <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">alloc::alloc</span>(<span class="ident">layout</span>);
-    (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>).<span class="ident">write</span>(<span class="ident">bytes</span>);
+    (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>).<span class="ident">write</span>(<span class="ident">bytes</span>);
     <span class="comment">// We must offset a whole ALIGN_TO in order to preserve the same alignment</span>
     <span class="comment">// this means we &quot;lose&quot; ALIGN_TO-size_of(usize) for padding.</span>
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">ALIGN_TO</span>) <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>;
+    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> <span class="ident">ptr</span>.<span class="ident">add</span>(<span class="ident">ALIGN_TO</span>) <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>;
     <span class="ident">secp256k1_context_preallocated_create</span>(<span class="ident">ptr</span>, <span class="ident">flags</span>)
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_create</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_create</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span> {
     <span class="ident">rustsecp256k1_v0_4_1_context_create</span>(<span class="ident">flags</span>)
 }
 
@@ -1744,17 +1745,17 @@
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_destroy</span>(<span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_destroy</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">Context</span>) {
     <span class="kw">use</span> <span class="ident">std::alloc</span>;
     <span class="ident">secp256k1_context_preallocated_destroy</span>(<span class="ident">ctx</span>);
-    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">ctx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>).<span class="ident">sub</span>(<span class="ident">ALIGN_TO</span>);
-    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">usize</span>).<span class="ident">read</span>();
+    <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">ctx</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>).<span class="ident">sub</span>(<span class="ident">ALIGN_TO</span>);
+    <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">usize</span>).<span class="ident">read</span>();
     <span class="kw">let</span> <span class="ident">layout</span> <span class="op">=</span> <span class="ident">alloc::Layout::from_size_align</span>(<span class="ident">bytes</span>, <span class="ident">ALIGN_TO</span>).<span class="ident">unwrap</span>();
     <span class="ident">alloc::dealloc</span>(<span class="ident">ptr</span>, <span class="ident">layout</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>, <span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>)))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_destroy</span>(<span class="ident">ctx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_destroy</span>(<span class="ident">ctx</span>: <span class="kw-2">*mut</span> <span class="ident">Context</span>) {
     <span class="ident">rustsecp256k1_v0_4_1_context_destroy</span>(<span class="ident">ctx</span>)
 }
 
@@ -1779,9 +1780,9 @@
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_default_illegal_callback_fn</span>(<span class="ident">message</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_default_illegal_callback_fn</span>(<span class="ident">message</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">_data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) {
     <span class="kw">use</span> <span class="ident">core::str</span>;
-    <span class="kw">let</span> <span class="ident">msg_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">message</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="ident">strlen</span>(<span class="ident">message</span>));
+    <span class="kw">let</span> <span class="ident">msg_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">message</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">strlen</span>(<span class="ident">message</span>));
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">str::from_utf8_unchecked</span>(<span class="ident">msg_slice</span>);
     <span class="macro">panic!</span>(<span class="string">&quot;[libsecp256k1] illegal argument. {}&quot;</span>, <span class="ident">msg</span>);
 }
@@ -1802,15 +1803,15 @@
 <span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">no_mangle</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>))]</span>
-<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_default_error_callback_fn</span>(<span class="ident">message</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>, <span class="ident">_data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) {
+<span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_default_error_callback_fn</span>(<span class="ident">message</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>, <span class="ident">_data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) {
     <span class="kw">use</span> <span class="ident">core::str</span>;
-    <span class="kw">let</span> <span class="ident">msg_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">message</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="ident">strlen</span>(<span class="ident">message</span>));
+    <span class="kw">let</span> <span class="ident">msg_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">message</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="ident">strlen</span>(<span class="ident">message</span>));
     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">str::from_utf8_unchecked</span>(<span class="ident">msg_slice</span>);
     <span class="macro">panic!</span>(<span class="string">&quot;[libsecp256k1] internal consistency check failed {}&quot;</span>, <span class="ident">msg</span>);
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">rust_secp_no_symbol_renaming</span>))]</span>
-<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">strlen</span>(<span class="kw-2">mut</span> <span class="ident">str_ptr</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_char</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
+<span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">strlen</span>(<span class="kw-2">mut</span> <span class="ident">str_ptr</span>: <span class="kw-2">*const</span> <span class="ident">c_char</span>) -&gt; <span class="ident">usize</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ctr</span> <span class="op">=</span> <span class="number">0</span>;
     <span class="kw">while</span> <span class="kw-2">*</span><span class="ident">str_ptr</span> <span class="op">!</span><span class="op">=</span> <span class="string">&#39;\0&#39;</span> <span class="kw">as</span> <span class="ident">c_char</span> {
         <span class="ident">ctr</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -1826,13 +1827,13 @@
 <span class="doccomment">///</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CPtr</span> {
     <span class="kw">type</span> <span class="ident">Target</span>;
-    <span class="kw">fn</span> <span class="ident">as_c_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::Target</span>;
-    <span class="kw">fn</span> <span class="ident">as_mut_c_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span>;
+    <span class="kw">fn</span> <span class="ident">as_c_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident"><span class="self">Self</span>::Target</span>;
+    <span class="kw">fn</span> <span class="ident">as_mut_c_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident"><span class="self">Self</span>::Target</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CPtr</span> <span class="kw">for</span> [<span class="ident">T</span>] {
     <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">fn</span> <span class="ident">as_c_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">as_c_ptr</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">*const</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="ident">ptr::null</span>()
         } <span class="kw">else</span> {
@@ -1840,7 +1841,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">as_mut_c_ptr</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
+    <span class="kw">fn</span> <span class="ident">as_mut_c_ptr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident"><span class="self">Self</span>::Target</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="ident">ptr::null_mut</span>::<span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Target</span><span class="op">&gt;</span>()
         } <span class="kw">else</span> {
@@ -1857,9 +1858,9 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">rust_secp_no_symbol_renaming</span>)]</span> <span class="macro">compile_error!</span>(<span class="string">&quot;We do not support fuzzing with rust_secp_no_symbol_renaming&quot;</span>);
 
     <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">size_t</span>;
-        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>;
-        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>;
+        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="ident">size_t</span>;
+        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span>;
+        <span class="kw">fn</span> <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span>;
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;lowmemory&quot;</span>)]</span>
@@ -1867,7 +1868,7 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;lowmemory&quot;</span>))]</span>
     <span class="kw">const</span> <span class="ident">CTX_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1024</span> <span class="op">*</span> (<span class="number">1024</span> <span class="op">+</span> <span class="number">128</span>);
     <span class="comment">// Contexts</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">size_t</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_size</span>(<span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="ident">size_t</span> {
         <span class="macro">assert!</span>(<span class="ident">rustsecp256k1_v0_4_1_context_preallocated_size</span>(<span class="ident">flags</span>) <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">CTX_SIZE</span>);
         <span class="ident">CTX_SIZE</span>
     }
@@ -1877,7 +1878,7 @@
     <span class="kw">const</span> <span class="ident">HAVE_CONTEXT_WORKING</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">1</span>;
     <span class="kw">const</span> <span class="ident">HAVE_CONTEXT_DONE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2</span>;
     <span class="kw">static</span> <span class="kw-2">mut</span> <span class="ident">PREALLOCATED_CONTEXT</span>: [<span class="ident">u8</span>; <span class="ident">CTX_SIZE</span>] <span class="op">=</span> [<span class="number">0</span>; <span class="ident">CTX_SIZE</span>];
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_create</span>(<span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>, <span class="ident">flags</span>: <span class="ident">c_uint</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span> {
         <span class="comment">// While applications should generally avoid creating too many contexts, sometimes fuzzers</span>
         <span class="comment">// perform tasks repeatedly which real applications may only do rarely. Thus, we want to</span>
         <span class="comment">// avoid being overly slow here. We do so by having a static context and copying it into</span>
@@ -1885,17 +1886,17 @@
         <span class="comment">// simple hand-written OnceFlag built out of an atomic to gate the global static.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">have_ctx</span> <span class="op">=</span> <span class="ident">HAVE_PREALLOCATED_CONTEXT</span>.<span class="ident">load</span>(<span class="ident">Ordering::Relaxed</span>);
         <span class="kw">while</span> <span class="ident">have_ctx</span> <span class="op">!</span><span class="op">=</span> <span class="ident">HAVE_CONTEXT_DONE</span> {
-            <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HAVE_CONTEXT_NONE</span> {
+            <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">==</span> <span class="ident">HAVE_CONTEXT_NONE</span> {
                 <span class="ident">have_ctx</span> <span class="op">=</span> <span class="ident">HAVE_PREALLOCATED_CONTEXT</span>.<span class="ident">swap</span>(<span class="ident">HAVE_CONTEXT_WORKING</span>, <span class="ident">Ordering::AcqRel</span>);
-                <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HAVE_CONTEXT_NONE</span> {
+                <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">==</span> <span class="ident">HAVE_CONTEXT_NONE</span> {
                     <span class="macro">assert!</span>(<span class="ident">rustsecp256k1_v0_4_1_context_preallocated_size</span>(<span class="ident">SECP256K1_START_SIGN</span> <span class="op">|</span> <span class="ident">SECP256K1_START_VERIFY</span>) <span class="op">+</span> <span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>() <span class="op">&lt;</span><span class="op">=</span> <span class="ident">CTX_SIZE</span>);
                     <span class="macro">assert_eq!</span>(<span class="ident">rustsecp256k1_v0_4_1_context_preallocated_create</span>(
-                            <span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
+                            <span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
                             <span class="ident">SECP256K1_START_SIGN</span> <span class="op">|</span> <span class="ident">SECP256K1_START_VERIFY</span>),
-                        <span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>);
+                        <span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>() <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Context</span>);
                     <span class="macro">assert_eq!</span>(<span class="ident">HAVE_PREALLOCATED_CONTEXT</span>.<span class="ident">swap</span>(<span class="ident">HAVE_CONTEXT_DONE</span>, <span class="ident">Ordering::AcqRel</span>),
                         <span class="ident">HAVE_CONTEXT_WORKING</span>);
-                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HAVE_CONTEXT_DONE</span> {
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">have_ctx</span> <span class="op">==</span> <span class="ident">HAVE_CONTEXT_DONE</span> {
                     <span class="comment">// Another thread finished while we were swapping.</span>
                     <span class="ident">HAVE_PREALLOCATED_CONTEXT</span>.<span class="ident">store</span>(<span class="ident">HAVE_CONTEXT_DONE</span>, <span class="ident">Ordering::Release</span>);
                 }
@@ -1907,53 +1908,53 @@
                 <span class="ident">std::thread::yield_now</span>();
             }
         }
-        <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>(), <span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="ident">CTX_SIZE</span>);
-        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
-        (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uint</span>).<span class="ident">write</span>(<span class="ident">flags</span>);
-        <span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>
+        <span class="ident">ptr::copy_nonoverlapping</span>(<span class="ident">PREALLOCATED_CONTEXT</span>[..].<span class="ident">as_ptr</span>(), <span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="ident">CTX_SIZE</span>);
+        <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
+        (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_uint</span>).<span class="ident">write</span>(<span class="ident">flags</span>);
+        <span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">Context</span>
     }
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone_size</span>(<span class="ident">_cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">size_t</span> { <span class="ident">CTX_SIZE</span> }
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span> {
-        <span class="kw">let</span> <span class="ident">orig_ptr</span> <span class="op">=</span> (<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="ident">new_ptr</span> <span class="op">=</span> (<span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
-        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> (<span class="ident">orig_ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uint</span>).<span class="ident">read</span>();
-        (<span class="ident">new_ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uint</span>).<span class="ident">write</span>(<span class="ident">flags</span>);
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone_size</span>(<span class="ident">_cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>) -&gt; <span class="ident">size_t</span> { <span class="ident">CTX_SIZE</span> }
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_preallocated_clone</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">prealloc</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>) -&gt; <span class="kw-2">*mut</span> <span class="ident">Context</span> {
+        <span class="kw">let</span> <span class="ident">orig_ptr</span> <span class="op">=</span> (<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
+        <span class="kw">let</span> <span class="ident">new_ptr</span> <span class="op">=</span> (<span class="ident">prealloc</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
+        <span class="kw">let</span> <span class="ident">flags</span> <span class="op">=</span> (<span class="ident">orig_ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_uint</span>).<span class="ident">read</span>();
+        (<span class="ident">new_ptr</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">c_uint</span>).<span class="ident">write</span>(<span class="ident">flags</span>);
         <span class="ident">rustsecp256k1_v0_4_1_context_preallocated_clone</span>(<span class="ident">cx</span>, <span class="ident">prealloc</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_randomize</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Context</span>,
-                                              <span class="ident">_seed32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                              <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_context_randomize</span>(<span class="ident">cx</span>: <span class="kw-2">*mut</span> <span class="ident">Context</span>,
+                                              <span class="ident">_seed32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                              -&gt; <span class="ident">c_int</span> {
         <span class="comment">// This function is really slow, and unsuitable for fuzzing</span>
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="number">1</span>
     }
 
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">check_context_flags</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">required_flags</span>: <span class="ident">c_uint</span>) {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">check_context_flags</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">required_flags</span>: <span class="ident">c_uint</span>) {
         <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">cx</span>.<span class="ident">is_null</span>());
-        <span class="kw">let</span> <span class="ident">cx_flags</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cx</span> <span class="op">=</span><span class="op">=</span> <span class="ident">secp256k1_context_no_precomp</span> {
+        <span class="kw">let</span> <span class="ident">cx_flags</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">cx</span> <span class="op">==</span> <span class="ident">secp256k1_context_no_precomp</span> {
             <span class="number">1</span>
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
-            (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uint</span>).<span class="ident">read</span>()
+            <span class="kw">let</span> <span class="ident">ptr</span> <span class="op">=</span> (<span class="ident">cx</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>).<span class="ident">add</span>(<span class="ident">CTX_SIZE</span>).<span class="ident">sub</span>(<span class="ident">std::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">c_uint</span><span class="op">&gt;</span>());
+            (<span class="ident">ptr</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">c_uint</span>).<span class="ident">read</span>()
         };
         <span class="macro">assert_eq!</span>(<span class="ident">cx_flags</span> <span class="op">&amp;</span> <span class="number">1</span>, <span class="number">1</span>); <span class="comment">// SECP256K1_FLAGS_TYPE_CONTEXT</span>
         <span class="macro">assert_eq!</span>(<span class="ident">cx_flags</span> <span class="op">&amp;</span> <span class="ident">required_flags</span>, <span class="ident">required_flags</span>);
     }
 
     <span class="doccomment">/// Checks that pk != 0xffff...ffff and pk[1..32] == pk[33..64]</span>
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                               <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                               <span class="ident">pk</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">1</span>..<span class="number">32</span>] <span class="op">!</span><span class="op">=</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">33</span>..<span class="number">64</span>] <span class="op">|</span><span class="op">|</span>
            ((<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0</span> <span class="op">&amp;&amp;</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">!</span><span class="op">=</span> <span class="number">0xff</span>) <span class="op">|</span><span class="op">|</span>
-           <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>].<span class="ident">as_ptr</span>()) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+           <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>].<span class="ident">as_ptr</span>()) <span class="op">==</span> <span class="number">0</span> {
             <span class="number">0</span>
         } <span class="kw">else</span> {
             <span class="number">1</span>
         }
     }
-    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">test_cleanup_pk</span>(<span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>) {
+    <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">test_cleanup_pk</span>(<span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>) {
         (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[..<span class="number">32</span>]);
         <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">&lt;</span><span class="op">=</span> <span class="number">0x7f</span> {
             (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span> <span class="number">0</span>;
@@ -1963,18 +1964,18 @@
     }
 
     <span class="comment">// Pubkeys</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_parse</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                            <span class="ident">input</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
-                                            <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_parse</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                            <span class="ident">input</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>, <span class="ident">in_len</span>: <span class="ident">size_t</span>)
+                                            -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">match</span> <span class="ident">in_len</span> {
-            <span class="number">33</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">33</span> =&gt; {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">!</span><span class="op">=</span> <span class="number">2</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">!</span><span class="op">=</span> <span class="number">3</span> {
                     <span class="number">0</span>
                 } <span class="kw">else</span> {
                     <span class="ident">ptr::copy</span>(<span class="ident">input</span>.<span class="ident">offset</span>(<span class="number">1</span>), (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>].<span class="ident">as_mut_ptr</span>(), <span class="number">32</span>);
                     <span class="ident">ptr::copy</span>(<span class="ident">input</span>.<span class="ident">offset</span>(<span class="number">2</span>), (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">33</span>..<span class="number">64</span>].<span class="ident">as_mut_ptr</span>(), <span class="number">31</span>);
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">=</span><span class="op">=</span> <span class="number">3</span> {
+                    <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">==</span> <span class="number">3</span> {
                         (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span> <span class="number">0xff</span>;
                     } <span class="kw">else</span> {
                         (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span> <span class="number">0</span>;
@@ -1982,7 +1983,7 @@
                     <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>)
                 }
             },
-            <span class="number">65</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="number">65</span> =&gt; {
                 <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">!</span><span class="op">=</span> <span class="number">4</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">!</span><span class="op">=</span> <span class="number">6</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">input</span> <span class="op">!</span><span class="op">=</span> <span class="number">7</span> {
                     <span class="number">0</span>
                 } <span class="kw">else</span> {
@@ -1991,18 +1992,18 @@
                     <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>)
                 }
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">0</span>
+            <span class="kw">_</span> =&gt; <span class="number">0</span>
         }
     }
 
     <span class="doccomment">/// Serialize PublicKey back to 33/65 byte pubkey</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_serialize</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-                                                <span class="ident">out_len</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">size_t</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_serialize</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">output</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+                                                <span class="ident">out_len</span>: <span class="kw-2">*mut</span> <span class="ident">size_t</span>, <span class="ident">pk</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
                                                 <span class="ident">compressed</span>: <span class="ident">c_uint</span>)
-                                                <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+                                                -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>), <span class="number">1</span>);
-        <span class="kw">if</span> <span class="ident">compressed</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SECP256K1_SER_COMPRESSED</span> {
+        <span class="kw">if</span> <span class="ident">compressed</span> <span class="op">==</span> <span class="ident">SECP256K1_SER_COMPRESSED</span> {
             <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">out_len</span>, <span class="number">33</span>);
             <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">&lt;</span><span class="op">=</span> <span class="number">0x7f</span> {
                 <span class="kw-2">*</span><span class="ident">output</span> <span class="op">=</span> <span class="number">2</span>;
@@ -2010,7 +2011,7 @@
                 <span class="kw-2">*</span><span class="ident">output</span> <span class="op">=</span> <span class="number">3</span>;
             }
             <span class="ident">ptr::copy</span>((<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>.<span class="ident">as_ptr</span>(), <span class="ident">output</span>.<span class="ident">offset</span>(<span class="number">1</span>), <span class="number">32</span>);
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">compressed</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SECP256K1_SER_UNCOMPRESSED</span> {
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">compressed</span> <span class="op">==</span> <span class="ident">SECP256K1_SER_UNCOMPRESSED</span> {
             <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="ident">out_len</span>, <span class="number">65</span>);
             <span class="kw-2">*</span><span class="ident">output</span> <span class="op">=</span> <span class="number">4</span>;
             <span class="ident">ptr::copy</span>((<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>.<span class="ident">as_ptr</span>(), <span class="ident">output</span>.<span class="ident">offset</span>(<span class="number">1</span>), <span class="number">64</span>);
@@ -2022,8 +2023,8 @@
 
     <span class="comment">// EC</span>
     <span class="doccomment">/// Sets pk to sk||sk</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                             <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>, <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                             <span class="ident">sk</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_SIGN</span>);
         <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, <span class="ident">sk</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> { <span class="kw">return</span> <span class="number">0</span>; }
         <span class="ident">ptr::copy</span>(<span class="ident">sk</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>].<span class="ident">as_mut_ptr</span>(), <span class="number">32</span>);
@@ -2032,8 +2033,8 @@
         <span class="number">1</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                             <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_negate</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                             <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>), <span class="number">1</span>);
         <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_negate</span>(<span class="ident">cx</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">as_mut_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> { <span class="kw">return</span> <span class="number">0</span>; }
@@ -2043,10 +2044,10 @@
     }
 
     <span class="doccomment">/// The PublicKey equivalent of secp256k1_ec_privkey_tweak_add</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                                <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                                <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                                <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                                <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                                <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                                -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>), <span class="number">1</span>);
         <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_tweak_add</span>(<span class="ident">cx</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">as_mut_ptr</span>(), <span class="ident">tweak</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> { <span class="kw">return</span> <span class="number">0</span>; }
@@ -2056,10 +2057,10 @@
     }
 
     <span class="doccomment">/// The PublicKey equivalent of secp256k1_ec_privkey_tweak_mul</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                                <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                                <span class="ident">tweak</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>)
-                                                <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_tweak_mul</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                                <span class="ident">pk</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                                <span class="ident">tweak</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>)
+                                                -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pk</span>), <span class="number">1</span>);
         <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_tweak_mul</span>(<span class="ident">cx</span>, (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">as_mut_ptr</span>(), <span class="ident">tweak</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> { <span class="kw">return</span> <span class="number">0</span>; }
@@ -2068,11 +2069,11 @@
         <span class="number">1</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_combine</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                              <span class="ident">out</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-                                              <span class="ident">ins</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ec_pubkey_combine</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                              <span class="ident">out</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+                                              <span class="ident">ins</span>: <span class="kw-2">*const</span> <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
                                               <span class="ident">n</span>: <span class="ident">c_int</span>)
-                                              <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+                                              -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="macro">assert!</span>(<span class="ident">n</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">1</span>);
         (<span class="kw-2">*</span><span class="ident">out</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">ins</span>;
@@ -2089,13 +2090,13 @@
 
     <span class="doccomment">/// Sets out to point^scalar^1s</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdh</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">out</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">point</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
-        <span class="ident">scalar</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">out</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">point</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
+        <span class="ident">scalar</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
         <span class="ident">hashfp</span>: <span class="ident">EcdhHashFn</span>,
-        <span class="ident">data</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_void</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">data</span>: <span class="kw-2">*mut</span> <span class="ident">c_void</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">point</span>), <span class="number">1</span>);
         <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, <span class="ident">scalar</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> { <span class="kw">return</span> <span class="number">0</span>; }
@@ -2120,16 +2121,16 @@
 
     <span class="comment">// ECDSA</span>
     <span class="doccomment">/// Verifies that sig is msg32||pk[..32]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                         <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Signature</span>,
-                                         <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-                                         <span class="ident">pk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>)
-                                         <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_verify</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                         <span class="ident">sig</span>: <span class="kw-2">*const</span> <span class="ident">Signature</span>,
+                                         <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+                                         <span class="ident">pk</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>)
+                                         -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         <span class="comment">// Actually verify</span>
-        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">sig</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">64</span>);
-        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">32</span>);
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">sig_sl</span>[..<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">msg_sl</span> <span class="op">&amp;&amp;</span> <span class="ident">sig_sl</span>[<span class="number">32</span>..] <span class="op">=</span><span class="op">=</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>] {
+        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">sig</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">64</span>);
+        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">32</span>);
+        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">sig_sl</span>[..<span class="number">32</span>] <span class="op">==</span> <span class="ident">msg_sl</span> <span class="op">&amp;&amp;</span> <span class="ident">sig_sl</span>[<span class="number">32</span>..] <span class="op">==</span> (<span class="kw-2">*</span><span class="ident">pk</span>).<span class="number">0</span>[<span class="number">0</span>..<span class="number">32</span>] {
             <span class="number">1</span>
         } <span class="kw">else</span> {
             <span class="number">0</span>
@@ -2137,22 +2138,22 @@
     }
 
     <span class="doccomment">/// Sets sig to msg32||pk[..32]</span>
-    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_sign</span>(<span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-                                       <span class="ident">sig</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">Signature</span>,
-                                       <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-                                       <span class="ident">sk</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+    <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_ecdsa_sign</span>(<span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+                                       <span class="ident">sig</span>: <span class="kw-2">*mut</span> <span class="ident">Signature</span>,
+                                       <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+                                       <span class="ident">sk</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
                                        <span class="ident">_noncefn</span>: <span class="ident">NonceFn</span>,
-                                       <span class="ident">_noncedata</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>)
-                                       <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+                                       <span class="ident">_noncedata</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>)
+                                       -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_SIGN</span>);
         <span class="comment">// Check context is built for signing (and compute pk)</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_pk</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>();
-        <span class="kw">if</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_pk</span>, <span class="ident">sk</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">new_pk</span>, <span class="ident">sk</span>) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="number">0</span>;
         }
         <span class="comment">// Sign</span>
-        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">sig</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="number">64</span>);
-        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">32</span>);
+        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">sig</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="number">64</span>);
+        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">32</span>);
         <span class="ident">sig_sl</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="ident">msg_sl</span>);
         <span class="ident">sig_sl</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">new_pk</span>.<span class="number">0</span>[..<span class="number">32</span>]);
         <span class="number">1</span>
@@ -2161,19 +2162,19 @@
     <span class="comment">// Schnorr Signatures</span>
     <span class="doccomment">/// Verifies that sig is msg32||pk[32..]</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_schnorrsig_verify</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">sig64</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">sig64</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         <span class="comment">// Check context is built for verification</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_pk</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_pk</span>, <span class="ident">pubkey</span>, <span class="ident">msg32</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">new_pk</span>, <span class="ident">pubkey</span>, <span class="ident">msg32</span>);
         <span class="comment">// Actually verify</span>
-        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">sig64</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">64</span>);
-        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">32</span>);
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">sig_sl</span>[..<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">msg_sl</span> <span class="op">&amp;&amp;</span> <span class="ident">sig_sl</span>[<span class="number">32</span>..] <span class="op">=</span><span class="op">=</span> (<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[..<span class="number">32</span>] {
+        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">sig64</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">64</span>);
+        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">32</span>);
+        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">sig_sl</span>[..<span class="number">32</span>] <span class="op">==</span> <span class="ident">msg_sl</span> <span class="op">&amp;&amp;</span> <span class="ident">sig_sl</span>[<span class="number">32</span>..] <span class="op">==</span> (<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[..<span class="number">32</span>] {
             <span class="number">1</span>
         } <span class="kw">else</span> {
             <span class="number">0</span>
@@ -2182,23 +2183,23 @@
 
     <span class="doccomment">/// Sets sig to msg32||pk[..32]</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_schnorrsig_sign</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">sig64</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">msg32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">sig64</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">msg32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>,
         <span class="ident">_noncefp</span>: <span class="ident">SchnorrNonceFn</span>,
-        <span class="ident">_noncedata</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_void</span>
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">_noncedata</span>: <span class="kw-2">*const</span> <span class="ident">c_void</span>
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_SIGN</span>);
         <span class="comment">// Check context is built for signing</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_kp</span> <span class="op">=</span> <span class="ident">KeyPair::new</span>();
-        <span class="kw">if</span> <span class="ident">secp256k1_keypair_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">new_kp</span>, (<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>.<span class="ident">as_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">secp256k1_keypair_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">new_kp</span>, (<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>.<span class="ident">as_ptr</span>()) <span class="op">!</span><span class="op">=</span> <span class="number">1</span> {
             <span class="kw">return</span> <span class="number">0</span>;
         }
         <span class="macro">assert_eq!</span>(<span class="ident">new_kp</span>, <span class="kw-2">*</span><span class="ident">keypair</span>);
         <span class="comment">// Sign</span>
-        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">sig64</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">u8</span>, <span class="number">64</span>);
-        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">u8</span>, <span class="number">32</span>);
+        <span class="kw">let</span> <span class="ident">sig_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">sig64</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">u8</span>, <span class="number">64</span>);
+        <span class="kw">let</span> <span class="ident">msg_sl</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">msg32</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="ident">u8</span>, <span class="number">32</span>);
         <span class="ident">sig_sl</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="ident">msg_sl</span>);
         <span class="ident">sig_sl</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">new_kp</span>.<span class="number">0</span>[<span class="number">32</span>..<span class="number">64</span>]);
         <span class="number">1</span>
@@ -2206,15 +2207,15 @@
 
     <span class="comment">// Extra keys</span>
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_create</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">KeyPair</span>,
-        <span class="ident">seckey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*mut</span> <span class="ident">KeyPair</span>,
+        <span class="ident">seckey</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_SIGN</span>);
-        <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, <span class="ident">seckey</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="kw">return</span> <span class="number">0</span>; }
+        <span class="kw">if</span> <span class="ident">secp256k1_ec_seckey_verify</span>(<span class="ident">cx</span>, <span class="ident">seckey</span>) <span class="op">==</span> <span class="number">0</span> { <span class="kw">return</span> <span class="number">0</span>; }
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>();
-        <span class="kw">if</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pk</span>, <span class="ident">seckey</span>) <span class="op">=</span><span class="op">=</span> <span class="number">0</span> { <span class="kw">return</span> <span class="number">0</span>; }
+        <span class="kw">if</span> <span class="ident">secp256k1_ec_pubkey_create</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pk</span>, <span class="ident">seckey</span>) <span class="op">==</span> <span class="number">0</span> { <span class="kw">return</span> <span class="number">0</span>; }
 
         <span class="kw">let</span> <span class="ident">seckey_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">seckey</span>, <span class="number">32</span>);
         (<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="ident">seckey_slice</span>);
@@ -2223,23 +2224,23 @@
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_parse</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">input32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">input32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">inslice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">input32</span>, <span class="number">32</span>);
         (<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="ident">inslice</span>);
         (<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="ident">inslice</span>);
-        <span class="ident">test_cleanup_pk</span>(<span class="ident">pubkey</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>);
-        <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pubkey</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>)
+        <span class="ident">test_cleanup_pk</span>(<span class="ident">pubkey</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>);
+        <span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pubkey</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_serialize</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">output32</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_uchar</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">output32</span>: <span class="kw-2">*mut</span> <span class="ident">c_uchar</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">outslice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts_mut</span>(<span class="ident">output32</span>, <span class="number">32</span>);
         <span class="ident">outslice</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[..<span class="number">32</span>]);
@@ -2247,14 +2248,14 @@
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_from_pubkey</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">xonly_pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">pk_parity</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">PublicKey</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">xonly_pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">pk_parity</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*const</span> <span class="ident">PublicKey</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">pk_parity</span>.<span class="ident">is_null</span>() {
-            <span class="kw-2">*</span><span class="ident">pk_parity</span> <span class="op">=</span> ((<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">into</span>();
+            <span class="kw-2">*</span><span class="ident">pk_parity</span> <span class="op">=</span> ((<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">==</span> <span class="number">0</span>).<span class="ident">into</span>();
         }
         (<span class="kw-2">*</span><span class="ident">xonly_pubkey</span>).<span class="number">0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">test_pk_validate</span>(<span class="ident">cx</span>, <span class="ident">pubkey</span>), <span class="number">1</span>);
@@ -2262,59 +2263,59 @@
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">output_pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">PublicKey</span>,
-        <span class="ident">internal_pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">output_pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">PublicKey</span>,
+        <span class="ident">internal_pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         (<span class="kw-2">*</span><span class="ident">output_pubkey</span>).<span class="number">0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">internal_pubkey</span>).<span class="number">0</span>);
         <span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="ident">output_pubkey</span>, <span class="ident">tweak32</span>)
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_xonly_pub</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">pubkey</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">pk_parity</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">c_int</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">KeyPair</span>
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">pubkey</span>: <span class="kw-2">*mut</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">pk_parity</span>: <span class="kw-2">*mut</span> <span class="ident">c_int</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*const</span> <span class="ident">KeyPair</span>
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="number">0</span>);
         <span class="kw">if</span> <span class="op">!</span><span class="ident">pk_parity</span>.<span class="ident">is_null</span>() {
-            <span class="kw-2">*</span><span class="ident">pk_parity</span> <span class="op">=</span> ((<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">into</span>();
+            <span class="kw-2">*</span><span class="ident">pk_parity</span> <span class="op">=</span> ((<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[<span class="number">32</span>] <span class="op">==</span> <span class="number">0</span>).<span class="ident">into</span>();
         }
         (<span class="kw-2">*</span><span class="ident">pubkey</span>).<span class="number">0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[<span class="number">32</span>..]);
         <span class="number">1</span>
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_keypair_xonly_tweak_add</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">keypair</span>: <span class="kw-2">*</span><span class="kw-2">mut</span> <span class="ident">KeyPair</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">keypair</span>: <span class="kw-2">*mut</span> <span class="ident">KeyPair</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>();
         <span class="ident">pk</span>.<span class="number">0</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[<span class="number">32</span>..]);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sk</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">32</span>];
         <span class="ident">sk</span>.<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span>(<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[..<span class="number">32</span>]);
-        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">pk</span>, <span class="ident">tweak32</span>), <span class="number">1</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_ec_seckey_tweak_add</span>(<span class="ident">cx</span>, (<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sk</span>[..]).<span class="ident">as_mut_ptr</span>(), <span class="ident">tweak32</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_ec_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">pk</span>, <span class="ident">tweak32</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_ec_seckey_tweak_add</span>(<span class="ident">cx</span>, (<span class="kw-2">&amp;mut</span> <span class="ident">sk</span>[..]).<span class="ident">as_mut_ptr</span>(), <span class="ident">tweak32</span>), <span class="number">1</span>);
         (<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[..<span class="number">32</span>].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">sk</span>);
         (<span class="kw-2">*</span><span class="ident">keypair</span>).<span class="number">0</span>[<span class="number">32</span>..].<span class="ident">copy_from_slice</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="number">0</span>);
         <span class="number">1</span>
     }
 
     <span class="kw">pub</span> <span class="kw">unsafe</span> <span class="kw">fn</span> <span class="ident">secp256k1_xonly_pubkey_tweak_add_check</span>(
-        <span class="ident">cx</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">Context</span>,
-        <span class="ident">tweaked_pubkey32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
+        <span class="ident">cx</span>: <span class="kw-2">*const</span> <span class="ident">Context</span>,
+        <span class="ident">tweaked_pubkey32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
         <span class="ident">tweaked_pubkey_parity</span>: <span class="ident">c_int</span>,
-        <span class="ident">internal_pubkey</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">XOnlyPublicKey</span>,
-        <span class="ident">tweak32</span>: <span class="kw-2">*</span><span class="kw">const</span> <span class="ident">c_uchar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">c_int</span> {
+        <span class="ident">internal_pubkey</span>: <span class="kw-2">*const</span> <span class="ident">XOnlyPublicKey</span>,
+        <span class="ident">tweak32</span>: <span class="kw-2">*const</span> <span class="ident">c_uchar</span>,
+    ) -&gt; <span class="ident">c_int</span> {
         <span class="ident">check_context_flags</span>(<span class="ident">cx</span>, <span class="ident">SECP256K1_START_VERIFY</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tweaked_pk</span> <span class="op">=</span> <span class="ident">PublicKey::new</span>();
-        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">tweaked_pk</span>, <span class="ident">internal_pubkey</span>, <span class="ident">tweak32</span>), <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(<span class="ident">secp256k1_xonly_pubkey_tweak_add</span>(<span class="ident">cx</span>, <span class="kw-2">&amp;mut</span> <span class="ident">tweaked_pk</span>, <span class="ident">internal_pubkey</span>, <span class="ident">tweak32</span>), <span class="number">1</span>);
         <span class="kw">let</span> <span class="ident">in_slice</span> <span class="op">=</span> <span class="ident">slice::from_raw_parts</span>(<span class="ident">tweaked_pubkey32</span>, <span class="number">32</span>);
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">tweaked_pk</span>.<span class="number">0</span>[..<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="ident">in_slice</span> <span class="op">&amp;&amp;</span> <span class="ident">tweaked_pubkey_parity</span> <span class="op">=</span><span class="op">=</span> (<span class="ident">tweaked_pk</span>.<span class="number">0</span>[<span class="number">32</span>] <span class="op">=</span><span class="op">=</span> <span class="number">0</span>).<span class="ident">into</span>() {
+        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="ident">tweaked_pk</span>.<span class="number">0</span>[..<span class="number">32</span>] <span class="op">==</span> <span class="ident">in_slice</span> <span class="op">&amp;&amp;</span> <span class="ident">tweaked_pubkey_parity</span> <span class="op">==</span> (<span class="ident">tweaked_pk</span>.<span class="number">0</span>[<span class="number">32</span>] <span class="op">==</span> <span class="number">0</span>).<span class="ident">into</span>() {
             <span class="number">1</span>
         } <span class="kw">else</span> {
             <span class="number">0</span>
@@ -2342,5 +2343,4 @@
 
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="secp256k1_sys" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;psbt&#x2F;map&#x2F;global.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>global.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;psbt&#x2F;map&#x2F;global.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>global.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -407,7 +408,7 @@
 
 <span class="kw">impl</span> <span class="ident">Global</span> {
     <span class="doccomment">/// Create a Global from an unsigned transaction, error if not unsigned</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unsigned_tx</span>(<span class="ident">tx</span>: <span class="ident">Transaction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">psbt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">from_unsigned_tx</span>(<span class="ident">tx</span>: <span class="ident">Transaction</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">psbt::Error</span><span class="op">&gt;</span> {
         <span class="kw">for</span> <span class="ident">txin</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">tx</span>.<span class="ident">input</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">txin</span>.<span class="ident">script_sig</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UnsignedTxHasScriptSigs</span>);
@@ -429,28 +430,28 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Map</span> <span class="kw">for</span> <span class="ident">Global</span> {
-    <span class="kw">fn</span> <span class="ident">insert_pair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pair</span>: <span class="ident">raw::Pair</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">encode::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">insert_pair</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">pair</span>: <span class="ident">raw::Pair</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">encode::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">raw::Pair</span> {
             <span class="ident">key</span>: <span class="ident">raw_key</span>,
             <span class="ident">value</span>: <span class="ident">raw_value</span>,
         } <span class="op">=</span> <span class="ident">pair</span>;
 
         <span class="kw">match</span> <span class="ident">raw_key</span>.<span class="ident">type_value</span> {
-            <span class="ident">PSBT_GLOBAL_UNSIGNED_TX</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">raw_key</span>).<span class="ident">into</span>()),
-            <span class="ident">PSBT_GLOBAL_PROPRIETARY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">proprietary</span>.<span class="ident">entry</span>(<span class="ident">raw::ProprietaryKey::from_key</span>(<span class="ident">raw_key</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>) {
-                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">raw_value</span>);},
-                <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">raw_key</span>).<span class="ident">into</span>()),
+            <span class="ident">PSBT_GLOBAL_UNSIGNED_TX</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">raw_key</span>).<span class="ident">into</span>()),
+            <span class="ident">PSBT_GLOBAL_PROPRIETARY</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">proprietary</span>.<span class="ident">entry</span>(<span class="ident">raw::ProprietaryKey::from_key</span>(<span class="ident">raw_key</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>) {
+                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) =&gt; {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">raw_value</span>);},
+                <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">raw_key</span>).<span class="ident">into</span>()),
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unknown</span>.<span class="ident">entry</span>(<span class="ident">raw_key</span>) {
-                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">raw_value</span>);},
-                <span class="ident">btree_map::Entry::Occupied</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">k</span>.<span class="ident">key</span>().<span class="ident">clone</span>()).<span class="ident">into</span>()),
+            <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">unknown</span>.<span class="ident">entry</span>(<span class="ident">raw_key</span>) {
+                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) =&gt; {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">raw_value</span>);},
+                <span class="ident">btree_map::Entry::Occupied</span>(<span class="ident">k</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">k</span>.<span class="ident">key</span>().<span class="ident">clone</span>()).<span class="ident">into</span>()),
             }
         }
 
         <span class="prelude-val">Ok</span>(())
     }
 
-    <span class="kw">fn</span> <span class="ident">get_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">raw::Pair</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">get_pairs</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">raw::Pair</span><span class="op">&gt;</span>, <span class="ident">io::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rv</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">raw::Pair</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="ident">rv</span>.<span class="ident">push</span>(<span class="ident">raw::Pair</span> {
@@ -462,10 +463,10 @@
                 <span class="comment">// Manually serialized to ensure 0-input txs are serialized</span>
                 <span class="comment">// without witnesses.</span>
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">input</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">lock_time</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">input</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
+                <span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">lock_time</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">ret</span>)<span class="question-mark">?</span>;
                 <span class="ident">ret</span>
             },
         });
@@ -515,7 +516,7 @@
 
     <span class="comment">// Keep in mind that according to BIP 174 this function must be commutative, i.e.</span>
     <span class="comment">// A.merge(B) == B.merge(A)</span>
-    <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">psbt::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">merge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">other</span>: <span class="self">Self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">psbt::Error</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">unsigned_tx</span> <span class="op">!</span><span class="op">=</span> <span class="ident">other</span>.<span class="ident">unsigned_tx</span> {
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">psbt::Error::UnexpectedUnsignedTx</span> {
                 <span class="ident">expected</span>: <span class="ident">Box::new</span>(<span class="self">self</span>.<span class="ident">unsigned_tx</span>.<span class="ident">clone</span>()),
@@ -532,10 +533,10 @@
         <span class="comment">// Merging xpubs</span>
         <span class="kw">for</span> (<span class="ident">xpub</span>, (<span class="ident">fingerprint1</span>, <span class="ident">derivation1</span>)) <span class="kw">in</span> <span class="ident">other</span>.<span class="ident">xpub</span> {
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">xpub</span>.<span class="ident">entry</span>(<span class="ident">xpub</span>) {
-                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">entry</span>) =&gt; {
                     <span class="ident">entry</span>.<span class="ident">insert</span>((<span class="ident">fingerprint1</span>, <span class="ident">derivation1</span>));
                 },
-                <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw-2">mut</span> <span class="ident">entry</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw-2">mut</span> <span class="ident">entry</span>) =&gt; {
                     <span class="comment">// Here in case of the conflict we select the version with algorithm:</span>
                     <span class="comment">// 1) if everything is equal we do nothing</span>
                     <span class="comment">// 2) report an error if</span>
@@ -547,17 +548,17 @@
 
                     <span class="kw">let</span> (<span class="ident">fingerprint2</span>, <span class="ident">derivation2</span>) <span class="op">=</span> <span class="ident">entry</span>.<span class="ident">get</span>().<span class="ident">clone</span>();
 
-                    <span class="kw">if</span> <span class="ident">derivation1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">derivation2</span> <span class="op">&amp;&amp;</span> <span class="ident">fingerprint1</span> <span class="op">=</span><span class="op">=</span> <span class="ident">fingerprint2</span>
+                    <span class="kw">if</span> <span class="ident">derivation1</span> <span class="op">==</span> <span class="ident">derivation2</span> <span class="op">&amp;&amp;</span> <span class="ident">fingerprint1</span> <span class="op">==</span> <span class="ident">fingerprint2</span>
                     {
                         <span class="kw">continue</span>
                     }
                     <span class="kw">else</span> <span class="kw">if</span>
                         <span class="ident">derivation1</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">derivation2</span>.<span class="ident">len</span>() <span class="op">&amp;&amp;</span>
-                        <span class="ident">derivation1</span>[..] <span class="op">=</span><span class="op">=</span> <span class="ident">derivation2</span>[<span class="ident">derivation2</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">derivation1</span>.<span class="ident">len</span>()..]
+                        <span class="ident">derivation1</span>[..] <span class="op">==</span> <span class="ident">derivation2</span>[<span class="ident">derivation2</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">derivation1</span>.<span class="ident">len</span>()..]
                     {
                         <span class="kw">continue</span>
                     }
-                    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">derivation2</span>[..] <span class="op">=</span><span class="op">=</span> <span class="ident">derivation1</span>[<span class="ident">derivation1</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">derivation2</span>.<span class="ident">len</span>()..]
+                    <span class="kw">else</span> <span class="kw">if</span> <span class="ident">derivation2</span>[..] <span class="op">==</span> <span class="ident">derivation1</span>[<span class="ident">derivation1</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">derivation2</span>.<span class="ident">len</span>()..]
                     {
                         <span class="ident">entry</span>.<span class="ident">insert</span>((<span class="ident">fingerprint1</span>, <span class="ident">derivation1</span>));
                         <span class="kw">continue</span>
@@ -578,7 +579,7 @@
 <span class="macro">impl_psbtmap_consensus_encoding!</span>(<span class="ident">Global</span>);
 
 <span class="kw">impl</span> <span class="ident">Decodable</span> <span class="kw">for</span> <span class="ident">Global</span> {
-    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">consensus_decode</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">io::Read</span><span class="op">&gt;</span>(<span class="ident">d</span>: <span class="ident">D</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">encode::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">take</span>(<span class="ident">MAX_VEC_SIZE</span> <span class="kw">as</span> <span class="ident">u64</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tx</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Transaction</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">version</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u32</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -587,10 +588,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proprietary</span>: <span class="ident">BTreeMap</span><span class="op">&lt;</span><span class="ident">raw::ProprietaryKey</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Default::default</span>();
 
         <span class="kw">loop</span> {
-            <span class="kw">match</span> <span class="ident">raw::Pair::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">d</span>) {
-                <span class="prelude-val">Ok</span>(<span class="ident">pair</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">match</span> <span class="ident">raw::Pair::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">d</span>) {
+                <span class="prelude-val">Ok</span>(<span class="ident">pair</span>) =&gt; {
                     <span class="kw">match</span> <span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">type_value</span> {
-                        <span class="ident">PSBT_GLOBAL_UNSIGNED_TX</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PSBT_GLOBAL_UNSIGNED_TX</span> =&gt; {
                             <span class="comment">// key has to be empty</span>
                             <span class="kw">if</span> <span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">key</span>.<span class="ident">is_empty</span>() {
                                 <span class="comment">// there can only be one unsigned transaction</span>
@@ -602,10 +603,10 @@
                                     <span class="comment">// txs without witnesses are deserialized</span>
                                     <span class="comment">// properly.</span>
                                     <span class="ident">tx</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Transaction</span> {
-                                        <span class="ident">version</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
-                                        <span class="ident">input</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
-                                        <span class="ident">output</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
-                                        <span class="ident">lock_time</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
+                                        <span class="ident">version</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
+                                        <span class="ident">input</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
+                                        <span class="ident">output</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
+                                        <span class="ident">lock_time</span>: <span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>,
                                     });
 
                                     <span class="kw">if</span> <span class="ident">decoder</span>.<span class="ident">position</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">vlen</span> <span class="kw">as</span> <span class="ident">u64</span> {
@@ -618,7 +619,7 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidKey</span>(<span class="ident">pair</span>.<span class="ident">key</span>).<span class="ident">into</span>())
                             }
                         }
-                        <span class="ident">PSBT_GLOBAL_XPUB</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PSBT_GLOBAL_XPUB</span> =&gt; {
                             <span class="kw">if</span> <span class="op">!</span><span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">key</span>.<span class="ident">is_empty</span>() {
                                 <span class="kw">let</span> <span class="ident">xpub</span> <span class="op">=</span> <span class="ident">ExtendedPubKey::decode</span>(<span class="kw-2">&amp;</span><span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">key</span>)
                                     .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">encode::Error::ParseFailed</span>(
@@ -632,9 +633,9 @@
                                 <span class="kw">let</span> <span class="ident">child_count</span> <span class="op">=</span> <span class="ident">pair</span>.<span class="ident">value</span>.<span class="ident">len</span>() <span class="op">/</span> <span class="number">4</span> <span class="op">-</span> <span class="number">1</span>;
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">decoder</span> <span class="op">=</span> <span class="ident">Cursor::new</span>(<span class="ident">pair</span>.<span class="ident">value</span>);
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fingerprint</span> <span class="op">=</span> [<span class="number">0u8</span>; <span class="number">4</span>];
-                                <span class="ident">decoder</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fingerprint</span>[..])<span class="question-mark">?</span>;
+                                <span class="ident">decoder</span>.<span class="ident">read_exact</span>(<span class="kw-2">&amp;mut</span> <span class="ident">fingerprint</span>[..])<span class="question-mark">?</span>;
                                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">path</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span><span class="ident">ChildNumber</span><span class="op">&gt;</span><span class="ident">::with_capacity</span>(<span class="ident">child_count</span>);
-                                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">u32::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>) {
+                                <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">index</span>) <span class="op">=</span> <span class="ident">u32::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>) {
                                     <span class="ident">path</span>.<span class="ident">push</span>(<span class="ident">ChildNumber::from</span>(<span class="ident">index</span>))
                                 }
                                 <span class="kw">let</span> <span class="ident">derivation</span> <span class="op">=</span> <span class="ident">DerivationPath::from</span>(<span class="ident">path</span>);
@@ -646,7 +647,7 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">encode::Error::ParseFailed</span>(<span class="string">&quot;Xpub global key must contain serialized Xpub data&quot;</span>))
                             }
                         }
-                        <span class="ident">PSBT_GLOBAL_VERSION</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">PSBT_GLOBAL_VERSION</span> =&gt; {
                             <span class="comment">// key has to be empty</span>
                             <span class="kw">if</span> <span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">key</span>.<span class="ident">is_empty</span>() {
                                 <span class="comment">// there can only be one version</span>
@@ -656,7 +657,7 @@
                                     <span class="kw">if</span> <span class="ident">vlen</span> <span class="op">!</span><span class="op">=</span> <span class="number">4</span> {
                                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">encode::Error::ParseFailed</span>(<span class="string">&quot;Wrong global version value length (must be 4 bytes)&quot;</span>))
                                     }
-                                    <span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>);
+                                    <span class="ident">version</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Decodable::consensus_decode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">decoder</span>)<span class="question-mark">?</span>);
                                     <span class="comment">// We only understand version 0 PSBTs. According to BIP-174 we</span>
                                     <span class="comment">// should throw an error if we see anything other than version 0.</span>
                                     <span class="kw">if</span> <span class="ident">version</span> <span class="op">!</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="number">0</span>) {
@@ -669,18 +670,18 @@
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::InvalidKey</span>(<span class="ident">pair</span>.<span class="ident">key</span>).<span class="ident">into</span>())
                             }
                         }
-                        <span class="ident">PSBT_GLOBAL_PROPRIETARY</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">proprietary</span>.<span class="ident">entry</span>(<span class="ident">raw::ProprietaryKey::from_key</span>(<span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>) {
-                            <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">value</span>);},
-                            <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">pair</span>.<span class="ident">key</span>).<span class="ident">into</span>()),
+                        <span class="ident">PSBT_GLOBAL_PROPRIETARY</span> =&gt; <span class="kw">match</span> <span class="ident">proprietary</span>.<span class="ident">entry</span>(<span class="ident">raw::ProprietaryKey::from_key</span>(<span class="ident">pair</span>.<span class="ident">key</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>) {
+                            <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) =&gt; {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">value</span>);},
+                            <span class="ident">btree_map::Entry::Occupied</span>(<span class="kw">_</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">pair</span>.<span class="ident">key</span>).<span class="ident">into</span>()),
                         }
-                        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">match</span> <span class="ident">unknowns</span>.<span class="ident">entry</span>(<span class="ident">pair</span>.<span class="ident">key</span>) {
-                            <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) <span class="op">=</span><span class="op">&gt;</span> {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">value</span>);},
-                            <span class="ident">btree_map::Entry::Occupied</span>(<span class="ident">k</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">k</span>.<span class="ident">key</span>().<span class="ident">clone</span>()).<span class="ident">into</span>()),
+                        <span class="kw">_</span> =&gt; <span class="kw">match</span> <span class="ident">unknowns</span>.<span class="ident">entry</span>(<span class="ident">pair</span>.<span class="ident">key</span>) {
+                            <span class="ident">btree_map::Entry::Vacant</span>(<span class="ident">empty_key</span>) =&gt; {<span class="ident">empty_key</span>.<span class="ident">insert</span>(<span class="ident">pair</span>.<span class="ident">value</span>);},
+                            <span class="ident">btree_map::Entry::Occupied</span>(<span class="ident">k</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::DuplicateKey</span>(<span class="ident">k</span>.<span class="ident">key</span>().<span class="ident">clone</span>()).<span class="ident">into</span>()),
                         }
                     }
                 }
-                <span class="prelude-val">Err</span>(<span class="ident">::consensus::encode::Error::Psbt</span>(<span class="ident">::util::psbt::Error::NoMorePairs</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
-                <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
+                <span class="prelude-val">Err</span>(<span class="ident">::consensus::encode::Error::Psbt</span>(<span class="ident">::util::psbt::Error::NoMorePairs</span>)) =&gt; <span class="kw">break</span>,
+                <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>),
             }
         }
 
@@ -698,5 +699,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="bitcoin" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
-    <script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script>
 </body></html>

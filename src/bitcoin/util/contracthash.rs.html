@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;contracthash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>contracthash.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;contracthash.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>contracthash.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -458,26 +459,26 @@
 }
 
 <span class="kw">impl</span> <span class="ident">fmt::Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt::Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt::Result</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;mut</span> <span class="ident">fmt::Formatter</span>) -&gt; <span class="ident">fmt::Result</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Secp</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">f</span>),
-            <span class="ident">Error::Script</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">f</span>),
-            <span class="ident">Error::UncompressedKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;encountered uncompressed secp public key&quot;</span>),
-            <span class="ident">Error::ExpectedKey</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;expected key when deserializing script&quot;</span>),
-            <span class="ident">Error::ExpectedChecksig</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;expected OP_*CHECKSIG* when deserializing script&quot;</span>),
-            <span class="ident">Error::TooFewKeys</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;got {} keys, which was not enough&quot;</span>, <span class="ident">n</span>),
-            <span class="ident">Error::TooManyKeys</span>(<span class="ident">n</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;got {} keys, which was too many&quot;</span>, <span class="ident">n</span>)
+            <span class="ident">Error::Secp</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">f</span>),
+            <span class="ident">Error::Script</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="ident">fmt::Display::fmt</span>(<span class="kw-2">&amp;</span><span class="ident">e</span>, <span class="ident">f</span>),
+            <span class="ident">Error::UncompressedKey</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;encountered uncompressed secp public key&quot;</span>),
+            <span class="ident">Error::ExpectedKey</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;expected key when deserializing script&quot;</span>),
+            <span class="ident">Error::ExpectedChecksig</span> =&gt; <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;expected OP_*CHECKSIG* when deserializing script&quot;</span>),
+            <span class="ident">Error::TooFewKeys</span>(<span class="ident">n</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;got {} keys, which was not enough&quot;</span>, <span class="ident">n</span>),
+            <span class="ident">Error::TooManyKeys</span>(<span class="ident">n</span>) =&gt; <span class="macro">write!</span>(<span class="ident">f</span>, <span class="string">&quot;got {} keys, which was too many&quot;</span>, <span class="ident">n</span>)
         }
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;std&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">::std::error::Error</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">cause</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">dyn</span> <span class="ident">error::Error</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">Error::Secp</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="ident">Error::Script</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>
+            <span class="ident">Error::Secp</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="ident">Error::Script</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) =&gt; <span class="prelude-val">Some</span>(<span class="ident">e</span>),
+            <span class="kw">_</span> =&gt; <span class="prelude-val">None</span>
         }
     }
 }
@@ -495,14 +496,14 @@
 
 <span class="kw">impl</span> <span class="ident">Template</span> {
     <span class="doccomment">/// Instantiate a template</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">PublicKey</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">script::Script</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">to_script</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">PublicKey</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">script::Script</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_index</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">script::Builder::new</span>();
         <span class="kw">for</span> <span class="ident">elem</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
             <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">elem</span> {
-                <span class="ident">TemplateElement::Op</span>(<span class="ident">opcode</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ret</span>.<span class="ident">push_opcode</span>(<span class="ident">opcode</span>),
-                <span class="ident">TemplateElement::Key</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="ident">key_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>() {
+                <span class="ident">TemplateElement::Op</span>(<span class="ident">opcode</span>) =&gt; <span class="ident">ret</span>.<span class="ident">push_opcode</span>(<span class="ident">opcode</span>),
+                <span class="ident">TemplateElement::Key</span> =&gt; {
+                    <span class="kw">if</span> <span class="ident">key_index</span> <span class="op">==</span> <span class="ident">keys</span>.<span class="ident">len</span>() {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::TooFewKeys</span>(<span class="ident">key_index</span>));
                     }
                     <span class="ident">key_index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
@@ -510,7 +511,7 @@
                 }
             }
         }
-        <span class="kw">if</span> <span class="ident">key_index</span> <span class="op">=</span><span class="op">=</span> <span class="ident">keys</span>.<span class="ident">len</span>() {
+        <span class="kw">if</span> <span class="ident">key_index</span> <span class="op">==</span> <span class="ident">keys</span>.<span class="ident">len</span>() {
             <span class="prelude-val">Ok</span>(<span class="ident">ret</span>.<span class="ident">into_script</span>())
         } <span class="kw">else</span> {
             <span class="prelude-val">Err</span>(<span class="ident">Error::TooManyKeys</span>(<span class="ident">keys</span>.<span class="ident">len</span>()))
@@ -518,15 +519,15 @@
     }
 
     <span class="doccomment">/// Returns the number of keys this template requires to instantiate</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> <span class="op">=</span><span class="op">=</span> <span class="ident">TemplateElement::Key</span>).<span class="ident">count</span>()
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">required_keys</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">filter</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">e</span> <span class="op">==</span> <span class="ident">TemplateElement::Key</span>).<span class="ident">count</span>()
     }
 
     <span class="doccomment">/// If the first push in the template is a number, return this number. For the</span>
     <span class="doccomment">/// common case of standard multisig templates, such a number will exist and</span>
     <span class="doccomment">/// will represent the number of signatures that are required for the script</span>
     <span class="doccomment">/// to pass.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_push_as_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">first_push_as_number</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
             <span class="kw">if</span> <span class="kw">let</span> <span class="ident">TemplateElement::Op</span>(<span class="ident">op</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>] {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">opcodes::Class::PushNum</span>(<span class="ident">n</span>) <span class="op">=</span> <span class="ident">op</span>.<span class="ident">classify</span>() {
@@ -541,9 +542,9 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Template</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Template</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">slice</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>]) -&gt; <span class="ident">Template</span> {
         <span class="ident">Template</span>(<span class="ident">slice</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="kw-2">&amp;</span><span class="ident">byte</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="ident">byte</span> <span class="op">=</span><span class="op">=</span> <span class="ident">PUBKEY</span> {
+            <span class="kw">if</span> <span class="ident">byte</span> <span class="op">==</span> <span class="ident">PUBKEY</span> {
                 <span class="ident">TemplateElement::Key</span>
             } <span class="kw">else</span> {
                 <span class="ident">TemplateElement::Op</span>(<span class="ident">opcodes::All::from</span>(<span class="ident">byte</span>))
@@ -553,19 +554,19 @@
 }
 
 <span class="doccomment">/// Tweak a single key using some arbitrary data</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_key</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Verification</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">key</span>: <span class="ident">PublicKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">PublicKey</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_key</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Verification</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">key</span>: <span class="ident">PublicKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">PublicKey</span> {
     <span class="kw">let</span> <span class="ident">hmac_result</span> <span class="op">=</span> <span class="ident">compute_tweak</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>, <span class="ident">contract</span>);
     <span class="ident">key</span>.<span class="ident">key</span>.<span class="ident">add_exp_assign</span>(<span class="ident">secp</span>, <span class="kw-2">&amp;</span><span class="ident">hmac_result</span>[..]).<span class="ident">expect</span>(<span class="string">&quot;HMAC cannot produce invalid tweak&quot;</span>);
     <span class="ident">key</span>
 }
 
 <span class="doccomment">/// Tweak keys using some arbitrary data</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_keys</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Verification</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">PublicKey</span>], <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_keys</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Verification</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">PublicKey</span>], <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span> {
     <span class="ident">keys</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> <span class="ident">tweak_key</span>(<span class="ident">secp</span>, <span class="ident">key</span>, <span class="ident">contract</span>)).<span class="ident">collect</span>()
 }
 
 <span class="doccomment">/// Compute a tweak from some given data for the given public key</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_tweak</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">sha256::Hash</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_tweak</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">PublicKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="ident">Hmac</span><span class="op">&lt;</span><span class="ident">sha256::Hash</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hmac_engine</span>: <span class="ident">HmacEngine</span><span class="op">&lt;</span><span class="ident">sha256::Hash</span><span class="op">&gt;</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">pk</span>.<span class="ident">compressed</span> {
         <span class="ident">HmacEngine::new</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>.<span class="ident">key</span>.<span class="ident">serialize</span>())
     } <span class="kw">else</span> {
@@ -576,7 +577,7 @@
 }
 
 <span class="doccomment">/// Tweak a secret key using some arbitrary data (calls `compute_tweak` internally)</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_secret_key</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Signing</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">tweak_secret_key</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">secp256k1::Signing</span><span class="op">&gt;</span>(<span class="ident">secp</span>: <span class="kw-2">&amp;</span><span class="ident">Secp256k1</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateKey</span>, <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateKey</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="comment">// Compute public key</span>
     <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">PublicKey::from_private_key</span>(<span class="ident">secp</span>, <span class="kw-2">&amp;</span><span class="ident">key</span>);
     <span class="comment">// Compute tweak</span>
@@ -594,7 +595,7 @@
                       <span class="ident">contract</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>],
                       <span class="ident">keys</span>: <span class="kw-2">&amp;</span>[<span class="ident">PublicKey</span>],
                       <span class="ident">template</span>: <span class="kw-2">&amp;</span><span class="ident">Template</span>)
-                      <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">address::Address</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+                      -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">address::Address</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">keys</span> <span class="op">=</span> <span class="ident">tweak_keys</span>(<span class="ident">secp</span>, <span class="ident">keys</span>, <span class="ident">contract</span>);
     <span class="kw">let</span> <span class="ident">script</span> <span class="op">=</span> <span class="ident">template</span>.<span class="ident">to_script</span>(<span class="kw-2">&amp;</span><span class="ident">keys</span>)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(<span class="ident">address::Address</span> {
@@ -606,7 +607,7 @@
 }
 
 <span class="doccomment">/// Extract the keys and template from a completed script</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">untemplate</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Template</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">untemplate</span>(<span class="ident">script</span>: <span class="kw-2">&amp;</span><span class="ident">script::Script</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Template</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PublicKey</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ret</span> <span class="op">=</span> <span class="ident">script::Builder::new</span>();
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">retkeys</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
@@ -623,49 +624,49 @@
             <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::Script</span>(<span class="ident">e</span>));
         }
         <span class="kw">match</span> <span class="ident">instruction</span>.<span class="ident">unwrap</span>() {
-            <span class="ident">script::Instruction::PushBytes</span>(<span class="ident">data</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">script::Instruction::PushBytes</span>(<span class="ident">data</span>) =&gt; {
                 <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">len</span>();
                 <span class="ident">ret</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">PublicKey::from_slice</span>(<span class="ident">data</span>) {
-                    <span class="prelude-val">Ok</span>(<span class="ident">key</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">if</span> <span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="number">65</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedKey</span>); }
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::SeekingCheckMulti</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
+                    <span class="prelude-val">Ok</span>(<span class="ident">key</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">n</span> <span class="op">==</span> <span class="number">65</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::UncompressedKey</span>); }
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::SeekingCheckMulti</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
                         <span class="ident">retkeys</span>.<span class="ident">push</span>(<span class="ident">key</span>);
                         <span class="ident">mode</span> <span class="op">=</span> <span class="ident">Mode::CopyingKeys</span>;
                         <span class="ident">ret</span>.<span class="ident">push_opcode</span>(<span class="ident">opcodes::All::from</span>(<span class="ident">PUBKEY</span>))
                     }
-                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; {
                         <span class="comment">// Arbitrary pushes are only allowed before we&#39;ve found any keys.</span>
                         <span class="comment">// Otherwise we have to wait for a N CHECKSIG pair.</span>
                         <span class="kw">match</span> <span class="ident">mode</span> {
-                            <span class="ident">Mode::SeekingKeys</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="ident">ret</span>.<span class="ident">push_slice</span>(<span class="ident">data</span>) }
-                            <span class="ident">Mode::CopyingKeys</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); },
-                            <span class="ident">Mode::SeekingCheckMulti</span> <span class="op">=</span><span class="op">&gt;</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
+                            <span class="ident">Mode::SeekingKeys</span> =&gt; { <span class="ident">ret</span>.<span class="ident">push_slice</span>(<span class="ident">data</span>) }
+                            <span class="ident">Mode::CopyingKeys</span> =&gt; { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); },
+                            <span class="ident">Mode::SeekingCheckMulti</span> =&gt; { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
                         }
                     }
                 }
             }
-            <span class="ident">script::Instruction::Op</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">script::Instruction::Op</span>(<span class="ident">op</span>) =&gt; {
                 <span class="kw">match</span> <span class="ident">op</span>.<span class="ident">classify</span>() {
                     <span class="comment">// CHECKSIG should only come after a list of keys</span>
                     <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKSIG</span>) <span class="op">|</span>
-                    <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKSIGVERIFY</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::SeekingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
+                    <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKSIGVERIFY</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::SeekingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
                         <span class="ident">mode</span> <span class="op">=</span> <span class="ident">Mode::SeekingKeys</span>;
                     }
                     <span class="comment">// CHECKMULTISIG should only come after a number</span>
                     <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKMULTISIG</span>) <span class="op">|</span>
-                    <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKMULTISIGVERIFY</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::SeekingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::CopyingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
+                    <span class="ident">opcodes::Class::Ordinary</span>(<span class="ident">opcodes::Ordinary::OP_CHECKMULTISIGVERIFY</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::SeekingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::CopyingKeys</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedKey</span>); }
                         <span class="ident">mode</span> <span class="op">=</span> <span class="ident">Mode::SeekingKeys</span>;
                     }
                     <span class="comment">// Numbers after keys mean we expect a CHECKMULTISIG.</span>
-                    <span class="ident">opcodes::Class::PushNum</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::SeekingCheckMulti</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
-                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Mode::CopyingKeys</span> { <span class="ident">mode</span> <span class="op">=</span> <span class="ident">Mode::SeekingCheckMulti</span>; }
+                    <span class="ident">opcodes::Class::PushNum</span>(<span class="kw">_</span>) =&gt; {
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::SeekingCheckMulti</span> { <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error::ExpectedChecksig</span>); }
+                        <span class="kw">if</span> <span class="ident">mode</span> <span class="op">==</span> <span class="ident">Mode::CopyingKeys</span> { <span class="ident">mode</span> <span class="op">=</span> <span class="ident">Mode::SeekingCheckMulti</span>; }
                     }
                     <span class="comment">// All other opcodes do nothing</span>
-                    <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                    <span class="kw">_</span> =&gt; {}
                 }
                 <span class="ident">ret</span> <span class="op">=</span> <span class="ident">ret</span>.<span class="ident">push_opcode</span>(<span class="ident">op</span>);
             }
@@ -687,10 +688,10 @@
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
     <span class="kw">use</span> <span class="ident">PublicKey</span>;
 
-    <span class="macro">macro_rules!</span> <span class="ident">hex</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Vec::from_hex</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>).<span class="ident">unwrap</span>()));
-    <span class="macro">macro_rules!</span> <span class="ident">hex_key</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="macro">hex!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>)).<span class="ident">unwrap</span>()));
-    <span class="macro">macro_rules!</span> <span class="ident">alpha_template</span>(() <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">Template::from</span>(<span class="kw-2">&amp;</span><span class="macro">hex!</span>(<span class="string">&quot;55fefefefefefefe57AE&quot;</span>)[..])));
-    <span class="macro">macro_rules!</span> <span class="ident">alpha_keys</span>(() <span class="op">=</span><span class="op">&gt;</span> (
+    <span class="macro">macro_rules!</span> <span class="ident">hex</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) =&gt; (<span class="ident">Vec::from_hex</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>).<span class="ident">unwrap</span>()));
+    <span class="macro">macro_rules!</span> <span class="ident">hex_key</span> ((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>:<span class="ident">expr</span>) =&gt; (<span class="ident">PublicKey::from_slice</span>(<span class="kw-2">&amp;</span><span class="macro">hex!</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">hex</span>)).<span class="ident">unwrap</span>()));
+    <span class="macro">macro_rules!</span> <span class="ident">alpha_template</span>(() =&gt; (<span class="ident">Template::from</span>(<span class="kw-2">&amp;</span><span class="macro">hex!</span>(<span class="string">&quot;55fefefefefefefe57AE&quot;</span>)[..])));
+    <span class="macro">macro_rules!</span> <span class="ident">alpha_keys</span>(() =&gt; (
         <span class="kw-2">&amp;</span>[<span class="macro">hex_key!</span>(<span class="string">&quot;0269992fb441ae56968e5b77d46a3e53b69f136444ae65a94041fc937bdb28d933&quot;</span>),
           <span class="macro">hex_key!</span>(<span class="string">&quot;021df31471281d4478df85bfce08a10aab82601dca949a79950f8ddf7002bd915a&quot;</span>),
           <span class="macro">hex_key!</span>(<span class="string">&quot;02174c82021492c2c6dfcbfa4187d10d38bed06afb7fdcd72c880179fddd641ea1&quot;</span>),
@@ -726,9 +727,9 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">tweak_secret</span>() {
         <span class="kw">let</span> <span class="ident">secp</span> <span class="op">=</span> <span class="ident">Secp256k1::new</span>();
-        <span class="kw">let</span> (<span class="ident">sk1</span>, <span class="ident">pk1</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">thread_rng</span>());
-        <span class="kw">let</span> (<span class="ident">sk2</span>, <span class="ident">pk2</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">thread_rng</span>());
-        <span class="kw">let</span> (<span class="ident">sk3</span>, <span class="ident">pk3</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">thread_rng</span>());
+        <span class="kw">let</span> (<span class="ident">sk1</span>, <span class="ident">pk1</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;mut</span> <span class="ident">thread_rng</span>());
+        <span class="kw">let</span> (<span class="ident">sk2</span>, <span class="ident">pk2</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;mut</span> <span class="ident">thread_rng</span>());
+        <span class="kw">let</span> (<span class="ident">sk3</span>, <span class="ident">pk3</span>) <span class="op">=</span> <span class="ident">secp</span>.<span class="ident">generate_keypair</span>(<span class="kw-2">&amp;mut</span> <span class="ident">thread_rng</span>());
 
         <span class="kw">let</span> <span class="ident">sk1</span> <span class="op">=</span> <span class="ident">PrivateKey::new</span>(<span class="ident">sk1</span>, <span class="ident">Network::Bitcoin</span>);
         <span class="kw">let</span> <span class="ident">sk2</span> <span class="op">=</span> <span class="ident">PrivateKey::new_uncompressed</span>(<span class="ident">sk2</span>, <span class="ident">Network::Bitcoin</span>);
@@ -794,5 +795,4 @@
 
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>

@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;bip143.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bip143.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;runner&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;bitcoin-0.27.1&#x2F;src&#x2F;util&#x2F;bip143.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bip143.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../bitcoin/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -480,11 +481,11 @@
     <span class="doccomment">/// information about its inputs.</span>
     <span class="doccomment">/// For the generated sighashes to be valid, no fields in the transaction may change except for</span>
     <span class="doccomment">/// script_sig and witnesses.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="ident">Transaction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SighashComponents</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tx</span>: <span class="kw-2">&amp;</span><span class="ident">Transaction</span>) -&gt; <span class="ident">SighashComponents</span> {
         <span class="kw">let</span> <span class="ident">hash_prevouts</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
             <span class="kw">for</span> <span class="ident">txin</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">tx</span>.<span class="ident">input</span> {
-                <span class="ident">txin</span>.<span class="ident">previous_output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txin</span>.<span class="ident">previous_output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">SigHash::from_engine</span>(<span class="ident">enc</span>)
         };
@@ -492,7 +493,7 @@
         <span class="kw">let</span> <span class="ident">hash_sequence</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
             <span class="kw">for</span> <span class="ident">txin</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">tx</span>.<span class="ident">input</span> {
-                <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">SigHash::from_engine</span>(<span class="ident">enc</span>)
         };
@@ -500,7 +501,7 @@
         <span class="kw">let</span> <span class="ident">hash_outputs</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
             <span class="kw">for</span> <span class="ident">txout</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">tx</span>.<span class="ident">output</span> {
-                <span class="ident">txout</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txout</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">SigHash::from_engine</span>(<span class="ident">enc</span>)
         };
@@ -516,21 +517,21 @@
 
     <span class="doccomment">/// Compute the BIP143 sighash for a `SIGHASH_ALL` signature for the given</span>
     <span class="doccomment">/// input.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sighash_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">txin</span>: <span class="kw-2">&amp;</span><span class="ident">TxIn</span>, <span class="ident">script_code</span>: <span class="kw-2">&amp;</span><span class="ident">Script</span>, <span class="ident">value</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SigHash</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">sighash_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">txin</span>: <span class="kw-2">&amp;</span><span class="ident">TxIn</span>, <span class="ident">script_code</span>: <span class="kw-2">&amp;</span><span class="ident">Script</span>, <span class="ident">value</span>: <span class="ident">u64</span>) -&gt; <span class="ident">SigHash</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
-        <span class="self">self</span>.<span class="ident">tx_version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">hash_prevouts</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">hash_sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">tx_version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">hash_prevouts</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">hash_sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
         <span class="ident">txin</span>
             .<span class="ident">previous_output</span>
-            .<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>)
+            .<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>)
             .<span class="ident">unwrap</span>();
-        <span class="ident">script_code</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="ident">value</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">hash_outputs</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">tx_locktime</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
-        <span class="number">1u32</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>(); <span class="comment">// hashtype</span>
+        <span class="ident">script_code</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="ident">value</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">hash_outputs</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="self">self</span>.<span class="ident">tx_locktime</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+        <span class="number">1u32</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>(); <span class="comment">// hashtype</span>
         <span class="ident">SigHash::from_engine</span>(<span class="ident">enc</span>)
     }
 }
@@ -552,7 +553,7 @@
     <span class="doccomment">/// in a lazy manner when required.</span>
     <span class="doccomment">/// For the generated sighashes to be valid, no fields in the transaction may change except for</span>
     <span class="doccomment">/// script_sig and witnesses.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tx</span>: <span class="ident">R</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tx</span>: <span class="ident">R</span>) -&gt; <span class="self">Self</span> {
         <span class="ident">SigHashCache</span> {
             <span class="ident">tx</span>: <span class="ident">tx</span>,
             <span class="ident">hash_prevouts</span>: <span class="prelude-val">None</span>,
@@ -562,39 +563,39 @@
     }
 
     <span class="doccomment">/// Calculate hash for prevouts</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_prevouts</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sha256d::Hash</span> {
-        <span class="kw">let</span> <span class="ident">hash_prevout</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">hash_prevouts</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_prevouts</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">sha256d::Hash</span> {
+        <span class="kw">let</span> <span class="ident">hash_prevout</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hash_prevouts</span>;
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">input</span>;
         <span class="kw-2">*</span><span class="ident">hash_prevout</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">sha256d::Hash::engine</span>();
             <span class="kw">for</span> <span class="ident">txin</span> <span class="kw">in</span> <span class="ident">input</span> {
-                <span class="ident">txin</span>.<span class="ident">previous_output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txin</span>.<span class="ident">previous_output</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">sha256d::Hash::from_engine</span>(<span class="ident">enc</span>)
         })
     }
 
     <span class="doccomment">/// Calculate hash for input sequence values</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_sequence</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sha256d::Hash</span> {
-        <span class="kw">let</span> <span class="ident">hash_sequence</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">hash_sequence</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_sequence</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">sha256d::Hash</span> {
+        <span class="kw">let</span> <span class="ident">hash_sequence</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hash_sequence</span>;
         <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">input</span>;
         <span class="kw-2">*</span><span class="ident">hash_sequence</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">sha256d::Hash::engine</span>();
             <span class="kw">for</span> <span class="ident">txin</span> <span class="kw">in</span> <span class="ident">input</span> {
-                <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">sha256d::Hash::from_engine</span>(<span class="ident">enc</span>)
         })
     }
 
     <span class="doccomment">/// Calculate hash for outputs</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_outputs</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">sha256d::Hash</span> {
-        <span class="kw">let</span> <span class="ident">hash_output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">hash_outputs</span>;
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">hash_outputs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">sha256d::Hash</span> {
+        <span class="kw">let</span> <span class="ident">hash_output</span> <span class="op">=</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">hash_outputs</span>;
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">output</span>;
         <span class="kw-2">*</span><span class="ident">hash_output</span>.<span class="ident">get_or_insert_with</span>(<span class="op">|</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">sha256d::Hash::engine</span>();
             <span class="kw">for</span> <span class="ident">txout</span> <span class="kw">in</span> <span class="ident">output</span> {
-                <span class="ident">txout</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
+                <span class="ident">txout</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>).<span class="ident">unwrap</span>();
             }
             <span class="ident">sha256d::Hash::from_engine</span>(<span class="ident">enc</span>)
         })
@@ -603,29 +604,29 @@
     <span class="doccomment">/// Encode the BIP143 signing data for any flag type into a given object implementing a</span>
     <span class="doccomment">/// std::io::Write trait.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">encode_signing_data_to</span><span class="op">&lt;</span><span class="ident">Write</span>: <span class="ident">io::Write</span><span class="op">&gt;</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="kw-2">mut</span> <span class="ident">writer</span>: <span class="ident">Write</span>,
         <span class="ident">input_index</span>: <span class="ident">usize</span>,
         <span class="ident">script_code</span>: <span class="kw-2">&amp;</span><span class="ident">Script</span>,
         <span class="ident">value</span>: <span class="ident">u64</span>,
         <span class="ident">sighash_type</span>: <span class="ident">SigHashType</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">encode::Error</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">encode::Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">zero_hash</span> <span class="op">=</span> <span class="ident">sha256d::Hash::default</span>();
 
         <span class="kw">let</span> (<span class="ident">sighash</span>, <span class="ident">anyone_can_pay</span>) <span class="op">=</span> <span class="ident">sighash_type</span>.<span class="ident">split_anyonecanpay_flag</span>();
 
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">version</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">anyone_can_pay</span> {
-            <span class="self">self</span>.<span class="ident">hash_prevouts</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">hash_prevouts</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> {
-            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         }
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">anyone_can_pay</span> <span class="op">&amp;&amp;</span> <span class="ident">sighash</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SigHashType::Single</span> <span class="op">&amp;&amp;</span> <span class="ident">sighash</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SigHashType::None</span> {
-            <span class="self">self</span>.<span class="ident">hash_sequence</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">hash_sequence</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> {
-            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         }
 
         {
@@ -633,38 +634,38 @@
 
             <span class="ident">txin</span>
                 .<span class="ident">previous_output</span>
-                .<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-            <span class="ident">script_code</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-            <span class="ident">value</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-            <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+                .<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">script_code</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">value</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">txin</span>.<span class="ident">sequence</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         }
 
         <span class="kw">if</span> <span class="ident">sighash</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SigHashType::Single</span> <span class="op">&amp;&amp;</span> <span class="ident">sighash</span> <span class="op">!</span><span class="op">=</span> <span class="ident">SigHashType::None</span> {
-            <span class="self">self</span>.<span class="ident">hash_outputs</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sighash</span> <span class="op">=</span><span class="op">=</span> <span class="ident">SigHashType::Single</span> <span class="op">&amp;&amp;</span> <span class="ident">input_index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">output</span>.<span class="ident">len</span>() {
+            <span class="self">self</span>.<span class="ident">hash_outputs</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">sighash</span> <span class="op">==</span> <span class="ident">SigHashType::Single</span> <span class="op">&amp;&amp;</span> <span class="ident">input_index</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">output</span>.<span class="ident">len</span>() {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">single_enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
-            <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">output</span>[<span class="ident">input_index</span>].<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">single_enc</span>)<span class="question-mark">?</span>;
-            <span class="ident">SigHash::from_engine</span>(<span class="ident">single_enc</span>).<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">output</span>[<span class="ident">input_index</span>].<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">single_enc</span>)<span class="question-mark">?</span>;
+            <span class="ident">SigHash::from_engine</span>(<span class="ident">single_enc</span>).<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         } <span class="kw">else</span> {
-            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+            <span class="ident">zero_hash</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">lock_time</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
-        <span class="ident">sighash_type</span>.<span class="ident">as_u32</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">lock_time</span>.<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
+        <span class="ident">sighash_type</span>.<span class="ident">as_u32</span>().<span class="ident">consensus_encode</span>(<span class="kw-2">&amp;mut</span> <span class="ident">writer</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 
     <span class="doccomment">/// Compute the BIP143 sighash for any flag type. See SighashComponents::sighash_all simpler</span>
     <span class="doccomment">/// API for the most common case</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">signature_hash</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">input_index</span>: <span class="ident">usize</span>,
         <span class="ident">script_code</span>: <span class="kw-2">&amp;</span><span class="ident">Script</span>,
         <span class="ident">value</span>: <span class="ident">u64</span>,
         <span class="ident">sighash_type</span>: <span class="ident">SigHashType</span>
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SigHash</span> {
+    ) -&gt; <span class="ident">SigHash</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">enc</span> <span class="op">=</span> <span class="ident">SigHash::engine</span>();
-        <span class="self">self</span>.<span class="ident">encode_signing_data_to</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">enc</span>, <span class="ident">input_index</span>, <span class="ident">script_code</span>, <span class="ident">value</span>, <span class="ident">sighash_type</span>)
+        <span class="self">self</span>.<span class="ident">encode_signing_data_to</span>(<span class="kw-2">&amp;mut</span> <span class="ident">enc</span>, <span class="ident">input_index</span>, <span class="ident">script_code</span>, <span class="ident">value</span>, <span class="ident">sighash_type</span>)
             .<span class="ident">expect</span>(<span class="string">&quot;engines don&#39;t error&quot;</span>);
         <span class="ident">SigHash::from_engine</span>(<span class="ident">enc</span>)
     }
@@ -691,8 +692,8 @@
     <span class="doccomment">///     sig_hasher.access_witness(inp).push(Vec::new());</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">access_witness</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">input_index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">input</span>[<span class="ident">input_index</span>].<span class="ident">witness</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">access_witness</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">input_index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">input</span>[<span class="ident">input_index</span>].<span class="ident">witness</span>
     }
 }
 
@@ -710,7 +711,7 @@
 
     <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
-    <span class="kw">fn</span> <span class="ident">p2pkh_hex</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Script</span> {
+    <span class="kw">fn</span> <span class="ident">p2pkh_hex</span>(<span class="ident">pk</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Script</span> {
         <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">Vec::from_hex</span>(<span class="ident">pk</span>).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">pk</span> <span class="op">=</span> <span class="ident">PublicKey::from_slice</span>(<span class="ident">pk</span>.<span class="ident">as_slice</span>()).<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">witness_script</span> <span class="op">=</span> <span class="ident">Address::p2pkh</span>(<span class="kw-2">&amp;</span><span class="ident">pk</span>, <span class="ident">Network::Bitcoin</span>).<span class="ident">script_pubkey</span>();
@@ -858,5 +859,4 @@
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="bitcoin" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
 </body></html>
