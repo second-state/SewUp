@@ -17,7 +17,7 @@ use ewasm_api::types::Address;
 /// The storage unit in the contract of Ethereum, which contains 32 bytes
 /// The structure is easiler to try_from `Row`; from `Address`, bytes, unsigned integers;
 /// or into `bytes32`, `bytes20`, etc.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Default)]
 pub struct Raw {
     pub(crate) bytes: [u8; 32],
     // TODO: design a feature using the flag to write only needed
@@ -119,15 +119,6 @@ impl<'de> Deserialize<'de> for Raw {
     }
 }
 
-impl Default for Raw {
-    fn default() -> Self {
-        Raw {
-            bytes: [0; 32],
-            // flag: 0,
-        }
-    }
-}
-
 impl AsRef<[u8]> for Raw {
     #[inline]
     fn as_ref(&self) -> &[u8] {
@@ -203,10 +194,9 @@ impl From<u8> for Raw {
         ])
     }
 }
-
-impl Into<u8> for Raw {
-    fn into(self) -> u8 {
-        self.bytes[31]
+impl From<Raw> for u8 {
+    fn from(r: Raw) -> u8 {
+        r.bytes[31]
     }
 }
 
@@ -220,9 +210,9 @@ impl From<u16> for Raw {
     }
 }
 
-impl Into<u16> for Raw {
-    fn into(self) -> u16 {
-        u16::from_be_bytes(self.bytes[30..32].try_into().unwrap())
+impl From<Raw> for u16 {
+    fn from(r: Raw) -> u16 {
+        u16::from_be_bytes(r.bytes[30..32].try_into().unwrap())
     }
 }
 
@@ -237,9 +227,9 @@ impl From<u32> for Raw {
     }
 }
 
-impl Into<u32> for Raw {
-    fn into(self) -> u32 {
-        u32::from_be_bytes(self.bytes[28..32].try_into().unwrap())
+impl From<Raw> for u32 {
+    fn from(r: Raw) -> u32 {
+        u32::from_be_bytes(r.bytes[28..32].try_into().unwrap())
     }
 }
 
@@ -254,9 +244,9 @@ impl From<u64> for Raw {
     }
 }
 
-impl Into<u64> for Raw {
-    fn into(self) -> u64 {
-        u64::from_be_bytes(self.bytes[24..32].try_into().unwrap())
+impl From<Raw> for u64 {
+    fn from(r: Raw) -> u64 {
+        u64::from_be_bytes(r.bytes[24..32].try_into().unwrap())
     }
 }
 
@@ -279,13 +269,13 @@ impl From<usize> for Raw {
     }
 }
 
-impl Into<usize> for Raw {
-    fn into(self) -> usize {
+impl From<Raw> for usize {
+    fn from(r: Raw) -> usize {
         #[cfg(target_pointer_width = "64")]
-        return u64::from_be_bytes(self.bytes[24..32].try_into().unwrap()) as usize;
+        return u64::from_be_bytes(r.bytes[24..32].try_into().unwrap()) as usize;
 
         #[cfg(target_pointer_width = "32")]
-        return u32::from_be_bytes(self.bytes[28..32].try_into().unwrap()) as usize;
+        return u32::from_be_bytes(r.bytes[28..32].try_into().unwrap()) as usize;
     }
 }
 

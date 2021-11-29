@@ -5,7 +5,7 @@ use serde_derive::{Deserialize, Serialize};
 use crate::types::*;
 
 /// A list of `Raw`, which helps you store much bigger data than a `Raw`
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize)]
 pub struct Row {
     pub(crate) inner: Vec<Raw>,
     _buffer: Vec<u8>,
@@ -58,15 +58,6 @@ impl Row {
     pub fn wipe_header(&mut self, header_size: usize) {
         assert!(header_size <= 32);
         self.inner[0].wipe_header(header_size);
-    }
-}
-
-impl Default for Row {
-    fn default() -> Self {
-        Row {
-            inner: Vec::new(),
-            _buffer: Vec::new(),
-        }
     }
 }
 
@@ -229,10 +220,10 @@ macro_rules! from_array {
                 }
             }
 
-            impl Into<[Raw; $n]> for Row {
-                fn into(self) -> [Raw; $n]{
+            impl From<Row> for [Raw; $n] {
+                fn from(r: Row) -> [Raw; $n]{
                     let mut buffer : [Raw; $n] = Default::default();
-                    buffer.copy_from_slice(&self.inner[0..$n]);
+                    buffer.copy_from_slice(&r.inner[0..$n]);
                     buffer
                 }
             }

@@ -47,7 +47,7 @@ pub async fn run() -> Result<()> {
     let all_abis = linked_hash_set::LinkedHashSet::<String>::from_iter(total_abis.iter().cloned());
     let mut lib_abis = all_abis.clone();
     let mut contract_abi_context = String::new();
-    for (abi, def) in contract_abis.into_iter() {
+    for (abi, def) in contract_abis {
         lib_abis.remove(&abi);
         contract_abi_context = contract_abi_context + &def;
     }

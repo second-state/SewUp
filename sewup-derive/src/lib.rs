@@ -615,7 +615,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
 pub fn ewasm_output_from(item: TokenStream) -> TokenStream {
     format!(
         r#"sewup::bincode::serialize(&{}).expect("fail to serialize in `ewasm_output_from`")"#,
-        item.to_string(),
+        item,
     )
     .parse()
     .unwrap()
@@ -1482,15 +1482,15 @@ pub fn SizedString(item: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
     let input = item.to_string().replace(" ", "");
-    let output = if input.starts_with("\"") {
-        let addr = format!("{}", input.replace("\"", ""));
+    let output = if input.starts_with('"') {
+        let addr = input.replace("\"", "");
         quote! {
             if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
                 return Err(sewup::errors::HandlerError::Unauthorized.into())
             }
         }
     } else {
-        let addr = Ident::new(&format!("{}", input), Span::call_site());
+        let addr = Ident::new(&input, Span::call_site());
         quote! {
             if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
                 return Err(sewup::errors::HandlerError::Unauthorized.into())
