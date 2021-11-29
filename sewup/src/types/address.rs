@@ -1,4 +1,6 @@
 use std::convert::TryInto;
+#[cfg(target_arch = "wasm32")]
+use std::str::FromStr;
 
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
@@ -97,10 +99,9 @@ impl std::fmt::Debug for AddressType {
 
 /// Address is a 20 bytes binary, you can build a Address with hex string easily.
 /// ```
+/// use std::str::FromStr;
 /// let address = sewup::types::Address::from_str("8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
-///
 /// let same_address = sewup::types::Address::from_str("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
-///
 /// assert!(address == same_address);
 /// ```
 pub type Address = AddressType;
@@ -159,9 +160,10 @@ impl<'de> Deserialize<'de> for AddressType {
     }
 }
 
-impl AddressType {
+impl std::str::FromStr for AddressType {
+    type Err = anyhow::Error;
     #[cfg(target_arch = "wasm32")]
-    pub fn from_str(s: &str) -> anyhow::Result<Self> {
+    fn from_str(s: &str) -> anyhow::Result<Self> {
         let hex_s: &str = if s.starts_with("0x") {
             &s[2..s.len()]
         } else {
@@ -175,7 +177,7 @@ impl AddressType {
         })
     }
     #[cfg(not(target_arch = "wasm32"))]
-    pub fn from_str(s: &str) -> anyhow::Result<Self> {
+    fn from_str(s: &str) -> anyhow::Result<Self> {
         let hex_s: &str = if s.starts_with("0x") {
             &s[2..s.len()]
         } else {

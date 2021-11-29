@@ -7,6 +7,7 @@
 //! everyone can check out the voting result after everyone voted
 //!
 use std::convert::TryInto;
+use std::str::FromStr;
 
 use serde_derive::{Deserialize, Serialize};
 use sewup::types::Address;

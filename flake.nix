@@ -13,7 +13,7 @@
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-        devRustNightly = pkgs.rust-bin.nightly."2021-08-31".default.override {
+        devRustNightly = pkgs.rust-bin.nightly."2021-11-27".default.override {
           extensions = [ "rust-src" ];
           targets = [ "wasm32-unknown-unknown" ];
         };

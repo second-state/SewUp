@@ -62,7 +62,7 @@ impl<T: Record> Table<T> {
 
     #[allow(bare_trait_objects)]
     /// Filter the records
-    pub fn filter_records(&self, filter: &Fn(&T) -> bool) -> Result<Vec<(usize, T)>> {
+    pub fn filter_records(&self, filter: &dyn Fn(&T) -> bool) -> Result<Vec<(usize, T)>> {
         let mut output: Vec<(usize, T)> = Vec::new();
         for (idx, r) in self.data.iter().enumerate() {
             let mut buffer_row = r.clone();
