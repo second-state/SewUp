@@ -1,4 +1,8 @@
-name: Derive
+name: Feature
+
+concurrency:
+  group: feature-${{ github.head_ref }}
+  cancel-in-progress: true
 
 on:
   push:
