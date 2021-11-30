@@ -1,0 +1,24 @@
+[package]
+name = "tests-build"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[features]
+kv = ["sewup/kv", "sewup-derive/kv"]
+rdb = ["sewup/rdb", "sewup-derive/rdb"]
+token = ["sewup/token", "sewup-derive/token"]
+
+[dependencies]
+sewup-derive = { version = "*", path = "../sewup-derive" }
+sewup = { version = "*", path = "../sewup" }
+
+[dev-dependencies]
+hex-literal = "0.3.1"
+rustversion = "1"
+sewup = { path = "../sewup" }
+anyhow = "1.0.40"
+serde = "1.0"
+serde_derive = "1.0"
+serde-value = "0.7.0"
+trybuild = "1.0"

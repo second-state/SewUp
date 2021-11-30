@@ -4,6 +4,9 @@ members = [
     "sewup",
     "sewup-derive",
     "cargo-sewup",
+
+    # Internal
+    "tests-build",
 ]
 exclude = [
     "examples/hello-contract",
