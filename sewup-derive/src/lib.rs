@@ -710,7 +710,7 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 ///
 /// you can use `ewasm_output_from!` to get the exactly input/output binary of the protol, for
 /// example:
-/// ```
+/// ```compile_fail
 /// let handler_input = person::protocol(person);
 /// ewasm_output_from!(handler_input)
 /// ```
