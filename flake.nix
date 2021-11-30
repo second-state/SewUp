@@ -60,6 +60,11 @@
           cargo login $2
           cargo publish
         '';
+        featureTestScript = pkgs.writeShellScriptBin "feature-test" ''
+          cargo install cargo-hack
+          cd tests-build
+          cargo hack test --each-feature
+        '';
       in
       with pkgs;
       {
@@ -78,6 +83,7 @@
             abiTestScript
             clientTestScript
             publishScript
+            featureTestScript
           ];
 
           LIBCLANG_PATH = "${llvmPackages.libclang.lib}/lib";
