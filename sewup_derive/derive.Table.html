@@ -42,7 +42,7 @@ for examples.</p>
 <p>you can use <code>ewasm_output_from!</code> to get the exactly input/output binary of the protol, for
 example:</p>
 
-<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">let</span> <span class="ident">handler_input</span> <span class="op">=</span> <span class="ident">person::protocol</span>(<span class="ident">person</span>);
+<div class='information'><div class='tooltip compile_fail'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered compile_fail"><code><span class="kw">let</span> <span class="ident">handler_input</span> <span class="op">=</span> <span class="ident">person::protocol</span>(<span class="ident">person</span>);
 <span class="macro">ewasm_output_from!</span>(<span class="ident">handler_input</span>)</code></pre></div>
 <p>Please note that the protocol default and the protocol for default instance may be different.
 This base on the implementation of the default trait of the structure.</p>
