@@ -131,3 +131,57 @@ fn test_str_for_row() {
         ]
     );
 }
+
+#[cfg(feature = "default")]
+#[test]
+fn test_integer_raw_convert() {
+    let i = 5u8;
+    let raw = Raw::from(i);
+    let j = u8::from(raw);
+    assert_eq!(i, j);
+
+    let i = 300u16;
+    let raw = Raw::from(i);
+    let j = u16::from(raw);
+    assert_eq!(i, j);
+
+    let i = 4294967295u32;
+    let raw = Raw::from(i);
+    let j = u32::from(raw);
+    assert_eq!(i, j);
+
+    let i = 4300000000u64;
+    let raw = Raw::from(i);
+    let j = u64::from(raw);
+    assert_eq!(i, j);
+
+    let i = 4294967295usize;
+    let raw = Raw::from(i);
+    let j = usize::from(raw);
+    assert_eq!(i, j);
+
+    let i = -5i8;
+    let raw = Raw::from(i);
+    let j = i8::from(raw);
+    assert_eq!(i, j);
+
+    let i = -300i16;
+    let raw = Raw::from(i);
+    let j = i16::from(raw);
+    assert_eq!(i, j);
+
+    let i = -2147483648i32;
+    let raw = Raw::from(i);
+    let j = i32::from(raw);
+    assert_eq!(i, j);
+
+    let i = -4294967295i64;
+    let raw = Raw::from(i);
+    let j = i64::from(raw);
+    assert_eq!(i, j);
+
+    let i = -2147483648isize;
+    let raw = Raw::from(i);
+    let j = isize::from(raw);
+    assert_eq!(i, j);
+}
