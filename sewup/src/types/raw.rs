@@ -194,6 +194,7 @@ impl From<u8> for Raw {
         ])
     }
 }
+
 impl From<Raw> for u8 {
     fn from(r: Raw) -> u8 {
         r.bytes[31]
@@ -278,6 +279,30 @@ impl From<Raw> for usize {
         return u32::from_be_bytes(r.bytes[28..32].try_into().unwrap()) as usize;
     }
 }
+
+macro_rules! signed_int_convert {
+    ($($n:expr),*) => {
+        paste::paste! {
+            $(
+                impl From< [<i $n>] > for Raw {
+                    fn from(num: [<i $n>]) -> Self {
+                        let n = unsafe { std::mem::transmute::<[<i $n>], [<u $n>]>(num) };
+                        n.into()
+                    }
+                }
+
+                impl From<Raw> for [<i $n>] {
+                    fn from(r: Raw) -> [<i $n>] {
+                        let num = [<u $n>]::from(r);
+                        unsafe { std::mem::transmute::<[<u $n>], [<i $n>]>(num) }
+                    }
+                }
+            )*
+        }
+    }
+}
+
+signed_int_convert!(8, 16, 32, 64, size);
 
 #[cfg(target_arch = "wasm32")]
 impl From<Address> for Raw {
