@@ -17,7 +17,7 @@ pub struct Pair(pub u32, pub Vec<u8>);
 pub struct SimpleStructPair(pub String, pub bool, pub String);
 
 #[ewasm_constructor]
-fn constructor() {
+fn setup() {
     use sewup::types::{Raw, Row};
     let mut storage =
         sewup::kv::Store::new().expect("there is no return for constructor currently");

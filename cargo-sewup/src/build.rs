@@ -107,7 +107,7 @@ async fn build_wat(
         format!(
             r#"
   (export "memory" (memory 0))
-  (func (export "main") call $constructor i32.const 0 i32.const {} call {})"#,
+  (func (export "main") call $__constructor i32.const 0 i32.const {} call {})"#,
             bin_size, eth_finish_sig
         )
     } else {
@@ -124,7 +124,7 @@ async fn build_wat(
         format!(
             r#"
   (export "memory" (memory 0))
-  (func (export "main") call $constructor i32.const 0 i32.const {} call $_Eth_Finish)
+  (func (export "main") call $__constructor i32.const 0 i32.const {} call $_Eth_Finish)
         "#,
             bin_size
         )
