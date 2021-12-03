@@ -24,6 +24,9 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
+      - name: Clippy cargo-sewup
+        run: nix develop --ignore-environment -c cargo clippy -p cargo-sewup
+
       - name: Init default project test
         run: nix develop -c 'cli-init-test' default
 

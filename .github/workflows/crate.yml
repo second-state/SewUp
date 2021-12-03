@@ -32,8 +32,11 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
+      - name: Clippy sewup
+        run: nix develop  --ignore-environment -c cargo clippy -p sewup
+
       - name: Default feature test
-        run: nix develop -c 'cargo' test -p sewup --features=default
+        run: nix develop -c cargo test -p sewup --features=default
 
       - name: RDB feature test
-        run: nix develop -c 'cargo' test -p sewup --features=rdb --no-default-features
+        run: nix develop -c cargo test -p sewup --features=rdb --no-default-features

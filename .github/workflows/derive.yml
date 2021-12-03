@@ -24,5 +24,8 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
+      - name: Clippy sewup-derive
+        run: nix develop --ignore-environment -c cargo clippy -p sewup-derive
+
       - name: Derive test
-        run: nix develop -c 'cargo' test -p sewup-derive
+        run: nix develop -c cargo test -p sewup-derive
