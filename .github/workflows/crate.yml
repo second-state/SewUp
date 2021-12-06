@@ -37,6 +37,8 @@ jobs:
 
       - name: Clippy sewup
         run: nix develop  --ignore-environment -c cargo clippy -p sewup
+        env:
+          RUST_BACKTRACE: 1
 
       - name: Default feature test
         run: nix develop -c cargo test -p sewup --features=default

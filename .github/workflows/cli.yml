@@ -29,6 +29,8 @@ jobs:
 
       - name: Clippy cargo-sewup
         run: nix develop --ignore-environment -c cargo clippy -p cargo-sewup
+        env:
+          RUST_BACKTRACE: 1
 
       - name: Init default project test
         run: nix develop -c 'cli-init-test' default
