@@ -36,7 +36,7 @@ jobs:
         run: rm -rf ~/.cargo/bin
 
       - name: Clippy sewup
-        run: nix develop  --ignore-environment -c cargo clippy -p sewup
+        run: nix develop -c cargo clippy -p sewup
         env:
           RUST_BACKTRACE: 1
 
