@@ -24,6 +24,9 @@ jobs:
         with:
           nix_path: nixpkgs=channel:nixos-unstable
 
+      - name: Remove non-nix binary
+        run: rm -rf ~/.cargo/bin
+
       - name: Clippy sewup-derive
         run: nix develop --ignore-environment -c cargo clippy -p sewup-derive
 
