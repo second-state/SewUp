@@ -321,10 +321,10 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let name = &input.sig.ident;
-    if *name != "constructor" {
-        abort!(input.sig.ident, "please name the function as `constructor`");
+    let mut input = syn::parse_macro_input!(item as syn::ItemFn);
+    let default_name = Ident::new("__constructor", Span::call_site());
+    if input.sig.ident != "__constructor" {
+        input.sig.ident = default_name;
     }
     let result = quote! {
         #[cfg(target_arch = "wasm32")]
@@ -336,7 +336,7 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
         #[cfg(feature = "constructor-test")]
         #[no_mangle]
         pub fn main() {
-            #name();
+            __constructor();
         }
     };
     result.into()
