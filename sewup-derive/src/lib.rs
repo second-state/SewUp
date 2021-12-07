@@ -177,6 +177,23 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
         },
+        "rusty" if Some("EwasmAny".to_string()) == output_type  => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                let r = #name().map(|any| any.bin);
+                let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
+                finish_data(&bin);
+            }
+        },
 
         // Return all result structure
         // This is for a scenario that you are using a rust client to operation the contract

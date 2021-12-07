@@ -1,4 +1,4 @@
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde::{Deserialize, Deserializer, Serialize};
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
@@ -74,15 +74,9 @@ impl EwasmAny {
     }
 }
 
-trait EwasmAnyTrait: Serialize {}
-impl EwasmAnyTrait for EwasmAny {}
-
-// TODO:
-// Need negative trait bound
-// https://github.com/rust-lang/rust/issues/42721
 impl<T> From<T> for EwasmAny
 where
-    T: EwasmAnyTrait + !EwasmAnyTrait ,
+    T: Serialize,
 {
     fn from(i: T) -> Self {
         Self {
@@ -91,14 +85,14 @@ where
     }
 }
 
-impl Serialize for EwasmAny {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        self.bin.serialize(serializer)
-    }
-}
+// impl Serialize for EwasmAny {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: Serializer,
+//     {
+//         self.bin.serialize(serializer)
+//     }
+// }
 
 impl<'de> Deserialize<'de> for EwasmAny {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
