@@ -1,4 +1,4 @@
-use serde::Serialize;
+use serde::{Deserialize, Deserializer, Serialize};
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
@@ -58,7 +58,7 @@ impl Contract {
 
 /// helps you return different type of date in the contract handlers
 /// The any serializable data can easy to become EwasmAny by following command
-/// `EwasmAny::from(protocol)`
+/// `EwasmAny::from(instance)`
 /// and the data will preserialized and store in the EwasmAny structure,
 /// once the `ewasm_main` function try to return the instance of EwasmAny, the preserialized data
 /// will be returned.
@@ -82,5 +82,23 @@ where
         Self {
             bin: bincode::serialize(&i).unwrap(),
         }
+    }
+}
+
+// impl Serialize for EwasmAny {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: Serializer,
+//     {
+//         self.bin.serialize(serializer)
+//     }
+// }
+
+impl<'de> Deserialize<'de> for EwasmAny {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        Deserialize::deserialize(deserializer).map(|bin: Vec<u8>| EwasmAny { bin })
     }
 }

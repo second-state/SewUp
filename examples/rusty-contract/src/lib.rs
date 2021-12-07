@@ -11,15 +11,15 @@ struct SimpleStruct {
 fn constructor() {}
 
 #[ewasm_fn(4a6f7679)]
-fn check_input_object(s: SimpleStruct) -> Result<(), &'static str> {
+fn check_input_object(s: SimpleStruct) -> Result<sewup::primitives::EwasmAny, &'static str> {
     if !s.trust {
         return Err("NotTrustedInput");
     }
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_main(rusty)]
-fn main() -> Result<(), &'static str> {
+fn main() -> Result<sewup::primitives::EwasmAny, &'static str> {
     use sewup::primitives::Contract;
     use sewup_derive::ewasm_input_from;
 
@@ -34,7 +34,7 @@ fn main() -> Result<(), &'static str> {
         _ => return Err("UnknownHandle"),
     };
 
-    Ok(())
+    Ok(().into())
 }
 
 #[ewasm_test]
@@ -67,11 +67,11 @@ mod tests {
 
         simple_struct.trust = true;
 
-        // use `ewasm_assert_rusty_ok`, because the `#[ewasm_main(rusty)]` specify the rusty return
-        ewasm_rusty_assert_ok!(check_input_object(simple_struct));
-
         // Assert an ok result with raw output,
         // the previous `ewasm_assert_rusty_ok` is the suggested way
-        ewasm_assert_eq!(check_input_object(simple_struct), vec![0, 0, 0, 0]);
+        ewasm_assert_eq!(
+            check_input_object(simple_struct),
+            vec![0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        );
     }
 }
