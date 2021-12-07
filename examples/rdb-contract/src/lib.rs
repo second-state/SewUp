@@ -336,6 +336,11 @@ mod tests {
         let create_input = person::protocol(person.clone());
         let mut expect_output = create_input.clone();
         expect_output.set_id(1);
+
+        // debug trait will auto enabled in test, if you need debug trait in contrait, please
+        // provide a debug feature when building contract
+        println!("{:?}", expect_output);
+
         ewasm_auto_assert_eq!(person::create(create_input), expect_output);
 
         ewasm_assert_ok!(add_address_table());

@@ -61,21 +61,23 @@ pub enum VmError {
 }
 
 // TODO: abstract this, such that this can suitable for other chain than ETH
-#[derive(Debug, Default)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(Default)]
 pub struct VMResult {
     pub(crate) gas_left: i64,
     pub output_data: Vec<u8>,
     pub(crate) create_address: Option<Raw>,
 }
 
-#[derive(Debug, PartialEq)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(PartialEq)]
 pub enum Flags {
     Default = 0,
     Static = 1,
 }
 
 // TODO: abstract this, such that this can suitable for other chain than ETH
-#[derive(Debug)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
 pub struct VMMessage<'a> {
     pub kind: evmc_call_kind,
     pub flags: Flags,
@@ -89,7 +91,7 @@ pub struct VMMessage<'a> {
     pub create2_salt: Option<()>,
 }
 
-#[derive(Debug)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
 pub struct VMMessageBuilder<'a> {
     pub kind: evmc_call_kind,
     pub flags: Flags,

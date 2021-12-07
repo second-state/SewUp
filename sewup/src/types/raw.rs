@@ -1,6 +1,5 @@
 use std::{
     convert::{TryFrom, TryInto},
-    fmt,
     iter::FromIterator,
 };
 
@@ -24,7 +23,8 @@ pub struct Raw {
     // flag: u8,
 }
 
-#[derive(DeserializeDerive, Debug, PartialEq)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(DeserializeDerive, PartialEq)]
 struct RawHelper {
     e01: u8,
     e02: u8,
@@ -471,8 +471,9 @@ impl PartialEq<[u8]> for Raw {
 
 impl Eq for Raw {}
 
-impl fmt::Debug for Raw {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+#[cfg(any(feature = "debug", test))]
+impl std::fmt::Debug for Raw {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.as_ref().fmt(f)
     }
 }

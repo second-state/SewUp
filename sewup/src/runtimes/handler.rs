@@ -2,7 +2,6 @@
 //! The handler helps you deploy contract and test the contract you developing
 use std::cell::RefCell;
 use std::convert::TryInto;
-use std::fmt;
 use std::fs::read;
 use std::sync::Arc;
 
@@ -23,8 +22,9 @@ pub struct ContractHandler {
     pub rt: Option<Arc<RefCell<dyn RT>>>,
 }
 
-impl fmt::Debug for ContractHandler {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+#[cfg(any(feature = "debug", test))]
+impl std::fmt::Debug for ContractHandler {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ContractHandler")
             .field("call_data", &self.call_data)
             .field("rt", &self.rt.is_some())
