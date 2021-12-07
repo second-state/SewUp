@@ -29,7 +29,8 @@
 //! bucket2.set(b"long".into(), "Testing".to_string().into());
 //! ```
 
-#[derive(Debug, PartialEq)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(PartialEq)]
 pub enum Feature {
     Default = 1,
 }

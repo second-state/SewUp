@@ -25,7 +25,8 @@ const CONFIG_ADDR: [u8; 32] = [0; 32];
 pub(crate) type TableSig = [u8; 4];
 
 /// Metadata of table
-#[derive(Serialize, Deserialize, Clone, Default, Debug, PartialEq)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
 pub struct TableInfo {
     pub(crate) sig: TableSig,
     pub range: Range<u32>,

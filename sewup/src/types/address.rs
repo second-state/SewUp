@@ -11,7 +11,8 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 use crate::types::Raw;
 
 #[cfg(not(target_arch = "wasm32"))]
-#[derive(Clone, PartialEq, Default, Debug)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(Clone, PartialEq, Default)]
 pub struct AddressType {
     pub inner: [u8; 20],
 }

@@ -1,7 +1,8 @@
 //! `rdb` feature provides a simple way to store things with relations into ethereum runtime.
 
 /// DB feature flag to enable the different feature for db
-#[derive(Debug, PartialEq)]
+#[cfg_attr(any(feature = "debug", test), derive(Debug))]
+#[derive(PartialEq)]
 pub enum Feature {
     Default = 1,
 }
