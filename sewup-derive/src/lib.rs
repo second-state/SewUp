@@ -817,6 +817,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
     let mut output = quote!(
         impl sewup::rdb::traits::Record for #struct_name {}
 
+        #[cfg_attr(feature = "debug", derive(Debug))]
         #[derive(Clone, sewup::Serialize, sewup::Deserialize)]
         pub struct #protocol_name {
             pub select_fields: Option<std::collections::HashSet::<String>>,
@@ -906,6 +907,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
             pub const DELETE_SIG: [u8; 4] = ewasm_fn_sig!(#struct_name::delete());
         }
 
+        #[cfg_attr(feature = "debug", derive(Debug))]
         #[derive(Default, Clone, sewup::Serialize, sewup::Deserialize)]
         pub struct #wrapper_name {
             #(pub #wrapper_field_names: #wrapper_field_types,)*

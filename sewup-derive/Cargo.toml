@@ -36,6 +36,7 @@ kv = []
 rdb = []
 token = []
 test = ["rdb", "kv"]
+debug = []
 
 [package.metadata.docs.rs]
 all-features = true
