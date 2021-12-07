@@ -1518,6 +1518,8 @@
 <span id="1517">1517</span>
 <span id="1518">1518</span>
 <span id="1519">1519</span>
+<span id="1520">1520</span>
+<span id="1521">1521</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -2337,6 +2339,7 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="macro">quote!</span>(
         <span class="kw">impl</span> <span class="ident">sewup::rdb::traits::Record</span> <span class="kw">for</span> #<span class="ident">struct_name</span> {}
 
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">test</span>), <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> #<span class="ident">protocol_name</span> {
             <span class="kw">pub</span> <span class="ident">select_fields</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">std::collections::HashSet</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -2426,6 +2429,7 @@
             <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">DELETE_SIG</span>: [<span class="ident">u8</span>; <span class="number">4</span>] <span class="op">=</span> <span class="macro">ewasm_fn_sig!</span>(#<span class="ident">struct_name::delete</span>());
         }
 
+        <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">test</span>), <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>, <span class="ident">Clone</span>, <span class="ident">sewup::Serialize</span>, <span class="ident">sewup::Deserialize</span>)]</span>
         <span class="kw">pub</span> <span class="kw">struct</span> #<span class="ident">wrapper_name</span> {
             #(<span class="kw">pub</span> #<span class="ident">wrapper_field_names</span>: #<span class="ident">wrapper_field_types</span>,)<span class="op">*</span>

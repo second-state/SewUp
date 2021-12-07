@@ -16,10 +16,12 @@
 <span id="15">15</span>
 <span id="16">16</span>
 <span id="17">17</span>
+<span id="18">18</span>
 </pre><pre class="rust"><code><span class="doccomment">//! `rdb` feature provides a simple way to store things with relations into ethereum runtime.</span>
 
 <span class="doccomment">/// DB feature flag to enable the different feature for db</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">test</span>), <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Feature</span> {
     <span class="ident">Default</span> <span class="op">=</span> <span class="number">1</span>,
 }

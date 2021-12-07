@@ -55,6 +55,7 @@
 <span id="54">54</span>
 <span id="55">55</span>
 <span id="56">56</span>
+<span id="57">57</span>
 </pre><pre class="rust"><code><span class="doccomment">//! `kv` feature provides a simple way to key/value store things into ethereum runtime.</span>
 <span class="doccomment">//! It aims to be lightweight and with a nice high level interface.</span>
 <span class="doccomment">//! Store is an abstract storage instance from one account in one block</span>
@@ -86,7 +87,8 @@
 <span class="doccomment">//! bucket2.set(b&quot;long&quot;.into(), &quot;Testing&quot;.to_string().into());</span>
 <span class="doccomment">//! ```</span>
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;debug&quot;</span>, <span class="ident">test</span>), <span class="ident">derive</span>(<span class="ident">Debug</span>))]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Feature</span> {
     <span class="ident">Default</span> <span class="op">=</span> <span class="number">1</span>,
 }
