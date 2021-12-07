@@ -9,7 +9,7 @@ path = "src/lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-sewup = { version = "*", path = "../../sewup", features = [ "kv" ] }
+sewup = { version = "*", path = "../../sewup", features = [ "kv", "debug" ] }
 sewup-derive = { version = "*", path = "../../sewup-derive", features = [ "kv" ] }
 hex = "0.4.3"
 serde = "1.0"
