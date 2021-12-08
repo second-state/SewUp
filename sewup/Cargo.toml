@@ -1,6 +1,6 @@
 [package]
 name = "sewup"
-version = "0.1.9"
+version = "0.1.10"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2021"
 build="build.rs"
