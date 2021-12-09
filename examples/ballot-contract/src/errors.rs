@@ -1,5 +1,6 @@
 use thiserror::Error;
 
+#[allow(dead_code)]
 #[derive(Error, Debug, PartialEq)]
 pub enum Error {
     #[error("Voter `{0}` already exist")]

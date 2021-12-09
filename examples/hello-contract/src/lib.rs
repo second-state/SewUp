@@ -1,4 +1,4 @@
-use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_main, ewasm_test};
 
 #[ewasm_constructor]
 fn constructor() {}
@@ -12,7 +12,7 @@ fn hello() -> anyhow::Result<String> {
 fn main() -> anyhow::Result<String> {
     let contract = sewup::primitives::Contract::new()?;
     let greeting = match contract.get_function_selector()? {
-        ewasm_fn_sig!(hello) => hello()?,
+        sewup_derive::ewasm_fn_sig!(hello) => hello()?,
         _ => panic!("unknown handle"),
     };
     Ok(greeting)
@@ -21,7 +21,7 @@ fn main() -> anyhow::Result<String> {
 #[ewasm_test]
 mod tests {
     use super::*;
-    use sewup_derive::{ewasm_assert_eq, ewasm_auto_assert_eq, ewasm_output_from};
+    use sewup_derive::{ewasm_assert_eq, ewasm_auto_assert_eq, ewasm_fn_sig, ewasm_output_from};
 
     #[ewasm_test]
     fn test_get_greeting() {

@@ -57,14 +57,14 @@ impl Value for Row {
 }
 
 impl Value for Address {
-    fn from_row_value(x: &Row) -> Result<Self> {
+    fn from_row_value(_x: &Row) -> Result<Self> {
         #[cfg(not(target_arch = "wasm32"))]
         let addr = Address {
             ..Default::default()
         };
         #[cfg(target_arch = "wasm32")]
         let addr: Address = {
-            let raw: Raw = x.try_into().expect("row key should at least one raw");
+            let raw: Raw = _x.try_into().expect("row key should at least one raw");
             let byte20: [u8; 20] = [
                 raw.bytes[12],
                 raw.bytes[13],
