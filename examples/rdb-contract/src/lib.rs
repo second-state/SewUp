@@ -1,11 +1,13 @@
 use serde_derive::{Deserialize, Serialize};
 
+#[cfg(target_arch = "wasm32")]
 use sewup::rdb::errors::Error as LibError;
-use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_main, ewasm_test};
 
 mod errors;
 
 pub mod modules;
+#[cfg(target_arch = "wasm32")]
 use modules::{location, person, post, Location, Person, Post, LOCATION, PERSON, POST};
 
 #[derive(Serialize, Deserialize)]
@@ -109,7 +111,7 @@ fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> 
 
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    use sewup_derive::ewasm_input_from;
+    use sewup_derive::{ewasm_fn_sig, ewasm_input_from};
     let contract = sewup::primitives::Contract::new()?;
 
     match contract.get_function_selector()? {
@@ -141,8 +143,12 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_test]
 mod tests {
     use super::*;
+    use modules::{location, person, post, Location, Person, Post, LOCATION, PERSON, POST};
+    use sewup::rdb::errors::Error as LibError;
     use sewup::types::{Raw, SizedString};
-    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_auto_assert_eq, ewasm_err_output};
+    use sewup_derive::{
+        ewasm_assert_eq, ewasm_assert_ok, ewasm_auto_assert_eq, ewasm_err_output, ewasm_fn_sig,
+    };
 
     #[ewasm_test]
     fn test_execute_crud_handler() {

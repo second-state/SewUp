@@ -6,18 +6,21 @@
 //! the voter can vote the proposal once
 //! everyone can check out the voting result after everyone voted
 //!
+#[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
+#[cfg(target_arch = "wasm32")]
 use std::str::FromStr;
 
 use serde_derive::{Deserialize, Serialize};
+#[cfg(target_arch = "wasm32")]
 use sewup::types::Address;
 use sewup_derive::{
-    ewasm_call_only_by, ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test,
-    SizedString, Value,
+    ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, SizedString, Value,
 };
 
 mod errors;
 
+#[cfg(target_arch = "wasm32")]
 static CHAIRMAN: &str = "8663DBF0cC68AaF37fC8BA262F2df4c666a41993";
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
@@ -72,7 +75,7 @@ fn constructor() {
 
 #[ewasm_fn]
 fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
-    ewasm_call_only_by!(CHAIRMAN);
+    sewup_derive::ewasm_call_only_by!(CHAIRMAN);
     // or
     // ewasm_call_only_by!("8663DBF0cC68AaF37fC8BA262F2df4c666a41993");
     // or

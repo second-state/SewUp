@@ -1,7 +1,8 @@
 use serde_derive::{Deserialize, Serialize};
-use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_fn_sig, ewasm_main, ewasm_test, Value};
+use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_main, ewasm_test, Value};
 
 mod errors;
+#[cfg(target_arch = "wasm32")]
 use errors::KVError;
 
 #[derive(Default, Clone, Serialize, Deserialize, Debug, PartialEq, Value)]
@@ -231,7 +232,7 @@ fn non_register_function() -> anyhow::Result<sewup::primitives::EwasmAny> {
 
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
-    use sewup_derive::ewasm_input_from;
+    use sewup_derive::{ewasm_fn_sig, ewasm_input_from};
 
     let contract = sewup::primitives::Contract::new()?;
 
@@ -269,7 +270,8 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 #[ewasm_test]
 mod tests {
     use super::*;
-    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output};
+    use errors::KVError;
+    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output, ewasm_fn_sig};
 
     #[ewasm_test]
     fn test_execute_storage_operations() {
