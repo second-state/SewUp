@@ -293,6 +293,11 @@ pub fn transfer_from(contract: &Contract) {
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, value: usize) {
     let address = {
+        let addr = if addr.starts_with("0x") {
+            &addr[2..addr.len()]
+        } else {
+            addr
+        };
         let byte20: [u8; 20] = decode(addr)
             .expect("address should be hex format")
             .try_into()

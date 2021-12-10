@@ -2,7 +2,9 @@ use sewup_derive::{ewasm_constructor, ewasm_fn_sig, ewasm_main, ewasm_test};
 
 #[ewasm_constructor]
 fn constructor() {
-    sewup::token::erc20::mint("8663DBF0cC68AaF37fC8BA262F2df4c666a41993", 1000);
+    sewup::token::erc20::mint("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993", 1000);
+    // Following address format is also acceptable
+    // sewup::token::erc20::mint("8663DBF0cC68AaF37fC8BA262F2df4c666a41993", 1000);
 }
 
 #[ewasm_main]
@@ -87,7 +89,7 @@ mod tests {
 
         // assert the transfer() function of contract and call by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993"
         ewasm_assert_eq!(
-            transfer(input_data) by "8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
+            transfer(input_data) by "0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993",
             vec![]
         );
 
