@@ -26,7 +26,7 @@ Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wik
 [hackthon1]: https://slides.com/yanganto/ethereum-wasm-in-rust
 [hackthon2]: https://slides.com/yanganto/key-value-storage-with-sewup
 [hackthon3]: https://slides.com/yanganto/writing-ethereum-webassembly-in-rust-iii-utility-token-with-sewup
-[hackthon4]: https://slides.com/yanganto/writing-ethereum-webassembly-in-rust-iv-todo-app-with-sewup/edit
+[hackthon4]: https://slides.com/yanganto/writing-ethereum-webassembly-in-rust-iv-todo-app-with-sewup
 [record1]: https://www.youtube.com/watch?v=DaVg5WCM2LI
 [record2]: https://youtu.be/XWeOALFPJQ0
 [prerelease]: https://slides.com/yanganto/sewup
