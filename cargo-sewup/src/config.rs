@@ -33,11 +33,17 @@ impl Display for Deploy {
 #[derive(Deserialize)]
 pub struct Package {
     pub name: String,
+    pub version: String,
 }
 
 #[derive(Deserialize)]
 pub struct CargoToml {
     pub package: Package,
+}
+
+#[derive(Deserialize)]
+pub struct CargoLock {
+    pub package: Vec<Package>,
 }
 
 #[derive(Deserialize)]
