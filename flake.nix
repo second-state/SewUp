@@ -29,8 +29,10 @@
           cargo run -- -d -b -p ../examples/$1-contract
           cd ../
           ls -l examples/$1-contract/target/wasm32-unknown-unknown/release/$1_contract.deploy
-          rc=$?
-          exit $rc
+          rc1=$?
+          ls -l examples/$1-contract/target/wasm32-unknown-unknown/release/$1_contract.metadata.toml
+          rc2=$?
+          exit $(($rc1 + $rc2))
         '';
         abiTestScript = pkgs.writeShellScriptBin "abi-test" ''
           cd cargo-sewup
