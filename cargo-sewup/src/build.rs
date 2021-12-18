@@ -10,7 +10,7 @@ use tokio::{
 };
 use wasmprinter::print_file;
 
-use cargo_sewup::config::CargoToml;
+use cargo_sewup::config::{CargoLock, CargoToml, Package};
 use cargo_sewup::deploy_wasm;
 
 async fn check_cargo_toml() -> Result<String> {
@@ -22,6 +22,58 @@ async fn check_cargo_toml() -> Result<String> {
     // TODO: more toml config checking here
 
     Ok(config.package.name.replace("-", "_"))
+}
+
+async fn sewup_version_check() -> Result<()> {
+    Command::new("cargo")
+        .args(&["generate-lockfile"])
+        .output()
+        .await
+        .context("fail to generate lock")?;
+
+    let lock_contents = read_to_string("Cargo.lock")
+        .await
+        .context("can not read Cargo.lock")?;
+    let package_locks: CargoLock = toml::from_str(lock_contents.as_str())?;
+    let mut sewup_version = None;
+    let mut sewup_derive_version = None;
+    for Package { name, version } in package_locks.package.into_iter() {
+        if name == "sewup" {
+            sewup_version = Some(version)
+        } else if name == "sewup-derive" {
+            sewup_derive_version = Some(version)
+        }
+    }
+    let mut warning_msg =
+        "Warning: following sewup crates are not in the same version\nCargo Sewup:".to_string();
+    let mut warning = false;
+    let cargo_sewup_version = env!("CARGO_PKG_VERSION");
+    warning_msg.push_str(&cargo_sewup_version);
+    warning_msg.push('\n');
+
+    if let Some(sewup_version) = sewup_version {
+        warning_msg.push_str("Sewup: ");
+        warning_msg.push_str(&sewup_version);
+        warning_msg.push('\n');
+        if sewup_version != cargo_sewup_version {
+            warning = true;
+        }
+        if let Some(sewup_derive_version) = sewup_derive_version {
+            warning_msg.push_str("Sewup Derive: ");
+            warning_msg.push_str(&sewup_derive_version);
+            warning_msg.push('\n');
+            if sewup_derive_version != cargo_sewup_version || sewup_derive_version != sewup_version
+            {
+                warning = true;
+            }
+        }
+    }
+
+    if warning {
+        println!("{}", warning_msg);
+    }
+
+    Ok(())
 }
 
 async fn build_constructor_template(contract_wasm_path: &str) -> Result<String> {
@@ -294,8 +346,13 @@ async fn get_version() -> Result<String> {
 pub async fn run(debug: bool) -> Result<String> {
     let contract_name = check_cargo_toml().await?;
 
-    match tokio::try_join!(build(debug, &contract_name), list_fn_sig(), get_version()) {
-        Ok((hex_str, fn_sigs, version)) => {
+    match tokio::try_join!(
+        build(debug, &contract_name),
+        list_fn_sig(),
+        get_version(),
+        sewup_version_check()
+    ) {
+        Ok((hex_str, fn_sigs, version, _)) => {
             let meta_path = format!(
                 "./target/wasm32-unknown-unknown/release/{}.metadata.toml",
                 contract_name
