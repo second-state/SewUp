@@ -163,9 +163,35 @@ async fn generate_debug_wat(wat_path: &str, wat_content: &str) -> Result<()> {
     Ok(())
 }
 
-pub async fn run(debug: bool) -> Result<String> {
-    let contract_name = check_cargo_toml().await?;
+async fn generate_metadata() -> Result<()> {
+    let builder = tempfile::Builder::new();
+    let outdir = builder.tempdir().expect("failed to create tmp file");
+    let outfile_path = outdir.path().join("expanded");
 
+    Command::new("cargo")
+        .args(&[
+            "rustc",
+            "--target=wasm32-unknown-unknown",
+            "--",
+            "-o",
+            outfile_path.to_str().unwrap(),
+            "-Zunpretty=expanded",
+        ])
+        .output()
+        .await
+        .context("fail to expand macro")?;
+    let expanded = read_to_string(outfile_path).await?;
+
+    let sig_re = Regex::new(r"[A-Za-z0-9:_]*_SIG").unwrap();
+    let _total_sig: Vec<String> = sig_re
+        .find_iter(&expanded)
+        .map(|m| m.as_str().into())
+        .collect();
+
+    Ok(())
+}
+
+async fn build(debug: bool, contract_name: &str) -> Result<()> {
     let mut wasm_path = format!(
         "./target/wasm32-unknown-unknown/release/{}.wasm",
         contract_name
@@ -213,6 +239,16 @@ pub async fn run(debug: bool) -> Result<String> {
         );
         generate_deploy_wasm_hex(&wasm_path, &text_path).await?;
     }
+    Ok(())
+}
+
+pub async fn run(debug: bool) -> Result<String> {
+    let contract_name = check_cargo_toml().await?;
+
+    match tokio::try_join!(build(debug, &contract_name), generate_metadata()) {
+        Ok((_, _)) => {}
+        Err(err) => return Err(err),
+    };
 
     Ok(contract_name)
 }
