@@ -305,10 +305,14 @@ pub async fn run(debug: bool) -> Result<String> {
 name = "{}"
 deploy_wasm_sha256 = "{}"
 rustc = "{}"
+cargo-sewup = "{}"
 
 [function]
 "#,
-                &contract_name, hex_str, version
+                &contract_name,
+                hex_str,
+                version,
+                env!("CARGO_PKG_VERSION")
             );
             for (fn_name, fn_sig) in fn_sigs {
                 meta_content = meta_content + &fn_name;
