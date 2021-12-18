@@ -1,8 +1,9 @@
-use std::path::Path;
+use std::{fs::File, path::Path};
 
 use anyhow::{Context, Result};
 use hex::encode;
 use regex::Regex;
+use sha2::{Digest, Sha256};
 use tokio::{
     fs::{read, read_to_string, write},
     process::Command,
@@ -163,9 +164,55 @@ async fn generate_debug_wat(wat_path: &str, wat_content: &str) -> Result<()> {
     Ok(())
 }
 
-pub async fn run(debug: bool) -> Result<String> {
-    let contract_name = check_cargo_toml().await?;
+async fn list_fn_sig() -> Result<Vec<(String, String)>> {
+    let builder = tempfile::Builder::new();
+    let outdir = builder.tempdir().expect("failed to create tmp file");
+    let outfile_path = outdir.path().join("expanded");
 
+    Command::new("cargo")
+        .args(&[
+            "rustc",
+            "--target=wasm32-unknown-unknown",
+            "--",
+            "-o",
+            outfile_path.to_str().unwrap(),
+            "-Zunpretty=expanded",
+        ])
+        .output()
+        .await
+        .context("fail to expand macro")?;
+    let expanded = read_to_string(outfile_path).await?;
+
+    let sig_re =
+        Regex::new(r"(?P<sig_name>[A-Za-z0-9:_]*)_SIG: \[u8; 4\] = \[(?P<sig_value>[0-9u,\s]*)\];")
+            .unwrap();
+    let total_sig: Vec<(String, String)> = sig_re
+        .captures_iter(&expanded)
+        .map(|c| {
+            let sig_name = c.name("sig_name").unwrap().as_str();
+            let sig_values: Vec<String> = c
+                .name("sig_value")
+                .unwrap()
+                .as_str()
+                .replace("u8", "")
+                .split(",")
+                .map(|p| p.trim().into())
+                .collect();
+            let sig_hex_str = format!(
+                "{}",
+                sig_values
+                    .iter()
+                    .map(|b| format!("{:02x}", b.parse::<u8>().unwrap()))
+                    .collect::<Vec<_>>()
+                    .join("")
+            );
+            (sig_name.into(), sig_hex_str)
+        })
+        .collect();
+    Ok(total_sig)
+}
+
+async fn build(debug: bool, contract_name: &str) -> Result<String> {
     let mut wasm_path = format!(
         "./target/wasm32-unknown-unknown/release/{}.wasm",
         contract_name
@@ -213,6 +260,71 @@ pub async fn run(debug: bool) -> Result<String> {
         );
         generate_deploy_wasm_hex(&wasm_path, &text_path).await?;
     }
+    let mut file = File::open(wasm_path)?;
+    let mut sha256 = Sha256::new();
+    std::io::copy(&mut file, &mut sha256)?;
+    let hash: [u8; 32] = sha256
+        .finalize()
+        .as_slice()
+        .try_into()
+        .expect("hash size unexpected");
+    let hex_str = format!(
+        "{}",
+        hash.to_vec()
+            .iter()
+            .map(|b| format!("{:02x}", *b))
+            .collect::<Vec<_>>()
+            .join("")
+    );
+    Ok(hex_str)
+}
+
+async fn get_version() -> Result<String> {
+    let version_info = Command::new("rustc")
+        .args(&["--version"])
+        .output()
+        .await
+        .map_err(|e| anyhow::anyhow!("fail to get rustc version: {:?}", e))?;
+    Ok(std::str::from_utf8(&version_info.stdout)
+        .expect("output of rustc version should be utf-8 decoded")
+        .trim()
+        .into())
+}
+
+pub async fn run(debug: bool) -> Result<String> {
+    let contract_name = check_cargo_toml().await?;
+
+    match tokio::try_join!(build(debug, &contract_name), list_fn_sig(), get_version()) {
+        Ok((hex_str, fn_sigs, version)) => {
+            let meta_path = format!(
+                "./target/wasm32-unknown-unknown/release/{}.metadata.toml",
+                contract_name
+            );
+            let mut meta_content = format!(
+                r#"[metadata]
+name = "{}"
+deploy_wasm_sha256 = "{}"
+rustc = "{}"
+cargo-sewup = "{}"
+
+[function]
+"#,
+                &contract_name,
+                hex_str,
+                version,
+                env!("CARGO_PKG_VERSION")
+            );
+            for (fn_name, fn_sig) in fn_sigs {
+                meta_content = meta_content + &fn_name;
+                meta_content = meta_content + r#" = ""#;
+                meta_content = meta_content + &fn_sig;
+                meta_content = meta_content + r#"""#;
+                meta_content = meta_content + "\n";
+            }
+            write(meta_path, meta_content).await?;
+        }
+        Err(err) => return Err(err),
+    };
 
     Ok(contract_name)
 }
