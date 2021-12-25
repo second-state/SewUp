@@ -238,8 +238,13 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
     }
 
     /// Pop the first item
-    pub fn pop_front(&self) -> Result<Option<Item<K, V>>> {
-        Ok(None)
+    pub fn pop_front(&mut self) -> Result<Option<Item<K, V>>> {
+        if let Some((key, value)) = self.iter().next() {
+            self.raw_bucket.0.remove(0);
+            Ok(Some((key, value)))
+        } else {
+            Ok(None)
+        }
     }
 
     /// Get the length of the bucket
