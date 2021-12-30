@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Feature",""]],"mod":[["traits","traits for Key and Value"]],"struct":[["Store",""]]});
+initSidebarItems({"enum":[["Feature",""]],"mod":[["traits","traits for Key and Value"]],"struct":[["Bucket","Bucket is a wrapper for `RawBucket`, including the name of the bucket"],["Iter",""],["Store",""]],"type":[["RawBucket","`RawBucket` is a structure the data format really store The hash key is stored in the first item, and the `Key` and `Value` are stored in the second item"],["SewUpVec",""]]});
