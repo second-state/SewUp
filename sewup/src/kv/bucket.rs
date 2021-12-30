@@ -18,8 +18,8 @@ pub type RawBucket = (Vec<Raw>, Vec<Raw>);
 pub struct Bucket<K: Key, V: Value> {
     pub(crate) name: String,
     pub(crate) raw_bucket: RawBucket,
-    phantom_k: PhantomData<K>,
-    phantom_v: PhantomData<V>,
+    pub(crate) phantom_k: PhantomData<K>,
+    pub(crate) phantom_v: PhantomData<V>,
 }
 
 type Item<K, V> = (K, V);

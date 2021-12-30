@@ -46,10 +46,11 @@ pub struct Store {}
 
 #[allow(unused_variables)]
 #[allow(dead_code)]
-#[cfg(target_arch = "wasm32")]
 mod bucket;
-#[cfg(target_arch = "wasm32")]
 pub use bucket::*;
+
+#[cfg(test)]
+mod tests;
 
 pub mod traits;
 
