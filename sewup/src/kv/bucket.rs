@@ -18,8 +18,8 @@ pub type RawBucket = (Vec<Raw>, Vec<Raw>);
 pub struct Bucket<K: Key, V: Value> {
     pub(crate) name: String,
     pub(crate) raw_bucket: RawBucket,
-    phantom_k: PhantomData<K>,
-    phantom_v: PhantomData<V>,
+    pub(crate) phantom_k: PhantomData<K>,
+    pub(crate) phantom_v: PhantomData<V>,
 }
 
 type Item<K, V> = (K, V);
@@ -238,8 +238,13 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
     }
 
     /// Pop the first item
-    pub fn pop_front(&self) -> Result<Option<Item<K, V>>> {
-        Ok(None)
+    pub fn pop_front(&mut self) -> Result<Option<Item<K, V>>> {
+        if let Some((key, value)) = self.iter().next() {
+            self.raw_bucket.0.remove(0);
+            Ok(Some((key, value)))
+        } else {
+            Ok(None)
+        }
     }
 
     /// Get the length of the bucket
