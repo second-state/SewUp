@@ -236,14 +236,16 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
+<span id="238">238</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::cmp::PartialEq</span>;
+<span class="kw">use</span> <span class="ident">std::iter::FromIterator</span>;
 
 <span class="kw">use</span> <span class="ident">serde_derive</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::types</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// A list of `Raw`, which helps you store much bigger data than a `Raw`</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Row</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Raw</span><span class="op">&gt;</span>,
     <span class="ident">_buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,

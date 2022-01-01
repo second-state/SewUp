@@ -415,9 +415,38 @@
 <span id="414">414</span>
 <span id="415">415</span>
 <span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
 </pre><pre class="rust"><code><span class="doccomment">//! Bucket is an abstract concept to help you storage key value items.</span>
 <span class="doccomment">//! The types of key and value should be specific when new a bucket.</span>
 <span class="doccomment">//! Items save into bucket may have different encoding, the will base on the feature you enabled.</span>
+<span class="kw">use</span> <span class="ident">std::cmp::PartialEq</span>;
 <span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
 
 <span class="kw">use</span> <span class="ident">anyhow::Result</span>;
@@ -488,7 +517,7 @@
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="ident">Key</span>, <span class="ident">V</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Value</span><span class="op">&gt;</span> <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
+<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">K</span>: <span class="ident">Key</span> <span class="op">+</span> <span class="ident">PartialEq</span>, <span class="ident">V</span>: <span class="ident">Clone</span> <span class="op">+</span> <span class="ident">Value</span><span class="op">&gt;</span> <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
     <span class="doccomment">/// New a `Bucket` with name</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">name</span>: <span class="ident">String</span>, <span class="ident">raw_bucket</span>: <span class="ident">RawBucket</span>) -&gt; <span class="ident">Bucket</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span> {
         <span class="ident">Bucket</span> {
@@ -645,22 +674,49 @@
     }
 
     <span class="doccomment">/// Pop item with specific key</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="macro">unimplemented!</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">search_key</span>: <span class="ident">K</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">index</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">item_idx</span> <span class="op">=</span> <span class="number">0</span>;
+        <span class="kw">loop</span> {
+            <span class="kw">if</span> <span class="ident">index</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">0</span>.<span class="ident">len</span>() {
+                <span class="kw">return</span> <span class="prelude-val">None</span>;
+            }
+
+            <span class="kw">let</span> (<span class="ident">k_size</span>, <span class="ident">v_size</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">0</span>[<span class="ident">index</span>].<span class="ident">get_size</span>();
+
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">key_row</span> <span class="op">=</span>
+                <span class="ident">Row::from</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">1</span>[(<span class="ident">item_idx</span>) <span class="kw">as</span> <span class="ident">usize</span>..(<span class="ident">item_idx</span> <span class="op">+</span> <span class="ident">k_size</span>) <span class="kw">as</span> <span class="ident">usize</span>]);
+
+            <span class="ident">key_row</span>.<span class="ident">make_buffer</span>();
+            <span class="kw">let</span> <span class="ident">key</span> <span class="op">=</span> <span class="ident">K::from_row_key</span>(<span class="kw-2">&amp;</span><span class="ident">key_row</span>).<span class="ident">expect</span>(<span class="string">&quot;parse key from raw fail&quot;</span>);
+
+            <span class="kw">if</span> <span class="ident">key</span> <span class="op">==</span> <span class="ident">search_key</span> {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value_row</span> <span class="op">=</span> <span class="ident">Row::from</span>(
+                    <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">1</span>
+                        [(<span class="ident">item_idx</span> <span class="op">+</span> <span class="ident">k_size</span>) <span class="kw">as</span> <span class="ident">usize</span>..(<span class="ident">item_idx</span> <span class="op">+</span> <span class="ident">k_size</span> <span class="op">+</span> <span class="ident">v_size</span>) <span class="kw">as</span> <span class="ident">usize</span>],
+                );
+                <span class="ident">value_row</span>.<span class="ident">make_buffer</span>();
+                <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">V::from_row_value</span>(<span class="kw-2">&amp;</span><span class="ident">value_row</span>).<span class="ident">expect</span>(<span class="string">&quot;parse value from raw fail&quot;</span>);
+                <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">key</span>);
+                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
+            }
+            <span class="ident">index</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
+            <span class="ident">item_idx</span> <span class="op">=</span> <span class="ident">item_idx</span> <span class="op">+</span> <span class="ident">k_size</span> <span class="op">+</span> <span class="ident">v_size</span>;
+        }
     }
 
     <span class="doccomment">/// Pop the last item</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_back</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_back</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
     }
 
     <span class="doccomment">/// Pop the first item</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pop_front</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">&lt;</span><span class="ident">K</span>, <span class="ident">V</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>)) <span class="op">=</span> <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">next</span>() {
-            <span class="self">self</span>.<span class="ident">raw_bucket</span>.<span class="number">0</span>.<span class="ident">remove</span>(<span class="number">0</span>);
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>)))
+            <span class="self">self</span>.<span class="ident">remove</span>(<span class="ident">key</span>.<span class="ident">clone</span>());
+            <span class="prelude-val">Some</span>((<span class="ident">key</span>, <span class="ident">value</span>))
         } <span class="kw">else</span> {
-            <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+            <span class="prelude-val">None</span>
         }
     }
 
