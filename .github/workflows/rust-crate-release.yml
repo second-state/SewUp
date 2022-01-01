@@ -44,7 +44,7 @@ jobs:
       - name: Publish sewup crate
         uses: nick-invision/retry@v2
         with:
-          timeout_minutes: 1
+          timeout_minutes: 20
           max_attempts: 3
           retry_on: error
           command: nix develop -c 'crate-publish' sewup ${{ secrets.CARGO_REGISTRY_TOKEN }}
