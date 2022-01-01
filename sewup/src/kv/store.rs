@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use std::collections::hash_map::HashMap;
 use std::convert::TryInto;
 
@@ -81,7 +82,7 @@ impl Store {
         self.tenants.keys().map(|k| k.to_string()).collect()
     }
 
-    pub fn bucket<'a, K: Key, V: Default + Clone + Value>(
+    pub fn bucket<'a, K: Key + PartialEq, V: Default + Clone + Value>(
         &mut self,
         name: &str,
     ) -> Result<Bucket<K, V>> {
