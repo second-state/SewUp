@@ -1,3 +1,4 @@
+use std::cmp::PartialEq;
 use std::iter::FromIterator;
 
 use serde_derive::{Deserialize, Serialize};
@@ -5,7 +6,7 @@ use serde_derive::{Deserialize, Serialize};
 use crate::types::*;
 
 /// A list of `Raw`, which helps you store much bigger data than a `Raw`
-#[derive(Clone, Default, Serialize, Deserialize)]
+#[derive(Clone, Default, Serialize, Deserialize, PartialEq)]
 pub struct Row {
     pub(crate) inner: Vec<Raw>,
     _buffer: Vec<u8>,
