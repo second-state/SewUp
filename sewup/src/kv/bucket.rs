@@ -1,6 +1,7 @@
 //! Bucket is an abstract concept to help you storage key value items.
 //! The types of key and value should be specific when new a bucket.
 //! Items save into bucket may have different encoding, the will base on the feature you enabled.
+use std::cmp::PartialEq;
 use std::marker::PhantomData;
 
 use anyhow::Result;
@@ -71,7 +72,7 @@ impl<'a, K: Key, V: Value> Iterator for Iter<'a, K, V> {
     }
 }
 
-impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
+impl<'a, K: Key + PartialEq, V: Clone + Value> Bucket<K, V> {
     /// New a `Bucket` with name
     pub fn new(name: String, raw_bucket: RawBucket) -> Bucket<K, V> {
         Bucket {
@@ -228,22 +229,49 @@ impl<'a, K: Key, V: Clone + Value> Bucket<K, V> {
     }
 
     /// Pop item with specific key
-    pub fn pop(&self, key: K) -> Result<Option<V>> {
-        unimplemented!();
+    pub fn pop(&mut self, search_key: K) -> Option<V> {
+        let mut index = 0;
+        let mut item_idx = 0;
+        loop {
+            if index == self.raw_bucket.0.len() {
+                return None;
+            }
+
+            let (k_size, v_size) = self.raw_bucket.0[index].get_size();
+
+            let mut key_row =
+                Row::from(&self.raw_bucket.1[(item_idx) as usize..(item_idx + k_size) as usize]);
+
+            key_row.make_buffer();
+            let key = K::from_row_key(&key_row).expect("parse key from raw fail");
+
+            if key == search_key {
+                let mut value_row = Row::from(
+                    &self.raw_bucket.1
+                        [(item_idx + k_size) as usize..(item_idx + k_size + v_size) as usize],
+                );
+                value_row.make_buffer();
+                let value = V::from_row_value(&value_row).expect("parse value from raw fail");
+                self.remove(key);
+                return Some(value);
+            }
+            index += 1;
+            item_idx = item_idx + k_size + v_size;
+        }
     }
 
     /// Pop the last item
-    pub fn pop_back(&self) -> Result<Option<Item<K, V>>> {
-        Ok(None)
+    pub fn pop_back(&self) -> Option<Item<K, V>> {
+        None
     }
 
     /// Pop the first item
-    pub fn pop_front(&mut self) -> Result<Option<Item<K, V>>> {
+    pub fn pop_front(&mut self) -> Option<Item<K, V>> {
         if let Some((key, value)) = self.iter().next() {
-            self.raw_bucket.0.remove(0);
-            Ok(Some((key, value)))
+            self.remove(key.clone());
+            Some((key, value))
         } else {
-            Ok(None)
+            None
         }
     }
 
