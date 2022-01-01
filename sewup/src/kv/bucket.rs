@@ -261,8 +261,18 @@ impl<'a, K: Key + PartialEq, V: Clone + Value> Bucket<K, V> {
     }
 
     /// Pop the last item
-    pub fn pop_back(&self) -> Option<Item<K, V>> {
-        None
+    pub fn pop_back(&mut self) -> Option<Item<K, V>> {
+        let mut prev_pair: Option<(K, V)> = None;
+        let mut iter = self.iter();
+        while let Some(pair) = iter.next() {
+            prev_pair = Some(pair);
+        }
+        if let Some((key, value)) = prev_pair {
+            self.remove(key.clone());
+            Some((key, value))
+        } else {
+            None
+        }
     }
 
     /// Pop the first item
