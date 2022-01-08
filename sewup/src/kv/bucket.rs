@@ -224,8 +224,40 @@ impl<'a, K: Key + PartialEq, V: Clone + Value> Bucket<K, V> {
     }
 
     /// Get next key value pair
-    pub fn next_key(&self, key: K) -> Result<Option<Item<K, V>>> {
-        unimplemented!();
+    pub fn next_key(&self, niddle: K) -> Option<Item<K, V>> {
+        let mut match_key = false;
+        let mut index = 0;
+        let mut item_idx = 0;
+        loop {
+            if index == self.raw_bucket.0.len() {
+                return None;
+            }
+
+            let (k_size, v_size) = self.raw_bucket.0[index].get_size();
+
+            let mut key_row =
+                Row::from(&self.raw_bucket.1[(item_idx) as usize..(item_idx + k_size) as usize]);
+
+            key_row.make_buffer();
+            let key = K::from_row_key(&key_row).expect("parse key from raw fail");
+
+            if match_key {
+                let mut value_row = Row::from(
+                    &self.raw_bucket.1
+                        [(item_idx + k_size) as usize..(item_idx + k_size + v_size) as usize],
+                );
+                value_row.make_buffer();
+                let value = V::from_row_value(&value_row).expect("parse value from raw fail");
+                return Some((key, value));
+            }
+
+            if key == niddle {
+                match_key = true;
+            }
+
+            index += 1;
+            item_idx = item_idx + k_size + v_size;
+        }
     }
 
     /// Pop item with specific key
