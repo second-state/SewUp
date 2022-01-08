@@ -11,8 +11,6 @@ fn test_function_signature() {
 
 #[test]
 fn test_parse_fn_attr() {
-    use crate::_parse_fn_attr as parse_fn_attr;
-
     // without attr
     assert_eq!(parse_fn_attr("".to_string()), Ok((None, "{}".to_string())));
 
