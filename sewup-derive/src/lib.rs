@@ -239,6 +239,9 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
+pub(crate) fn parse_fn_attr(attr: String) -> (Option<String>, String) {
+    return (None, "{}".into());
+}
 /// helps you to build your handlers in the contract
 ///
 /// This macro also generate the function signature, you can use
