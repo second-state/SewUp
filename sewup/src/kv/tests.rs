@@ -70,3 +70,17 @@ fn test_next_key_of_bucket() {
     bucket.set(2, 2);
     assert_eq!(bucket.next_key(1), Some((2, 2)));
 }
+
+#[cfg(feature = "default")]
+#[test]
+fn test_prev_key_of_bucket() {
+    let mut bucket = Bucket {
+        name: "test_bucket".into(),
+        raw_bucket: (vec![], vec![]),
+        phantom_k: PhantomData::<usize>,
+        phantom_v: PhantomData::<usize>,
+    };
+    bucket.set(1, 1);
+    bucket.set(2, 2);
+    assert_eq!(bucket.prev_key(2), Some((1, 1)));
+}

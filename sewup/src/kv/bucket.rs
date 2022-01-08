@@ -3,6 +3,7 @@
 //! Items save into bucket may have different encoding, the will base on the feature you enabled.
 use std::cmp::PartialEq;
 use std::marker::PhantomData;
+use std::ops::Range;
 
 use anyhow::Result;
 
@@ -219,8 +220,47 @@ impl<'a, K: Key + PartialEq, V: Clone + Value> Bucket<K, V> {
     // }
 
     /// Get previous key, value pair
-    pub fn prev_key(&self, key: K) -> Result<Option<Item<K, V>>> {
-        unimplemented!();
+    pub fn prev_key(&self, niddle: K) -> Option<Item<K, V>> {
+        let mut previous_key: Option<K> = None;
+        let mut previous_value_range: Option<Range<usize>> = None;
+        let mut index = 0;
+        let mut item_idx = 0;
+        loop {
+            if index == self.raw_bucket.0.len() {
+                return None;
+            }
+
+            let (k_size, v_size) = self.raw_bucket.0[index].get_size();
+
+            let mut key_row =
+                Row::from(&self.raw_bucket.1[(item_idx) as usize..(item_idx + k_size) as usize]);
+
+            key_row.make_buffer();
+            let key = K::from_row_key(&key_row).expect("parse key from raw fail");
+
+            if key == niddle {
+                match (previous_key, previous_value_range) {
+                    (Some(previous_key), Some(previous_value_range)) => {
+                        let mut value_row = Row::from(&self.raw_bucket.1[previous_value_range]);
+                        value_row.make_buffer();
+                        let value =
+                            V::from_row_value(&value_row).expect("parse value from raw fail");
+                        return Some((previous_key, value));
+                    }
+                    (None, None) => {
+                        return None;
+                    }
+                    _ => panic!("prev_key update not correct"),
+                }
+            }
+
+            previous_key = Some(key);
+            previous_value_range =
+                Some((item_idx + k_size) as usize..(item_idx + k_size + v_size) as usize);
+
+            index += 1;
+            item_idx = item_idx + k_size + v_size;
+        }
     }
 
     /// Get next key value pair
