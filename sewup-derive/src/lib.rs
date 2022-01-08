@@ -1,6 +1,9 @@
 #![feature(box_into_inner)]
 extern crate proc_macro;
 
+#[cfg(test)]
+mod function_tests;
+
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
@@ -239,6 +242,82 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
+fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str> {
+    let attr_str = attr.replace(" ", "").replace("\n", "");
+    return if attr_str.is_empty() {
+        Ok((None, "{}".into()))
+    } else if let Some((head, tail)) = attr_str.split_once(',') {
+        if tail.is_empty() {
+            Ok((Some(head.replace("\"", "")), "{}".into()))
+        } else {
+            let mut json = "{".to_string();
+            if let Some(cap) = Regex::new(r"constant=(?P<constant>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("constant").unwrap().as_str() {
+                    "true" => json.push_str(r#""constant":true,"#),
+                    "false" => json.push_str(r#""constant":false,"#),
+                    _ => return Err("constacnt should be true or false"),
+                }
+            }
+
+            if let Some(cap) = Regex::new(r"inputs=(?P<inputs>\[[^\[\]]*\])")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""inputs":"#);
+                json.push_str(cap.name("inputs").unwrap().as_str());
+                json.push(',');
+            }
+
+            if let Some(cap) = Regex::new(r"name=(?P<name>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""name":""#);
+                json.push_str(cap.name("name").unwrap().as_str());
+                json.push_str(r#"","#);
+            }
+
+            if let Some(cap) = Regex::new(r"outputs=(?P<outputs>\[[^\[\]]*\])")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""outputs":"#);
+                json.push_str(cap.name("outputs").unwrap().as_str());
+                json.push(',');
+            }
+
+            if let Some(cap) = Regex::new(r"payable=(?P<payable>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("payable").unwrap().as_str() {
+                    "true" => json.push_str(r#""payable":true,"#),
+                    "false" => json.push_str(r#""payable":false,"#),
+                    _ => return Err("payable should be true or false"),
+                }
+            }
+
+            if let Some(cap) = Regex::new(r"stateMutability=(?P<stateMutability>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("stateMutability").unwrap().as_str() {
+                    "nonpayable" => json.push_str(r#""stateMutability":"nonpayable","#),
+                    "view" => json.push_str(r#""stateMutability":"view","#),
+                    _ => return Err("stateMutability should be nonpayable or view"),
+                }
+            }
+
+            json.push_str(r#""type":"function"}"#);
+            Ok((Some(head.replace("\"", "")), json))
+        }
+    } else {
+        Ok((Some(attr_str.replace("\"", "")), "{}".into()))
+    };
+}
 /// helps you to build your handlers in the contract
 ///
 /// This macro also generate the function signature, you can use
@@ -264,18 +343,9 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_str = attr.to_string().replace(" ", "");
-    let (hex_str, abi_str) = if attr_str.is_empty() {
-        (None, "{}".to_string())
-    } else if attr_str.starts_with('{') {
-        (None, attr_str.split_whitespace().collect())
-    } else if let Some((head, tail)) = attr_str.split_once(',') {
-        (
-            Some(head.replace("\"", "")),
-            tail.split_whitespace().collect(),
-        )
-    } else {
-        (Some(attr_str.replace("\"", "")), "{}".to_string())
+    let (hex_str, abi_str) = match parse_fn_attr(attr.to_string()) {
+        Ok(o) => o,
+        Err(e) => abort_call_site!(e),
     };
 
     let input = syn::parse_macro_input!(item as syn::ItemFn);
@@ -393,15 +463,9 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let attr_str = attr.to_string().replace(" ", "");
-    let (hex_str, abi_str) = if attr_str.is_empty() {
-        (None, "{}".to_string())
-    } else if attr_str.starts_with('{') {
-        (None, attr_str)
-    } else if let Some((head, tail)) = attr_str.split_once(',') {
-        (Some(head.replace("\"", "")), tail.to_string())
-    } else {
-        (Some(attr_str.replace("\"", "")), "{}".to_string())
+    let (hex_str, abi_str) = match parse_fn_attr(attr.to_string()) {
+        Ok(o) => o,
+        Err(e) => abort_call_site!(e),
     };
 
     let input = syn::parse_macro_input!(item as syn::ItemFn);

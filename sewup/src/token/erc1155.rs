@@ -29,18 +29,17 @@ pub use super::erc721::{
 };
 
 /// Implement ERC-1155 balanceOf(address,uint256)
-#[ewasm_lib_fn(00fdd58e, {
-    "constant": true,
-    "inputs": [
+#[ewasm_lib_fn(00fdd58e,
+    constant=true,
+    inputs=[
         { "internalType": "address", "name": "account", "type": "address" },
         { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
     ],
-    "name": "balanceOf",
-    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-})]
+    name=balanceOf,
+    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    payable=false,
+    stateMutability=view
+)]
 pub fn balance_of(contract: &Contract) {
     let address = copy_into_address(&contract.input_data[16..36]);
     let token_id: [u8; 32] = contract.input_data[36..68]
@@ -51,18 +50,17 @@ pub fn balance_of(contract: &Contract) {
 }
 
 /// Implement ERC-1155 balanceOfBatch(address[],uint256[])
-#[ewasm_lib_fn(4e1273f4, {
-    "constant": true,
-    "inputs": [
+#[ewasm_lib_fn(4e1273f4,
+    constant=true,
+    inputs=[
         { "internalType": "address[]", "name": "account", "type": "address[]" },
         { "internalType": "uinit256[]", "name": "token_id", "type": "uinit256[]" }
     ],
-    "name": "balanceOfBatch",
-    "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-})]
+    name=balanceOfBatch,
+    outputs=[{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
+    payable=false,
+    stateMutability=view
+)]
 pub fn balance_of_batch(contract: &Contract) {
     // TODO: handle the offset bigger than usize
     let mut buf: [u8; 4] = contract.input_data[32..36].try_into().unwrap();
@@ -136,21 +134,20 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
 }
 
 /// Implement ERC-1155 safeTransferFrom(address,address,uint256,uint256,bytes)
-#[ewasm_lib_fn(f242432a, {
-    "constant": true,
-    "inputs": [
+#[ewasm_lib_fn(f242432a,
+    constant=true,
+    inputs=[
         { "internalType": "address", "name": "from", "type": "address" },
         { "internalType": "address", "name": "to", "type": "address" },
         { "internalType": "uinit256", "name": "token_id", "type": "uinit256" },
         { "internalType": "uinit256", "name": "value", "type": "uinit256" },
         { "internalType": "bytes", "name": "data", "type": "bytes" }
     ],
-    "name": "safeTransferFrom",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-})]
+    name=safeTransferFrom,
+    outputs=[],
+    payable=false,
+    stateMutability=view
+)]
 pub fn safe_transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let from = copy_into_address(&contract.input_data[16..36]);
@@ -183,21 +180,20 @@ pub fn safe_transfer_from(contract: &Contract) {
 }
 
 /// Implement ERC-1155 safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
-#[ewasm_lib_fn("2eb2c2d6", {
-    "constant": true,
-    "inputs": [
+#[ewasm_lib_fn("2eb2c2d6",
+    constant=true,
+    inputs=[
         { "internalType": "address", "name": "from", "type": "address" },
         { "internalType": "address", "name": "to", "type": "address" },
         { "internalType": "uinit256[]", "name": "token_id", "type": "uinit256[]" },
         { "internalType": "uinit256[]", "name": "value", "type": "uinit256[]" },
         { "internalType": "bytes", "name": "data", "type": "bytes" }
     ],
-    "name": "safeBatchTransferFrom",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-})]
+    name=safeBatchTransferFrom,
+    outputs=[],
+    payable=false,
+    stateMutability=view
+)]
 pub fn safe_batch_transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let from = copy_into_address(&contract.input_data[16..36]);
