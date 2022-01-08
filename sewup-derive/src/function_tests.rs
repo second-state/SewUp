@@ -11,6 +11,8 @@ fn test_function_signature() {
 
 #[test]
 fn test_parse_fn_attr() {
+    use crate::_parse_fn_attr as parse_fn_attr;
+
     // without attr
     assert_eq!(parse_fn_attr("".to_string()), (None, "{}".to_string()));
 
@@ -41,5 +43,9 @@ fn test_parse_fn_attr() {
     //   payable=false,
     //   stateMutability=nonpayable,
     //   type=function
-    // "#.to_string()), (Some("a9059cbb".to_string()), "{}".to_string()));
+    // "#.to_string()), (Some("a9059cbb".to_string()),
+    // r#"{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},"#.to_owned() +
+    // r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","# +
+    // r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
+    // r#""stateMutability":"nonpayable","type":"function"}"#));
 }

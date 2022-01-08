@@ -1,6 +1,9 @@
 #![feature(box_into_inner)]
 extern crate proc_macro;
 
+#[cfg(test)]
+mod function_tests;
+
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
@@ -239,7 +242,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-pub(crate) fn _parse_fn_attr(attr: String) -> (Option<String>, String) {
+fn _parse_fn_attr(attr: String) -> (Option<String>, String) {
     let attr_str = attr.replace(" ", "");
     return if attr_str.is_empty() {
         (None, "{}".into())
