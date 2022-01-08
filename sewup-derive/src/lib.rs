@@ -242,18 +242,79 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-fn _parse_fn_attr(attr: String) -> (Option<String>, String) {
-    let attr_str = attr.replace(" ", "");
+fn _parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str> {
+    let attr_str = attr.replace(" ", "").replace("\n", "");
     return if attr_str.is_empty() {
-        (None, "{}".into())
+        Ok((None, "{}".into()))
     } else if let Some((head, tail)) = attr_str.split_once(',') {
         if tail.is_empty() {
-            (Some(head.into()), "{}".into())
+            Ok((Some(head.into()), "{}".into()))
         } else {
-            (Some(head.into()), "{..}".into())
+            let mut json = "{".to_string();
+            if let Some(cap) = Regex::new(r"constant=(?P<constant>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("constant").unwrap().as_str() {
+                    "true" => json.push_str(r#""constant":true,"#),
+                    "false" => json.push_str(r#""constant":false,"#),
+                    _ => return Err("constacnt should be true or false"),
+                }
+            }
+
+            if let Some(cap) = Regex::new(r"inputs=(?P<inputs>\[[^\[\]]*\])")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""inputs":"#);
+                json.push_str(cap.name("inputs").unwrap().as_str());
+                json.push(',');
+            }
+
+            if let Some(cap) = Regex::new(r"name=(?P<name>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""name":""#);
+                json.push_str(cap.name("name").unwrap().as_str());
+                json.push_str(r#"","#);
+            }
+
+            if let Some(cap) = Regex::new(r"outputs=(?P<outputs>\[[^\[\]]*\])")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                json.push_str(r#""outputs":"#);
+                json.push_str(cap.name("outputs").unwrap().as_str());
+                json.push(',');
+            }
+
+            if let Some(cap) = Regex::new(r"payable=(?P<payable>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("payable").unwrap().as_str() {
+                    "true" => json.push_str(r#""payable":true,"#),
+                    "false" => json.push_str(r#""payable":false,"#),
+                    _ => return Err("payable should be true or false"),
+                }
+            }
+
+            if let Some(cap) = Regex::new(r"stateMutability=(?P<stateMutability>[^,]*)")
+                .unwrap()
+                .captures(&attr_str)
+            {
+                match cap.name("stateMutability").unwrap().as_str() {
+                    "nonpayable" => json.push_str(r#""stateMutability":"nonpayable","#),
+                    _ => return Err("stateMutability should be nonpayable"), // Validate more field here
+                }
+            }
+
+            json.push_str(r#""type":"function"}"#);
+            Ok((Some(head.into()), json))
         }
     } else {
-        (Some(attr_str), "{}".into())
+        Ok((Some(attr_str), "{}".into()))
     };
 }
 /// helps you to build your handlers in the contract
