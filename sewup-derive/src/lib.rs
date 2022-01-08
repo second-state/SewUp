@@ -239,8 +239,19 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-pub(crate) fn parse_fn_attr(attr: String) -> (Option<String>, String) {
-    return (None, "{}".into());
+pub(crate) fn _parse_fn_attr(attr: String) -> (Option<String>, String) {
+    let attr_str = attr.replace(" ", "");
+    return if attr_str.is_empty() {
+        (None, "{}".into())
+    } else if let Some((head, tail)) = attr_str.split_once(',') {
+        if tail.is_empty() {
+            (Some(head.into()), "{}".into())
+        } else {
+            (Some(head.into()), "{..}".into())
+        }
+    } else {
+        (Some(attr_str), "{}".into())
+    };
 }
 /// helps you to build your handlers in the contract
 ///
