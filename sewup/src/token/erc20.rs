@@ -24,14 +24,11 @@ use sewup_derive::ewasm_lib_fn;
 
 /// Implement ERC-20 transfer(address,uint256)
 #[ewasm_lib_fn(a9059cbb,
-    constant=false,
     inputs=[
         { "internalType": "address", "name": "recipient", "type": "address" },
         { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    name=transfer,
     outputs=[{ "internalType": "bool", "name": "", "type": "bool" }],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
@@ -92,10 +89,7 @@ pub fn transfer(contract: &Contract) {
 #[ewasm_lib_fn(70a08231,
     constant=true,
     inputs=[{ "internalType": "address", "name": "account", "type": "address" }],
-    name=balanceOf,
-    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
     let address = copy_into_address(&contract.input_data[16..36]);
@@ -108,11 +102,7 @@ pub fn balance_of(contract: &Contract) {
 /// ```
 #[ewasm_lib_fn(06fdde03,
     constant=true,
-    inputs=[],
-    name=symbol,
-    outputs=[{ "internalType": "string", "name": "", "type": "string" }],
-    payable=false,
-    stateMutability=view,
+    outputs=[{ "internalType": "string", "name": "", "type": "string" }]
 )]
 pub fn name(s: &str) {
     ewasm_return_str(s);
@@ -121,11 +111,7 @@ pub fn name(s: &str) {
 /// Implement ERC-20 symbol() and easy to change the symbol
 #[ewasm_lib_fn(95d89b41,
     constant=true,
-    inputs=[],
-    name=symbol,
-    outputs=[{ "internalType": "string", "name": "", "type": "string" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "internalType": "string", "name": "", "type": "string" }]
 )]
 pub fn symbol(s: &str) {
     ewasm_return_str(s);
@@ -134,11 +120,7 @@ pub fn symbol(s: &str) {
 /// Implement ERC-20 decimals()
 #[ewasm_lib_fn(313ce567,
     constant=true,
-    inputs=[],
-    name=decimals,
-    outputs=[{ "internalType": "uint256", "name": "", "type": "uint8" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "internalType": "uint256", "name": "", "type": "uint8" }]
 )]
 pub fn decimals(i: u8) {
     ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
@@ -149,11 +131,7 @@ pub fn decimals(i: u8) {
 /// ```
 #[ewasm_lib_fn(18160ddd,
     constant=true,
-    inputs=[],
-    name=totalSupply,
-    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn total_supply(i: usize) {
     ewasm_api::finish_data(&Raw::from(i).as_bytes().to_vec());
@@ -161,14 +139,11 @@ pub fn total_supply(i: usize) {
 
 /// Implement ERC-20 approve(address,uint256)
 #[ewasm_lib_fn("095ea7b3",
-    constant=false,
     inputs=[
         { "internalType": "address", "name": "spender", "type": "address" },
         { "internalType": "uint256", "name": "value", "type": "uint256" }
     ],
-    name=approve,
     outputs=[{ "internalType": "bool", "name": "", "type": "bool" }],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn approve(contract: &Contract) {
@@ -199,10 +174,7 @@ pub fn approve(contract: &Contract) {
         { "internalType": "address", "name": "owner", "type": "address" },
         { "internalType": "address", "name": "spender", "type": "address" }
     ],
-    name=allowance,
-    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn allowance(contract: &Contract) {
     let owner = copy_into_address(&contract.input_data[16..36]);
@@ -213,15 +185,12 @@ pub fn allowance(contract: &Contract) {
 
 /// Implement ERC-20 transferFrom(address,address,uint256)
 #[ewasm_lib_fn(23b872dd,
-    constant=false,
     inputs=[
         { "internalType": "address", "name": "sender", "type": "address" },
         { "internalType": "address", "name": "recipient", "type": "address" },
         { "internalType": "uint256", "name": "amount", "type": "uint256" }
     ],
-    name=transferFrom,
     outputs=[{ "internalType": "bool", "name": "", "type": "bool" }],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {

@@ -32,10 +32,7 @@ use ewasm_api::{log3, log4, types::Address};
 #[ewasm_lib_fn("6352211e",
     constant=true,
     inputs=[{ "name": "_tokenId", "type": "uint256" }],
-    name=ownerOf,
-    outputs=[{ "name": "_owner", "type": "address" }],
-    payable=false,
-    stateMutability=view
+    outputs=[{ "name": "_owner", "type": "address" }]
 )]
 pub fn owner_of(contract: &Contract) {
     let token_id: [u8; 32] = contract.input_data[4..36]
@@ -78,14 +75,11 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
 
 /// Implement ERC-721 transfer()
 #[ewasm_lib_fn("a9059cbb",
-  constant=false,
   inputs=[
     { "name": "_to", "type": "address" },
     { "name": "_tokenId", "type": "uint256" }
   ],
   name=transfer,
-  outputs=[],
-  payable=false,
   stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
@@ -105,15 +99,11 @@ pub fn transfer(contract: &Contract) {
 
 /// Implement ERC-721 transferFrom(address,address,uint256)
 #[ewasm_lib_fn("23b872dd",
-  constant=false,
   inputs=[
     { "name": "_from", "type": "address" },
     { "name": "_to", "type": "address" },
     { "name": "_tokenId", "type": "uint256" }
   ],
-  name=transferFrom,
-  outputs=[],
-  payable=false,
   stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {
@@ -131,14 +121,10 @@ pub fn transfer_from(contract: &Contract) {
 
 /// Implement ERC-721 approve(address,uint256)
 #[ewasm_lib_fn("095ea7b3",
-    constant=false,
     inputs=[
         { "name": "_to", "type": "address" },
         { "name": "_tokenId", "type": "uint256" }
     ],
-    name=approve,
-    outputs=[],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn approve(contract: &Contract) {
@@ -164,11 +150,8 @@ pub fn approve(contract: &Contract) {
 
 /// Implement ERC-721 getApproved(uint256)
 #[ewasm_lib_fn("081812fc",
-    constant=false,
     inputs=[ { "name": "_tokenId", "type": "uint256" } ],
-    name=getApproved,
     outputs=[{ "name": "_owner", "type": "address" }],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn get_approved(contract: &Contract) {
@@ -181,14 +164,11 @@ pub fn get_approved(contract: &Contract) {
 
 /// Implement ERC-721 setApprovalForAll(address,bool)
 #[ewasm_lib_fn("a22cb465",
-    constant=false,
     inputs=[
         { "name": "_operator", "type": "address" },
         { "name": "_approved", "type": "bool" }
     ],
     name=setApprovalForAll,
-    outputs=[],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn set_approval_for_all(contract: &Contract) {
@@ -212,14 +192,11 @@ pub fn set_approval_for_all(contract: &Contract) {
 
 /// Implement ERC-721 isApprovedForAll(address,address)
 #[ewasm_lib_fn("e985e9c5",
-    constant=false,
     inputs=[
         { "name": "owner", "type": "address" },
         { "name": "operator", "type": "address" }
     ],
-    name=isApprovedForAll,
     outputs=[{ "name": "_approved", "type": "bool" }],
-    payable=false,
     stateMutability=nonpayable
 )]
 pub fn is_approved_for_all(contract: &Contract) {
@@ -232,10 +209,7 @@ pub fn is_approved_for_all(contract: &Contract) {
 #[ewasm_lib_fn("6914db60",
     constant=true,
     inputs=[ { "name": "_tokenId", "type": "uint256" } ],
-    name=tokenMetadata,
-    outputs=[ { "name": "_infoUrl", "type": "string" } ],
-    payable=false,
-    stateMutability=view
+    outputs=[ { "name": "_infoUrl", "type": "string" } ]
 )]
 pub fn token_metadata(contract: &Contract) {
     // TODO
@@ -258,15 +232,11 @@ pub fn safe_transfer_from_with_data(contract: &Contract) {
 
 /// Implement ERC-721 safeTransferFrom(address,address,uint256)
 #[ewasm_lib_fn("42842e0e",
-  constant=false,
   inputs=[
     { "name": "_from", "type": "address" },
     { "name": "_to", "type": "address" },
     { "name": "_tokenId", "type": "uint256" }
   ],
-  name=safeTransferFrom,
-  outputs=[],
-  payable=false,
   stateMutability=nonpayable
 )]
 pub fn safe_transfer_from(contract: &Contract) {
