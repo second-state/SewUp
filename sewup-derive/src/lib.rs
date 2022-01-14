@@ -284,7 +284,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(cap.name("name").unwrap().as_str());
                 json.push_str(r#"","#);
             } else {
-                json.push_str(&mut format!(r#""name":"{}""#, fn_name.to_case(Camel)));
+                json.push_str(&mut format!(r#""name":"{}","#, fn_name.to_case(Camel)));
             }
 
             if let Some(cap) = Regex::new(r"outputs=(?P<outputs>\[[^\[\]]*\])")
