@@ -4,6 +4,7 @@ extern crate proc_macro;
 #[cfg(test)]
 mod function_tests;
 
+use convert_case::{Case::Camel, Casing};
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
@@ -242,7 +243,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str> {
+fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, String), &'static str> {
     let attr_str = attr.replace(" ", "").replace("\n", "");
     return if attr_str.is_empty() {
         Ok((None, "{}".into()))
@@ -260,6 +261,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                     "false" => json.push_str(r#""constant":false,"#),
                     _ => return Err("constacnt should be true or false"),
                 }
+            } else {
+                json.push_str(r#""constant":false,"#)
             }
 
             if let Some(cap) = Regex::new(r"inputs=(?P<inputs>\[[^\[\]]*\])")
@@ -269,6 +272,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                 json.push_str(r#""inputs":"#);
                 json.push_str(cap.name("inputs").unwrap().as_str());
                 json.push(',');
+            } else {
+                json.push_str(r#""inputs":[],"#);
             }
 
             if let Some(cap) = Regex::new(r"name=(?P<name>[^,]*)")
@@ -278,6 +283,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                 json.push_str(r#""name":""#);
                 json.push_str(cap.name("name").unwrap().as_str());
                 json.push_str(r#"","#);
+            } else {
+                json.push_str(&mut format!(r#""name":"{}""#, fn_name.to_case(Camel)));
             }
 
             if let Some(cap) = Regex::new(r"outputs=(?P<outputs>\[[^\[\]]*\])")
@@ -287,6 +294,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                 json.push_str(r#""outputs":"#);
                 json.push_str(cap.name("outputs").unwrap().as_str());
                 json.push(',');
+            } else {
+                json.push_str(r#""outputs":[],"#);
             }
 
             if let Some(cap) = Regex::new(r"payable=(?P<payable>[^,]*)")
@@ -298,6 +307,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                     "false" => json.push_str(r#""payable":false,"#),
                     _ => return Err("payable should be true or false"),
                 }
+            } else {
+                json.push_str(r#""payable":false,"#);
             }
 
             if let Some(cap) = Regex::new(r"stateMutability=(?P<stateMutability>[^,]*)")
@@ -309,6 +320,8 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
                     "view" => json.push_str(r#""stateMutability":"view","#),
                     _ => return Err("stateMutability should be nonpayable or view"),
                 }
+            } else {
+                json.push_str(r#""stateMutability":"view","#);
             }
 
             json.push_str(r#""type":"function"}"#);
@@ -318,6 +331,7 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
         Ok((Some(attr_str.replace("\"", "")), "{}".into()))
     };
 }
+
 /// helps you to build your handlers in the contract
 ///
 /// This macro also generate the function signature, you can use
@@ -340,16 +354,41 @@ fn parse_fn_attr(attr: String) -> Result<(Option<String>, String), &'static str>
 /// }
 /// ```
 ///
+/// There are two kind of inputs for `ewasm_fn` macro, first is functional signature, second and
+/// more are the fields of abijson.
+/// The functional signature can be specific as following ways.
+/// `#[ewasm_fn(00fdd58e)]` or #[ewasm_fn("00fdd58e")]
+///
+/// ``` #[ewasm_fn(00fdd58e,
+/// constant=true,
+/// inputs=[
+///     { "internalType": "address", "name": "account", "type": "address" },
+///     { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
+/// ],
+/// name=balanceOf,
+/// outputs=[
+///     { "internalType": "uint256", "name": "", "type": "uint256" }
+/// ],
+/// payable=false,
+/// stateMutability=view
+/// )]
+/// ```
+/// The fields are not required, it can use default value if not provided.
+/// The default values of `constant`, `payable` are `false`; the default values of `inputs` and
+/// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the
+/// camel case style of the function name.
+///
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let (hex_str, abi_str) = match parse_fn_attr(attr.to_string()) {
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+
+    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
 
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let name = &input.sig.ident;
     let args = &input
         .sig
         .inputs
@@ -460,16 +499,42 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 /// ```
+///
+/// There are two kind of inputs for `ewasm_fn` macro, first is functional signature, second and
+/// more are the fields of abijson.
+/// The functional signature can be specific as following ways.
+/// `#[ewasm_lib_fn(00fdd58e)]` or #[ewasm_lib_fn("00fdd58e")]
+///
+/// ``` #[ewasm_lib_fn(00fdd58e,
+/// constant=true,
+/// inputs=[
+///     { "internalType": "address", "name": "account", "type": "address" },
+///     { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
+/// ],
+/// name=balanceOf,
+/// outputs=[
+///     { "internalType": "uint256", "name": "", "type": "uint256" }
+/// ],
+/// payable=false,
+/// stateMutability=view
+/// )]
+/// ```
+/// The fields are not required, it can use default value if not provided.
+/// The default values of `constant`, `payable` are `false`; the default values of `inputs` and
+/// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the
+/// camel case style of the function name.
+///
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let (hex_str, abi_str) = match parse_fn_attr(attr.to_string()) {
+    let input = syn::parse_macro_input!(item as syn::ItemFn);
+    let name = &input.sig.ident;
+
+    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
 
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let name = &input.sig.ident;
     let inputs = &input.sig.inputs;
 
     let (sig_0, sig_1, sig_2, sig_3) = if let Some(hex_str) = hex_str {
