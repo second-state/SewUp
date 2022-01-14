@@ -1584,12 +1584,78 @@
 <span id="1583">1583</span>
 <span id="1584">1584</span>
 <span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
+<span id="1624">1624</span>
+<span id="1625">1625</span>
+<span id="1626">1626</span>
+<span id="1627">1627</span>
+<span id="1628">1628</span>
+<span id="1629">1629</span>
+<span id="1630">1630</span>
+<span id="1631">1631</span>
+<span id="1632">1632</span>
+<span id="1633">1633</span>
+<span id="1634">1634</span>
+<span id="1635">1635</span>
+<span id="1636">1636</span>
+<span id="1637">1637</span>
+<span id="1638">1638</span>
+<span id="1639">1639</span>
+<span id="1640">1640</span>
+<span id="1641">1641</span>
+<span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">function_tests</span>;
 
+<span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case::Camel</span>, <span class="ident">Casing</span>};
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">proc_macro_error</span>::{<span class="ident">abort</span>, <span class="ident">abort_call_site</span>, <span class="ident">proc_macro_error</span>};
@@ -1828,7 +1894,7 @@
     }.<span class="ident">into</span>()
 }
 
-<span class="kw">fn</span> <span class="ident">parse_fn_attr</span>(<span class="ident">attr</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">String</span>), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">parse_fn_attr</span>(<span class="ident">fn_name</span>: <span class="ident">String</span>, <span class="ident">attr</span>: <span class="ident">String</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">String</span>), <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">attr_str</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>).<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>);
     <span class="kw">return</span> <span class="kw">if</span> <span class="ident">attr_str</span>.<span class="ident">is_empty</span>() {
         <span class="prelude-val">Ok</span>((<span class="prelude-val">None</span>, <span class="string">&quot;{}&quot;</span>.<span class="ident">into</span>()))
@@ -1846,6 +1912,8 @@
                     <span class="string">&quot;false&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:false,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;constacnt should be true or false&quot;</span>),
                 }
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:false,&quot;#</span>)
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;inputs=(?P&lt;inputs&gt;\[[^\[\]]*\])&quot;</span>)
@@ -1855,6 +1923,8 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:&quot;#</span>);
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;inputs&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:[],&quot;#</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;name=(?P&lt;name&gt;[^,]*)&quot;</span>)
@@ -1864,6 +1934,8 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;name&quot;:&quot;&quot;#</span>);
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;,&quot;#</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;mut</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;name&quot;:&quot;{}&quot;,&quot;#</span>, <span class="ident">fn_name</span>.<span class="ident">to_case</span>(<span class="ident">Camel</span>)));
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;outputs=(?P&lt;outputs&gt;\[[^\[\]]*\])&quot;</span>)
@@ -1873,6 +1945,8 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:&quot;#</span>);
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;outputs&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:[],&quot;#</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;payable=(?P&lt;payable&gt;[^,]*)&quot;</span>)
@@ -1884,6 +1958,8 @@
                     <span class="string">&quot;false&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;payable&quot;:false,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;payable should be true or false&quot;</span>),
                 }
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;payable&quot;:false,&quot;#</span>);
             }
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;stateMutability=(?P&lt;stateMutability&gt;[^,]*)&quot;</span>)
@@ -1895,6 +1971,8 @@
                     <span class="string">&quot;view&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;stateMutability&quot;:&quot;view&quot;,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;stateMutability should be nonpayable or view&quot;</span>),
                 }
+            } <span class="kw">else</span> {
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;stateMutability&quot;:&quot;view&quot;,&quot;#</span>);
             }
 
             <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;type&quot;:&quot;function&quot;}&quot;#</span>);
@@ -1904,6 +1982,7 @@
         <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">attr_str</span>.<span class="ident">replace</span>(<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)), <span class="string">&quot;{}&quot;</span>.<span class="ident">into</span>()))
     };
 }
+
 <span class="doccomment">/// helps you to build your handlers in the contract</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This macro also generate the function signature, you can use</span>
@@ -1926,16 +2005,41 @@
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// There are two kind of inputs for `ewasm_fn` macro, first is functional signature, second and</span>
+<span class="doccomment">/// more are the fields of abijson.</span>
+<span class="doccomment">/// The functional signature can be specific as following ways.</span>
+<span class="doccomment">/// `#[ewasm_fn(00fdd58e)]` or #[ewasm_fn(&quot;00fdd58e&quot;)]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ``` #[ewasm_fn(00fdd58e,</span>
+<span class="doccomment">/// constant=true,</span>
+<span class="doccomment">/// inputs=[</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;account&quot;, &quot;type&quot;: &quot;address&quot; },</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uinit256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uinit256&quot; }</span>
+<span class="doccomment">/// ],</span>
+<span class="doccomment">/// name=balanceOf,</span>
+<span class="doccomment">/// outputs=[</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
+<span class="doccomment">/// ],</span>
+<span class="doccomment">/// payable=false,</span>
+<span class="doccomment">/// stateMutability=view</span>
+<span class="doccomment">/// )]</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// The fields are not required, it can use default value if not provided.</span>
+<span class="doccomment">/// The default values of `constant`, `payable` are `false`; the default values of `inputs` and</span>
+<span class="doccomment">/// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the</span>
+<span class="doccomment">/// camel case style of the function name.</span>
+<span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_fn</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> (<span class="ident">hex_str</span>, <span class="ident">abi_str</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_fn_attr</span>(<span class="ident">attr</span>.<span class="ident">to_string</span>()) {
+    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
+
+    <span class="kw">let</span> (<span class="ident">hex_str</span>, <span class="ident">abi_str</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_fn_attr</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">attr</span>.<span class="ident">to_string</span>()) {
         <span class="prelude-val">Ok</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
         <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">abort_call_site!</span>(<span class="ident">e</span>),
     };
 
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>
         .<span class="ident">sig</span>
         .<span class="ident">inputs</span>
@@ -2046,16 +2150,42 @@
 <span class="doccomment">///     Ok(())</span>
 <span class="doccomment">/// }</span>
 <span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// There are two kind of inputs for `ewasm_fn` macro, first is functional signature, second and</span>
+<span class="doccomment">/// more are the fields of abijson.</span>
+<span class="doccomment">/// The functional signature can be specific as following ways.</span>
+<span class="doccomment">/// `#[ewasm_lib_fn(00fdd58e)]` or #[ewasm_lib_fn(&quot;00fdd58e&quot;)]</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ``` #[ewasm_lib_fn(00fdd58e,</span>
+<span class="doccomment">/// constant=true,</span>
+<span class="doccomment">/// inputs=[</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;account&quot;, &quot;type&quot;: &quot;address&quot; },</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uinit256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uinit256&quot; }</span>
+<span class="doccomment">/// ],</span>
+<span class="doccomment">/// name=balanceOf,</span>
+<span class="doccomment">/// outputs=[</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
+<span class="doccomment">/// ],</span>
+<span class="doccomment">/// payable=false,</span>
+<span class="doccomment">/// stateMutability=view</span>
+<span class="doccomment">/// )]</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// The fields are not required, it can use default value if not provided.</span>
+<span class="doccomment">/// The default values of `constant`, `payable` are `false`; the default values of `inputs` and</span>
+<span class="doccomment">/// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the</span>
+<span class="doccomment">/// camel case style of the function name.</span>
+<span class="doccomment">///</span>
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_lib_fn</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> (<span class="ident">hex_str</span>, <span class="ident">abi_str</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_fn_attr</span>(<span class="ident">attr</span>.<span class="ident">to_string</span>()) {
+    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
+    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
+
+    <span class="kw">let</span> (<span class="ident">hex_str</span>, <span class="ident">abi_str</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">parse_fn_attr</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">attr</span>.<span class="ident">to_string</span>()) {
         <span class="prelude-val">Ok</span>(<span class="ident">o</span>) =&gt; <span class="ident">o</span>,
         <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="macro">abort_call_site!</span>(<span class="ident">e</span>),
     };
 
-    <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::ItemFn</span>);
-    <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">ident</span>;
     <span class="kw">let</span> <span class="ident">inputs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">sig</span>.<span class="ident">inputs</span>;
 
     <span class="kw">let</span> (<span class="ident">sig_0</span>, <span class="ident">sig_1</span>, <span class="ident">sig_2</span>, <span class="ident">sig_3</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">hex_str</span>) <span class="op">=</span> <span class="ident">hex_str</span> {
