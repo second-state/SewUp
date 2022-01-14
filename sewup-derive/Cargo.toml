@@ -20,6 +20,7 @@ syn = { version =  "1.0.73", features = ["full"] }
 quote = "1.0.9"
 paste = "1.0"
 hex = "0.4.3"
+convert_case = "0.5.0"
 
 [dev-dependencies]
 hex-literal = "0.3.1"

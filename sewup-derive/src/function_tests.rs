@@ -12,22 +12,25 @@ fn test_function_signature() {
 #[test]
 fn test_parse_fn_attr() {
     // without attr
-    assert_eq!(parse_fn_attr("".to_string()), Ok((None, "{}".to_string())));
+    assert_eq!(
+        parse_fn_attr("".to_string(), "".to_string()),
+        Ok((None, "{}".to_string()))
+    );
 
     // with hex attr only
     assert_eq!(
-        parse_fn_attr("a9059cbb".to_string()),
+        parse_fn_attr("".to_string(), "a9059cbb".to_string()),
         Ok((Some("a9059cbb".to_string()), "{}".to_string()))
     );
 
     // with hex attr only
     assert_eq!(
-        parse_fn_attr("a9059cbb, ".to_string()),
+        parse_fn_attr("".to_string(), "a9059cbb, ".to_string()),
         Ok((Some("a9059cbb".to_string()), "{}".to_string()))
     );
 
     // with hex attr and full abijson
-    assert_eq!(parse_fn_attr(r#"
+    assert_eq!(parse_fn_attr("".to_string(), r#"
       a9059cbb,
       constant=false,
       inputs=[
@@ -44,6 +47,23 @@ fn test_parse_fn_attr() {
     "#.to_string()), Ok((Some("a9059cbb".to_string()),
     r#"{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},"#.to_owned() +
     r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","# +
+    r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
+    r#""stateMutability":"nonpayable","type":"function"}"#)));
+
+    // with hex attr and full abijson
+    assert_eq!(parse_fn_attr("transfer_to".to_string(), r#"
+      a9059cbb,
+      inputs=[
+            { "internalType": "address", "name": "recipient", "type": "address" },
+            { "internalType": "uint256", "name": "amount", "type": "uint256" }
+      ],
+      outputs=[
+            { "internalType": "bool", "name": "", "type": "bool" }
+      ],
+      stateMutability=nonpayable
+    "#.to_string()), Ok((Some("a9059cbb".to_string()),
+    r#"{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},"#.to_owned() +
+    r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferTo","# +
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
     r#""stateMutability":"nonpayable","type":"function"}"#)));
 }
