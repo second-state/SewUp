@@ -45,3 +45,9 @@ jobs:
 
       - name: RDB feature test
         run: nix develop -c cargo test -p sewup --features=rdb --no-default-features
+
+      - name: Token feature test
+        run: nix develop -c cargo test -p sewup --features=token --no-default-features
+
+      - name: KV feature test
+        run: nix develop -c cargo test -p sewup --features=kv --no-default-features
