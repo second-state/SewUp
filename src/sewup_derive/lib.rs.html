@@ -1649,6 +1649,69 @@
 <span id="1648">1648</span>
 <span id="1649">1649</span>
 <span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
+<span id="1676">1676</span>
+<span id="1677">1677</span>
+<span id="1678">1678</span>
+<span id="1679">1679</span>
+<span id="1680">1680</span>
+<span id="1681">1681</span>
+<span id="1682">1682</span>
+<span id="1683">1683</span>
+<span id="1684">1684</span>
+<span id="1685">1685</span>
+<span id="1686">1686</span>
+<span id="1687">1687</span>
+<span id="1688">1688</span>
+<span id="1689">1689</span>
+<span id="1690">1690</span>
+<span id="1691">1691</span>
+<span id="1692">1692</span>
+<span id="1693">1693</span>
+<span id="1694">1694</span>
+<span id="1695">1695</span>
+<span id="1696">1696</span>
+<span id="1697">1697</span>
+<span id="1698">1698</span>
+<span id="1699">1699</span>
+<span id="1700">1700</span>
+<span id="1701">1701</span>
+<span id="1702">1702</span>
+<span id="1703">1703</span>
+<span id="1704">1704</span>
+<span id="1705">1705</span>
+<span id="1706">1706</span>
+<span id="1707">1707</span>
+<span id="1708">1708</span>
+<span id="1709">1709</span>
+<span id="1710">1710</span>
+<span id="1711">1711</span>
+<span id="1712">1712</span>
+<span id="1713">1713</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -1671,10 +1734,12 @@
 }
 
 <span class="kw">fn</span> <span class="ident">write_function_signature</span>(<span class="ident">sig_str</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">String</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)&quot;</span>).<span class="ident">unwrap_unchecked</span>() };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="ident">sig_str</span>) {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">canonical_fn</span> <span class="op">=</span> <span class="macro">format!</span>(
             <span class="string">&quot;{}({})&quot;</span>,
             <span class="ident">fn_name</span>,
@@ -1903,11 +1968,11 @@
             <span class="prelude-val">Ok</span>((<span class="prelude-val">Some</span>(<span class="ident">head</span>.<span class="ident">replace</span>(<span class="string">&quot;\&quot;&quot;</span>, <span class="string">&quot;&quot;</span>)), <span class="string">&quot;{}&quot;</span>.<span class="ident">into</span>()))
         } <span class="kw">else</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">json</span> <span class="op">=</span> <span class="string">&quot;{&quot;</span>.<span class="ident">to_string</span>();
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;constant=(?P&lt;constant&gt;[^,]*)&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;constant=(?P&lt;constant&gt;[^,]*)&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+                    .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
-                <span class="kw">match</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;constant&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>() {
+                <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;constant&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>() {
                     <span class="string">&quot;true&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:true,&quot;#</span>),
                     <span class="string">&quot;false&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:false,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;constacnt should be true or false&quot;</span>),
@@ -1916,44 +1981,43 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:false,&quot;#</span>)
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;inputs=(?P&lt;inputs&gt;\[[^\[\]]*\])&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;inputs=(?P&lt;inputs&gt;\[[^\[\]]*\])&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+                    .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:&quot;#</span>);
-                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;inputs&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;inputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
             } <span class="kw">else</span> {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:[],&quot;#</span>);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;name=(?P&lt;name&gt;[^,]*)&quot;</span>)
-                .<span class="ident">unwrap</span>()
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;name=(?P&lt;name&gt;[^,]*)&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
                 .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;name&quot;:&quot;&quot;#</span>);
-                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;,&quot;#</span>);
             } <span class="kw">else</span> {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;mut</span> <span class="macro">format!</span>(<span class="string">r#&quot;&quot;name&quot;:&quot;{}&quot;,&quot;#</span>, <span class="ident">fn_name</span>.<span class="ident">to_case</span>(<span class="ident">Camel</span>)));
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;outputs=(?P&lt;outputs&gt;\[[^\[\]]*\])&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;outputs=(?P&lt;outputs&gt;\[[^\[\]]*\])&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+                    .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:&quot;#</span>);
-                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;outputs&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;outputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
             } <span class="kw">else</span> {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:[],&quot;#</span>);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;payable=(?P&lt;payable&gt;[^,]*)&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;payable=(?P&lt;payable&gt;[^,]*)&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+                    .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
-                <span class="kw">match</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;payable&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>() {
+                <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;payable&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>() {
                     <span class="string">&quot;true&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;payable&quot;:true,&quot;#</span>),
                     <span class="string">&quot;false&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;payable&quot;:false,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;payable should be true or false&quot;</span>),
@@ -1962,11 +2026,12 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;payable&quot;:false,&quot;#</span>);
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;stateMutability=(?P&lt;stateMutability&gt;[^,]*)&quot;</span>)
-                .<span class="ident">unwrap</span>()
-                .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
+                <span class="ident">Regex::new</span>(<span class="string">r&quot;stateMutability=(?P&lt;stateMutability&gt;[^,]*)&quot;</span>).<span class="ident">unwrap_unchecked</span>()
+            }
+            .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
-                <span class="kw">match</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;stateMutability&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>() {
+                <span class="kw">match</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;stateMutability&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>() {
                     <span class="string">&quot;nonpayable&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;stateMutability&quot;:&quot;nonpayable&quot;,&quot;#</span>),
                     <span class="string">&quot;view&quot;</span> =&gt; <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;stateMutability&quot;:&quot;view&quot;,&quot;#</span>),
                     <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;stateMutability should be nonpayable or view&quot;</span>),
@@ -2051,9 +2116,25 @@
             <span class="ident">syn::FnArg::Typed</span>(<span class="ident">p</span>) =&gt; <span class="ident">Box::into_inner</span>(<span class="ident">p</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
         })
         .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
-            <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>),
+            <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (
+                <span class="ident">tp</span>.<span class="ident">path</span>
+                    .<span class="ident">segments</span>
+                    .<span class="ident">first</span>()
+                    .<span class="ident">expect</span>(<span class="string">&quot;at least one segment&quot;</span>)
+                    .<span class="ident">ident</span>
+                    .<span class="ident">clone</span>(),
+                <span class="bool-val">false</span>,
+            ),
             <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) =&gt; <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>) {
-                <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">true</span>),
+                <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (
+                    <span class="ident">tp</span>.<span class="ident">path</span>
+                        .<span class="ident">segments</span>
+                        .<span class="ident">first</span>()
+                        .<span class="ident">expect</span>(<span class="string">&quot;at least one segment&quot;</span>)
+                        .<span class="ident">ident</span>
+                        .<span class="ident">clone</span>(),
+                    <span class="bool-val">true</span>,
+                ),
                 <span class="kw">_</span> =&gt; <span class="macro">abort_call_site!</span>(<span class="string">&quot;please pass Path type or Reference type to ewasm_fn_sig&quot;</span>),
             },
             <span class="kw">_</span> =&gt; <span class="macro">abort_call_site!</span>(<span class="string">&quot;please pass Path type or Reference type to ewasm_fn_sig&quot;</span>),
@@ -2201,9 +2282,25 @@
                 <span class="ident">syn::FnArg::Typed</span>(<span class="ident">p</span>) =&gt; <span class="ident">Box::into_inner</span>(<span class="ident">p</span>.<span class="ident">ty</span>.<span class="ident">clone</span>()),
             })
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">ty</span><span class="op">|</span> <span class="kw">match</span> <span class="ident">ty</span> {
-                <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">false</span>),
+                <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (
+                    <span class="ident">tp</span>.<span class="ident">path</span>
+                        .<span class="ident">segments</span>
+                        .<span class="ident">first</span>()
+                        .<span class="ident">expect</span>(<span class="string">&quot;at least one segment&quot;</span>)
+                        .<span class="ident">ident</span>
+                        .<span class="ident">clone</span>(),
+                    <span class="bool-val">false</span>,
+                ),
                 <span class="ident">syn::Type::Reference</span>(<span class="ident">tr</span>) =&gt; <span class="kw">match</span> <span class="ident">Box::into_inner</span>(<span class="ident">tr</span>.<span class="ident">elem</span>) {
-                    <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (<span class="ident">tp</span>.<span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>().<span class="ident">ident</span>.<span class="ident">clone</span>(), <span class="bool-val">true</span>),
+                    <span class="ident">syn::Type::Path</span>(<span class="ident">tp</span>) =&gt; (
+                        <span class="ident">tp</span>.<span class="ident">path</span>
+                            .<span class="ident">segments</span>
+                            .<span class="ident">first</span>()
+                            .<span class="ident">expect</span>(<span class="string">&quot;at least one segment&quot;</span>)
+                            .<span class="ident">ident</span>
+                            .<span class="ident">clone</span>(),
+                        <span class="bool-val">true</span>,
+                    ),
                     <span class="kw">_</span> =&gt; {
                         <span class="macro">abort_call_site!</span>(<span class="string">&quot;please pass Path type or Reference type to ewasm_fn_sig&quot;</span>)
                     }
@@ -2297,7 +2394,9 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_fn_sig</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="ident">write_function_signature</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()).<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+    <span class="ident">write_function_signature</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>())
+        .<span class="ident">parse</span>()
+        .<span class="ident">expect</span>(<span class="string">&quot;can not generate function signature&quot;</span>)
 }
 
 <span class="doccomment">/// helps you generate the input raw data for specific contract handler</span>
@@ -2307,10 +2406,10 @@
 <span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_input</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;(?P&lt;instance&gt;.*)\s+for\s+(?P&lt;sig&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;(?P&lt;instance&gt;.*)\s+for\s+(?P&lt;sig&gt;.*)&quot;</span>).<span class="ident">unwrap_unchecked</span>() };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
-        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;sig&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;instance&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">sig</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;sig&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">instance</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;instance&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">instance</span> <span class="op">==</span> <span class="string">&quot;None&quot;</span> {
             <span class="macro">format!</span>(<span class="string">&quot;{}.to_vec()&quot;</span>, <span class="ident">write_function_signature</span>(<span class="ident">sig</span>),)
         } <span class="kw">else</span> {
@@ -2324,7 +2423,7 @@
                 <span class="ident">instance</span>
             )
         };
-        <span class="ident">output</span>.<span class="ident">parse</span>().<span class="ident">unwrap</span>()
+        <span class="ident">output</span>.<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;ewasm input transform unexpected&quot;</span>)
     } <span class="kw">else</span> {
         <span class="macro">panic!</span>(<span class="string">&quot;ewasm_input input incorrect&quot;</span>)
     }
@@ -2363,21 +2462,26 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_input_from</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span>
-        <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+)\s+move\s+(?P&lt;name&gt;[^,]+),?(?P&lt;error_handler&gt;.*)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(<span class="string">r&quot;^(?P&lt;contract&gt;\w+)\s+move\s+(?P&lt;name&gt;[^,]+),?(?P&lt;error_handler&gt;.*)&quot;</span>)
+            .<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>()) {
-        <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;contract&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>(), <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Ident::new</span>(
+            <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;contract&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>(),
+            <span class="ident">Span::call_site</span>(),
+        );
         <span class="kw">let</span> <span class="ident">name_result</span>: <span class="ident">syn::Result</span><span class="op">&lt;</span><span class="ident">syn::ExprPath</span><span class="op">&gt;</span> <span class="op">=</span>
-            <span class="ident">syn::parse_str</span>(<span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>());
+            <span class="ident">syn::parse_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
         <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">name</span>) <span class="op">=</span> <span class="ident">name_result</span> {
             <span class="ident">name</span>
         } <span class="kw">else</span> {
             <span class="macro">abort_call_site!</span>(
                 <span class="string">&quot;`{}` is not an ExprPath&quot;</span>,
-                <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>()
+                <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>()
             );
         };
-        <span class="kw">let</span> <span class="ident">error_handler</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;error_handler&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">error_handler</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;error_handler&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
         <span class="kw">return</span> <span class="kw">if</span> <span class="ident">error_handler</span>.<span class="ident">is_empty</span>() {
             <span class="macro">quote!</span> {
                 #<span class="ident">name</span>(<span class="ident">sewup::bincode::deserialize</span>(<span class="kw-2">&amp;</span>#<span class="ident">contract</span>.<span class="ident">input_data</span>[<span class="number">4</span>..])
@@ -2415,7 +2519,7 @@
         <span class="ident">item</span>,
     )
     .<span class="ident">parse</span>()
-    .<span class="ident">unwrap</span>()
+    .<span class="ident">expect</span>(<span class="string">&quot;ewasm output format unexpected&quot;</span>)
 }
 
 <span class="doccomment">/// `Key` derive help you implement Key trait for the kv feature</span>
@@ -2879,8 +2983,12 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_test</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">mod_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^mod (?P&lt;mod_name&gt;[^\{\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap</span>();
-    <span class="kw">let</span> <span class="ident">fn_re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;^fn (?P&lt;fn_name&gt;[^\(\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">mod_re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(<span class="string">r&quot;^mod (?P&lt;mod_name&gt;[^\{\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap_unchecked</span>()
+    };
+    <span class="kw">let</span> <span class="ident">fn_re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(<span class="string">r&quot;^fn (?P&lt;fn_name&gt;[^\(\s]*)(?P&lt;to_first_bracket&gt;[^\{]*\{)&quot;</span>).<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">to_string</span>();
     <span class="kw">if</span> <span class="ident">mod_re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>).<span class="ident">is_some</span>() {
         <span class="kw">let</span> <span class="ident">attr_str</span> <span class="op">=</span> <span class="ident">attr</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
@@ -3042,11 +3150,17 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
             .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
@@ -3080,11 +3194,15 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_auto_assert_eq</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(<span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*,(?P&lt;equivalence&gt;.*)&quot;#</span>).<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
-        <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">equivalence</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;equivalence&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
         <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
             .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
@@ -3131,13 +3249,17 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
-        <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
-    )
-    .<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(
+            <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
+        )
+        .<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
             .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
@@ -3171,13 +3293,17 @@
 <span class="attribute">#[<span class="ident">proc_macro_error</span>]</span>
 <span class="attribute">#[<span class="ident">proc_macro</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_rusty_assert_ok</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
-    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="ident">Regex::new</span>(
-        <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
-    )
-    .<span class="ident">unwrap</span>();
+    <span class="kw">let</span> <span class="ident">re</span> <span class="op">=</span> <span class="kw">unsafe</span> {
+        <span class="ident">Regex::new</span>(
+            <span class="string">r#&quot;^(?P&lt;fn_name&gt;[^(]+?)\((?P&lt;params&gt;[^)]*?)\)\s*(by)?\s*(?P&lt;caller&gt;&quot;[^&quot;]*&quot;)?\s*&quot;#</span>,
+        )
+        .<span class="ident">unwrap_unchecked</span>()
+    };
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span> <span class="ident">re</span>.<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">item</span>.<span class="ident">to_string</span>().<span class="ident">replace</span>(<span class="string">&quot;\n&quot;</span>, <span class="string">&quot;&quot;</span>)) {
-        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>();
-        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">as_str</span>().<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
+        <span class="kw">let</span> <span class="ident">fn_name</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;fn_name&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+        <span class="kw">let</span> <span class="ident">params</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;params&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            .<span class="ident">as_str</span>()
+            .<span class="ident">replace</span>(<span class="string">&quot; &quot;</span>, <span class="string">&quot;&quot;</span>);
         <span class="kw">let</span> <span class="ident">caller</span> <span class="op">=</span> <span class="ident">cap</span>
             .<span class="ident">name</span>(<span class="string">&quot;caller&quot;</span>)
             .<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="macro">format!</span>(<span class="string">&quot;Some({})&quot;</span>, <span class="ident">c</span>.<span class="ident">as_str</span>()))
