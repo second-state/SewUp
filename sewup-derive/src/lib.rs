@@ -13,12 +13,16 @@ use regex::Regex;
 use serde_derive::Deserialize;
 use tiny_keccak::{Hasher, Keccak};
 
+type MayString = Option<String>;
+
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
 #[allow(dead_code)]
 struct AbiIO {
-    internal_type: String,
-    name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    internal_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: MayString,
     r#type: String,
 }
 
