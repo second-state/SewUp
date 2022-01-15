@@ -35,8 +35,6 @@ pub use rdb::*;
 
 pub mod errors;
 
-/// The primitvie used in contract
-#[cfg(not(test))]
 pub mod primitives;
 
 #[allow(dead_code)]
