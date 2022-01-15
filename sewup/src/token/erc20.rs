@@ -2,6 +2,7 @@
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+use crate::types::Address as SewUpAddress;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 
@@ -32,8 +33,8 @@ use sewup_derive::ewasm_lib_fn;
     stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let sender = ewasm_api::caller();
-    let recipient: Bytes20 = {
+    let sender: SewUpAddress = ewasm_api::caller().into();
+    let recipient: SewUpAddress = {
         let buffer: [u8; 20] = contract.input_data[16..36].try_into().unwrap();
         buffer.into()
     };
@@ -44,7 +45,7 @@ pub fn transfer(contract: &Contract) {
     };
 
     let sender_storage_value = {
-        let balance = get_balance(&sender);
+        let balance = get_balance(&sender.inner.into());
         let origin_value = Uint256::from_be_bytes(balance.bytes);
 
         if origin_value < value {
@@ -57,7 +58,7 @@ pub fn transfer(contract: &Contract) {
     };
 
     let recipient_storage_value = {
-        let balance = get_balance(&recipient);
+        let balance = get_balance(&recipient.inner.into());
         let origin_value = Uint256::from_be_bytes(balance.bytes);
         let new_value = origin_value + value;
 
@@ -69,8 +70,8 @@ pub fn transfer(contract: &Contract) {
         copy_into_storage_value(&buffer)
     };
 
-    set_balance(&sender, &sender_storage_value);
-    set_balance(&recipient, &recipient_storage_value);
+    set_balance(&sender.inner, &sender_storage_value);
+    set_balance(&recipient.inner, &recipient_storage_value);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
@@ -92,7 +93,7 @@ pub fn transfer(contract: &Contract) {
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
-    let address = copy_into_address(&contract.input_data[16..36]);
+    let address: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let balance = get_balance(&address);
     ewasm_api::finish_data(&balance.bytes);
 }
@@ -194,9 +195,9 @@ pub fn allowance(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {
-    let sender = ewasm_api::caller();
-    let owner = copy_into_address(&contract.input_data[16..36]);
-    let recipient = copy_into_address(&contract.input_data[48..68]);
+    let sender: SewUpAddress = ewasm_api::caller().into();
+    let owner: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let recipient: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
 
     let amount = {
         let buffer: [u8; 32] = contract.input_data[68..100].try_into().unwrap();
@@ -204,7 +205,7 @@ pub fn transfer_from(contract: &Contract) {
     };
 
     let mut allowed = {
-        let allowed_value = get_allowance(&owner, &sender);
+        let allowed_value = get_allowance(&owner.inner, &sender.inner);
         Uint256::from_be_bytes(allowed_value.bytes)
     };
 
@@ -241,9 +242,9 @@ pub fn transfer_from(contract: &Contract) {
         copy_into_storage_value(&buffer)
     };
 
-    set_balance(&owner, &owner_storage_value);
-    set_balance(&recipient, &recipient_storage_value);
-    set_allowance(&owner, &sender, &allowed_storage_value);
+    set_balance(&owner.inner, &owner_storage_value);
+    set_balance(&recipient.inner, &recipient_storage_value);
+    set_allowance(&owner.inner, &sender.inner, &allowed_storage_value);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")

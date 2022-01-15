@@ -2,6 +2,7 @@
 use std::convert::TryInto;
 
 use crate::primitives::Contract;
+use crate::types::Address as SewUpAddress;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
@@ -43,21 +44,21 @@ pub fn owner_of(contract: &Contract) {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
+fn do_transfer(owner: SewUpAddress, to: SewUpAddress, token_id: [u8; 32]) {
     let mut balance = get_balance(&owner);
     let mut value = Uint256::from_be_bytes(balance.bytes)
         - Uint256::from_u64(1u64).expect("uint256 one should valid");
     let mut buffer = value.to_be_bytes();
-    set_balance(&owner, &copy_into_storage_value(&buffer));
+    set_balance(&owner.inner, &copy_into_storage_value(&buffer));
 
     balance = get_balance(&to);
     value = Uint256::from_be_bytes(balance.bytes)
         + Uint256::from_u64(1u64).expect("uint256 one should valid");
     buffer = value.to_be_bytes();
-    set_balance(&to, &copy_into_storage_value(&buffer));
+    set_balance(&to.inner, &copy_into_storage_value(&buffer));
 
-    set_token_owner(&token_id, &to);
-    set_token_approval(&token_id, &to);
+    set_token_owner(&token_id, &to.inner);
+    set_token_approval(&token_id, &to.inner);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
@@ -83,7 +84,7 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
   stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let to = copy_into_address(&contract.input_data[16..36]);
+    let to: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
@@ -94,7 +95,7 @@ pub fn transfer(contract: &Contract) {
         ewasm_api::revert();
     }
 
-    do_transfer(owner, to, token_id);
+    do_transfer(owner.into(), to, token_id);
 }
 
 /// Implement ERC-721 transferFrom(address,address,uint256)
@@ -109,14 +110,14 @@ pub fn transfer(contract: &Contract) {
 pub fn transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let owner = copy_into_address(&contract.input_data[16..36]);
-    let to = copy_into_address(&contract.input_data[48..68]);
+    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
     let token_id = contract.input_data[68..100].try_into().unwrap();
 
     if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
         ewasm_api::revert();
     }
 
-    do_transfer(owner, to, token_id);
+    do_transfer(owner.into(), to, token_id);
 }
 
 /// Implement ERC-721 approve(address,uint256)

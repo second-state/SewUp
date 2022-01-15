@@ -115,6 +115,15 @@ impl From<EwasmAddress> for AddressType {
 }
 
 #[cfg(target_arch = "wasm32")]
+impl From<[u8; 20]> for AddressType {
+    fn from(bytes: [u8; 20]) -> Self {
+        Self {
+            inner: ewasm_api::types::Address::from(bytes),
+        }
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
 impl Serialize for AddressType {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
