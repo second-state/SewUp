@@ -4,6 +4,7 @@ use std::convert::TryInto;
 #[cfg(target_arch = "wasm32")]
 use ewasm_api::types::Address;
 
+use crate::types::Address as SewUpAddress;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use crate::utils::sha3_256;
@@ -57,12 +58,12 @@ pub fn calculate_token_balance_hash(address: &[u8; 20], token_id: &[u8; 32]) -> 
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_balance(_address: &Address) -> StorageValue {
+pub fn get_balance(_address: &SewUpAddress) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_balance(address: &Address) -> StorageValue {
-    let hash = calculate_balance_hash(&address.bytes);
+pub fn get_balance(address: &SewUpAddress) -> StorageValue {
+    let hash = calculate_balance_hash(&address.inner.into());
 
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
