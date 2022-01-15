@@ -67,3 +67,30 @@ fn test_parse_fn_attr() {
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
     r#""stateMutability":"nonpayable","type":"function"}"#)));
 }
+
+#[test]
+fn test_parse_fn_attr_validation() {
+    assert_eq!(
+        parse_fn_attr(
+            "transfer_to".to_string(),
+            r#"
+      a9059cbb,
+      inputs=[{}]
+    "#
+            .to_string()
+        ),
+        Err("inputs are not valid format")
+    );
+
+    assert_eq!(
+        parse_fn_attr(
+            "transfer_to".to_string(),
+            r#"
+      a9059cbb,
+      outputs=[{"should_not_heler": true}]
+    "#
+            .to_string()
+        ),
+        Err("outputs are not valid format")
+    );
+}

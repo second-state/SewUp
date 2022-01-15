@@ -10,7 +10,22 @@ use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
 use quote::quote;
 use regex::Regex;
+use serde_derive::Deserialize;
 use tiny_keccak::{Hasher, Keccak};
+
+type MayString = Option<String>;
+
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+#[allow(dead_code)]
+struct AbiIO {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    internal_type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: MayString,
+    r#type: String,
+}
+
 fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
@@ -272,7 +287,13 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                     .captures(&attr_str)
             {
                 json.push_str(r#""inputs":"#);
-                json.push_str(unsafe { cap.name("inputs").unwrap_unchecked() }.as_str());
+                let inputs_str = unsafe { cap.name("inputs").unwrap_unchecked() }.as_str();
+                for input_cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(inputs_str) {
+                    if serde_json::from_str::<AbiIO>(input_cap.as_str()).is_err() {
+                        return Err("inputs are not valid format");
+                    }
+                }
+                json.push_str(inputs_str);
                 json.push(',');
             } else {
                 json.push_str(r#""inputs":[],"#);
@@ -293,7 +314,13 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                     .captures(&attr_str)
             {
                 json.push_str(r#""outputs":"#);
-                json.push_str(unsafe { cap.name("outputs").unwrap_unchecked() }.as_str());
+                let outputs_str = unsafe { cap.name("outputs").unwrap_unchecked() }.as_str();
+                for output_cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(outputs_str) {
+                    if serde_json::from_str::<AbiIO>(output_cap.as_str()).is_err() {
+                        return Err("outputs are not valid format");
+                    }
+                }
+                json.push_str(outputs_str);
                 json.push(',');
             } else {
                 json.push_str(r#""outputs":[],"#);
