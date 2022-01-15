@@ -1712,6 +1712,33 @@
 <span id="1711">1711</span>
 <span id="1712">1712</span>
 <span id="1713">1713</span>
+<span id="1714">1714</span>
+<span id="1715">1715</span>
+<span id="1716">1716</span>
+<span id="1717">1717</span>
+<span id="1718">1718</span>
+<span id="1719">1719</span>
+<span id="1720">1720</span>
+<span id="1721">1721</span>
+<span id="1722">1722</span>
+<span id="1723">1723</span>
+<span id="1724">1724</span>
+<span id="1725">1725</span>
+<span id="1726">1726</span>
+<span id="1727">1727</span>
+<span id="1728">1728</span>
+<span id="1729">1729</span>
+<span id="1730">1730</span>
+<span id="1731">1731</span>
+<span id="1732">1732</span>
+<span id="1733">1733</span>
+<span id="1734">1734</span>
+<span id="1735">1735</span>
+<span id="1736">1736</span>
+<span id="1737">1737</span>
+<span id="1738">1738</span>
+<span id="1739">1739</span>
+<span id="1740">1740</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -1724,7 +1751,22 @@
 <span class="kw">use</span> <span class="ident">proc_macro_error</span>::{<span class="ident">abort</span>, <span class="ident">abort_call_site</span>, <span class="ident">proc_macro_error</span>};
 <span class="kw">use</span> <span class="ident">quote::quote</span>;
 <span class="kw">use</span> <span class="ident">regex::Regex</span>;
+<span class="kw">use</span> <span class="ident">serde_derive::Deserialize</span>;
 <span class="kw">use</span> <span class="ident">tiny_keccak</span>::{<span class="ident">Hasher</span>, <span class="ident">Keccak</span>};
+
+<span class="kw">type</span> <span class="ident">MayString</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
+<span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;camelCase&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">dead_code</span>)]</span>
+<span class="kw">struct</span> <span class="ident">AbiIO</span> {
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">internal_type</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing_if</span> <span class="op">=</span> <span class="string">&quot;Option::is_none&quot;</span>)]</span>
+    <span class="ident">name</span>: <span class="ident">MayString</span>,
+    <span class="ident">r#type</span>: <span class="ident">String</span>,
+}
+
 <span class="kw">fn</span> <span class="ident">get_function_signature</span>(<span class="ident">function_prototype</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; [<span class="ident">u8</span>; <span class="number">4</span>] {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig</span> <span class="op">=</span> [<span class="number">0</span>; <span class="number">4</span>];
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">hasher</span> <span class="op">=</span> <span class="ident">Keccak::v256</span>();
@@ -1986,7 +2028,13 @@
                     .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:&quot;#</span>);
-                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;inputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
+                <span class="kw">let</span> <span class="ident">inputs_str</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;inputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+                <span class="kw">for</span> <span class="ident">input_cap</span> <span class="kw">in</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;\{[^\{\}]*\}&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">find_iter</span>(<span class="ident">inputs_str</span>) {
+                    <span class="kw">if</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">AbiIO</span><span class="op">&gt;</span>(<span class="ident">input_cap</span>.<span class="ident">as_str</span>()).<span class="ident">is_err</span>() {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;inputs are not valid format&quot;</span>);
+                    }
+                }
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">inputs_str</span>);
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
             } <span class="kw">else</span> {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:[],&quot;#</span>);
@@ -2007,7 +2055,13 @@
                     .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:&quot;#</span>);
-                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;outputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>());
+                <span class="kw">let</span> <span class="ident">outputs_str</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">cap</span>.<span class="ident">name</span>(<span class="string">&quot;outputs&quot;</span>).<span class="ident">unwrap_unchecked</span>() }.<span class="ident">as_str</span>();
+                <span class="kw">for</span> <span class="ident">output_cap</span> <span class="kw">in</span> <span class="ident">Regex::new</span>(<span class="string">r&quot;\{[^\{\}]*\}&quot;</span>).<span class="ident">unwrap</span>().<span class="ident">find_iter</span>(<span class="ident">outputs_str</span>) {
+                    <span class="kw">if</span> <span class="ident">serde_json::from_str</span>::<span class="op">&lt;</span><span class="ident">AbiIO</span><span class="op">&gt;</span>(<span class="ident">output_cap</span>.<span class="ident">as_str</span>()).<span class="ident">is_err</span>() {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;outputs are not valid format&quot;</span>);
+                    }
+                }
+                <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="ident">outputs_str</span>);
                 <span class="ident">json</span>.<span class="ident">push</span>(<span class="string">&#39;,&#39;</span>);
             } <span class="kw">else</span> {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:[],&quot;#</span>);
