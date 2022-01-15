@@ -1,5 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
+use std::str::FromStr;
 
 use crate::primitives::Contract;
 use crate::types::Address as SewUpAddress;
@@ -49,13 +50,13 @@ fn do_transfer(owner: SewUpAddress, to: SewUpAddress, token_id: [u8; 32]) {
     let mut value = Uint256::from_be_bytes(balance.bytes)
         - Uint256::from_u64(1u64).expect("uint256 one should valid");
     let mut buffer = value.to_be_bytes();
-    set_balance(&owner.inner, &copy_into_storage_value(&buffer));
+    set_balance(&owner, &copy_into_storage_value(&buffer));
 
     balance = get_balance(&to);
     value = Uint256::from_be_bytes(balance.bytes)
         + Uint256::from_u64(1u64).expect("uint256 one should valid");
     buffer = value.to_be_bytes();
-    set_balance(&to.inner, &copy_into_storage_value(&buffer));
+    set_balance(&to, &copy_into_storage_value(&buffer));
 
     set_token_owner(&token_id, &to.inner);
     set_token_approval(&token_id, &to.inner);
@@ -247,13 +248,7 @@ pub fn safe_transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, tokens: Vec<&str>) {
-    let address = {
-        let byte20: [u8; 20] = decode(addr)
-            .expect("address should be hex format")
-            .try_into()
-            .expect("address should be byte20");
-        Address::from(byte20)
-    };
+    let address = SewUpAddress::from_str(addr).expect("address invalid");
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
@@ -265,12 +260,12 @@ pub fn mint(addr: &str, tokens: Vec<&str>) {
             .expect("token id should be hex format")
             .try_into()
             .expect("token id should be byte32");
-        set_token_owner(&token_id, &address);
+        set_token_owner(&token_id, &address.inner);
         log4(
             &Vec::<u8>::with_capacity(0),
             &topic.into(),
             &Raw::from(0u32).to_bytes32().into(),
-            &Raw::from(address).to_bytes32().into(),
+            &Raw::from(&address).to_bytes32().into(),
             &token_id.into(),
         );
     }

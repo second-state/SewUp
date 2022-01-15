@@ -1,5 +1,6 @@
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
+use std::str::FromStr;
 
 use crate::primitives::Contract;
 use crate::types::Address as SewUpAddress;
@@ -17,7 +18,7 @@ use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, prelude::Bytes20, types::Address};
+use ewasm_api::{log3, types::Address};
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
 
@@ -70,8 +71,8 @@ pub fn transfer(contract: &Contract) {
         copy_into_storage_value(&buffer)
     };
 
-    set_balance(&sender.inner, &sender_storage_value);
-    set_balance(&recipient.inner, &recipient_storage_value);
+    set_balance(&sender, &sender_storage_value);
+    set_balance(&recipient, &recipient_storage_value);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
@@ -242,8 +243,8 @@ pub fn transfer_from(contract: &Contract) {
         copy_into_storage_value(&buffer)
     };
 
-    set_balance(&owner.inner, &owner_storage_value);
-    set_balance(&recipient.inner, &recipient_storage_value);
+    set_balance(&owner, &owner_storage_value);
+    set_balance(&recipient, &recipient_storage_value);
     set_allowance(&owner.inner, &sender.inner, &allowed_storage_value);
 
     let topic: [u8; 32] =
@@ -261,18 +262,7 @@ pub fn transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, value: usize) {
-    let address = {
-        let addr = if addr.starts_with("0x") {
-            &addr[2..addr.len()]
-        } else {
-            addr
-        };
-        let byte20: [u8; 20] = decode(addr)
-            .expect("address should be hex format")
-            .try_into()
-            .expect("address should be byte20");
-        Address::from(byte20)
-    };
+    let address = SewUpAddress::from_str(addr).expect("address invalid");
     set_balance(&address, &Raw::from(value).to_bytes32().into());
 
     let topic: [u8; 32] =

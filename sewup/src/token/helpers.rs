@@ -63,7 +63,7 @@ pub fn get_balance(_address: &SewUpAddress) -> StorageValue {
 }
 #[cfg(target_arch = "wasm32")]
 pub fn get_balance(address: &SewUpAddress) -> StorageValue {
-    let hash = calculate_balance_hash(&address.inner.into());
+    let hash = calculate_balance_hash(&address.inner.bytes);
 
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -72,10 +72,10 @@ pub fn get_balance(address: &SewUpAddress) -> StorageValue {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_balance(_address: &Address, _value: &StorageValue) {}
+pub fn set_balance(_address: &SewUpAddress, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_balance(address: &Address, value: &StorageValue) {
-    let hash = calculate_balance_hash(&address.bytes);
+pub fn set_balance(address: &SewUpAddress, value: &StorageValue) {
+    let hash = calculate_balance_hash(&address.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
 
