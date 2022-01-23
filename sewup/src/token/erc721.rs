@@ -61,7 +61,7 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
     set_balance(&to, &copy_into_storage_value(&buffer));
 
     set_token_owner(&token_id, &to.inner);
-    set_token_approval(&token_id, &to.inner);
+    set_token_approval(&token_id, &to);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
@@ -132,8 +132,8 @@ pub fn transfer_from(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn approve(contract: &Contract) {
-    let sender = ewasm_api::caller();
-    let spender = copy_into_address(&contract.input_data[16..36]);
+    let sender = caller();
+    let spender: Address = copy_into_address(&contract.input_data[16..36]).into();
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
