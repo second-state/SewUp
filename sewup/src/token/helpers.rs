@@ -83,12 +83,12 @@ pub fn set_balance(address: &SewUpAddress, value: &StorageValue) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_token_balance(_address: &Address, _token_id: &[u8; 32]) -> StorageValue {
+pub fn get_token_balance(_address: &SewUpAddress, _token_id: &[u8; 32]) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_token_balance(address: &Address, token_id: &[u8; 32]) -> StorageValue {
-    let hash = calculate_token_balance_hash(&address.bytes, token_id);
+pub fn get_token_balance(address: &SewUpAddress, token_id: &[u8; 32]) -> StorageValue {
+    let hash = calculate_token_balance_hash(&address.inner.bytes, token_id);
 
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);

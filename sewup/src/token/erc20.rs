@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use std::str::FromStr;
 
 use crate::primitives::Contract;
-use crate::types::Address as SewUpAddress;
+use crate::types::Address;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 
@@ -18,7 +18,7 @@ use crate::utils::ewasm_return_str;
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, types::Address};
+use ewasm_api::log3;
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
 
@@ -34,8 +34,8 @@ use sewup_derive::ewasm_lib_fn;
     stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let sender: SewUpAddress = ewasm_api::caller().into();
-    let recipient: SewUpAddress = {
+    let sender: Address = ewasm_api::caller().into();
+    let recipient: Address = {
         let buffer: [u8; 20] = contract.input_data[16..36].try_into().unwrap();
         buffer.into()
     };
@@ -94,7 +94,7 @@ pub fn transfer(contract: &Contract) {
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
-    let address: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let address: Address = copy_into_address(&contract.input_data[16..36]).into();
     let balance = get_balance(&address);
     ewasm_api::finish_data(&balance.bytes);
 }
@@ -196,9 +196,9 @@ pub fn allowance(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {
-    let sender: SewUpAddress = ewasm_api::caller().into();
-    let owner: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
-    let recipient: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
+    let sender: Address = ewasm_api::caller().into();
+    let owner: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let recipient: Address = copy_into_address(&contract.input_data[48..68]).into();
 
     let amount = {
         let buffer: [u8; 32] = contract.input_data[68..100].try_into().unwrap();
@@ -262,7 +262,7 @@ pub fn transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, value: usize) {
-    let address = SewUpAddress::from_str(addr).expect("address invalid");
+    let address = Address::from_str(addr).expect("address invalid");
     set_balance(&address, &Raw::from(value).to_bytes32().into());
 
     let topic: [u8; 32] =
