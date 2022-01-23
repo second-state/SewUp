@@ -60,7 +60,7 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
     buffer = value.to_be_bytes();
     set_balance(&to, &copy_into_storage_value(&buffer));
 
-    set_token_owner(&token_id, &to.inner);
+    set_token_owner(&token_id, &to);
     set_token_approval(&token_id, &to);
 
     let topic: [u8; 32] =
@@ -87,11 +87,11 @@ fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
   stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let to: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let to = copy_into_address(&contract.input_data[16..36]);
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
-    let sender = ewasm_api::caller();
+    let sender = caller();
     let owner = get_token_owner(&token_id);
 
     if owner != sender {
@@ -112,8 +112,8 @@ pub fn transfer(contract: &Contract) {
 )]
 pub fn transfer_from(contract: &Contract) {
     let sender = caller();
-    let owner = copy_into_address(&contract.input_data[16..36]).into();
-    let to = copy_into_address(&contract.input_data[48..68]).into();
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
     let token_id = contract.input_data[68..100].try_into().unwrap();
 
     if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
@@ -133,7 +133,7 @@ pub fn transfer_from(contract: &Contract) {
 )]
 pub fn approve(contract: &Contract) {
     let sender = caller();
-    let spender: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let spender = copy_into_address(&contract.input_data[16..36]);
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
@@ -177,7 +177,7 @@ pub fn get_approved(contract: &Contract) {
 )]
 pub fn set_approval_for_all(contract: &Contract) {
     let sender = caller();
-    let operator: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let operator = copy_into_address(&contract.input_data[16..36]);
     let is_approved = contract.input_data[67] == 1;
     set_approval(&sender, &operator, is_approved);
 
@@ -204,8 +204,8 @@ pub fn set_approval_for_all(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn is_approved_for_all(contract: &Contract) {
-    let owner = copy_into_address(&contract.input_data[16..36]).into();
-    let operator = copy_into_address(&contract.input_data[48..68]).into();
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let operator = copy_into_address(&contract.input_data[48..68]);
     ewasm_return_bool(get_approval(&owner, &operator));
 }
 
@@ -262,7 +262,7 @@ pub fn mint(addr: &str, tokens: Vec<&str>) {
             .expect("token id should be hex format")
             .try_into()
             .expect("token id should be byte32");
-        set_token_owner(&token_id, &address.inner);
+        set_token_owner(&token_id, &address);
         log4(
             &Vec::<u8>::with_capacity(0),
             &topic.into(),
