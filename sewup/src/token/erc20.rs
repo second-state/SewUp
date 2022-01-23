@@ -96,7 +96,7 @@ pub fn transfer(contract: &Contract) {
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
-    let address: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let address = copy_into_address(&contract.input_data[16..36]);
     let balance = get_balance(&address);
     ewasm_api::finish_data(&balance.bytes);
 }
@@ -152,7 +152,7 @@ pub fn total_supply(i: usize) {
 )]
 pub fn approve(contract: &Contract) {
     let sender = caller();
-    let spender: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let spender = copy_into_address(&contract.input_data[16..36]);
     let value = {
         let buffer: [u8; 32] = contract.input_data[36..68].try_into().unwrap();
         copy_into_storage_value(&buffer)
@@ -181,8 +181,8 @@ pub fn approve(contract: &Contract) {
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn allowance(contract: &Contract) {
-    let owner: Address = copy_into_address(&contract.input_data[16..36]).into();
-    let spender: Address = copy_into_address(&contract.input_data[48..68]).into();
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let spender = copy_into_address(&contract.input_data[48..68]);
     let allowance_value = get_allowance(&owner, &spender);
     ewasm_api::finish_data(&allowance_value.bytes);
 }
@@ -199,8 +199,8 @@ pub fn allowance(contract: &Contract) {
 )]
 pub fn transfer_from(contract: &Contract) {
     let sender = caller();
-    let owner: Address = copy_into_address(&contract.input_data[16..36]).into();
-    let recipient: Address = copy_into_address(&contract.input_data[48..68]).into();
+    let owner = copy_into_address(&contract.input_data[16..36]);
+    let recipient = copy_into_address(&contract.input_data[48..68]);
 
     let amount = {
         let buffer: [u8; 32] = contract.input_data[68..100].try_into().unwrap();

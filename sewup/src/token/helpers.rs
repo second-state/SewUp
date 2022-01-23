@@ -1,10 +1,7 @@
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
 
-#[cfg(target_arch = "wasm32")]
-use ewasm_api::types::Address;
-
-use crate::types::Address as SewUpAddress;
+use crate::types::Address;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use crate::utils::sha3_256;
@@ -14,9 +11,6 @@ use ewasm_api::types::{StorageKey, StorageValue};
 
 #[cfg(not(target_arch = "wasm32"))]
 pub struct StorageValue {}
-
-#[cfg(not(target_arch = "wasm32"))]
-pub struct Address {}
 
 pub fn calculate_approval_hash(sender: &[u8; 20], spender: &[u8; 20]) -> Vec<u8> {
     let mut allowance: Vec<u8> = "approval".as_bytes().into();
@@ -58,11 +52,11 @@ pub fn calculate_token_balance_hash(address: &[u8; 20], token_id: &[u8; 32]) -> 
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_balance(_address: &SewUpAddress) -> StorageValue {
+pub fn get_balance(_address: &Address) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_balance(address: &SewUpAddress) -> StorageValue {
+pub fn get_balance(address: &Address) -> StorageValue {
     let hash = calculate_balance_hash(&address.inner.bytes);
 
     let mut storage_key = StorageKey::default();
@@ -72,9 +66,9 @@ pub fn get_balance(address: &SewUpAddress) -> StorageValue {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_balance(_address: &SewUpAddress, _value: &StorageValue) {}
+pub fn set_balance(_address: &Address, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_balance(address: &SewUpAddress, value: &StorageValue) {
+pub fn set_balance(address: &Address, value: &StorageValue) {
     let hash = calculate_balance_hash(&address.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -83,11 +77,11 @@ pub fn set_balance(address: &SewUpAddress, value: &StorageValue) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_token_balance(_address: &SewUpAddress, _token_id: &[u8; 32]) -> StorageValue {
+pub fn get_token_balance(_address: &Address, _token_id: &[u8; 32]) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_token_balance(address: &SewUpAddress, token_id: &[u8; 32]) -> StorageValue {
+pub fn get_token_balance(address: &Address, token_id: &[u8; 32]) -> StorageValue {
     let hash = calculate_token_balance_hash(&address.inner.bytes, token_id);
 
     let mut storage_key = StorageKey::default();
@@ -97,9 +91,9 @@ pub fn get_token_balance(address: &SewUpAddress, token_id: &[u8; 32]) -> Storage
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_token_balance(_address: &SewUpAddress, _token_id: &[u8; 32], _value: &StorageValue) {}
+pub fn set_token_balance(_address: &Address, _token_id: &[u8; 32], _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_token_balance(address: &SewUpAddress, token_id: &[u8; 32], value: &StorageValue) {
+pub fn set_token_balance(address: &Address, token_id: &[u8; 32], value: &StorageValue) {
     let hash = calculate_token_balance_hash(&address.inner.bytes, token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -108,11 +102,11 @@ pub fn set_token_balance(address: &SewUpAddress, token_id: &[u8; 32], value: &St
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_allowance(_sender: &SewUpAddress, _spender: &SewUpAddress) -> StorageValue {
+pub fn get_allowance(_sender: &Address, _spender: &Address) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_allowance(sender: &SewUpAddress, spender: &SewUpAddress) -> StorageValue {
+pub fn get_allowance(sender: &Address, spender: &Address) -> StorageValue {
     let hash = calculate_allowance_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -121,9 +115,9 @@ pub fn get_allowance(sender: &SewUpAddress, spender: &SewUpAddress) -> StorageVa
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_allowance(_sender: &SewUpAddress, _spender: &SewUpAddress, _value: &StorageValue) {}
+pub fn set_allowance(_sender: &Address, _spender: &Address, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_allowance(sender: &SewUpAddress, spender: &SewUpAddress, value: &StorageValue) {
+pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) {
     let hash = calculate_allowance_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -132,13 +126,13 @@ pub fn set_allowance(sender: &SewUpAddress, spender: &SewUpAddress, value: &Stor
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_token_approval(_token_id: &[u8; 32]) -> SewUpAddress {
-    SewUpAddress {
+pub fn get_token_approval(_token_id: &[u8; 32]) -> Address {
+    Address {
         ..Default::default()
     }
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_token_approval(token_id: &[u8; 32]) -> SewUpAddress {
+pub fn get_token_approval(token_id: &[u8; 32]) -> Address {
     let hash = calculate_token_approval_hash(token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -149,9 +143,9 @@ pub fn get_token_approval(token_id: &[u8; 32]) -> SewUpAddress {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_token_approval(_token_id: &[u8; 32], _spender: &SewUpAddress) {}
+pub fn set_token_approval(_token_id: &[u8; 32], _spender: &Address) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_token_approval(token_id: &[u8; 32], spender: &SewUpAddress) {
+pub fn set_token_approval(token_id: &[u8; 32], spender: &Address) {
     let hash = calculate_token_approval_hash(token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -159,11 +153,11 @@ pub fn set_token_approval(token_id: &[u8; 32], spender: &SewUpAddress) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_approval(_sender: &SewUpAddress, _spender: &SewUpAddress) -> bool {
+pub fn get_approval(_sender: &Address, _spender: &Address) -> bool {
     true
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_approval(sender: &SewUpAddress, spender: &SewUpAddress) -> bool {
+pub fn get_approval(sender: &Address, spender: &Address) -> bool {
     let hash = calculate_approval_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -171,9 +165,9 @@ pub fn get_approval(sender: &SewUpAddress, spender: &SewUpAddress) -> bool {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_approval(_sender: &SewUpAddress, _spender: &SewUpAddress, _is_approved: bool) {}
+pub fn set_approval(_sender: &Address, _spender: &Address, _is_approved: bool) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_approval(sender: &SewUpAddress, spender: &SewUpAddress, is_approved: bool) {
+pub fn set_approval(sender: &Address, spender: &Address, is_approved: bool) {
     let hash = calculate_approval_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
@@ -195,13 +189,12 @@ pub fn copy_into_storage_value(slice: &[u8]) -> StorageValue {
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn copy_into_address(_slice: &[u8]) -> Address {
-    Address {}
+    Address::default()
 }
 #[cfg(target_arch = "wasm32")]
 pub fn copy_into_address(slice: &[u8]) -> Address {
-    let mut a = Address::default();
-    a.bytes.copy_from_slice(slice);
-    a
+    let bytes20: [u8; 20] = slice.try_into().expect("the length of slice should be 20");
+    bytes20.into()
 }
 
 #[cfg(not(target_arch = "wasm32"))]
@@ -215,7 +208,7 @@ pub fn set_token_owner(token_id: &[u8; 32], owner: &Address) {
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn get_token_owner(_token_id: &[u8; 32]) -> Address {
-    Address {}
+    Address::default()
 }
 #[cfg(target_arch = "wasm32")]
 pub fn get_token_owner(token_id: &[u8; 32]) -> Address {

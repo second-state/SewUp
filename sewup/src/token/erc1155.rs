@@ -18,9 +18,9 @@ use crate::utils::{caller, ewasm_return_vec};
 use bitcoin::util::uint::Uint256;
 
 #[cfg(target_arch = "wasm32")]
-use crate::types::Address as SewUpAddress;
+use crate::types::Address;
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log4, types::Address};
+use ewasm_api::log4;
 
 #[cfg(target_arch = "wasm32")]
 use hex::decode;
@@ -40,7 +40,7 @@ pub use super::erc721::{
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
-    let address: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let address = copy_into_address(&contract.input_data[16..36]);
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
@@ -90,7 +90,7 @@ pub fn balance_of_batch(contract: &Contract) {
             [token_offset + 32 + i * 32..token_offset + 64 + i * 32]
             .try_into()
             .unwrap();
-        let balance = get_token_balance(&address_list[i].into(), &bytes32);
+        let balance = get_token_balance(&address_list[i], &bytes32);
         token_balance_list.push(balance.bytes);
         i = i + 1;
     }
@@ -98,7 +98,7 @@ pub fn balance_of_batch(contract: &Contract) {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn do_transfer_from(from: &SewUpAddress, to: &SewUpAddress, token_id: &[u8; 32], value: Uint256) {
+fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Uint256) {
     let sender_storage_value = {
         let balance = get_token_balance(from, token_id);
         let origin_value = Uint256::from_be_bytes(balance.bytes);
@@ -142,8 +142,8 @@ fn do_transfer_from(from: &SewUpAddress, to: &SewUpAddress, token_id: &[u8; 32],
 )]
 pub fn safe_transfer_from(contract: &Contract) {
     let sender = caller();
-    let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
-    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
+    let from = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
     let token_id: [u8; 32] = contract.input_data[68..100]
         .try_into()
         .expect("token id should be byte32");
@@ -184,8 +184,8 @@ pub fn safe_transfer_from(contract: &Contract) {
 )]
 pub fn safe_batch_transfer_from(contract: &Contract) {
     let sender = caller();
-    let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
-    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
+    let from = copy_into_address(&contract.input_data[16..36]);
+    let to = copy_into_address(&contract.input_data[48..68]);
 
     if !get_approval(&from, &sender) {
         ewasm_api::revert();
@@ -247,7 +247,7 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, tokens: Vec<(&str, usize)>) {
-    let address = SewUpAddress::from_str(addr).expect("address invalid");
+    let address = Address::from_str(addr).expect("address invalid");
 
     let topic: [u8; 32] =
         decode("c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62")
