@@ -176,8 +176,8 @@ pub fn get_approved(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn set_approval_for_all(contract: &Contract) {
-    let sender = ewasm_api::caller();
-    let operator = copy_into_address(&contract.input_data[16..36]);
+    let sender = caller();
+    let operator: Address = copy_into_address(&contract.input_data[16..36]).into();
     let is_approved = contract.input_data[67] == 1;
     set_approval(&sender, &operator, is_approved);
 

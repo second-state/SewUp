@@ -171,10 +171,10 @@ pub fn get_approval(sender: &SewUpAddress, spender: &SewUpAddress) -> bool {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_approval(_sender: &Address, _spender: &Address, _is_approved: bool) {}
+pub fn set_approval(_sender: &SewUpAddress, _spender: &SewUpAddress, _is_approved: bool) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_approval(sender: &Address, spender: &Address, is_approved: bool) {
-    let hash = calculate_approval_hash(&sender.bytes, &spender.bytes);
+pub fn set_approval(sender: &SewUpAddress, spender: &SewUpAddress, is_approved: bool) {
+    let hash = calculate_approval_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
     let mut storage_value = StorageKey::default();
