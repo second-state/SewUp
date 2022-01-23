@@ -159,12 +159,12 @@ pub fn set_token_approval(token_id: &[u8; 32], spender: &SewUpAddress) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_approval(_sender: &Address, _spender: &Address) -> bool {
+pub fn get_approval(_sender: &SewUpAddress, _spender: &SewUpAddress) -> bool {
     true
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_approval(sender: &Address, spender: &Address) -> bool {
-    let hash = calculate_approval_hash(&sender.bytes, &spender.bytes);
+pub fn get_approval(sender: &SewUpAddress, spender: &SewUpAddress) -> bool {
+    let hash = calculate_approval_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
     ewasm_api::storage_load(&storage_key).bytes[31] == 1
