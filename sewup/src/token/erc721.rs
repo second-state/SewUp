@@ -22,7 +22,7 @@ use super::helpers::{
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::utils::ewasm_return_bool;
+use crate::utils::{caller, ewasm_return_bool};
 
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
@@ -111,12 +111,12 @@ pub fn transfer(contract: &Contract) {
   stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {
-    let sender = ewasm_api::caller();
+    let sender = caller();
     let owner = copy_into_address(&contract.input_data[16..36]);
     let to: Address = copy_into_address(&contract.input_data[48..68]).into();
     let token_id = contract.input_data[68..100].try_into().unwrap();
 
-    if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
+    if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender.inner) {
         ewasm_api::revert();
     }
 
