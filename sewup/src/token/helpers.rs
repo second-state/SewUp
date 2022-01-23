@@ -132,17 +132,19 @@ pub fn set_allowance(sender: &SewUpAddress, spender: &SewUpAddress, value: &Stor
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_token_approval(_token_id: &[u8; 32]) -> Address {
-    Address {}
+pub fn get_token_approval(_token_id: &[u8; 32]) -> SewUpAddress {
+    SewUpAddress {
+        ..Default::default()
+    }
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_token_approval(token_id: &[u8; 32]) -> Address {
+pub fn get_token_approval(token_id: &[u8; 32]) -> SewUpAddress {
     let hash = calculate_token_approval_hash(token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
     let buf: [u8; 20] = ewasm_api::storage_load(&storage_key).bytes[12..32]
         .try_into()
-        .expect("");
+        .expect("token approval from hash should be here");
     buf.into()
 }
 

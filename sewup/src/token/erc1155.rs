@@ -12,7 +12,7 @@ use super::helpers::{
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::utils::ewasm_return_vec;
+use crate::utils::{caller, ewasm_return_vec};
 
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
@@ -141,13 +141,13 @@ fn do_transfer_from(from: &SewUpAddress, to: &SewUpAddress, token_id: &[u8; 32],
     ]
 )]
 pub fn safe_transfer_from(contract: &Contract) {
-    let sender = ewasm_api::caller();
+    let sender = caller();
     let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
     let token_id: [u8; 32] = contract.input_data[68..100]
         .try_into()
         .expect("token id should be byte32");
-    if !get_approval(&from.inner, &sender) {
+    if !get_approval(&from.inner, &sender.inner) {
         ewasm_api::revert();
     }
     let value = {
@@ -183,11 +183,11 @@ pub fn safe_transfer_from(contract: &Contract) {
     ]
 )]
 pub fn safe_batch_transfer_from(contract: &Contract) {
-    let sender = ewasm_api::caller();
+    let sender = caller();
     let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
 
-    if !get_approval(&from.inner, &sender) {
+    if !get_approval(&from.inner, &sender.inner) {
         ewasm_api::revert();
     }
 
@@ -238,7 +238,7 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
     log4(
         &Vec::<u8>::with_capacity(0), //TODO handler the byte
         &topic.into(),
-        &Raw::from(ewasm_api::caller()).to_bytes32().into(),
+        &Raw::from(caller()).to_bytes32().into(),
         &Raw::from(from).to_bytes32().into(),
         &Raw::from(to).to_bytes32().into(),
     );

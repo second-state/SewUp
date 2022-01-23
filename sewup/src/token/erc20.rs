@@ -16,7 +16,7 @@ use super::helpers::{
 };
 
 #[cfg(target_arch = "wasm32")]
-use crate::utils::ewasm_return_str;
+use crate::utils::{caller, ewasm_return_str};
 #[cfg(target_arch = "wasm32")]
 use bitcoin::util::uint::Uint256;
 #[cfg(target_arch = "wasm32")]
@@ -36,7 +36,7 @@ use sewup_derive::ewasm_lib_fn;
     stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let sender: Address = ewasm_api::caller().into();
+    let sender = caller();
     let recipient: Address = {
         let buffer: [u8; 20] = contract.input_data[16..36].try_into().unwrap();
         buffer.into()
@@ -151,7 +151,7 @@ pub fn total_supply(i: usize) {
     stateMutability=nonpayable
 )]
 pub fn approve(contract: &Contract) {
-    let sender: Address = ewasm_api::caller().into();
+    let sender = caller();
     let spender: Address = copy_into_address(&contract.input_data[16..36]).into();
     let value = {
         let buffer: [u8; 32] = contract.input_data[36..68].try_into().unwrap();
@@ -198,7 +198,7 @@ pub fn allowance(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn transfer_from(contract: &Contract) {
-    let sender: Address = ewasm_api::caller().into();
+    let sender = caller();
     let owner: Address = copy_into_address(&contract.input_data[16..36]).into();
     let recipient: Address = copy_into_address(&contract.input_data[48..68]).into();
 
