@@ -306,7 +306,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(unsafe { cap.name("name").unwrap_unchecked() }.as_str());
                 json.push_str(r#"","#);
             } else {
-                json.push_str(&mut format!(r#""name":"{}","#, fn_name.to_case(Camel)));
+                json.push_str(&format!(r#""name":"{}","#, fn_name.to_case(Camel)));
             }
 
             if let Some(cap) =
