@@ -149,9 +149,9 @@ pub fn get_token_approval(token_id: &[u8; 32]) -> SewUpAddress {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_token_approval(_token_id: &[u8; 32], _spender: &Address) {}
+pub fn set_token_approval(_token_id: &[u8; 32], _spender: &SewUpAddress) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_token_approval(token_id: &[u8; 32], spender: &Address) {
+pub fn set_token_approval(token_id: &[u8; 32], spender: &SewUpAddress) {
     let hash = calculate_token_approval_hash(token_id);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
