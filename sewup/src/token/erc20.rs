@@ -181,8 +181,8 @@ pub fn approve(contract: &Contract) {
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn allowance(contract: &Contract) {
-    let owner = copy_into_address(&contract.input_data[16..36]);
-    let spender = copy_into_address(&contract.input_data[48..68]);
+    let owner: Address = copy_into_address(&contract.input_data[16..36]).into();
+    let spender: Address = copy_into_address(&contract.input_data[48..68]).into();
     let allowance_value = get_allowance(&owner, &spender);
     ewasm_api::finish_data(&allowance_value.bytes);
 }
@@ -208,7 +208,7 @@ pub fn transfer_from(contract: &Contract) {
     };
 
     let mut allowed = {
-        let allowed_value = get_allowance(&owner.inner, &sender.inner);
+        let allowed_value = get_allowance(&owner, &sender);
         Uint256::from_be_bytes(allowed_value.bytes)
     };
 
