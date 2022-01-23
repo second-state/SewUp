@@ -1,6 +1,6 @@
 use std::{fs::File, path::Path};
 
-use anyhow::{Context, Result};
+use anyhow::{anyhow, Context, Result};
 use hex::encode;
 use regex::Regex;
 use sha2::{Digest, Sha256};
@@ -19,7 +19,21 @@ async fn check_cargo_toml() -> Result<String> {
         .context("can not read Cargo.toml")?;
     let config: CargoToml = toml::from_str(config_contents.as_str())?;
 
-    // TODO: more toml config checking here
+    let mut has_feautes_error = false;
+
+    if let Some(features) = config.features {
+        if features.constructor.is_none() || features.constructor_test.is_none() {
+            has_feautes_error = true;
+        }
+    } else {
+        has_feautes_error = true;
+    }
+
+    if has_feautes_error {
+        return Err(anyhow!(
+            "There should be features following: constructor, constructor-test"
+        ));
+    }
 
     Ok(config.package.name.replace("-", "_"))
 }

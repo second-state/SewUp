@@ -37,8 +37,16 @@ pub struct Package {
 }
 
 #[derive(Deserialize)]
+pub struct Features {
+    pub constructor: Option<Vec<String>>,
+    #[serde(rename(deserialize = "constructor-test"))]
+    pub constructor_test: Option<Vec<String>>,
+}
+
+#[derive(Deserialize)]
 pub struct CargoToml {
     pub package: Package,
+    pub features: Option<Features>,
 }
 
 #[derive(Deserialize)]
