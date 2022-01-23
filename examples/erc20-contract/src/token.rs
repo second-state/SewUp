@@ -32,7 +32,7 @@ mod tests {
     use sewup::erc20::{
         BALANCE_OF_SIG, DECIMALS_SIG, NAME_SIG, SYMBOL_SIG, TOTAL_SUPPLY_SIG, TRANSFER_SIG,
     };
-    use sewup_derive::ewasm_assert_eq;
+    use sewup_derive::{ewasm_assert_eq, ewasm_fn_sig};
 
     #[ewasm_test]
     fn test_execute_basic_operations() {
