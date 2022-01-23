@@ -121,10 +121,10 @@ pub fn get_allowance(sender: &SewUpAddress, spender: &SewUpAddress) -> StorageVa
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn set_allowance(_sender: &Address, _spender: &Address, _value: &StorageValue) {}
+pub fn set_allowance(_sender: &SewUpAddress, _spender: &SewUpAddress, _value: &StorageValue) {}
 #[cfg(target_arch = "wasm32")]
-pub fn set_allowance(sender: &Address, spender: &Address, value: &StorageValue) {
-    let hash = calculate_allowance_hash(&sender.bytes, &spender.bytes);
+pub fn set_allowance(sender: &SewUpAddress, spender: &SewUpAddress, value: &StorageValue) {
+    let hash = calculate_allowance_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
 
