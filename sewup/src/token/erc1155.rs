@@ -1,5 +1,5 @@
 #[cfg(target_arch = "wasm32")]
-use std::convert::TryInto;
+use std::{convert::TryInto, str::FromStr};
 
 use crate::primitives::Contract;
 #[cfg(target_arch = "wasm32")]
@@ -125,8 +125,8 @@ fn do_transfer_from(from: &SewUpAddress, to: &SewUpAddress, token_id: &[u8; 32],
         copy_into_storage_value(&buffer)
     };
 
-    set_token_balance(&from.inner, token_id, &sender_storage_value);
-    set_token_balance(&to.inner, token_id, &recipient_storage_value);
+    set_token_balance(&from, token_id, &sender_storage_value);
+    set_token_balance(&to, token_id, &recipient_storage_value);
 }
 
 /// Implement ERC-1155 safeTransferFrom(address,address,uint256,uint256,bytes)
@@ -247,13 +247,7 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, tokens: Vec<(&str, usize)>) {
-    let address = {
-        let byte20: [u8; 20] = decode(addr)
-            .expect("address should be hex format")
-            .try_into()
-            .expect("address should be byte20");
-        Address::from(byte20)
-    };
+    let address = SewUpAddress::from_str(addr).expect("address invalid");
 
     let topic: [u8; 32] =
         decode("c3d58168c5ae7397731d063d5bbf3d657854427343f4c083240f7aacaa2d0f62")
@@ -271,7 +265,7 @@ pub fn mint(addr: &str, tokens: Vec<(&str, usize)>) {
             &topic.into(),
             &Raw::from(0u32).to_bytes32().into(),
             &Raw::from(0u32).to_bytes32().into(),
-            &Raw::from(address).to_bytes32().into(),
+            &Raw::from(&address).to_bytes32().into(),
         );
     }
 }
