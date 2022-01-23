@@ -3,7 +3,7 @@ use std::convert::TryInto;
 use std::str::FromStr;
 
 use crate::primitives::Contract;
-use crate::types::Address as SewUpAddress;
+use crate::types::Address;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 use sewup_derive::ewasm_lib_fn;
@@ -28,7 +28,7 @@ use bitcoin::util::uint::Uint256;
 use hex::decode;
 
 #[cfg(target_arch = "wasm32")]
-use ewasm_api::{log3, log4, types::Address};
+use ewasm_api::{log3, log4};
 
 /// Implement ERC-721 owner_of()
 #[ewasm_lib_fn("6352211e",
@@ -45,7 +45,7 @@ pub fn owner_of(contract: &Contract) {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn do_transfer(owner: SewUpAddress, to: SewUpAddress, token_id: [u8; 32]) {
+fn do_transfer(owner: Address, to: Address, token_id: [u8; 32]) {
     let mut balance = get_balance(&owner);
     let mut value = Uint256::from_be_bytes(balance.bytes)
         - Uint256::from_u64(1u64).expect("uint256 one should valid");
@@ -85,7 +85,7 @@ fn do_transfer(owner: SewUpAddress, to: SewUpAddress, token_id: [u8; 32]) {
   stateMutability=nonpayable
 )]
 pub fn transfer(contract: &Contract) {
-    let to: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let to: Address = copy_into_address(&contract.input_data[16..36]).into();
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
@@ -111,7 +111,7 @@ pub fn transfer(contract: &Contract) {
 pub fn transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
     let owner = copy_into_address(&contract.input_data[16..36]);
-    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
+    let to: Address = copy_into_address(&contract.input_data[48..68]).into();
     let token_id = contract.input_data[68..100].try_into().unwrap();
 
     if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
@@ -213,7 +213,7 @@ pub fn is_approved_for_all(contract: &Contract) {
     inputs=[ { "name": "_tokenId", "type": "uint256" } ],
     outputs=[ { "name": "_infoUrl", "type": "string" } ]
 )]
-pub fn token_metadata(contract: &Contract) {
+pub fn token_metadata(_contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/161
 }
@@ -227,7 +227,7 @@ pub fn token_metadata(contract: &Contract) {
 /// `onERC721Received` on `_to` and throws if the return value is not
 /// `bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"))`.
 #[ewasm_lib_fn("b88d4fde")]
-pub fn safe_transfer_from_with_data(contract: &Contract) {
+pub fn safe_transfer_from_with_data(_contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/160
 }
@@ -241,14 +241,14 @@ pub fn safe_transfer_from_with_data(contract: &Contract) {
   ],
   stateMutability=nonpayable
 )]
-pub fn safe_transfer_from(contract: &Contract) {
+pub fn safe_transfer_from(_contract: &Contract) {
     // TODO
     // https://github.com/second-state/SewUp/issues/160
 }
 
 #[cfg(target_arch = "wasm32")]
 pub fn mint(addr: &str, tokens: Vec<&str>) {
-    let address = SewUpAddress::from_str(addr).expect("address invalid");
+    let address = Address::from_str(addr).expect("address invalid");
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")

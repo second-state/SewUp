@@ -18,6 +18,8 @@ use crate::utils::ewasm_return_vec;
 use bitcoin::util::uint::Uint256;
 
 #[cfg(target_arch = "wasm32")]
+use crate::types::Address as SewUpAddress;
+#[cfg(target_arch = "wasm32")]
 use ewasm_api::{log4, types::Address};
 
 #[cfg(target_arch = "wasm32")]
@@ -38,7 +40,7 @@ pub use super::erc721::{
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
 pub fn balance_of(contract: &Contract) {
-    let address = copy_into_address(&contract.input_data[16..36]);
+    let address: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let token_id: [u8; 32] = contract.input_data[36..68]
         .try_into()
         .expect("token id should be byte32");
@@ -88,7 +90,7 @@ pub fn balance_of_batch(contract: &Contract) {
             [token_offset + 32 + i * 32..token_offset + 64 + i * 32]
             .try_into()
             .unwrap();
-        let balance = get_token_balance(&address_list[i], &bytes32);
+        let balance = get_token_balance(&address_list[i].into(), &bytes32);
         token_balance_list.push(balance.bytes);
         i = i + 1;
     }
@@ -96,7 +98,7 @@ pub fn balance_of_batch(contract: &Contract) {
 }
 
 #[cfg(target_arch = "wasm32")]
-fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Uint256) {
+fn do_transfer_from(from: &SewUpAddress, to: &SewUpAddress, token_id: &[u8; 32], value: Uint256) {
     let sender_storage_value = {
         let balance = get_token_balance(from, token_id);
         let origin_value = Uint256::from_be_bytes(balance.bytes);
@@ -123,8 +125,8 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
         copy_into_storage_value(&buffer)
     };
 
-    set_token_balance(from, token_id, &sender_storage_value);
-    set_token_balance(to, token_id, &recipient_storage_value);
+    set_token_balance(&from.inner, token_id, &sender_storage_value);
+    set_token_balance(&to.inner, token_id, &recipient_storage_value);
 }
 
 /// Implement ERC-1155 safeTransferFrom(address,address,uint256,uint256,bytes)
@@ -140,12 +142,12 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
 )]
 pub fn safe_transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
-    let from = copy_into_address(&contract.input_data[16..36]);
-    let to = copy_into_address(&contract.input_data[48..68]);
+    let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
     let token_id: [u8; 32] = contract.input_data[68..100]
         .try_into()
         .expect("token id should be byte32");
-    if !get_approval(&from, &sender) {
+    if !get_approval(&from.inner, &sender) {
         ewasm_api::revert();
     }
     let value = {
@@ -182,10 +184,10 @@ pub fn safe_transfer_from(contract: &Contract) {
 )]
 pub fn safe_batch_transfer_from(contract: &Contract) {
     let sender = ewasm_api::caller();
-    let from = copy_into_address(&contract.input_data[16..36]);
-    let to = copy_into_address(&contract.input_data[48..68]);
+    let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
+    let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
 
-    if !get_approval(&from, &sender) {
+    if !get_approval(&from.inner, &sender) {
         ewasm_api::revert();
     }
 
@@ -203,7 +205,6 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
     let mut token_list = Vec::<[u8; 32]>::new();
     let mut i = 0;
 
-    let mut output = Vec::<[u8; 32]>::new();
     while i < token_length {
         let bytes32: [u8; 32] = contract.input_data
             [token_offset + 32 + i * 32..token_offset + 64 + i * 32]
