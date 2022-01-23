@@ -151,8 +151,8 @@ pub fn total_supply(i: usize) {
     stateMutability=nonpayable
 )]
 pub fn approve(contract: &Contract) {
-    let sender = ewasm_api::caller();
-    let spender = copy_into_address(&contract.input_data[16..36]);
+    let sender: Address = ewasm_api::caller().into();
+    let spender: Address = copy_into_address(&contract.input_data[16..36]).into();
     let value = {
         let buffer: [u8; 32] = contract.input_data[36..68].try_into().unwrap();
         copy_into_storage_value(&buffer)
@@ -247,7 +247,7 @@ pub fn transfer_from(contract: &Contract) {
 
     set_balance(&owner, &owner_storage_value);
     set_balance(&recipient, &recipient_storage_value);
-    set_allowance(&owner.inner, &sender.inner, &allowed_storage_value);
+    set_allowance(&owner, &sender, &allowed_storage_value);
 
     let topic: [u8; 32] =
         decode("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef")
