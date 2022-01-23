@@ -108,12 +108,12 @@ pub fn set_token_balance(address: &SewUpAddress, token_id: &[u8; 32], value: &St
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn get_allowance(_sender: &Address, _spender: &Address) -> StorageValue {
+pub fn get_allowance(_sender: &SewUpAddress, _spender: &SewUpAddress) -> StorageValue {
     StorageValue {}
 }
 #[cfg(target_arch = "wasm32")]
-pub fn get_allowance(sender: &Address, spender: &Address) -> StorageValue {
-    let hash = calculate_allowance_hash(&sender.bytes, &spender.bytes);
+pub fn get_allowance(sender: &SewUpAddress, spender: &SewUpAddress) -> StorageValue {
+    let hash = calculate_allowance_hash(&sender.inner.bytes, &spender.inner.bytes);
     let mut storage_key = StorageKey::default();
     storage_key.bytes.copy_from_slice(&hash[0..32]);
 
