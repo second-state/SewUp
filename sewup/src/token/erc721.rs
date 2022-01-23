@@ -1,8 +1,10 @@
 #[cfg(target_arch = "wasm32")]
 use std::convert::TryInto;
+#[cfg(target_arch = "wasm32")]
 use std::str::FromStr;
 
 use crate::primitives::Contract;
+#[cfg(target_arch = "wasm32")]
 use crate::types::Address;
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
