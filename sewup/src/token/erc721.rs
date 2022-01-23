@@ -112,11 +112,11 @@ pub fn transfer(contract: &Contract) {
 )]
 pub fn transfer_from(contract: &Contract) {
     let sender = caller();
-    let owner = copy_into_address(&contract.input_data[16..36]);
-    let to: Address = copy_into_address(&contract.input_data[48..68]).into();
+    let owner = copy_into_address(&contract.input_data[16..36]).into();
+    let to = copy_into_address(&contract.input_data[48..68]).into();
     let token_id = contract.input_data[68..100].try_into().unwrap();
 
-    if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender.inner) {
+    if sender != get_token_approval(&token_id) && !get_approval(&owner, &sender) {
         ewasm_api::revert();
     }
 
@@ -204,8 +204,8 @@ pub fn set_approval_for_all(contract: &Contract) {
     stateMutability=nonpayable
 )]
 pub fn is_approved_for_all(contract: &Contract) {
-    let owner = copy_into_address(&contract.input_data[16..36]);
-    let operator = copy_into_address(&contract.input_data[48..68]);
+    let owner = copy_into_address(&contract.input_data[16..36]).into();
+    let operator = copy_into_address(&contract.input_data[48..68]).into();
     ewasm_return_bool(get_approval(&owner, &operator));
 }
 

@@ -147,7 +147,7 @@ pub fn safe_transfer_from(contract: &Contract) {
     let token_id: [u8; 32] = contract.input_data[68..100]
         .try_into()
         .expect("token id should be byte32");
-    if !get_approval(&from.inner, &sender.inner) {
+    if !get_approval(&from, &sender) {
         ewasm_api::revert();
     }
     let value = {
@@ -187,7 +187,7 @@ pub fn safe_batch_transfer_from(contract: &Contract) {
     let from: SewUpAddress = copy_into_address(&contract.input_data[16..36]).into();
     let to: SewUpAddress = copy_into_address(&contract.input_data[48..68]).into();
 
-    if !get_approval(&from.inner, &sender.inner) {
+    if !get_approval(&from, &sender) {
         ewasm_api::revert();
     }
 

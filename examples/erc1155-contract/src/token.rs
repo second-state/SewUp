@@ -1,4 +1,4 @@
-use sewup_derive::{ewasm_constructor, ewasm_fn_sig, ewasm_main, ewasm_test};
+use sewup_derive::{ewasm_constructor, ewasm_main, ewasm_test};
 
 #[ewasm_constructor]
 fn constructor() {
@@ -51,7 +51,7 @@ mod tests {
     use super::*;
     use hex_literal::hex;
     use sewup::erc1155::BALANCE_OF_SIG;
-    use sewup_derive::ewasm_assert_eq;
+    use sewup_derive::{ewasm_assert_eq, ewasm_fn_sig};
 
     #[ewasm_test]
     fn test_execute_basic_operations() {
