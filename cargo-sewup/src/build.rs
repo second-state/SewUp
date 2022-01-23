@@ -48,7 +48,7 @@ async fn sewup_version_check() -> Result<()> {
         "Warning: following sewup crates are not in the same version\nCargo Sewup:".to_string();
     let mut warning = false;
     let cargo_sewup_version = env!("CARGO_PKG_VERSION");
-    warning_msg.push_str(&cargo_sewup_version);
+    warning_msg.push_str(cargo_sewup_version);
     warning_msg.push('\n');
 
     if let Some(sewup_version) = sewup_version {
@@ -247,17 +247,15 @@ async fn list_fn_sig() -> Result<Vec<(String, String)>> {
                 .unwrap()
                 .as_str()
                 .replace("u8", "")
-                .split(",")
+                .split(',')
                 .map(|p| p.trim().into())
                 .collect();
-            let sig_hex_str = format!(
-                "{}",
-                sig_values
-                    .iter()
-                    .map(|b| format!("{:02x}", b.parse::<u8>().unwrap()))
-                    .collect::<Vec<_>>()
-                    .join("")
-            );
+            let sig_hex_str = sig_values
+                .iter()
+                .map(|b| format!("{:02x}", b.parse::<u8>().unwrap()))
+                .collect::<Vec<_>>()
+                .join("");
+
             (sig_name.into(), sig_hex_str)
         })
         .collect();
@@ -320,14 +318,11 @@ async fn build(debug: bool, contract_name: &str) -> Result<String> {
         .as_slice()
         .try_into()
         .expect("hash size unexpected");
-    let hex_str = format!(
-        "{}",
-        hash.to_vec()
-            .iter()
-            .map(|b| format!("{:02x}", *b))
-            .collect::<Vec<_>>()
-            .join("")
-    );
+    let hex_str = hash
+        .iter()
+        .map(|b| format!("{:02x}", *b))
+        .collect::<Vec<_>>()
+        .join("");
     Ok(hex_str)
 }
 
@@ -373,10 +368,10 @@ cargo-sewup = "{}"
             );
             for (fn_name, fn_sig) in fn_sigs {
                 meta_content = meta_content + &fn_name;
-                meta_content = meta_content + r#" = ""#;
+                meta_content += r#" = ""#;
                 meta_content = meta_content + &fn_sig;
-                meta_content = meta_content + r#"""#;
-                meta_content = meta_content + "\n";
+                meta_content += r#"""#;
+                meta_content += "\n";
             }
             write(meta_path, meta_content).await?;
         }
