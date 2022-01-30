@@ -38,6 +38,7 @@ async fn main() -> Result<()> {
     let person = Person {
         trusted: true,
         age: 18,
+        location_id: None,
     };
     let create_input = person::protocol(person.clone());
     let mut input = ewasm_input!(create_input for person::create);

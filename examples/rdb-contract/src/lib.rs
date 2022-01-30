@@ -109,6 +109,20 @@ fn get_post_author(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> 
     Ok(sewup::primitives::EwasmAny::from(owner))
 }
 
+#[ewasm_fn]
+fn get_home(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
+    let table = sewup::rdb::Db::load(None)?.table::<Person>()?;
+    let person = table.get_record(input.id)?;
+
+    // ( Person <- 1 or None --- many -> Location )
+    // use relationship to get the post owner
+    let home = person.location()?;
+
+    // This is an example show output not wrapped into protocol,
+    // just return instance itself
+    Ok(sewup::primitives::EwasmAny::from(home))
+}
+
 #[ewasm_main(auto)]
 fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
     use sewup_derive::{ewasm_fn_sig, ewasm_input_from};
@@ -131,6 +145,7 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
             check_version_and_features(0, vec![sewup::rdb::Feature::Default])
         }
         ewasm_fn_sig!(get_post_author) => ewasm_input_from!(contract move get_post_author),
+        ewasm_fn_sig!(get_home) => ewasm_input_from!(contract move get_home),
         ewasm_fn_sig!(get_children) => get_children(),
         ewasm_fn_sig!(check_tables) => check_tables(),
         ewasm_fn_sig!(drop_person_table) => drop_person_table(),
@@ -155,6 +170,7 @@ mod tests {
         let person = Person {
             trusted: true,
             age: 18,
+            location_id: None,
         };
 
         let mut create_input = person::protocol(person.clone());
@@ -182,6 +198,7 @@ mod tests {
         let child = Person {
             trusted: false,
             age: 9,
+            location_id: None,
         };
 
         create_input = person::protocol(child.clone());
@@ -195,6 +212,7 @@ mod tests {
         let older_person = Person {
             trusted: true,
             age: 20,
+            location_id: None,
         };
         let mut update_input = person::protocol(older_person.clone());
         update_input.set_id(1);
@@ -214,6 +232,7 @@ mod tests {
         // and other fields will be None
         expect_output = vec![(1, older_person)].into();
         expect_output.records[0].trusted = None;
+        expect_output.records[0].location_id = None;
         ewasm_auto_assert_eq!(person::get(person_query_protocol), expect_output);
 
         // Get the children by the customized handler
@@ -245,6 +264,7 @@ mod tests {
             let person = Person {
                 trusted: true,
                 age: i as u8,
+                location_id: None,
             };
 
             let create_input = person::protocol(person.clone());
@@ -271,6 +291,7 @@ mod tests {
         let person = Person {
             trusted: true,
             age: 1,
+            location_id: None,
         };
 
         let create_input = person::protocol(person.clone());
@@ -318,6 +339,7 @@ mod tests {
         let person = Person {
             trusted: true,
             age: 1,
+            location_id: None,
         };
 
         let create_input = person::protocol(person.clone());
@@ -337,6 +359,7 @@ mod tests {
         let person = Person {
             trusted: true,
             age: 1,
+            location_id: None,
         };
 
         let create_input = person::protocol(person.clone());
