@@ -114,8 +114,12 @@ fn get_home(input: Input) -> anyhow::Result<sewup::primitives::EwasmAny> {
     let table = sewup::rdb::Db::load(None)?.table::<Person>()?;
     let person = table.get_record(input.id)?;
 
+    // let t = sewup::rdb::Db::load(None)?.table::<Location>()?;
+    // let home = t.get_record(input.id)?;
+    // Ok(sewup::primitives::EwasmAny::from(home))
+
     // ( Person <- 1 or None --- many -> Location )
-    // use relationship to get the post owner
+    // use relationship to get the home of owner
     let home = person.location()?;
 
     // This is an example show output not wrapped into protocol,
@@ -284,6 +288,52 @@ mod tests {
         ewasm_assert_ok!(check_tables());
         ewasm_assert_ok!(drop_person_table());
         ewasm_assert_ok!(check_tables_again());
+    }
+
+    #[ewasm_test]
+    fn test_one_or_none_relation() {
+        ewasm_assert_ok!(add_address_table());
+
+        let location = Location {
+            address: Raw::from("Utopia"),
+        };
+
+        let create_input = location::protocol(location.clone());
+        let mut location_expect_output = create_input.clone();
+        location_expect_output.set_id(1);
+        ewasm_auto_assert_eq!(location::create(create_input), location_expect_output);
+
+        let mut get_input: location::Protocol = Location::default().into();
+        get_input.set_id(1);
+        ewasm_auto_assert_eq!(location::get(get_input), location_expect_output);
+
+        let mut person = Person {
+            trusted: true,
+            age: 1,
+            location_id: Some(1),
+        };
+
+        let mut create_input = person::protocol(person.clone());
+        let mut expect_output = create_input.clone();
+        expect_output.set_id(1);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        let mut may_home = Some(location);
+        ewasm_auto_assert_eq!(get_home(Input { id: 1 }), may_home);
+
+        person = Person {
+            trusted: false,
+            age: 1,
+            location_id: None,
+        };
+
+        create_input = person::protocol(person.clone());
+        expect_output = create_input.clone();
+        expect_output.set_id(2);
+        ewasm_auto_assert_eq!(person::create(create_input), expect_output);
+
+        may_home = None;
+        ewasm_auto_assert_eq!(get_home(Input { id: 2 }), may_home);
     }
 
     #[ewasm_test]

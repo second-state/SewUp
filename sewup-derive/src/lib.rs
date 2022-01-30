@@ -1284,11 +1284,15 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
         output += &quote! {
             impl #struct_name {
                 pub fn #lower_parent_table_ident (&self) -> sewup::Result<Option<#parent_table>> {
-                    let id: usize = sewup::utils::get_field_by_name(self, #field_name);
+                    let id: Option<usize> = sewup::utils::get_field_by_name(self, #field_name);
                     let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
-                    match parent_table.get_record(id) {
-                        Ok(r) => Ok(Some(r)),
-                        Err(_) => Ok(None)
+                    if let Some(id) = id {
+                        match parent_table.get_record(id) {
+                            Ok(r) => Ok(Some(r)),
+                            Err(e) => Err(e)
+                        }
+                    } else {
+                        Ok(None)
                     }
                 }
             }
