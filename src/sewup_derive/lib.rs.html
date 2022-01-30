@@ -1739,6 +1739,43 @@
 <span id="1738">1738</span>
 <span id="1739">1739</span>
 <span id="1740">1740</span>
+<span id="1741">1741</span>
+<span id="1742">1742</span>
+<span id="1743">1743</span>
+<span id="1744">1744</span>
+<span id="1745">1745</span>
+<span id="1746">1746</span>
+<span id="1747">1747</span>
+<span id="1748">1748</span>
+<span id="1749">1749</span>
+<span id="1750">1750</span>
+<span id="1751">1751</span>
+<span id="1752">1752</span>
+<span id="1753">1753</span>
+<span id="1754">1754</span>
+<span id="1755">1755</span>
+<span id="1756">1756</span>
+<span id="1757">1757</span>
+<span id="1758">1758</span>
+<span id="1759">1759</span>
+<span id="1760">1760</span>
+<span id="1761">1761</span>
+<span id="1762">1762</span>
+<span id="1763">1763</span>
+<span id="1764">1764</span>
+<span id="1765">1765</span>
+<span id="1766">1766</span>
+<span id="1767">1767</span>
+<span id="1768">1768</span>
+<span id="1769">1769</span>
+<span id="1770">1770</span>
+<span id="1771">1771</span>
+<span id="1772">1772</span>
+<span id="1773">1773</span>
+<span id="1774">1774</span>
+<span id="1775">1775</span>
+<span id="1776">1776</span>
+<span id="1777">1777</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -2684,6 +2721,7 @@
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="macro">syn::parse_macro_input!</span>(<span class="ident">item</span> <span class="kw">as</span> <span class="ident">syn::DeriveInput</span>);
     <span class="kw">let</span> <span class="ident">attrs</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">input</span>.<span class="ident">attrs</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">belongs_to</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">belongs_none_or</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
     <span class="kw">for</span> <span class="ident">a</span> <span class="kw">in</span> <span class="ident">attrs</span>.<span class="ident">iter</span>() {
         <span class="kw">let</span> <span class="ident">syn::Attribute</span> { <span class="ident">path</span>, <span class="ident">tokens</span>, .. } <span class="op">=</span> <span class="ident">a</span>;
         <span class="kw">let</span> <span class="ident">attr_name</span> <span class="op">=</span> <span class="ident">path</span>.<span class="ident">segments</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">s</span>.<span class="ident">ident</span>.<span class="ident">to_string</span>());
@@ -2695,6 +2733,17 @@
                     .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_to(table_name)] is not correct&quot;</span>)
                     .<span class="ident">strip_suffix</span>(<span class="string">&#39;)&#39;</span>)
                     .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_to(table_name)] is not correct&quot;</span>)
+                    .<span class="ident">to_string</span>(),
+            );
+        }
+        <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="string">&quot;belongs_none_or&quot;</span>.<span class="ident">to_string</span>()) <span class="op">==</span> <span class="ident">attr_name</span> {
+            <span class="ident">belongs_none_or</span> <span class="op">=</span> <span class="prelude-val">Some</span>(
+                <span class="ident">tokens</span>
+                    .<span class="ident">to_string</span>()
+                    .<span class="ident">strip_prefix</span>(<span class="string">&#39;(&#39;</span>)
+                    .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_none_or(table_name)] is not correct&quot;</span>)
+                    .<span class="ident">strip_suffix</span>(<span class="string">&#39;)&#39;</span>)
+                    .<span class="ident">expect</span>(<span class="string">&quot;#[belongs_none_or(table_name)] is not correct&quot;</span>)
                     .<span class="ident">to_string</span>(),
             );
         }
@@ -2998,6 +3047,31 @@
                     <span class="kw">let</span> <span class="ident">id</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="ident">sewup::utils::get_field_by_name</span>(<span class="self">self</span>, #<span class="ident">field_name</span>);
                     <span class="kw">let</span> <span class="ident">parent_table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span>#<span class="ident">parent_table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
                     <span class="ident">parent_table</span>.<span class="ident">get_record</span>(<span class="ident">id</span>)
+                }
+            }
+        }
+        .<span class="ident">to_string</span>();
+    }
+
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">parent_table</span>) <span class="op">=</span> <span class="ident">belongs_none_or</span> {
+        <span class="kw">let</span> <span class="ident">lower_parent_table</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">parent_table</span>).<span class="ident">to_ascii_lowercase</span>();
+        <span class="kw">let</span> <span class="ident">parent_table</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">parent_table</span>, <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">lower_parent_table_ident</span> <span class="op">=</span> <span class="ident">Ident::new</span>(<span class="kw-2">&amp;</span><span class="ident">lower_parent_table</span>, <span class="ident">Span::call_site</span>());
+        <span class="kw">let</span> <span class="ident">field_name</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}_id&quot;</span>, <span class="ident">lower_parent_table</span>);
+
+        <span class="ident">output</span> <span class="op">+</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="macro">quote!</span> {
+            <span class="kw">impl</span> #<span class="ident">struct_name</span> {
+                <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">lower_parent_table_ident</span> (<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">sewup::Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span>#<span class="ident">parent_table</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">sewup::utils::get_field_by_name</span>(<span class="self">self</span>, #<span class="ident">field_name</span>);
+                    <span class="kw">let</span> <span class="ident">parent_table</span> <span class="op">=</span> <span class="ident">sewup::rdb::Db::load</span>(<span class="prelude-val">None</span>)<span class="question-mark">?</span>.<span class="ident">table</span>::<span class="op">&lt;</span>#<span class="ident">parent_table</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">id</span> {
+                        <span class="kw">match</span> <span class="ident">parent_table</span>.<span class="ident">get_record</span>(<span class="ident">id</span>) {
+                            <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">r</span>)),
+                            <span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="prelude-val">Err</span>(<span class="ident">e</span>)
+                        }
+                    } <span class="kw">else</span> {
+                        <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+                    }
                 }
             }
         }
