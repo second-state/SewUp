@@ -34,6 +34,32 @@ async fn check_cargo_toml() -> Result<String> {
             "There should be features following: constructor, constructor-test"
         ));
     }
+    let mut has_profile_error = false;
+    if let Some(profile) = config.profile {
+        if let Some(release) = profile.release {
+            if release.incremental != Some(false)
+                || release.panic != Some("abort".to_string())
+                || release.lto != Some(true)
+                || release.opt_level != Some("z".to_string())
+            {
+                has_profile_error = true;
+            }
+        } else {
+            has_profile_error = true;
+        }
+    } else {
+        has_profile_error = true;
+    }
+    if has_profile_error {
+        return Err(anyhow!(
+            r#"Please provide [profile.release] section as following:
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z""#
+        ));
+    }
 
     Ok(config.package.name.replace("-", "_"))
 }

@@ -44,9 +44,24 @@ pub struct Features {
 }
 
 #[derive(Deserialize)]
+pub struct Release {
+    pub incremental: Option<bool>,
+    pub panic: Option<String>,
+    pub lto: Option<bool>,
+    #[serde(rename(deserialize = "opt-level"))]
+    pub opt_level: Option<String>,
+}
+
+#[derive(Deserialize)]
+pub struct Profile {
+    pub release: Option<Release>,
+}
+
+#[derive(Deserialize)]
 pub struct CargoToml {
     pub package: Package,
     pub features: Option<Features>,
+    pub profile: Option<Profile>,
 }
 
 #[derive(Deserialize)]
