@@ -7,9 +7,11 @@ use sewup_derive::{SizedString, Table};
 // The protocol is easy to build by the `{struct_name}::protocol`, `{struct_name}::Protocol`,
 // please check out the test case in the end of this document
 #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
+#[belongs_none_or(Location)]
 pub struct Person {
     pub trusted: bool,
     pub age: u8,
+    pub location_id: Option<usize>,
 }
 
 #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
