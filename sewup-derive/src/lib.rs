@@ -943,6 +943,7 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::DeriveInput);
     let attrs = &input.attrs;
     let mut belongs_to: Option<String> = None;
+    let mut belongs_none_or: Option<String> = None;
     for a in attrs.iter() {
         let syn::Attribute { path, tokens, .. } = a;
         let attr_name = path.segments.first().map(|s| s.ident.to_string());
@@ -954,6 +955,17 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                     .expect("#[belongs_to(table_name)] is not correct")
                     .strip_suffix(')')
                     .expect("#[belongs_to(table_name)] is not correct")
+                    .to_string(),
+            );
+        }
+        if Some("belongs_none_or".to_string()) == attr_name {
+            belongs_none_or = Some(
+                tokens
+                    .to_string()
+                    .strip_prefix('(')
+                    .expect("#[belongs_none_or(table_name)] is not correct")
+                    .strip_suffix(')')
+                    .expect("#[belongs_none_or(table_name)] is not correct")
                     .to_string(),
             );
         }
@@ -1257,6 +1269,27 @@ pub fn derive_table(item: TokenStream) -> TokenStream {
                     let id: usize = sewup::utils::get_field_by_name(self, #field_name);
                     let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
                     parent_table.get_record(id)
+                }
+            }
+        }
+        .to_string();
+    }
+
+    if let Some(parent_table) = belongs_none_or {
+        let lower_parent_table = &format!("{}", &parent_table).to_ascii_lowercase();
+        let parent_table = Ident::new(&parent_table, Span::call_site());
+        let lower_parent_table_ident = Ident::new(&lower_parent_table, Span::call_site());
+        let field_name = &format!("{}_id", lower_parent_table);
+
+        output += &quote! {
+            impl #struct_name {
+                pub fn #lower_parent_table_ident (&self) -> sewup::Result<Option<#parent_table>> {
+                    let id: usize = sewup::utils::get_field_by_name(self, #field_name);
+                    let parent_table = sewup::rdb::Db::load(None)?.table::<#parent_table>()?;
+                    match parent_table.get_record(id) {
+                        Ok(r) => Ok(Some(r)),
+                        Err(_) => Ok(None)
+                    }
                 }
             }
         }
