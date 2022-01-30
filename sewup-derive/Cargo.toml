@@ -1,6 +1,6 @@
 [package]
 name = "sewup-derive"
-version = "0.1.11"
+version = "0.1.12"
 authors = ["Antonio Yang <yanganto@gmail.com>"]
 edition = "2021"
 description = "Macros implementation for SewUp"

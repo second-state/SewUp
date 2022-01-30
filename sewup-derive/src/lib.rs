@@ -937,6 +937,37 @@ pub fn derive_value(item: TokenStream) -> TokenStream {
 /// let default_person_input: person::Protocol = Person::default().into();
 /// assert!(default_input != default_person_input)
 /// ```
+///
+/// The relation can be set with `#[belongs_to(Person)]` or `#[belongs_none_or(Person)]`
+/// ```compile_fail
+/// #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
+/// #[belongs_none_or(Location)]
+/// pub struct Person {
+///     pub trusted: bool,
+///     pub age: u8,
+///     pub location_id: Option<usize>,
+/// }
+///
+/// #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
+/// #[belongs_to(Person)]
+/// pub struct Post {
+///     pub content: SizedString!(50),
+///
+///     // Currently, this field need to set up manually, this will be enhance later
+///     pub person_id: usize,
+/// }
+///
+/// #[derive(Table, Default, Clone, PartialEq, Serialize, Deserialize)]
+/// pub struct Location {
+///     pub address: Raw,
+/// }
+/// ```
+/// After the directive setup, you can use `table_name.another_table_name` to get the related
+/// instance, for example
+/// ```compile_fail
+/// let person: Person = post.person()?;
+/// let home: Option<Location> = person.location()?;
+/// ```
 #[cfg(feature = "rdb")]
 #[proc_macro_derive(Table, attributes(belongs_to, belongs_none_or))]
 pub fn derive_table(item: TokenStream) -> TokenStream {
