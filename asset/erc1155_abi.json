@@ -8,9 +8,9 @@
         "type": "address"
       },
       {
-        "internalType": "uinit256",
+        "internalType": "uint256",
         "name": "token_id",
-        "type": "uinit256"
+        "type": "uint256"
       }
     ],
     "name": "balanceOf",
@@ -34,9 +34,9 @@
         "type": "address[]"
       },
       {
-        "internalType": "uinit256[]",
+        "internalType": "uint256[]",
         "name": "token_id",
-        "type": "uinit256[]"
+        "type": "uint256[]"
       }
     ],
     "name": "balanceOfBatch",
@@ -106,14 +106,14 @@
         "type": "address"
       },
       {
-        "internalType": "uinit256",
+        "internalType": "uint256",
         "name": "token_id",
-        "type": "uinit256"
+        "type": "uint256"
       },
       {
-        "internalType": "uinit256",
+        "internalType": "uint256",
         "name": "value",
-        "type": "uinit256"
+        "type": "uint256"
       },
       {
         "internalType": "bytes",
@@ -141,14 +141,14 @@
         "type": "address"
       },
       {
-        "internalType": "uinit256[]",
+        "internalType": "uint256[]",
         "name": "token_id",
-        "type": "uinit256[]"
+        "type": "uint256[]"
       },
       {
-        "internalType": "uinit256[]",
+        "internalType": "uint256[]",
         "name": "value",
-        "type": "uinit256[]"
+        "type": "uint256[]"
       },
       {
         "internalType": "bytes",
