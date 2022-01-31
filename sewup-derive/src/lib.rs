@@ -5,6 +5,7 @@ extern crate proc_macro;
 mod function_tests;
 
 use convert_case::{Case::Camel, Casing};
+use fancy_regex::Regex as FancyRegex;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
@@ -282,8 +283,8 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(r#""constant":false,"#)
             }
 
-            if let Some(cap) =
-                unsafe { Regex::new(r"inputs=(?P<inputs>\[[^\[\]]*\])").unwrap_unchecked() }
+            if let Ok(Some(cap)) =
+                unsafe { FancyRegex::new(r#"inputs=(?<inputs>\[.*?\])(?!")"#).unwrap_unchecked() }
                     .captures(&attr_str)
             {
                 json.push_str(r#""inputs":"#);
@@ -309,8 +310,8 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(&format!(r#""name":"{}","#, fn_name.to_case(Camel)));
             }
 
-            if let Some(cap) =
-                unsafe { Regex::new(r"outputs=(?P<outputs>\[[^\[\]]*\])").unwrap_unchecked() }
+            if let Ok(Some(cap)) =
+                unsafe { FancyRegex::new(r#"outputs=(?<outputs>\[.*?\])(?!")"#).unwrap_unchecked() }
                     .captures(&attr_str)
             {
                 json.push_str(r#""outputs":"#);
@@ -392,7 +393,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
 /// constant=true,
 /// inputs=[
 ///     { "internalType": "address", "name": "account", "type": "address" },
-///     { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
+///     { "internalType": "uint256", "name": "token_id", "type": "uint256" }
 /// ],
 /// name=balanceOf,
 /// outputs=[
@@ -554,7 +555,7 @@ pub fn ewasm_constructor(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// constant=true,
 /// inputs=[
 ///     { "internalType": "address", "name": "account", "type": "address" },
-///     { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
+///     { "internalType": "uint256", "name": "token_id", "type": "uint256" }
 /// ],
 /// name=balanceOf,
 /// outputs=[

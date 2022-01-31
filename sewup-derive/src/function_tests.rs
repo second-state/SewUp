@@ -66,6 +66,36 @@ fn test_parse_fn_attr() {
     r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferTo","# +
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
     r#""stateMutability":"nonpayable","type":"function"}"#)));
+
+    assert_eq!(parse_fn_attr("transfer_to_batch".to_string(), r#"
+      xxxxxxxx,
+      inputs=[
+            { "internalType": "address[]", "name": "recipient", "type": "address[]" },
+            { "internalType": "uint256[]", "name": "amount", "type": "uint256[]" }
+      ],
+      outputs=[
+            { "internalType": "bool", "name": "", "type": "bool" }
+      ],
+      stateMutability=nonpayable
+    "#.to_string()), Ok((Some("xxxxxxxx".to_string()),
+    r#"{"constant":false,"inputs":[{"internalType":"address[]","name":"recipient","type":"address[]"},"#.to_owned() +
+    r#"{"internalType":"uint256[]","name":"amount","type":"uint256[]"}],"name":"transferToBatch","# +
+    r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
+    r#""stateMutability":"nonpayable","type":"function"}"#)));
+
+    assert_eq!(parse_fn_attr("transfer_to_batch".to_string(), r#"
+        4e1273f4,
+        constant=true,
+        inputs=[
+            { "internalType": "address[]", "name": "account", "type": "address[]" },
+            { "internalType": "uint256[]", "name": "token_id", "type": "uint256[]" }
+        ],
+        outputs=[{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }]
+    "#.to_string()), Ok((Some("4e1273f4".to_string()),
+    r#"{"constant":true,"inputs":[{"internalType":"address[]","name":"account","type":"address[]"},"#.to_owned() +
+    r#"{"internalType":"uint256[]","name":"token_id","type":"uint256[]"}],"name":"transferToBatch","# +
+    r#""outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"payable":false,"# +
+    r#""stateMutability":"view","type":"function"}"#)));
 }
 
 #[test]
