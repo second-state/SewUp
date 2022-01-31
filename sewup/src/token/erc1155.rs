@@ -35,7 +35,7 @@ pub use super::erc721::{
     constant=true,
     inputs=[
         { "internalType": "address", "name": "account", "type": "address" },
-        { "internalType": "uinit256", "name": "token_id", "type": "uinit256" }
+        { "internalType": "uint256", "name": "token_id", "type": "uint256" }
     ],
     outputs=[{ "internalType": "uint256", "name": "", "type": "uint256" }]
 )]
@@ -53,7 +53,7 @@ pub fn balance_of(contract: &Contract) {
     constant=true,
     inputs=[
         { "internalType": "address[]", "name": "account", "type": "address[]" },
-        { "internalType": "uinit256[]", "name": "token_id", "type": "uinit256[]" }
+        { "internalType": "uint256[]", "name": "token_id", "type": "uint256[]" }
     ],
     outputs=[{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }]
 )]
@@ -135,8 +135,8 @@ fn do_transfer_from(from: &Address, to: &Address, token_id: &[u8; 32], value: Ui
     inputs=[
         { "internalType": "address", "name": "from", "type": "address" },
         { "internalType": "address", "name": "to", "type": "address" },
-        { "internalType": "uinit256", "name": "token_id", "type": "uinit256" },
-        { "internalType": "uinit256", "name": "value", "type": "uinit256" },
+        { "internalType": "uint256", "name": "token_id", "type": "uint256" },
+        { "internalType": "uint256", "name": "value", "type": "uint256" },
         { "internalType": "bytes", "name": "data", "type": "bytes" }
     ]
 )]
@@ -177,8 +177,8 @@ pub fn safe_transfer_from(contract: &Contract) {
     inputs=[
         { "internalType": "address", "name": "from", "type": "address" },
         { "internalType": "address", "name": "to", "type": "address" },
-        { "internalType": "uinit256[]", "name": "token_id", "type": "uinit256[]" },
-        { "internalType": "uinit256[]", "name": "value", "type": "uinit256[]" },
+        { "internalType": "uint256[]", "name": "token_id", "type": "uint256[]" },
+        { "internalType": "uint256[]", "name": "value", "type": "uint256[]" },
         { "internalType": "bytes", "name": "data", "type": "bytes" }
     ]
 )]
