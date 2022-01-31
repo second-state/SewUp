@@ -1807,6 +1807,7 @@
 <span id="1806">1806</span>
 <span id="1807">1807</span>
 <span id="1808">1808</span>
+<span id="1809">1809</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -1814,6 +1815,7 @@
 <span class="kw">mod</span> <span class="ident">function_tests</span>;
 
 <span class="kw">use</span> <span class="ident">convert_case</span>::{<span class="ident">Case::Camel</span>, <span class="ident">Casing</span>};
+<span class="kw">use</span> <span class="ident">fancy_regex::Regex</span> <span class="kw">as</span> <span class="ident">FancyRegex</span>;
 <span class="kw">use</span> <span class="ident">proc_macro::TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::{<span class="ident">Ident</span>, <span class="ident">Span</span>};
 <span class="kw">use</span> <span class="ident">proc_macro_error</span>::{<span class="ident">abort</span>, <span class="ident">abort_call_site</span>, <span class="ident">proc_macro_error</span>};
@@ -2091,8 +2093,8 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;constant&quot;:false,&quot;#</span>)
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
-                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;inputs=(?P&lt;inputs&gt;\[[^\[\]]*\])&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">cap</span>)) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">FancyRegex::new</span>(<span class="string">r#&quot;inputs=(?&lt;inputs&gt;\[.*?\])(?!&quot;)&quot;#</span>).<span class="ident">unwrap_unchecked</span>() }
                     .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;inputs&quot;:&quot;#</span>);
@@ -2118,8 +2120,8 @@
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">r#&quot;&quot;name&quot;:&quot;{}&quot;,&quot;#</span>, <span class="ident">fn_name</span>.<span class="ident">to_case</span>(<span class="ident">Camel</span>)));
             }
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cap</span>) <span class="op">=</span>
-                <span class="kw">unsafe</span> { <span class="ident">Regex::new</span>(<span class="string">r&quot;outputs=(?P&lt;outputs&gt;\[[^\[\]]*\])&quot;</span>).<span class="ident">unwrap_unchecked</span>() }
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">cap</span>)) <span class="op">=</span>
+                <span class="kw">unsafe</span> { <span class="ident">FancyRegex::new</span>(<span class="string">r#&quot;outputs=(?&lt;outputs&gt;\[.*?\])(?!&quot;)&quot;#</span>).<span class="ident">unwrap_unchecked</span>() }
                     .<span class="ident">captures</span>(<span class="kw-2">&amp;</span><span class="ident">attr_str</span>)
             {
                 <span class="ident">json</span>.<span class="ident">push_str</span>(<span class="string">r#&quot;&quot;outputs&quot;:&quot;#</span>);
@@ -2201,7 +2203,7 @@
 <span class="doccomment">/// constant=true,</span>
 <span class="doccomment">/// inputs=[</span>
 <span class="doccomment">///     { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;account&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///     { &quot;internalType&quot;: &quot;uinit256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uinit256&quot; }</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
 <span class="doccomment">/// ],</span>
 <span class="doccomment">/// name=balanceOf,</span>
 <span class="doccomment">/// outputs=[</span>
@@ -2363,7 +2365,7 @@
 <span class="doccomment">/// constant=true,</span>
 <span class="doccomment">/// inputs=[</span>
 <span class="doccomment">///     { &quot;internalType&quot;: &quot;address&quot;, &quot;name&quot;: &quot;account&quot;, &quot;type&quot;: &quot;address&quot; },</span>
-<span class="doccomment">///     { &quot;internalType&quot;: &quot;uinit256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uinit256&quot; }</span>
+<span class="doccomment">///     { &quot;internalType&quot;: &quot;uint256&quot;, &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;uint256&quot; }</span>
 <span class="doccomment">/// ],</span>
 <span class="doccomment">/// name=balanceOf,</span>
 <span class="doccomment">/// outputs=[</span>
