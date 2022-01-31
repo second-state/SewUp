@@ -13,6 +13,7 @@ proc-macro = true
 
 [dependencies]
 regex = "1"
+fancy-regex = "0.7.1"
 tiny-keccak = { version = "2.0.2", features = ["keccak"] }
 proc-macro2 = "1.0.27"
 proc-macro-error = "1.0.4"
