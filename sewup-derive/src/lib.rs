@@ -424,7 +424,8 @@ fn parse_fn_attr(
 /// The functional signature can be specific as following ways.
 /// `#[ewasm_fn(00fdd58e)]` or #[ewasm_fn("00fdd58e")]
 ///
-/// ``` #[ewasm_fn(00fdd58e,
+/// ```compile_fail
+/// #[ewasm_fn(00fdd58e,
 /// constant=true,
 /// inputs=[
 ///     { "internalType": "address", "name": "account", "type": "address" },
@@ -443,6 +444,14 @@ fn parse_fn_attr(
 /// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the
 /// camel case style of the function name.
 ///
+/// The handler also can be restricted by called special account with `only_by` attribute,
+/// following are examples:
+/// ```compile_fail
+/// #[ewasm_fn(only_by=8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+/// #[ewasm_fn(only_by="0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+/// #[ewasm_fn(only_by=0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+/// #[ewasm_fn(only_by="8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+/// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
