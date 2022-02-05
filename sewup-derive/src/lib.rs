@@ -265,23 +265,24 @@ fn parse_fn_attr(
     attr: String,
 ) -> Result<(Option<String>, String, Option<String>), &'static str> {
     let attr_str = attr.replace(" ", "").replace("\n", "");
-    let mut root_str: Option<String> = None;
-    let (hex_str, abi_str) = if attr_str.is_empty() {
-        (None, "{}".into())
+    return if attr_str.is_empty() {
+        Ok((None, "{}".into(), None))
     } else if let Some((head, tail)) = attr_str.split_once(',') {
         if tail.is_empty() {
-            (Some(head.replace("\"", "")), "{}".into())
+            Ok((Some(head.replace("\"", "")), "{}".into(), None))
         } else {
-            if let Ok(Some(cap)) =
+            let root_str = if let Ok(Some(cap)) =
                 unsafe { Regex::new(r"only_by=(?P<account>[^,]*)").unwrap_unchecked() }
                     .captures(&attr_str)
             {
-                root_str = Some(
+                Some(
                     unsafe { cap.name("account").unwrap_unchecked() }
                         .as_str()
                         .into(),
-                );
-            }
+                )
+            } else {
+                None
+            };
 
             let mut json = "{".to_string();
             if let Ok(Some(cap)) =
@@ -373,12 +374,27 @@ fn parse_fn_attr(
             }
 
             json.push_str(r#""type":"function"}"#);
-            (Some(head.replace("\"", "")), json)
+            if head.starts_with("only_by") {
+                Ok((None, json, root_str))
+            } else {
+                Ok((Some(head.replace("\"", "")), json, root_str))
+            }
         }
+    } else if let Ok(Some(cap)) =
+        unsafe { Regex::new(r"only_by=(?P<account>[^,]*)").unwrap_unchecked() }.captures(&attr_str)
+    {
+        Ok((
+            None,
+            "{}".into(),
+            Some(
+                unsafe { cap.name("account").unwrap_unchecked() }
+                    .as_str()
+                    .into(),
+            ),
+        ))
     } else {
-        (Some(attr_str.replace("\"", "")), "{}".into())
+        Ok((Some(attr_str.replace("\"", "")), "{}".into(), None))
     };
-    Ok((hex_str, abi_str, root_str))
 }
 
 /// helps you to build your handlers in the contract
@@ -504,6 +520,7 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         Span::call_site(),
     );
     let result = if let Some(root_str) = root_str {
+        let addr = root_str.replace("\"", "");
         quote! {
             pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
             pub(crate) const #abi_info: &'static str = #abi_str;
@@ -512,7 +529,7 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
             #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
             #(#attrs)*
             #vis #sig {
-                if sewup::utils::caller() != sewup::types::Address::from_str(#root_str)? {
+                if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
                     return Err(sewup::errors::HandlerError::Unauthorized.into())
                 }
                 #(#stmts)*
