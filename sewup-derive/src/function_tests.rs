@@ -14,19 +14,19 @@ fn test_parse_fn_attr() {
     // without attr
     assert_eq!(
         parse_fn_attr("".to_string(), "".to_string()),
-        Ok((None, "{}".to_string()))
+        Ok((None, "{}".to_string(), None))
     );
 
     // with hex attr only
     assert_eq!(
         parse_fn_attr("".to_string(), "a9059cbb".to_string()),
-        Ok((Some("a9059cbb".to_string()), "{}".to_string()))
+        Ok((Some("a9059cbb".to_string()), "{}".to_string(), None))
     );
 
     // with hex attr only
     assert_eq!(
         parse_fn_attr("".to_string(), "a9059cbb, ".to_string()),
-        Ok((Some("a9059cbb".to_string()), "{}".to_string()))
+        Ok((Some("a9059cbb".to_string()), "{}".to_string(), None))
     );
 
     // with hex attr and full abijson
@@ -48,7 +48,7 @@ fn test_parse_fn_attr() {
     r#"{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},"#.to_owned() +
     r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transfer","# +
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
-    r#""stateMutability":"nonpayable","type":"function"}"#)));
+    r#""stateMutability":"nonpayable","type":"function"}"#, None)));
 
     // with hex attr and full abijson
     assert_eq!(parse_fn_attr("transfer_to".to_string(), r#"
@@ -65,7 +65,7 @@ fn test_parse_fn_attr() {
     r#"{"constant":false,"inputs":[{"internalType":"address","name":"recipient","type":"address"},"#.to_owned() +
     r#"{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"transferTo","# +
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
-    r#""stateMutability":"nonpayable","type":"function"}"#)));
+    r#""stateMutability":"nonpayable","type":"function"}"#, None)));
 
     assert_eq!(parse_fn_attr("transfer_to_batch".to_string(), r#"
       xxxxxxxx,
@@ -81,7 +81,7 @@ fn test_parse_fn_attr() {
     r#"{"constant":false,"inputs":[{"internalType":"address[]","name":"recipient","type":"address[]"},"#.to_owned() +
     r#"{"internalType":"uint256[]","name":"amount","type":"uint256[]"}],"name":"transferToBatch","# +
     r#""outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"# +
-    r#""stateMutability":"nonpayable","type":"function"}"#)));
+    r#""stateMutability":"nonpayable","type":"function"}"#, None)));
 
     assert_eq!(parse_fn_attr("transfer_to_batch".to_string(), r#"
         4e1273f4,
@@ -95,7 +95,7 @@ fn test_parse_fn_attr() {
     r#"{"constant":true,"inputs":[{"internalType":"address[]","name":"account","type":"address[]"},"#.to_owned() +
     r#"{"internalType":"uint256[]","name":"token_id","type":"uint256[]"}],"name":"transferToBatch","# +
     r#""outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"payable":false,"# +
-    r#""stateMutability":"view","type":"function"}"#)));
+    r#""stateMutability":"view","type":"function"}"#, None)));
 }
 
 #[test]

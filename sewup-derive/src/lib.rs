@@ -260,14 +260,29 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, String), &'static str> {
+fn parse_fn_attr(
+    fn_name: String,
+    attr: String,
+) -> Result<(Option<String>, String, Option<String>), &'static str> {
     let attr_str = attr.replace(" ", "").replace("\n", "");
-    return if attr_str.is_empty() {
-        Ok((None, "{}".into()))
+    let mut root_str: Option<String> = None;
+    let (hex_str, abi_str) = if attr_str.is_empty() {
+        (None, "{}".into())
     } else if let Some((head, tail)) = attr_str.split_once(',') {
         if tail.is_empty() {
-            Ok((Some(head.replace("\"", "")), "{}".into()))
+            (Some(head.replace("\"", "")), "{}".into())
         } else {
+            if let Ok(Some(cap)) =
+                unsafe { Regex::new(r"only_by=(?P<account>[^,]*)").unwrap_unchecked() }
+                    .captures(&attr_str)
+            {
+                root_str = Some(
+                    unsafe { cap.name("account").unwrap_unchecked() }
+                        .as_str()
+                        .into(),
+                );
+            }
+
             let mut json = "{".to_string();
             if let Ok(Some(cap)) =
                 unsafe { Regex::new(r"constant=(?P<constant>[^,]*)").unwrap_unchecked() }
@@ -358,11 +373,12 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
             }
 
             json.push_str(r#""type":"function"}"#);
-            Ok((Some(head.replace("\"", "")), json))
+            (Some(head.replace("\"", "")), json)
         }
     } else {
-        Ok((Some(attr_str.replace("\"", "")), "{}".into()))
+        (Some(attr_str.replace("\"", "")), "{}".into())
     };
+    Ok((hex_str, abi_str, root_str))
 }
 
 /// helps you to build your handlers in the contract
@@ -414,16 +430,22 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let name = &input.sig.ident;
+    let syn::ItemFn {
+        attrs,
+        vis,
+        sig,
+        block,
+    } = syn::parse_macro_input!(item as syn::ItemFn);
+    let syn::Block { stmts, .. } = *block;
 
-    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
+    let name = &sig.ident;
+
+    let (hex_str, abi_str, root_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
 
-    let args = &input
-        .sig
+    let args = &sig
         .inputs
         .iter()
         .map(|fn_arg| match fn_arg {
@@ -481,13 +503,33 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
-    let result = quote! {
-        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
-        pub(crate) const #abi_info: &'static str = #abi_str;
+    let result = if let Some(root_str) = root_str {
+        quote! {
+            pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+            pub(crate) const #abi_info: &'static str = #abi_str;
 
-        #[cfg(target_arch = "wasm32")]
-        #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
-        #input
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #(#attrs)*
+            #vis #sig {
+                if sewup::utils::caller() != sewup::types::Address::from_str(#root_str)? {
+                    return Err(sewup::errors::HandlerError::Unauthorized.into())
+                }
+                #(#stmts)*
+            }
+        }
+    } else {
+        quote! {
+            pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+            pub(crate) const #abi_info: &'static str = #abi_str;
+
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #(#attrs)*
+            #vis #sig {
+                #(#stmts)*
+            }
+        }
     };
     result.into()
 }
@@ -579,7 +621,7 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
 
-    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
+    let (hex_str, abi_str, _root_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
