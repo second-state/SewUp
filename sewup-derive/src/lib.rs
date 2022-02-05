@@ -5,12 +5,11 @@ extern crate proc_macro;
 mod function_tests;
 
 use convert_case::{Case::Camel, Casing};
-use fancy_regex::Regex as FancyRegex;
+use fancy_regex::Regex;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
 use proc_macro_error::{abort, abort_call_site, proc_macro_error};
 use quote::quote;
-use regex::Regex;
 use serde_derive::Deserialize;
 use tiny_keccak::{Hasher, Keccak};
 
@@ -37,7 +36,7 @@ fn get_function_signature(function_prototype: &str) -> [u8; 4] {
 
 fn write_function_signature(sig_str: &str) -> String {
     let re = unsafe { Regex::new(r"^(?P<name>[^(]+?)\((?P<params>[^)]*?)\)").unwrap_unchecked() };
-    if let Some(cap) = re.captures(sig_str) {
+    if let Ok(Some(cap)) = re.captures(sig_str) {
         let fn_name = unsafe { cap.name("name").unwrap_unchecked() }.as_str();
         let params = unsafe { cap.name("params").unwrap_unchecked() }
             .as_str()
@@ -270,7 +269,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
             Ok((Some(head.replace("\"", "")), "{}".into()))
         } else {
             let mut json = "{".to_string();
-            if let Some(cap) =
+            if let Ok(Some(cap)) =
                 unsafe { Regex::new(r"constant=(?P<constant>[^,]*)").unwrap_unchecked() }
                     .captures(&attr_str)
             {
@@ -284,14 +283,16 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
             }
 
             if let Ok(Some(cap)) =
-                unsafe { FancyRegex::new(r#"inputs=(?<inputs>\[.*?\])(?!")"#).unwrap_unchecked() }
+                unsafe { Regex::new(r#"inputs=(?<inputs>\[.*?\])(?!")"#).unwrap_unchecked() }
                     .captures(&attr_str)
             {
                 json.push_str(r#""inputs":"#);
                 let inputs_str = unsafe { cap.name("inputs").unwrap_unchecked() }.as_str();
-                for input_cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(inputs_str) {
-                    if serde_json::from_str::<AbiIO>(input_cap.as_str()).is_err() {
-                        return Err("inputs are not valid format");
+                for cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(inputs_str) {
+                    if let Ok(input_cap) = cap {
+                        if serde_json::from_str::<AbiIO>(input_cap.as_str()).is_err() {
+                            return Err("inputs are not valid format");
+                        }
                     }
                 }
                 json.push_str(inputs_str);
@@ -300,7 +301,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(r#""inputs":[],"#);
             }
 
-            if let Some(cap) = unsafe { Regex::new(r"name=(?P<name>[^,]*)").unwrap_unchecked() }
+            if let Ok(Some(cap)) = unsafe { Regex::new(r"name=(?P<name>[^,]*)").unwrap_unchecked() }
                 .captures(&attr_str)
             {
                 json.push_str(r#""name":""#);
@@ -311,14 +312,16 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
             }
 
             if let Ok(Some(cap)) =
-                unsafe { FancyRegex::new(r#"outputs=(?<outputs>\[.*?\])(?!")"#).unwrap_unchecked() }
+                unsafe { Regex::new(r#"outputs=(?<outputs>\[.*?\])(?!")"#).unwrap_unchecked() }
                     .captures(&attr_str)
             {
                 json.push_str(r#""outputs":"#);
                 let outputs_str = unsafe { cap.name("outputs").unwrap_unchecked() }.as_str();
-                for output_cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(outputs_str) {
-                    if serde_json::from_str::<AbiIO>(output_cap.as_str()).is_err() {
-                        return Err("outputs are not valid format");
+                for cap in Regex::new(r"\{[^\{\}]*\}").unwrap().find_iter(outputs_str) {
+                    if let Ok(output_cap) = cap {
+                        if serde_json::from_str::<AbiIO>(output_cap.as_str()).is_err() {
+                            return Err("outputs are not valid format");
+                        }
                     }
                 }
                 json.push_str(outputs_str);
@@ -327,7 +330,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(r#""outputs":[],"#);
             }
 
-            if let Some(cap) =
+            if let Ok(Some(cap)) =
                 unsafe { Regex::new(r"payable=(?P<payable>[^,]*)").unwrap_unchecked() }
                     .captures(&attr_str)
             {
@@ -340,7 +343,7 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
                 json.push_str(r#""payable":false,"#);
             }
 
-            if let Some(cap) = unsafe {
+            if let Ok(Some(cap)) = unsafe {
                 Regex::new(r"stateMutability=(?P<stateMutability>[^,]*)").unwrap_unchecked()
             }
             .captures(&attr_str)
@@ -721,7 +724,7 @@ pub fn ewasm_fn_sig(item: TokenStream) -> TokenStream {
 #[proc_macro]
 pub fn ewasm_input(item: TokenStream) -> TokenStream {
     let re = unsafe { Regex::new(r"(?P<instance>.*)\s+for\s+(?P<sig>.*)").unwrap_unchecked() };
-    if let Some(cap) = re.captures(&item.to_string()) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string()) {
         let sig = unsafe { cap.name("sig").unwrap_unchecked() }.as_str();
         let instance = unsafe { cap.name("instance").unwrap_unchecked() }.as_str();
         let output = if instance == "None" {
@@ -780,7 +783,7 @@ pub fn ewasm_input_from(item: TokenStream) -> TokenStream {
         Regex::new(r"^(?P<contract>\w+)\s+move\s+(?P<name>[^,]+),?(?P<error_handler>.*)")
             .unwrap_unchecked()
     };
-    if let Some(cap) = re.captures(&item.to_string()) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string()) {
         let contract = Ident::new(
             unsafe { cap.name("contract").unwrap_unchecked() }.as_str(),
             Span::call_site(),
@@ -1372,7 +1375,9 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
         Regex::new(r"^fn (?P<fn_name>[^\(\s]*)(?P<to_first_bracket>[^\{]*\{)").unwrap_unchecked()
     };
     let context = item.to_string();
-    if mod_re.captures(&context).is_some() {
+    let mod_captures = mod_re.captures(&context).unwrap();
+    let fn_captures = fn_re.captures(&context).unwrap();
+    if mod_captures.is_some() {
         let attr_str = attr.to_string().replace(" ", "");
         let runtime_log_option = if attr_str.is_empty() {
             "".to_string()
@@ -1490,7 +1495,7 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
             .to_string()
             .parse()
             .unwrap();
-    } else if fn_re.captures(&context).is_some() {
+    } else if fn_captures.is_some() {
         let attr_str = attr.to_string().replace(" ", "");
         if !attr_str.is_empty() {
             abort_call_site!("no support option when wrapping on function")
@@ -1535,7 +1540,7 @@ pub fn ewasm_assert_eq(item: TokenStream) -> TokenStream {
     let re = unsafe {
         Regex::new(r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*,(?P<equivalence>.*)"#).unwrap_unchecked()
     };
-    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = unsafe { cap.name("fn_name").unwrap_unchecked() }
             .as_str()
             .replace(" ", "");
@@ -1579,7 +1584,7 @@ pub fn ewasm_auto_assert_eq(item: TokenStream) -> TokenStream {
     let re = unsafe {
         Regex::new(r#"^(?P<fn_name>[^(]+?)\((?P<params>[^)]*?)\)\s*(by)?\s*(?P<caller>"[^"]*")?\s*,(?P<equivalence>.*)"#).unwrap_unchecked()
     };
-    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = unsafe { cap.name("fn_name").unwrap_unchecked() }.as_str();
         let params = unsafe { cap.name("params").unwrap_unchecked() }
             .as_str()
@@ -1637,7 +1642,7 @@ pub fn ewasm_assert_ok(item: TokenStream) -> TokenStream {
         )
         .unwrap_unchecked()
     };
-    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = unsafe { cap.name("fn_name").unwrap_unchecked() }.as_str();
         let params = unsafe { cap.name("params").unwrap_unchecked() }
             .as_str()
@@ -1681,7 +1686,7 @@ pub fn ewasm_rusty_assert_ok(item: TokenStream) -> TokenStream {
         )
         .unwrap_unchecked()
     };
-    if let Some(cap) = re.captures(&item.to_string().replace("\n", "")) {
+    if let Ok(Some(cap)) = re.captures(&item.to_string().replace("\n", "")) {
         let fn_name = unsafe { cap.name("fn_name").unwrap_unchecked() }.as_str();
         let params = unsafe { cap.name("params").unwrap_unchecked() }
             .as_str()
