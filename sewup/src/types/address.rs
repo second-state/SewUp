@@ -10,15 +10,22 @@ pub use ewasm_api::types::{Address as EwasmAddress, Bytes20};
 #[cfg(target_arch = "wasm32")]
 use crate::types::Raw;
 
+/// Address is a 20 bytes binary, you can build a Address with hex string easily.
+/// ```
+/// use std::str::FromStr;
+/// let address = sewup::types::Address::from_str("8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
+/// let same_address = sewup::types::Address::from_str("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
+/// assert!(address == same_address);
+/// ```
 #[cfg(not(target_arch = "wasm32"))]
 #[cfg_attr(any(feature = "debug", test), derive(Debug))]
 #[derive(Clone, PartialEq, Default)]
-pub struct AddressType {
+pub struct Address {
     pub inner: [u8; 20],
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-impl Serialize for AddressType {
+impl Serialize for Address {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -62,12 +69,12 @@ impl Serialize for AddressType {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-impl<'de> Deserialize<'de> for AddressType {
+impl<'de> Deserialize<'de> for Address {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        Deserialize::deserialize(deserializer).map(|bytes: [u8; 32]| AddressType {
+        Deserialize::deserialize(deserializer).map(|bytes: [u8; 32]| Address {
             inner: [
                 bytes[12], bytes[13], bytes[14], bytes[15], bytes[16], bytes[17], bytes[18],
                 bytes[19], bytes[20], bytes[21], bytes[22], bytes[23], bytes[24], bytes[25],
@@ -79,43 +86,34 @@ impl<'de> Deserialize<'de> for AddressType {
 
 #[cfg(target_arch = "wasm32")]
 #[derive(Clone, PartialEq)]
-pub struct AddressType {
+pub struct Address {
     pub(crate) inner: EwasmAddress,
 }
 
 #[cfg(target_arch = "wasm32")]
-impl Default for AddressType {
+impl Default for Address {
     fn default() -> Self {
         Self::from_str("0x0000000000000000000000000000000000000000").unwrap()
     }
 }
 
 #[cfg(target_arch = "wasm32")]
-impl std::fmt::Debug for AddressType {
+impl std::fmt::Debug for Address {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let bytes = self.inner.bytes;
         f.debug_struct("Address").field("inner", &bytes).finish()
     }
 }
 
-/// Address is a 20 bytes binary, you can build a Address with hex string easily.
-/// ```
-/// use std::str::FromStr;
-/// let address = sewup::types::Address::from_str("8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
-/// let same_address = sewup::types::Address::from_str("0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993").unwrap();
-/// assert!(address == same_address);
-/// ```
-pub type Address = AddressType;
-
 #[cfg(target_arch = "wasm32")]
-impl From<EwasmAddress> for AddressType {
+impl From<EwasmAddress> for Address {
     fn from(inner: EwasmAddress) -> Self {
         Self { inner }
     }
 }
 
 #[cfg(target_arch = "wasm32")]
-impl From<[u8; 20]> for AddressType {
+impl From<[u8; 20]> for Address {
     fn from(bytes: [u8; 20]) -> Self {
         Self {
             inner: ewasm_api::types::Address::from(bytes),
@@ -124,7 +122,7 @@ impl From<[u8; 20]> for AddressType {
 }
 
 #[cfg(target_arch = "wasm32")]
-impl Serialize for AddressType {
+impl Serialize for Address {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -135,7 +133,7 @@ impl Serialize for AddressType {
 }
 
 #[cfg(target_arch = "wasm32")]
-impl<'de> Deserialize<'de> for AddressType {
+impl<'de> Deserialize<'de> for Address {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
@@ -163,14 +161,14 @@ impl<'de> Deserialize<'de> for AddressType {
                 raw.bytes[30],
                 raw.bytes[31],
             ];
-            AddressType {
+            Address {
                 inner: ewasm_api::types::Address::from(byte20),
             }
         })
     }
 }
 
-impl std::str::FromStr for AddressType {
+impl std::str::FromStr for Address {
     type Err = anyhow::Error;
     #[cfg(target_arch = "wasm32")]
     fn from_str(s: &str) -> anyhow::Result<Self> {
