@@ -1,7 +1,7 @@
 use std::iter::FromIterator;
 
 use anyhow::{Context, Result};
-use regex::Regex;
+use fancy_regex::Regex;
 use tokio::{
     fs::{create_dir_all, read_to_string, write},
     process::Command,
@@ -30,19 +30,31 @@ pub async fn run() -> Result<()> {
         .context("fail to expand macro")?;
     let expanded = read_to_string(outfile_path).await?;
 
-    let sig_re = Regex::new(r"[A-Za-z0-9:_]*_SIG").unwrap();
-    let abi_re =
-        Regex::new(r#"const (?P<abi_name>[A-Za-z0-9_]*_ABI): &'static str =[^;]*;"#).unwrap();
+    let sig_re = unsafe { Regex::new(r"[A-Za-z0-9:_]*_SIG").unwrap_unchecked() };
+    let abi_re = unsafe {
+        Regex::new(r#"const (?P<abi_name>[A-Za-z0-9_]*_ABI): &'static str =[^;]*;"#)
+            .unwrap_unchecked()
+    };
+
     let total_abis: Vec<String> = sig_re
         .find_iter(&expanded)
-        .map(|m| m.as_str().replace("_SIG", "_ABI"))
+        .filter(|m| m.is_ok())
+        .map(|m| m.unwrap().as_str().replace("_SIG", "_ABI"))
         .collect();
-    let contract_abis = abi_re.captures_iter(&expanded).map(|c| {
-        (
-            c.name("abi_name").unwrap().as_str().to_string(),
-            c.get(0).unwrap().as_str().to_string(),
-        )
-    });
+    let contract_abis = abi_re
+        .captures_iter(&expanded)
+        .filter(|c| c.is_ok())
+        .map(|c| {
+            (
+                c.as_ref()
+                    .unwrap()
+                    .name("abi_name")
+                    .unwrap()
+                    .as_str()
+                    .to_string(),
+                c.unwrap().get(0).unwrap().as_str().to_string(),
+            )
+        });
 
     let all_abis = linked_hash_set::LinkedHashSet::<String>::from_iter(total_abis.iter().cloned());
     let mut lib_abis = all_abis.clone();

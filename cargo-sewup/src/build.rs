@@ -1,8 +1,8 @@
 use std::{fs::File, path::Path};
 
 use anyhow::{anyhow, Context, Result};
+use fancy_regex::Regex;
 use hex::encode;
-use regex::Regex;
 use sha2::{Digest, Sha256};
 use tokio::{
     fs::{read, read_to_string, write},
@@ -139,7 +139,7 @@ async fn build_runtime_wat(contract_wasm_path: &str) -> Result<String> {
         .context("fail to build runtime wasm")?;
     let rt_content = print_file(contract_wasm_path)?;
 
-    let hinden_export_re = Regex::new(r#"\(export "__.*\)\)\n"#).unwrap();
+    let hinden_export_re = unsafe { Regex::new(r#"\(export "__.*\)\)\n"#).unwrap_unchecked() };
     Ok(hinden_export_re
         .replace_all(&rt_content, "")
         .trim_end()
@@ -168,14 +168,20 @@ async fn build_wat(
     mem_size: usize,
     hex_string: String,
 ) -> Result<String> {
-    let eth_finish_re =
-        Regex::new(r#"\(import "ethereum" "finish" \(func (?P<eth_finish_sig>[^\s]*) "#).unwrap();
-    let eth_finish_sig = eth_finish_re
-        .captures(&tmpl)
-        .map(|cap| cap.name("eth_finish_sig").unwrap().as_str());
+    let eth_finish_re = unsafe {
+        Regex::new(r#"\(import "ethereum" "finish" \(func (?P<eth_finish_sig>[^\s]*) "#)
+            .unwrap_unchecked()
+    };
 
-    let memory_re = Regex::new(r#"\(memory \(;0;\) (?P<mem_size>\d*)"#).unwrap();
-    let mem_size = if let Some(cap) = memory_re.captures(&tmpl) {
+    let eth_finish_sig = if let Ok(Some(captures)) = eth_finish_re.captures(&tmpl) {
+        captures.name("eth_finish_sig").map(|c| c.as_str())
+    } else {
+        None
+    };
+
+    let memory_re =
+        unsafe { Regex::new(r#"\(memory \(;0;\) (?P<mem_size>\d*)"#).unwrap_unchecked() };
+    let mem_size = if let Ok(Some(cap)) = memory_re.captures(&tmpl) {
         cap.name("mem_size")
             .unwrap()
             .as_str()
@@ -193,7 +199,7 @@ async fn build_wat(
 
     content.truncate(content.len() - 1);
 
-    let export_re = Regex::new(r#"\(export.*\)\)\n"#).unwrap();
+    let export_re = unsafe { Regex::new(r#"\(export.*\)\)\n"#).unwrap_unchecked() };
     content = export_re.replace_all(&content, "").trim_end().to_string();
 
     let main_call = if let Some(eth_finish_sig) = eth_finish_sig {
@@ -204,7 +210,7 @@ async fn build_wat(
             bin_size, eth_finish_sig
         )
     } else {
-        let module_re = Regex::new(r#"\n\s*\(func \$"#).unwrap();
+        let module_re = unsafe { Regex::new(r#"\n\s*\(func \$"#).unwrap_unchecked() };
         content = module_re
             .replace(
                 &content,
@@ -275,14 +281,17 @@ async fn list_fn_sig() -> Result<Vec<(String, String)>> {
         .context("fail to expand macro")?;
     let expanded = read_to_string(outfile_path).await?;
 
-    let sig_re =
+    let sig_re = unsafe {
         Regex::new(r"(?P<sig_name>[A-Za-z0-9:_]*)_SIG: \[u8; 4\] = \[(?P<sig_value>[0-9u,\s]*)\];")
-            .unwrap();
-    let total_sig: Vec<(String, String)> = sig_re
+            .unwrap_unchecked()
+    };
+    Ok(sig_re
         .captures_iter(&expanded)
+        .filter(|c| c.is_ok())
         .map(|c| {
-            let sig_name = c.name("sig_name").unwrap().as_str();
+            let sig_name = c.as_ref().unwrap().name("sig_name").unwrap().as_str();
             let sig_values: Vec<String> = c
+                .unwrap()
                 .name("sig_value")
                 .unwrap()
                 .as_str()
@@ -298,8 +307,7 @@ async fn list_fn_sig() -> Result<Vec<(String, String)>> {
 
             (sig_name.into(), sig_hex_str)
         })
-        .collect();
-    Ok(total_sig)
+        .collect())
 }
 
 async fn build(debug: bool, contract_name: &str) -> Result<String> {
