@@ -260,14 +260,30 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }.into()
 }
 
-fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, String), &'static str> {
+fn parse_fn_attr(
+    fn_name: String,
+    attr: String,
+) -> Result<(Option<String>, String, Option<String>), &'static str> {
     let attr_str = attr.replace(" ", "").replace("\n", "");
     return if attr_str.is_empty() {
-        Ok((None, "{}".into()))
+        Ok((None, "{}".into(), None))
     } else if let Some((head, tail)) = attr_str.split_once(',') {
         if tail.is_empty() {
-            Ok((Some(head.replace("\"", "")), "{}".into()))
+            Ok((Some(head.replace("\"", "")), "{}".into(), None))
         } else {
+            let root_str = if let Ok(Some(cap)) =
+                unsafe { Regex::new(r"only_by=(?P<account>[^,]*)").unwrap_unchecked() }
+                    .captures(&attr_str)
+            {
+                Some(
+                    unsafe { cap.name("account").unwrap_unchecked() }
+                        .as_str()
+                        .into(),
+                )
+            } else {
+                None
+            };
+
             let mut json = "{".to_string();
             if let Ok(Some(cap)) =
                 unsafe { Regex::new(r"constant=(?P<constant>[^,]*)").unwrap_unchecked() }
@@ -358,10 +374,26 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
             }
 
             json.push_str(r#""type":"function"}"#);
-            Ok((Some(head.replace("\"", "")), json))
+            if head.starts_with("only_by") {
+                Ok((None, json, root_str))
+            } else {
+                Ok((Some(head.replace("\"", "")), json, root_str))
+            }
         }
+    } else if let Ok(Some(cap)) =
+        unsafe { Regex::new(r"only_by=(?P<account>[^,]*)").unwrap_unchecked() }.captures(&attr_str)
+    {
+        Ok((
+            None,
+            "{}".into(),
+            Some(
+                unsafe { cap.name("account").unwrap_unchecked() }
+                    .as_str()
+                    .into(),
+            ),
+        ))
     } else {
-        Ok((Some(attr_str.replace("\"", "")), "{}".into()))
+        Ok((Some(attr_str.replace("\"", "")), "{}".into(), None))
     };
 }
 
@@ -392,7 +424,8 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
 /// The functional signature can be specific as following ways.
 /// `#[ewasm_fn(00fdd58e)]` or #[ewasm_fn("00fdd58e")]
 ///
-/// ``` #[ewasm_fn(00fdd58e,
+/// ```compile_fail
+/// #[ewasm_fn(00fdd58e,
 /// constant=true,
 /// inputs=[
 ///     { "internalType": "address", "name": "account", "type": "address" },
@@ -411,19 +444,33 @@ fn parse_fn_attr(fn_name: String, attr: String) -> Result<(Option<String>, Strin
 /// `outputs` are `[]`; the default value of `stateMutability` is `view`; the default name is the
 /// camel case style of the function name.
 ///
+/// The handler also can be restricted by called special account with `only_by` attribute,
+/// following are examples:
+/// ```compile_fail
+/// #[ewasm_fn(only_by=8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+/// #[ewasm_fn(only_by="0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+/// #[ewasm_fn(only_by=0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+/// #[ewasm_fn(only_by="8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+/// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
-    let input = syn::parse_macro_input!(item as syn::ItemFn);
-    let name = &input.sig.ident;
+    let syn::ItemFn {
+        attrs,
+        vis,
+        sig,
+        block,
+    } = syn::parse_macro_input!(item as syn::ItemFn);
+    let syn::Block { stmts, .. } = *block;
 
-    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
+    let name = &sig.ident;
+
+    let (hex_str, abi_str, root_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
 
-    let args = &input
-        .sig
+    let args = &sig
         .inputs
         .iter()
         .map(|fn_arg| match fn_arg {
@@ -481,13 +528,34 @@ pub fn ewasm_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
         &format!("{}_SIG", name.to_string().to_ascii_uppercase()),
         Span::call_site(),
     );
-    let result = quote! {
-        pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
-        pub(crate) const #abi_info: &'static str = #abi_str;
+    let result = if let Some(root_str) = root_str {
+        let addr = root_str.replace("\"", "");
+        quote! {
+            pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+            pub(crate) const #abi_info: &'static str = #abi_str;
 
-        #[cfg(target_arch = "wasm32")]
-        #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
-        #input
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #(#attrs)*
+            #vis #sig {
+                if sewup::utils::caller() != sewup::types::Address::from_str(#addr)? {
+                    return Err(sewup::errors::HandlerError::Unauthorized.into())
+                }
+                #(#stmts)*
+            }
+        }
+    } else {
+        quote! {
+            pub const #sig_name : [u8; 4] = [#sig_0, #sig_1, #sig_2, #sig_3];
+            pub(crate) const #abi_info: &'static str = #abi_str;
+
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #(#attrs)*
+            #vis #sig {
+                #(#stmts)*
+            }
+        }
     };
     result.into()
 }
@@ -579,7 +647,7 @@ pub fn ewasm_lib_fn(attr: TokenStream, item: TokenStream) -> TokenStream {
     let input = syn::parse_macro_input!(item as syn::ItemFn);
     let name = &input.sig.ident;
 
-    let (hex_str, abi_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
+    let (hex_str, abi_str, _root_str) = match parse_fn_attr(name.to_string(), attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };

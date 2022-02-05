@@ -73,6 +73,16 @@ fn constructor() {
         .expect("there is no return for constructor currently");
 }
 
+// There are several way to add access control on a function
+// the admin account can be specified in `only_by` meta attribute as following format
+// #[ewasm_fn(only_by=8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+// #[ewasm_fn(only_by="0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+// #[ewasm_fn(only_by=0x8663DBF0cC68AaF37fC8BA262F2df4c666a41993)]
+#[ewasm_fn(only_by = "8663DBF0cC68AaF37fC8BA262F2df4c666a41993")]
+fn admin_only() -> anyhow::Result<sewup::primitives::EwasmAny> {
+    Ok(().into())
+}
+
 #[ewasm_fn]
 fn give_right_to_vote(voter: String) -> anyhow::Result<sewup::primitives::EwasmAny> {
     sewup_derive::ewasm_call_only_by!(CHAIRMAN);
