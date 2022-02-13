@@ -26,6 +26,36 @@ struct AbiIO {
     r#type: String,
 }
 
+/// Different Contract mode will treat input and output in different
+enum ContractMode {
+    /// Default mode, only return the error message, if any
+    /// This is for a scenario that you just want to modify the data on
+    /// chain only
+    DefaultMode,
+    /// Rusty mode, return serialized binary of `Result<T,E>`, this is good for rust client
+    /// This is for a scenario that you are using a rust client to operation the contract
+    RustyMode,
+    /// Auto mode, return serialize binary for `T` if the Result is Ok, else return the serialize
+    /// binary of E
+    /// This is for a scenario that you take care the result but not using Rust client
+    AutoMode,
+}
+
+/// Options can set in ewasm_main function
+#[allow(dead_code)]
+enum ContractOption {
+    /// The default message that can be used in Default mode and Auto mode
+    DefaultMessage(String),
+}
+
+fn parse_contract_mode_and_options(attr: String) -> (ContractMode, Vec<ContractOption>) {
+    match attr.to_lowercase().as_str() {
+        "auto" => (ContractMode::AutoMode, vec![]),
+        "rusty" => (ContractMode::RustyMode, vec![]),
+        _ => (ContractMode::DefaultMode, vec![]),
+    }
+}
+
 fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
@@ -148,8 +178,10 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => None,
     };
 
-    match attr.to_string().to_lowercase().as_str() {
-        "auto" if Some("EwasmAny".to_string()) == output_type  => quote! {
+    let (contract_mode, _) = parse_contract_mode_and_options(attr.to_string());
+
+    match contract_mode {
+        ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type  => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -172,9 +204,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
         },
-        // Return the inner structure from unwrap result
-        // This is for a scenario that you take care the result but not using Rust client
-        "auto" => quote! {
+        ContractMode::AutoMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -198,7 +228,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
         },
-        "rusty" if Some("EwasmAny".to_string()) == output_type  => quote! {
+        ContractMode::RustyMode if Some("EwasmAny".to_string()) == output_type  => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -215,10 +245,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 finish_data(&bin);
             }
         },
-
-        // Return all result structure
-        // This is for a scenario that you are using a rust client to operation the contract
-        "rusty" => quote! {
+        ContractMode::RustyMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -236,10 +263,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             }
         },
 
-        // Default only return error message,
-        // This is for a scenario that you just want to modify the data on
-        // chain only
-        _ => quote! {
+        ContractMode::DefaultMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
