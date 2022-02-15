@@ -124,3 +124,42 @@ fn test_parse_fn_attr_validation() {
         Err("outputs are not valid format")
     );
 }
+
+#[test]
+fn test_contract_mode_option_parser() {
+    assert_eq!(
+        parse_contract_mode_and_options("".to_string()),
+        Ok((ContractMode::DefaultMode, vec![]))
+    );
+
+    assert_eq!(
+        parse_contract_mode_and_options("auto".to_string()),
+        Ok((ContractMode::AutoMode, vec![]))
+    );
+
+    assert_eq!(
+        parse_contract_mode_and_options("rusty".to_string()),
+        Ok((ContractMode::RustyMode, vec![]))
+    );
+
+    assert_eq!(
+        parse_contract_mode_and_options("default=\"message\"".to_string()),
+        Ok((
+            ContractMode::DefaultMode,
+            vec![ContractOption::DefaultMessage("message".into())]
+        ))
+    );
+
+    assert_eq!(
+        parse_contract_mode_and_options("auto, default=\"message\"".to_string()),
+        Ok((
+            ContractMode::AutoMode,
+            vec![ContractOption::DefaultMessage("message".into())]
+        ))
+    );
+
+    assert_eq!(
+        parse_contract_mode_and_options("rusty, default=\"message\"".to_string()),
+        Err("can not set default message for rusty mode")
+    );
+}

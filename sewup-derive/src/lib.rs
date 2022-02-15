@@ -27,6 +27,7 @@ struct AbiIO {
 }
 
 /// Different Contract mode will treat input and output in different
+#[derive(Debug, PartialEq)]
 enum ContractMode {
     /// Default mode, only return the error message, if any
     /// This is for a scenario that you just want to modify the data on
@@ -43,17 +44,45 @@ enum ContractMode {
 
 /// Options can set in ewasm_main function
 #[allow(dead_code)]
+#[derive(Debug, PartialEq)]
 enum ContractOption {
     /// The default message that can be used in Default mode and Auto mode
     DefaultMessage(String),
 }
 
-fn parse_contract_mode_and_options(attr: String) -> (ContractMode, Vec<ContractOption>) {
-    match attr.to_lowercase().as_str() {
-        "auto" => (ContractMode::AutoMode, vec![]),
-        "rusty" => (ContractMode::RustyMode, vec![]),
-        _ => (ContractMode::DefaultMode, vec![]),
-    }
+fn parse_contract_mode_and_options(
+    attr: String,
+) -> Result<(ContractMode, Vec<ContractOption>), &'static str> {
+    let (arg_str, option_str) = match attr.split_once(',') {
+        Some((head, tail)) => (head, tail),
+        None => {
+            if attr.starts_with("default") {
+                ("", attr.as_str())
+            } else {
+                (attr.as_str(), "")
+            }
+        }
+    };
+    let options = if let Ok(Some(cap)) =
+        unsafe { Regex::new(r#"default.*=.*"(?<default>[^"]*)""#).unwrap_unchecked() }
+            .captures(option_str)
+    {
+        let default = unsafe { cap.name("default").unwrap_unchecked() }.as_str();
+        vec![ContractOption::DefaultMessage(default.into())]
+    } else {
+        vec![]
+    };
+    let output = match arg_str {
+        "auto" => (ContractMode::AutoMode, options),
+        "rusty" => {
+            if options.len() != 0 {
+                return Err("can not set default message for rusty mode");
+            }
+            (ContractMode::RustyMode, options)
+        }
+        _ => (ContractMode::DefaultMode, options),
+    };
+    Ok(output)
 }
 
 fn get_function_signature(function_prototype: &str) -> [u8; 4] {
@@ -178,7 +207,10 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => None,
     };
 
-    let (contract_mode, _) = parse_contract_mode_and_options(attr.to_string());
+    let (contract_mode, _) = match parse_contract_mode_and_options(attr.to_string()) {
+        Ok(o) => o,
+        Err(e) => abort_call_site!(e),
+    };
 
     match contract_mode {
         ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type  => quote! {
