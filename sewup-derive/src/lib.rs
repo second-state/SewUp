@@ -207,10 +207,16 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => None,
     };
 
-    let (contract_mode, _) = match parse_contract_mode_and_options(attr.to_string()) {
+    let (contract_mode, options) = match parse_contract_mode_and_options(attr.to_string()) {
         Ok(o) => o,
         Err(e) => abort_call_site!(e),
     };
+
+    let mut default_message = None;
+    for option in options.into_iter() {
+        let ContractOption::DefaultMessage(s) = option;
+        default_message = Some(s);
+    }
 
     match contract_mode {
         ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type  => quote! {
@@ -230,8 +236,12 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         finish_data(&r.bin);
                     },
                     Err(e) => {
-                        let error_msg = e.to_string();
-                        finish_data(&error_msg.as_bytes());
+                        if #default_message.is_some() {
+                            finish_data(#default_message.unwrap().as_bytes());
+                        } else {
+                            let error_msg = e.to_string();
+                            finish_data(&error_msg.as_bytes());
+                        }
                     }
                 }
             }
@@ -254,8 +264,12 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         finish_data(&bin);
                     },
                     Err(e) => {
-                        let error_msg = e.to_string();
-                        finish_data(&error_msg.as_bytes());
+                        if #default_message.is_some() {
+                            finish_data(#default_message.unwrap().as_bytes());
+                        } else {
+                            let error_msg = e.to_string();
+                            finish_data(&error_msg.as_bytes());
+                        }
                     }
                 }
             }
@@ -308,8 +322,12 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             pub fn main() {
                 #input
                 if let Err(e) = #name() {
-                    let error_msg = e.to_string();
-                    finish_data(&error_msg.as_bytes());
+                    if #default_message.is_some() {
+                        finish_data(#default_message.unwrap().as_bytes());
+                    } else {
+                        let error_msg = e.to_string();
+                        finish_data(&error_msg.as_bytes());
+                    }
                 }
             }
         }
