@@ -1,21 +1,31 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="helps you setup the main function of a contract"><meta name="keywords" content="rust, rustlang, rust-lang, ewasm_main"><title>ewasm_main in sewup_derive - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
-    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../sewup_derive/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="index.html">sewup_derive</a></h2><div id="sidebar-vars" data-name="ewasm_main" data-ty="attr" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">sewup_derive</a>::<wbr><a class="attr" href="#">ewasm_main</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/sewup_derive/lib.rs.html#100" title="goto source code">[src]</a></span></h1><div class="docblock item-decl"><pre class="rust attr"><code>#[ewasm_main]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>helps you setup the main function of a contract</p>
-<p>There are three different kind contract output.</p>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../sewup_derive/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><h2 class="location">Other items in<br><a href="index.html">sewup_derive</a></h2><div id="sidebar-vars" data-name="ewasm_main" data-ty="attr" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">sewup_derive</a>::<wbr><a class="attr" href="#">ewasm_main</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/sewup_derive/lib.rs.html#185" title="goto source code">[src]</a></span></h1><div class="docblock item-decl"><pre class="rust attr"><code>#[ewasm_main]</code></pre></div><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>helps you setup the main function of a contract</p>
+<p>There are three different kind contract output, and the return <code>Result</code> can based on
+<code>anyhow::Result</code> or <code>std::result::Result</code>.  If you want to use <code>std::result::Result</code>, you need
+to set up <code>default</code> option with default message in default mode and auto mode, such that there
+will be a return message in bytes let you know some error happen.</p>
 <p><code>#[ewasm_main]</code>
-The default contract output, the error will be return as a string message
+The default contract output, the Anyhow error will be return as a string message
 This is for a scenario that you just want to modify the data on
 chain only, and the error will to string than return.</p>
+<p><code>#[ewasm_main(default=&quot;message&quot;)]</code>
+The default contract output, if any error happened the default message will be returned</p>
 <p><code>#[ewasm_main(rusty)]</code>
-The rust styl output, the result object from ewasm_main function will be
+The rust style output, the result object from ewasm_main function will be
 returned, this is for a scenario that you are using a rust client to catch
 and want to catch the result from the contract.</p>
 <p><code>#[ewasm_main(auto)]</code>
-Auto unwrap the output of the result object from ewasm_main function.
+Auto unwrap the OK output of the Anyhow::Result object from ewasm_main function.
 This is for a scenario that you are using a rust non-rust client,
+and you are only care the happy case of executing the contract.</p>
+<p><code>#[ewasm_main(auto, default=&quot;message&quot;)]</code>
+Auto unwrap the OK output of the result object (it can be <code>Anyhow::Result</code>
+or <code>std::result::Result</code>) from ewasm_main function, if any error happened the default message
+will be returned.  This is for a scenario that you are using a rust non-rust client,
 and you are only care the happy case of executing the contract.</p>
 
 <div class='information'><div class='tooltip compile_fail'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered compile_fail"><code><span class="attribute">#[<span class="ident">ewasm_main</span>]</span>
-<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="ident">anyhow::Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">Contract::new</span>()<span class="question-mark">?</span>;
     <span class="kw">match</span> <span class="ident">contract</span>.<span class="ident">get_function_selector</span>()<span class="question-mark">?</span> {
         <span class="macro">ewasm_fn_sig!</span>(<span class="ident">check_input_object</span>) =&gt; <span class="macro">ewasm_input_from!</span>(<span class="ident">contract</span> <span class="kw">move</span> <span class="ident">check_input_object</span>)<span class="question-mark">?</span>,
@@ -23,5 +33,18 @@ and you are only care the happy case of executing the contract.</p>
     };
     <span class="prelude-val">Ok</span>(())
 }</code></pre></div>
+
+<div class='information'><div class='tooltip compile_fail'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered compile_fail"><code><span class="attribute">#[<span class="ident">ewasm_main</span>(<span class="ident">auto</span>, <span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Some error happen&quot;</span>)]</span>
+<span class="kw">fn</span> <span class="ident">main</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span>, ()<span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">contract</span> <span class="op">=</span> <span class="ident">sewup::primitives::Contract::new</span>().<span class="ident">expect</span>(<span class="string">&quot;contract should work&quot;</span>);
+    <span class="kw">match</span> <span class="ident">contract</span>
+        .<span class="ident">get_function_selector</span>()
+        .<span class="ident">expect</span>(<span class="string">&quot;function selector should work&quot;</span>)
+    {
+        <span class="macro">sewup_derive::ewasm_fn_sig!</span>(<span class="ident">hello</span>) =&gt; <span class="ident">hello</span>(),
+        <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(()),
+    }
+}
+</code></pre></div>
 </div></details></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="sewup_derive" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
 </body></html>
