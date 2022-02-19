@@ -236,7 +236,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         finish_data(&r.bin);
                     },
                     Err(e) => {
-                        finish_data(#default_message.unwrap().as_bytes());
+                        finish_data(&#default_message.as_bytes());
                     }
                 }
             }
@@ -281,8 +281,8 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
                         finish_data(&bin);
                     },
-                    Err(e) => {
-                        finish_data(#default_message.unwrap().as_bytes());
+                    Err(_) => {
+                        finish_data(&#default_message.as_bytes());
                     }
                 }
             }
@@ -358,7 +358,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             pub fn main() {
                 #input
                 if let Err(e) = #name() {
-                    finish_data(#default_message.unwrap().as_bytes());
+                    finish_data(#default_message.as_bytes());
                 }
             }
         },
