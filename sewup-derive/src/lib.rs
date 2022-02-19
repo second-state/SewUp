@@ -138,11 +138,11 @@ fn write_function_signature(sig_str: &str) -> String {
 /// This is for a scenario that you just want to modify the data on
 /// chain only, and the error will to string than return.
 ///
-/// `#[ewasm_main(default="messge")]`
+/// `#[ewasm_main(default="message")]`
 /// The default contract output, if any error happened the default message will be returned
 ///
 /// `#[ewasm_main(rusty)]`
-/// The rust styl output, the result object from ewasm_main function will be
+/// The rust style output, the result object from ewasm_main function will be
 /// returned, this is for a scenario that you are using a rust client to catch
 /// and want to catch the result from the contract.
 ///
