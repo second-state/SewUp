@@ -4,18 +4,26 @@ use sewup_derive::{ewasm_constructor, ewasm_fn, ewasm_main, ewasm_test};
 fn constructor() {}
 
 #[ewasm_fn]
-fn hello() -> anyhow::Result<String> {
+fn hello() -> Result<String, ()> {
     Ok("hello world".to_string())
 }
 
-#[ewasm_main(auto)]
-fn main() -> anyhow::Result<String> {
-    let contract = sewup::primitives::Contract::new()?;
-    let greeting = match contract.get_function_selector()? {
-        sewup_derive::ewasm_fn_sig!(hello) => hello()?,
-        _ => panic!("unknown handle"),
-    };
-    Ok(greeting)
+#[ewasm_fn]
+fn make_err() -> Result<String, ()> {
+    Err(())
+}
+
+#[ewasm_main(auto, default = "Some error happen")]
+fn main() -> Result<String, ()> {
+    let contract = sewup::primitives::Contract::new().expect("contract should work");
+    match contract
+        .get_function_selector()
+        .expect("function selector should work")
+    {
+        sewup_derive::ewasm_fn_sig!(hello) => hello(),
+        sewup_derive::ewasm_fn_sig!(make_err) => make_err(),
+        _ => Err(()),
+    }
 }
 
 #[ewasm_test]
@@ -31,5 +39,6 @@ mod tests {
         );
         ewasm_assert_eq!(hello(), ewasm_output_from!("hello world".to_string()));
         ewasm_auto_assert_eq!(hello(), "hello world".to_string());
+        ewasm_assert_eq!(make_err(), "Some error happen".as_bytes().to_vec());
     }
 }

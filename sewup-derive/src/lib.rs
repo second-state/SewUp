@@ -26,6 +26,65 @@ struct AbiIO {
     r#type: String,
 }
 
+/// Different Contract mode will treat input and output in different
+#[derive(Debug, PartialEq)]
+enum ContractMode {
+    /// Default mode, only return the error message, if any
+    /// This is for a scenario that you just want to modify the data on
+    /// chain only
+    DefaultMode,
+    /// Rusty mode, return serialized binary of `Result<T,E>`, this is good for rust client
+    /// This is for a scenario that you are using a rust client to operation the contract
+    RustyMode,
+    /// Auto mode, return serialize binary for `T` if the Result is Ok, else return the serialize
+    /// binary of E
+    /// This is for a scenario that you take care the result but not using Rust client
+    AutoMode,
+}
+
+/// Options can set in ewasm_main function
+#[allow(dead_code)]
+#[derive(Debug, PartialEq)]
+enum ContractOption {
+    /// The default message that can be used in Default mode and Auto mode
+    DefaultMessage(String),
+}
+
+fn parse_contract_mode_and_options(
+    attr: String,
+) -> Result<(ContractMode, Vec<ContractOption>), &'static str> {
+    let (arg_str, option_str) = match attr.split_once(',') {
+        Some((head, tail)) => (head, tail),
+        None => {
+            if attr.starts_with("default") {
+                ("", attr.as_str())
+            } else {
+                (attr.as_str(), "")
+            }
+        }
+    };
+    let options = if let Ok(Some(cap)) =
+        unsafe { Regex::new(r#"default.*=.*"(?<default>[^"]*)""#).unwrap_unchecked() }
+            .captures(option_str)
+    {
+        let default = unsafe { cap.name("default").unwrap_unchecked() }.as_str();
+        vec![ContractOption::DefaultMessage(default.into())]
+    } else {
+        vec![]
+    };
+    let output = match arg_str {
+        "auto" => (ContractMode::AutoMode, options),
+        "rusty" => {
+            if options.len() != 0 {
+                return Err("can not set default message for rusty mode");
+            }
+            (ContractMode::RustyMode, options)
+        }
+        _ => (ContractMode::DefaultMode, options),
+    };
+    Ok(output)
+}
+
 fn get_function_signature(function_prototype: &str) -> [u8; 4] {
     let mut sig = [0; 4];
     let mut hasher = Keccak::v256();
@@ -69,26 +128,38 @@ fn write_function_signature(sig_str: &str) -> String {
 
 /// helps you setup the main function of a contract
 ///
-/// There are three different kind contract output.
+/// There are three different kind contract output, and the return `Result` can based on
+/// `anyhow::Result` or `std::result::Result`.  If you want to use `std::result::Result`, you need
+/// to set up `default` option with default message in default mode and auto mode, such that there
+/// will be a return message in bytes let you know some error happen.
 ///
 /// `#[ewasm_main]`
-/// The default contract output, the error will be return as a string message
+/// The default contract output, the Anyhow error will be return as a string message
 /// This is for a scenario that you just want to modify the data on
 /// chain only, and the error will to string than return.
 ///
+/// `#[ewasm_main(default="message")]`
+/// The default contract output, if any error happened the default message will be returned
+///
 /// `#[ewasm_main(rusty)]`
-/// The rust styl output, the result object from ewasm_main function will be
+/// The rust style output, the result object from ewasm_main function will be
 /// returned, this is for a scenario that you are using a rust client to catch
 /// and want to catch the result from the contract.
 ///
 /// `#[ewasm_main(auto)]`
-/// Auto unwrap the output of the result object from ewasm_main function.
+/// Auto unwrap the OK output of the Anyhow::Result object from ewasm_main function.
 /// This is for a scenario that you are using a rust non-rust client,
+/// and you are only care the happy case of executing the contract.
+///
+/// `#[ewasm_main(auto, default="message")]`
+/// Auto unwrap the OK output of the result object (it can be `Anyhow::Result`
+/// or `std::result::Result`) from ewasm_main function, if any error happened the default message
+/// will be returned.  This is for a scenario that you are using a rust non-rust client,
 /// and you are only care the happy case of executing the contract.
 ///
 /// ```compile_fail
 /// #[ewasm_main]
-/// fn main() -> Result<()> {
+/// fn main() -> anyhow::Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
 ///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
@@ -96,6 +167,20 @@ fn write_function_signature(sig_str: &str) -> String {
 ///     };
 ///     Ok(())
 /// }
+/// ```
+/// ```compile_fail
+/// #[ewasm_main(auto, default = "Some error happen")]
+/// fn main() -> Result<String, ()> {
+///     let contract = sewup::primitives::Contract::new().expect("contract should work");
+///     match contract
+///         .get_function_selector()
+///         .expect("function selector should work")
+///     {
+///         sewup_derive::ewasm_fn_sig!(hello) => hello(),
+///         _ => Err(()),
+///     }
+/// }
+///
 /// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
@@ -148,8 +233,41 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
         _ => None,
     };
 
-    match attr.to_string().to_lowercase().as_str() {
-        "auto" if Some("EwasmAny".to_string()) == output_type  => quote! {
+    let (contract_mode, options) = match parse_contract_mode_and_options(attr.to_string()) {
+        Ok(o) => o,
+        Err(e) => abort_call_site!(e),
+    };
+
+    let mut default_message = None;
+    for option in options.into_iter() {
+        let ContractOption::DefaultMessage(s) = option;
+        default_message = Some(s);
+    }
+
+    match contract_mode {
+        ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type && default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
+                        finish_data(&r.bin);
+                    },
+                    Err(e) => {
+                        finish_data(&#default_message.as_bytes());
+                    }
+                }
+            }
+        },
+        ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type  => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -172,9 +290,30 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
         },
-        // Return the inner structure from unwrap result
-        // This is for a scenario that you take care the result but not using Rust client
-        "auto" => quote! {
+        ContractMode::AutoMode if default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
+                        let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
+                        finish_data(&bin);
+                    },
+                    Err(_) => {
+                        finish_data(&#default_message.as_bytes());
+                    }
+                }
+            }
+        },
+        ContractMode::AutoMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -198,7 +337,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 }
             }
         },
-        "rusty" if Some("EwasmAny".to_string()) == output_type  => quote! {
+        ContractMode::RustyMode if Some("EwasmAny".to_string()) == output_type  => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -215,10 +354,7 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 finish_data(&bin);
             }
         },
-
-        // Return all result structure
-        // This is for a scenario that you are using a rust client to operation the contract
-        "rusty" => quote! {
+        ContractMode::RustyMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]
@@ -235,11 +371,24 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 finish_data(&bin);
             }
         },
-
-        // Default only return error message,
-        // This is for a scenario that you just want to modify the data on
-        // chain only
-        _ => quote! {
+        ContractMode::DefaultMode if default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                if let Err(e) = #name() {
+                    finish_data(#default_message.as_bytes());
+                }
+            }
+        },
+        ContractMode::DefaultMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
             #[cfg(target_arch = "wasm32")]

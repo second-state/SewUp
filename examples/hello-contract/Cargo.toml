@@ -17,7 +17,6 @@ required-features = ["client"]
 [dependencies]
 sewup ={ version = "*", path = "../../sewup" }
 sewup-derive = { version = "*", path = "../../sewup-derive" }
-anyhow = "1.0.40"
 
 cargo-sewup = { version = "0.1.2-1", path = "../../cargo-sewup", optional = true }
 web3 = { version = "0.16.0", optional = true }
