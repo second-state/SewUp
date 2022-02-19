@@ -219,6 +219,28 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     match contract_mode {
+        ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type && default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
+                        finish_data(&r.bin);
+                    },
+                    Err(e) => {
+                        finish_data(#default_message.unwrap().as_bytes());
+                    }
+                }
+            }
+        },
         ContractMode::AutoMode if Some("EwasmAny".to_string()) == output_type  => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
@@ -236,12 +258,31 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         finish_data(&r.bin);
                     },
                     Err(e) => {
-                        if #default_message.is_some() {
-                            finish_data(#default_message.unwrap().as_bytes());
-                        } else {
-                            let error_msg = e.to_string();
-                            finish_data(&error_msg.as_bytes());
-                        }
+                        let error_msg = e.to_string();
+                        finish_data(&error_msg.as_bytes());
+                    }
+                }
+            }
+        },
+        ContractMode::AutoMode if default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                match #name() {
+                    Ok(r) =>  {
+                        let bin = bincode::serialize(&r).expect("The resuslt of `ewasm_main` should be serializable");
+                        finish_data(&bin);
+                    },
+                    Err(e) => {
+                        finish_data(#default_message.unwrap().as_bytes());
                     }
                 }
             }
@@ -264,12 +305,8 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                         finish_data(&bin);
                     },
                     Err(e) => {
-                        if #default_message.is_some() {
-                            finish_data(#default_message.unwrap().as_bytes());
-                        } else {
-                            let error_msg = e.to_string();
-                            finish_data(&error_msg.as_bytes());
-                        }
+                        let error_msg = e.to_string();
+                        finish_data(&error_msg.as_bytes());
                     }
                 }
             }
@@ -308,7 +345,23 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
                 finish_data(&bin);
             }
         },
-
+        ContractMode::DefaultMode if default_message.is_some() => quote! {
+            #[cfg(target_arch = "wasm32")]
+            use sewup::bincode;
+            #[cfg(target_arch = "wasm32")]
+            use sewup::ewasm_api::finish_data;
+            #[cfg(all(not(target_arch = "wasm32"), not(test)))]
+            pub fn main() {}
+            #[cfg(target_arch = "wasm32")]
+            #[cfg(not(any(feature = "constructor", feature = "constructor-test")))]
+            #[no_mangle]
+            pub fn main() {
+                #input
+                if let Err(e) = #name() {
+                    finish_data(#default_message.unwrap().as_bytes());
+                }
+            }
+        },
         ContractMode::DefaultMode => quote! {
             #[cfg(target_arch = "wasm32")]
             use sewup::bincode;
@@ -322,12 +375,8 @@ pub fn ewasm_main(attr: TokenStream, item: TokenStream) -> TokenStream {
             pub fn main() {
                 #input
                 if let Err(e) = #name() {
-                    if #default_message.is_some() {
-                        finish_data(#default_message.unwrap().as_bytes());
-                    } else {
-                        let error_msg = e.to_string();
-                        finish_data(&error_msg.as_bytes());
-                    }
+                    let error_msg = e.to_string();
+                    finish_data(&error_msg.as_bytes());
                 }
             }
         }
