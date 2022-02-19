@@ -22,7 +22,7 @@ fn main() -> Result<String, ()> {
     {
         sewup_derive::ewasm_fn_sig!(hello) => hello(),
         sewup_derive::ewasm_fn_sig!(make_err) => make_err(),
-        _ => panic!("unknown handle"),
+        _ => Err(()),
     }
 }
 

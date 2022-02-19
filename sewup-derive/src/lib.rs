@@ -128,12 +128,18 @@ fn write_function_signature(sig_str: &str) -> String {
 
 /// helps you setup the main function of a contract
 ///
-/// There are three different kind contract output.
+/// There are three different kind contract output, and the return `Result` can based on
+/// `anyhow::Result` or `std::result::Result`.  If you want to use `std::result::Result`, you need
+/// to set up `default` option with default message in default mode and auto mode, such that there
+/// will be a return message in bytes let you know some error happen.
 ///
 /// `#[ewasm_main]`
-/// The default contract output, the error will be return as a string message
+/// The default contract output, the Anyhow error will be return as a string message
 /// This is for a scenario that you just want to modify the data on
 /// chain only, and the error will to string than return.
+///
+/// `#[ewasm_main(default="messge")]`
+/// The default contract output, if any error happened the default message will be returned
 ///
 /// `#[ewasm_main(rusty)]`
 /// The rust styl output, the result object from ewasm_main function will be
@@ -141,13 +147,19 @@ fn write_function_signature(sig_str: &str) -> String {
 /// and want to catch the result from the contract.
 ///
 /// `#[ewasm_main(auto)]`
-/// Auto unwrap the output of the result object from ewasm_main function.
+/// Auto unwrap the OK output of the Anyhow::Result object from ewasm_main function.
 /// This is for a scenario that you are using a rust non-rust client,
+/// and you are only care the happy case of executing the contract.
+///
+/// `#[ewasm_main(auto, default="message")]`
+/// Auto unwrap the OK output of the result object (it can be `Anyhow::Result`
+/// or `std::result::Result`) from ewasm_main function, if any error happened the default message
+/// will be returned.  This is for a scenario that you are using a rust non-rust client,
 /// and you are only care the happy case of executing the contract.
 ///
 /// ```compile_fail
 /// #[ewasm_main]
-/// fn main() -> Result<()> {
+/// fn main() -> anyhow::Result<()> {
 ///     let contract = Contract::new()?;
 ///     match contract.get_function_selector()? {
 ///         ewasm_fn_sig!(check_input_object) => ewasm_input_from!(contract move check_input_object)?,
@@ -155,6 +167,20 @@ fn write_function_signature(sig_str: &str) -> String {
 ///     };
 ///     Ok(())
 /// }
+/// ```
+/// ```compile_fail
+/// #[ewasm_main(auto, default = "Some error happen")]
+/// fn main() -> Result<String, ()> {
+///     let contract = sewup::primitives::Contract::new().expect("contract should work");
+///     match contract
+///         .get_function_selector()
+///         .expect("function selector should work")
+///     {
+///         sewup_derive::ewasm_fn_sig!(hello) => hello(),
+///         _ => Err(()),
+///     }
+/// }
+///
 /// ```
 #[proc_macro_error]
 #[proc_macro_attribute]
