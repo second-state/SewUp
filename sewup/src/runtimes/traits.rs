@@ -4,6 +4,7 @@
 //!
 //! Besides, the VMErrors, VMmessage VMresult are rust style wrarp for
 //! evm_error, evm_message and evm_result
+use std::collections::HashMap;
 
 use anyhow::Result;
 use evmc_sys::evmc_call_kind;
@@ -192,4 +193,7 @@ pub trait RT {
 
     /// Deploy contract
     fn deploy(&mut self, msg: VMMessage) -> Result<()>;
+
+    /// Get storage
+    fn get_storage(&self, account: &[u8; 20]) -> Option<&HashMap<[u8; 32], [u8; 32]>>;
 }

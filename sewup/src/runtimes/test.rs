@@ -112,6 +112,10 @@ impl RT for TestRuntime {
         self.execute(msg)?;
         Ok(())
     }
+
+    fn get_storage(&self, account: &[u8; 20]) -> Option<&HashMap<[u8; 32], [u8; 32]>> {
+        self.host.store.get(account)
+    }
 }
 
 #[derive(Default)]
