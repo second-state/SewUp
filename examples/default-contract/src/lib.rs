@@ -25,6 +25,8 @@ fn check_input_object(s: SimpleStruct) -> anyhow::Result<()> {
     // `cargo test -- --nocapture`
     // Or you may checkout the log file set by following `ewasm_test` macro
     // `#[ewasm_test(log=/tmp/default.log)]`
+    let test = [1; 32];
+    sewup::ewasm_dbg!(test);
     if !sewup::ewasm_dbg!(s.trust) {
         return Err(Error::NotTrustedInput.into());
     }
