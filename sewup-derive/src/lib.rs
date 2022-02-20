@@ -1615,6 +1615,7 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 use std::path::PathBuf;
                 use std::process::Command;
                 use std::sync::Arc;
+                use sewup::runtimes::traits::RT;
 
                 fn _build_wasm(opt: Option<String>) -> String {
                     let cargo_cmd = format!("cargo build --release --target=wasm32-unknown-unknown {}", opt.unwrap_or_default());
@@ -2028,4 +2029,15 @@ pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
     };
 
     output.into()
+}
+
+#[proc_macro]
+pub fn ewasm_storage_debug(_item: TokenStream) -> TokenStream {
+    quote!({
+        let __cloned = _runtime.clone();
+        let __borrowed = __cloned.borrow();
+        let __storage = __borrowed.get_storage(&[0; 20]);
+        eprintln!("STORAGE: {:?}", __storage);
+    })
+    .into()
 }

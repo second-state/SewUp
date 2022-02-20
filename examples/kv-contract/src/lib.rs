@@ -271,10 +271,14 @@ fn main() -> anyhow::Result<sewup::primitives::EwasmAny> {
 mod tests {
     use super::*;
     use errors::KVError;
-    use sewup_derive::{ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output, ewasm_fn_sig};
+    use sewup_derive::{
+        ewasm_assert_eq, ewasm_assert_ok, ewasm_err_output, ewasm_fn_sig, ewasm_storage_debug,
+    };
 
     #[ewasm_test]
     fn test_execute_storage_operations() {
+        ewasm_storage_debug!();
+
         ewasm_assert_eq!(
             non_register_function(),
             ewasm_err_output!(KVError::UnknownHandle)
@@ -341,7 +345,11 @@ mod tests {
         ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
         ewasm_assert_eq!(get_value_to_bucket1(100), new_expected_of_100_value);
 
+        ewasm_storage_debug!();
+
         ewasm_assert_ok!(drop_bucket_than_check());
+
+        ewasm_storage_debug!();
     }
 
     #[ewasm_test]
