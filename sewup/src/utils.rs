@@ -23,7 +23,7 @@ macro_rules! ewasm_dbg {
     ($val:expr $(,)?) => {
         match $val {
             tmp => {
-                $crate::utils::log(format!("[{}:{}] {} = {:#?}", file!(), line!(), stringify!($val), &tmp));
+                $crate::utils::log(format!("[{}:{}] {} = {:?}", file!(), line!(), stringify!($val), &tmp));
                 tmp
             }
         }
