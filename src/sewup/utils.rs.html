@@ -172,6 +172,39 @@
 <span id="171">171</span>
 <span id="172">172</span>
 <span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
 </pre><pre class="rust"><code><span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">ewasm_api::finish_data</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">target_arch</span> <span class="op">=</span> <span class="string">&quot;wasm32&quot;</span>)]</span>
@@ -297,6 +330,39 @@
     <span class="kw">match</span> <span class="ident">R::deserialize</span>(<span class="ident">value</span>) {
         <span class="prelude-val">Ok</span>(<span class="ident">r</span>) =&gt; <span class="ident">r</span>,
         <span class="prelude-val">Err</span>(<span class="kw">_</span>) =&gt; <span class="macro">panic!</span>(<span class="string">&quot;type incorrect&quot;</span>),
+    }
+}
+
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pretty_print_storage</span>(
+    <span class="ident">desc</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+    <span class="ident">may_storage</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">std::collections::HashMap</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>], [<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="op">&gt;</span>,
+) -&gt; <span class="ident">String</span> {
+    <span class="kw">match</span> <span class="ident">may_storage</span> {
+        <span class="prelude-val">Some</span>(<span class="ident">storage</span>) =&gt; {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">desc</span>.<span class="ident">trim</span>().<span class="ident">is_empty</span>() {
+                <span class="string">&quot;Storage: \n&quot;</span>.<span class="ident">to_string</span>()
+            } <span class="kw">else</span> {
+                <span class="macro">format!</span>(<span class="string">&quot;Storage at {}:\n&quot;</span>, <span class="ident">desc</span>)
+            };
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">chrunks</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="op">&lt;</span>([<span class="ident">u8</span>; <span class="number">32</span>], [<span class="ident">u8</span>; <span class="number">32</span>])<span class="op">&gt;</span><span class="ident">::new</span>();
+            <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">storage</span>.<span class="ident">iter</span>() {
+                <span class="ident">chrunks</span>.<span class="ident">push</span>((<span class="kw-2">*</span><span class="ident">k</span>, <span class="kw-2">*</span><span class="ident">v</span>));
+            }
+            <span class="ident">chrunks</span>.<span class="ident">sort_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="number">0</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="number">0</span>));
+            <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">chrunks</span>.<span class="ident">drain</span>(..) {
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">try_str</span> <span class="op">=</span> <span class="ident">String::new</span>();
+                <span class="kw">for</span> <span class="ident">b</span> <span class="kw">in</span> <span class="ident">v</span>.<span class="ident">iter</span>() {
+                    <span class="kw">if</span> <span class="number">31</span> <span class="op">&lt;</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">b</span> <span class="op">&lt;</span> <span class="number">127</span> {
+                        <span class="ident">try_str</span>.<span class="ident">push</span>(<span class="kw-2">*</span><span class="ident">b</span> <span class="kw">as</span> <span class="ident">char</span>);
+                    } <span class="kw">else</span> {
+                        <span class="ident">try_str</span>.<span class="ident">push</span>(<span class="string">&#39; &#39;</span>);
+                    }
+                }
+                <span class="ident">output</span>.<span class="ident">push_str</span>(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;{}|{}|{:?}\n&quot;</span>, <span class="ident">hex::encode</span>(<span class="ident">k</span>), <span class="ident">try_str</span>, <span class="ident">v</span>));
+            }
+            <span class="ident">output</span>
+        }
+        <span class="prelude-val">None</span> =&gt; <span class="string">&quot;Storage not use at this moment&quot;</span>.<span class="ident">into</span>(),
     }
 }
 

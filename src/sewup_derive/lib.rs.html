@@ -2030,6 +2030,26 @@
 <span id="2029">2029</span>
 <span id="2030">2030</span>
 <span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
+<span id="2034">2034</span>
+<span id="2035">2035</span>
+<span id="2036">2036</span>
+<span id="2037">2037</span>
+<span id="2038">2038</span>
+<span id="2039">2039</span>
+<span id="2040">2040</span>
+<span id="2041">2041</span>
+<span id="2042">2042</span>
+<span id="2043">2043</span>
+<span id="2044">2044</span>
+<span id="2045">2045</span>
+<span id="2046">2046</span>
+<span id="2047">2047</span>
+<span id="2048">2048</span>
+<span id="2049">2049</span>
+<span id="2050">2050</span>
+<span id="2051">2051</span>
 </pre><pre class="rust"><code><span class="attribute">#![<span class="ident">feature</span>(<span class="ident">box_into_inner</span>)]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
@@ -3647,6 +3667,7 @@
                 use std::path::PathBuf;
                 use std::process::Command;
                 use std::sync::Arc;
+                use sewup::runtimes::traits::RT;
 
                 fn _build_wasm(opt: Option&lt;String&gt;) -&gt; String {
                     let cargo_cmd = format!(&quot;cargo build --release --target=wasm32-unknown-unknown {}&quot;, opt.unwrap_or_default());
@@ -4060,6 +4081,25 @@
     };
 
     <span class="ident">output</span>.<span class="ident">into</span>()
+}
+
+<span class="doccomment">/// helps you inspect the storage in test</span>
+<span class="doccomment">/// this will print out the detail of storage, you can add description on the storage debug or</span>
+<span class="doccomment">/// leave  it empty</span>
+<span class="doccomment">/// ```compile_fail</span>
+<span class="doccomment">/// ewasm_storage_debug!();</span>
+<span class="doccomment">/// ewasm_storage_debug!(description);</span>
+<span class="doccomment">/// ```</span>
+<span class="attribute">#[<span class="ident">proc_macro</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ewasm_storage_debug</span>(<span class="ident">item</span>: <span class="ident">TokenStream</span>) -&gt; <span class="ident">TokenStream</span> {
+    <span class="kw">let</span> <span class="ident">desc</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">to_string</span>();
+    <span class="macro">quote!</span>({
+        <span class="kw">let</span> <span class="ident">__cloned</span> <span class="op">=</span> <span class="ident">_runtime</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">__borrowed</span> <span class="op">=</span> <span class="ident">__cloned</span>.<span class="ident">borrow</span>();
+        <span class="kw">let</span> <span class="ident">__storage</span> <span class="op">=</span> <span class="ident">__borrowed</span>.<span class="ident">get_storage</span>(<span class="kw-2">&amp;</span>[<span class="number">0</span>; <span class="number">20</span>]);
+        <span class="macro">eprintln!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">sewup::utils::pretty_print_storage</span>(#<span class="ident">desc</span>, <span class="ident">__storage</span>));
+    })
+    .<span class="ident">into</span>()
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="sewup_derive" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>

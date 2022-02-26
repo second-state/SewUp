@@ -194,12 +194,17 @@
 <span id="193">193</span>
 <span id="194">194</span>
 <span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
 </pre><pre class="rust"><code><span class="doccomment">//! RT Trait</span>
 <span class="doccomment">//! This trait help you abstract any VM into application runtime layer,</span>
 <span class="doccomment">//! such that you can easily use your VM with SewUp libs.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Besides, the VMErrors, VMmessage VMresult are rust style wrarp for</span>
 <span class="doccomment">//! evm_error, evm_message and evm_result</span>
+<span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 
 <span class="kw">use</span> <span class="ident">anyhow::Result</span>;
 <span class="kw">use</span> <span class="ident">evmc_sys::evmc_call_kind</span>;
@@ -388,6 +393,9 @@
 
     <span class="doccomment">/// Deploy contract</span>
     <span class="kw">fn</span> <span class="ident">deploy</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">VMMessage</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Get storage</span>
+    <span class="kw">fn</span> <span class="ident">get_storage</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">account</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>; <span class="number">20</span>]) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span>[<span class="ident">u8</span>; <span class="number">32</span>], [<span class="ident">u8</span>; <span class="number">32</span>]<span class="op">&gt;</span><span class="op">&gt;</span>;
 }
 </code></pre></div>
 </section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="sewup" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
