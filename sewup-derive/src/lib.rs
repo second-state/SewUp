@@ -1615,6 +1615,7 @@ pub fn ewasm_test(attr: TokenStream, item: TokenStream) -> TokenStream {
                 use std::path::PathBuf;
                 use std::process::Command;
                 use std::sync::Arc;
+                use sewup::runtimes::traits::RT;
 
                 fn _build_wasm(opt: Option<String>) -> String {
                     let cargo_cmd = format!("cargo build --release --target=wasm32-unknown-unknown {}", opt.unwrap_or_default());
@@ -2028,4 +2029,23 @@ pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
     };
 
     output.into()
+}
+
+/// helps you inspect the storage in test
+/// this will print out the detail of storage, you can add description on the storage debug or
+/// leave  it empty
+/// ```compile_fail
+/// ewasm_storage_debug!();
+/// ewasm_storage_debug!(description);
+/// ```
+#[proc_macro]
+pub fn ewasm_storage_debug(item: TokenStream) -> TokenStream {
+    let desc = item.to_string();
+    quote!({
+        let __cloned = _runtime.clone();
+        let __borrowed = __cloned.borrow();
+        let __storage = __borrowed.get_storage(&[0; 20]);
+        eprintln!("{}", sewup::utils::pretty_print_storage(#desc, __storage));
+    })
+    .into()
 }

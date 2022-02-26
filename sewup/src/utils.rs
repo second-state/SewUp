@@ -126,6 +126,39 @@ where
     }
 }
 
+pub fn pretty_print_storage(
+    desc: &str,
+    may_storage: Option<&std::collections::HashMap<[u8; 32], [u8; 32]>>,
+) -> String {
+    match may_storage {
+        Some(storage) => {
+            let mut output = if desc.trim().is_empty() {
+                "Storage: \n".to_string()
+            } else {
+                format!("Storage at {}:\n", desc)
+            };
+            let mut chrunks = Vec::<([u8; 32], [u8; 32])>::new();
+            for (k, v) in storage.iter() {
+                chrunks.push((*k, *v));
+            }
+            chrunks.sort_by(|a, b| a.0.cmp(&b.0));
+            for (k, v) in chrunks.drain(..) {
+                let mut try_str = String::new();
+                for b in v.iter() {
+                    if 31 < *b && *b < 127 {
+                        try_str.push(*b as char);
+                    } else {
+                        try_str.push(' ');
+                    }
+                }
+                output.push_str(&format!("{}|{}|{:?}\n", hex::encode(k), try_str, v));
+            }
+            output
+        }
+        None => "Storage not use at this moment".into(),
+    }
+}
+
 #[cfg(feature = "default")]
 #[cfg(test)]
 mod tests {
