@@ -2039,8 +2039,7 @@ pub fn ewasm_storage_debug(item: TokenStream) -> TokenStream {
         let __cloned = _runtime.clone();
         let __borrowed = __cloned.borrow();
         let __storage = __borrowed.get_storage(&[0; 20]);
-        let __formated = sewup::utils::pretty_print_storage(#desc, __storage);
-        eprintln!("{}", __formated);
+        eprintln!("{}", sewup::utils::pretty_print_storage(#desc, __storage));
     })
     .into()
 }
