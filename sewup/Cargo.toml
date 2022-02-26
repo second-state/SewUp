@@ -40,6 +40,7 @@ token = [ ]
 kv = []
 rdb = []
 debug = []
+single-bucket = []
 
 [package.metadata.docs.rs]
 all-features = true

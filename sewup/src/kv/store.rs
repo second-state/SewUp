@@ -26,6 +26,9 @@ type Tenants = HashMap<String, Option<RawBucket>>;
 /// Besides, there may be more than one bucket in store, such that you can
 /// easily save different kind of key/value pair in the chain.
 ///
+/// If you want to take all storage as a key value without bucket, you may checkout
+/// the `single-bucket` feature.
+///
 /// ### Store Header
 /// The fist 32 bytes are reserved as header of the store,
 ///
