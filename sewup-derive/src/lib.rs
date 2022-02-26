@@ -2031,13 +2031,16 @@ pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
     output.into()
 }
 
+/// helps you inspect the storage
 #[proc_macro]
-pub fn ewasm_storage_debug(_item: TokenStream) -> TokenStream {
+pub fn ewasm_storage_debug(item: TokenStream) -> TokenStream {
+    let desc = item.to_string();
     quote!({
         let __cloned = _runtime.clone();
         let __borrowed = __cloned.borrow();
         let __storage = __borrowed.get_storage(&[0; 20]);
-        eprintln!("STORAGE: {:?}", __storage);
+        let __formated = sewup::utils::pretty_print_storage(#desc, __storage);
+        eprintln!("{}", __formated);
     })
     .into()
 }

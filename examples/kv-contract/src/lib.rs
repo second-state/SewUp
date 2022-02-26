@@ -345,11 +345,11 @@ mod tests {
         ewasm_assert_ok!(put_pair_to_bucket1(input_pair));
         ewasm_assert_eq!(get_value_to_bucket1(100), new_expected_of_100_value);
 
-        ewasm_storage_debug!();
+        ewasm_storage_debug!(point1);
 
         ewasm_assert_ok!(drop_bucket_than_check());
 
-        ewasm_storage_debug!();
+        ewasm_storage_debug!(point2);
     }
 
     #[ewasm_test]
