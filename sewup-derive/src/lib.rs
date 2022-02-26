@@ -2031,7 +2031,13 @@ pub fn ewasm_call_only_by(item: TokenStream) -> TokenStream {
     output.into()
 }
 
-/// helps you inspect the storage
+/// helps you inspect the storage in test
+/// this will print out the detail of storage, you can add description on the storage debug or
+/// leave  it empty
+/// ```compile_fail
+/// ewasm_storage_debug!();
+/// ewasm_storage_debug!(description);
+/// ```
 #[proc_macro]
 pub fn ewasm_storage_debug(item: TokenStream) -> TokenStream {
     let desc = item.to_string();
