@@ -1,13 +1,15 @@
 # SewUp
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/second-state/SewUp/CI)
-[![Generic badge](https://img.shields.io/badge/sewup-0.1.13-green.svg)](https://crates.io/crates/sewup)
+[![Generic badge](https://img.shields.io/badge/sewup-0.1.14-green.svg)](https://crates.io/crates/sewup)
 [![Generic badge](https://img.shields.io/badge/SewUpDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup/)
-[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.13-green.svg)](https://crates.io/crates/sewup-derive)
+[![Generic badge](https://img.shields.io/badge/sewup_derive-0.1.14-green.svg)](https://crates.io/crates/sewup-derive)
 [![Generic badge](https://img.shields.io/badge/SewUpDeriveDoc-main-green.svg)](https://second-state.github.io/SewUp/sewup_derive/)
-[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.13-green.svg)](https://crates.io/crates/cargo-sewup)
+[![Generic badge](https://img.shields.io/badge/cargo_sewup-0.1.14-green.svg)](https://crates.io/crates/cargo-sewup)
 
 **S**econdstate **EW**asm **U**tility **P**rogram, a library helps you sew up your Ethereum project with Rust and just like development in a common backend.
+Sewup is a blockchain Rust contract framwork base on ethereum webassembly, and suitable for any ethereum wabassembly blockchain.
+If you have question about Rust contract framework, and about the different between these, you can check out this wiki page of [contract framework](https://github.com/second-state/SewUp/wiki/Contract-Framework).
 There is an [issue](https://github.com/second-state/SewUp/issues/116) on building document on Doc.rs, please kindly use the [document](https://second-state.github.io/SewUp/sewup/) of master instead.
 Furthermore, there is also [wiki site](https://github.com/second-state/SewUp/wiki) helps you work with sewup, once you got problems or confusing you can learn more on the wiki.
 
@@ -47,9 +49,10 @@ Add `sewup` with the features and the `sewup-derive` into Cargo.toml, and setup 
 as following, then you are ready to build contract with sewup.
 
 Features list (should select none or one of following)
-- kv - for writing contract as key value database
+- kv - for writing contract as key value database withb bucket partition
 - rdb - for writing contract as relational database
 - token - for writing ERC-20, ERC-721, ERC-1155 tokens
+- single-bucket(working in process) - for the storage without bucket partition
 
 Beside, we suggest you using `anyhow` to handle your result and error, but not limited to,
 if you want to use other error crate please checkout `#[ewasm_main(rusty)]` and learn more.
@@ -62,7 +65,9 @@ It is easy to setup your sewup project with cargo-sewup with following commands.
 - `cargo install cargo-sewup`
 - `cargo sewup init`
 You can use `-m <rusty|auto>` option to initialize different type of sewup project,
-and you can learn more about the project configure with the [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide) wiki page.
+and you can learn more about the project configure
+from the doc of [ewasm\_main!](https://second-state.github.io/SewUp/sewup_derive/attr.ewasm_main.html)
+and the wiki page of [Deploy Guide](https://github.com/second-state/SewUp/wiki/Develop-Guide).
 
 ### Interact
 There are so many clients can interact with contract.
@@ -79,7 +84,9 @@ If you want to learn more details about the testing flow, please check out [Test
 
 
 ### Debugging
-Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`, and run the contract with message output by `cargo test -- --nocapture`.
+Furthermore, you can debug your ewasm contract with debug macro `sewup::ewasm_dbg!`.
+Besides, it easy to know the exactly detail of storage with `ewasm_storage_debug!`.
+And all these debug method should run test of the contract with message output by `cargo test -- --nocapture`.
 To learn more about the usage, you check out the examples in the [example](./examples/) folder.
 
 ### Deployment
