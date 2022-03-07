@@ -39,6 +39,7 @@ rdb = []
 token = []
 test = ["rdb", "kv"]
 debug = []
+single-bucket = ["kv"]
 
 [package.metadata.docs.rs]
 all-features = true
