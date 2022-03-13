@@ -58,23 +58,208 @@ pub enum Pair1<K, V> {
     Item1(Item<K, V>),
 }
 
-pub trait SingleBucket1<K1, V1>: SingleBucket + Default {
-    type Pairs: Iterator<Item = Pair1<K1, V1>>;
-}
-
 pub enum Pair2<K1, V1, K2, V2> {
     Item1(Item<K1, V1>),
     Item2(Item<K2, V2>),
 }
 
-#[derive(Default, SerializeDerive)]
-pub struct SingleBucket2<K1: Default, V1: Default, K2: Default, V2: Default> {
-    phantom_k1: PhantomData<K1>,
-    phantom_v1: PhantomData<V1>,
-    phantom_k2: PhantomData<K2>,
-    phantom_v2: PhantomData<V2>,
+macro_rules! single_bucket_factory {
+    ($i:expr, ($($o:ident),+)) => {
+        paste::paste! {
+            #[derive(Default, SerializeDerive)]
+            #[allow(non_snake_case)]
+            pub struct [< SingleBucket $i >]<$($o: Default),+> {
+                $($o: PhantomData<$o>),+
+            }
+            impl<$($o: Default),+> SingleBucket for [<  SingleBucket $i >] <$($o),+> {
+
+            }
+        }
+    }
 }
-impl<K1: Default, V1: Default, K2: Default, V2: Default> SingleBucket
-    for SingleBucket2<K1, V1, K2, V2>
-{
-}
+
+single_bucket_factory!(1, (K1, V1));
+single_bucket_factory!(2, (K1, V1, K2, V2));
+single_bucket_factory!(3, (K1, V1, K2, V2, K3, V3));
+single_bucket_factory!(4, (K1, V1, K2, V2, K3, V3, K4, V4));
+single_bucket_factory!(5, (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5));
+single_bucket_factory!(6, (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6));
+single_bucket_factory!(7, (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7));
+single_bucket_factory!(
+    8,
+    (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8)
+);
+single_bucket_factory!(
+    9,
+    (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9)
+);
+single_bucket_factory!(
+    10,
+    (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10)
+);
+single_bucket_factory!(
+    11,
+    (K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11)
+);
+single_bucket_factory!(
+    12,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12
+    )
+);
+single_bucket_factory!(
+    13,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13
+    )
+);
+single_bucket_factory!(
+    14,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14
+    )
+);
+single_bucket_factory!(
+    15,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15
+    )
+);
+single_bucket_factory!(
+    16,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16
+    )
+);
+single_bucket_factory!(
+    17,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17
+    )
+);
+single_bucket_factory!(
+    18,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18
+    )
+);
+single_bucket_factory!(
+    19,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19
+    )
+);
+single_bucket_factory!(
+    20,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20
+    )
+);
+single_bucket_factory!(
+    21,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21
+    )
+);
+single_bucket_factory!(
+    22,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22
+    )
+);
+single_bucket_factory!(
+    23,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23
+    )
+);
+single_bucket_factory!(
+    24,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24
+    )
+);
+single_bucket_factory!(
+    25,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25
+    )
+);
+single_bucket_factory!(
+    26,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26
+    )
+);
+single_bucket_factory!(
+    27,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27
+    )
+);
+single_bucket_factory!(
+    28,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27, K28, V28
+    )
+);
+single_bucket_factory!(
+    29,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27, K28, V28, K29, V29
+    )
+);
+single_bucket_factory!(
+    30,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27, K28, V28, K29, V29,
+        K30, V30
+    )
+);
+single_bucket_factory!(
+    31,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27, K28, V28, K29, V29,
+        K30, V30, K31, V31
+    )
+);
+single_bucket_factory!(
+    32,
+    (
+        K1, V1, K2, V2, K3, V3, K4, V4, K5, V5, K6, V6, K7, V7, K8, V8, K9, V9, K10, V10, K11, V11,
+        K12, V12, K13, V13, K14, V14, K15, V15, K16, V16, K17, V17, K18, V18, K19, V19, K20, V20,
+        K21, V21, K22, V22, K23, V23, K24, V24, K25, V25, K26, V26, K27, V27, K28, V28, K29, V29,
+        K30, V30, K31, V31, K32, V32
+    )
+);
