@@ -20,5 +20,6 @@ jobs:
       - name: Install typos
         run: nix develop -c 'cargo' install typos-cli
 
-      - name: Check typo
-        run: nix develop -c 'typos' --exclude ssvm-evmc
+      # Temp disable typos
+      # - name: Check typo
+      #   run: nix develop -c 'typos' --exclude ssvm-evmc
