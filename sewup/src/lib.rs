@@ -21,11 +21,17 @@ pub mod token;
 #[cfg(feature = "token")]
 pub use token::*;
 
-/// help you storage thing as key value object pair
+/// help you storage thing as key value object pair with multiple bucket
 #[cfg(feature = "kv")]
 pub mod kv;
 #[cfg(feature = "kv")]
 pub use kv::*;
+
+/// help you storage thing as key value object pair
+#[cfg(feature = "single-bucket")]
+pub mod single_bucket;
+#[cfg(feature = "single-bucket")]
+pub use single_bucket::*;
 
 /// help you storage thing as records in tables
 #[cfg(feature = "rdb")]

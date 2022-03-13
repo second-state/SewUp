@@ -1,0 +1,33 @@
+[package]
+name = "sb-contract"
+version = "0.1.0"
+authors = ["Antonio Yang <yanganto@gmail.com>"]
+edition = "2021"
+description = "The example contract using sewup single bucket feature"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+anyhow = "1.0.40"
+serde = "1.0"
+serde_derive = "1.0"
+
+sewup = { version = "*", path = "../../sewup", features = [ "single-bucket" ] }
+sewup-derive = { version = "*", path = "../../sewup-derive", features = [ "single-bucket" ] }
+thiserror = "1.0.24"
+
+[profile.release]
+incremental = false
+panic = "abort"
+lto = true
+opt-level = "z"
+
+[profile.release.package.kv-contract]
+incremental = false
+opt-level = "z"
+
+[features]
+constructor = []
+constructor-test = []

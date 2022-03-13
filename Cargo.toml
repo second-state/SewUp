@@ -18,4 +18,5 @@ exclude = [
     "examples/rdb-contract",
     "examples/rusty-contract",
     "examples/ballot-contract",
+    "examples/sb-contract",
 ]

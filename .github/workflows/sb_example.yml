@@ -1,0 +1,32 @@
+name: Example
+
+concurrency:
+  group: single-bucket-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  single-bucket-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - uses: cachix/install-nix-action@v15
+        with:
+          nix_path: nixpkgs=channel:nixos-unstable
+
+      # Currently, there is issue when running with ssvm with this test case
+      - name: Run example
+        run: nix develop -c 'build-example-test' sb
+
+      # - name: Deploy test
+      #   run: nix develop -c 'cli-build-test' sb

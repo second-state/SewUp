@@ -51,3 +51,7 @@ jobs:
 
       - name: KV feature test
         run: nix develop -c cargo test -p sewup --features=kv --no-default-features
+
+      # TODO Fix me when test ready
+      - name: Build Single bucket feature
+        run: nix develop -c cargo build -p sewup --features=single-bucket --no-default-features
