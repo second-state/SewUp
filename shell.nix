@@ -22,7 +22,5 @@ clangStdenv.mkDerivation {
     llvmPackages_10.llvm
     lld_10
     boost
-  ] ++ stdenv.lib.optionals stdenv.isDarwin [
-    darwin.apple_sdk.frameworks.Security
   ];
 }
